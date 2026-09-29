@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import type { Mock } from 'vitest';
 
 import { version } from '../package.json';
 import { HotCodePushError } from './errors';
-import { HttpClient, withRetry, withTimeout } from './http-client';
+import { HttpClient, resolvePath, withRetry, withTimeout } from './http-client';
+import { resolveSentRequest, stubFetch } from './test-helpers';
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -95,6 +95,34 @@ describe('HttpClient', () => {
     });
   });
 
+  test('should send the query without its undefined values and empty lists when a query is set', async () => {
+    const fetchMock = stubFetch();
+
+    await new HttpClient({}).fetchJson({
+      method: 'GET',
+      path: '/v1/organizations/organization/members',
+      query: { limit: 10, name: undefined, offset: 0, relations: [] },
+    });
+
+    expect(resolveSentRequest(fetchMock).url).toBe(
+      'https://api.hotcodepush.com/v1/organizations/organization/members?limit=10&offset=0',
+    );
+  });
+
+  test('should send a list in the query as a comma list', async () => {
+    const fetchMock = stubFetch();
+
+    await new HttpClient({}).fetchJson({
+      method: 'GET',
+      path: '/v1/apps/app/releases/release',
+      query: { relations: ['bundle', 'channel'] },
+    });
+
+    expect(resolveSentRequest(fetchMock).url).toBe(
+      'https://api.hotcodepush.com/v1/apps/app/releases/release?relations=bundle%2Cchannel',
+    );
+  });
+
   test('should return the parsed body when the response has one', async () => {
     stubFetch(() => Response.json({ id: 'channel' }));
 
@@ -124,6 +152,71 @@ describe('HttpClient', () => {
       code: 'E_UNAUTHENTICATED',
       status: 401,
     });
+  });
+});
+
+describe('HttpClient.fetchCreatingPost', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  test('should send the given idempotency key when one is set', async () => {
+    const fetchMock = stubFetch();
+
+    await new HttpClient({}).fetchCreatingPost({
+      body: { name: 'Acme' },
+      idempotencyKey: 'key',
+      path: '/v1/organizations',
+    });
+
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      body: { name: 'Acme' },
+      headers: { 'Idempotency-Key': 'key' },
+      method: 'POST',
+    });
+  });
+
+  test('should send one generated idempotency key on every attempt when none is set', async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response(null, { status: 503 }))
+      .mockResolvedValueOnce(Response.json({ id: 'organization' }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const createPromise = new HttpClient({}).fetchCreatingPost({
+      body: { name: 'Acme' },
+      path: '/v1/organizations',
+    });
+    await vi.runAllTimersAsync();
+    await createPromise;
+
+    const [firstKey, secondKey] = fetchMock.mock.calls.map(
+      ([, init]) =>
+        (init?.headers as Record<string, string>)['Idempotency-Key'],
+    );
+    expect(firstKey).toMatch(/^[0-9a-f-]{36}$/);
+    expect(secondKey).toBe(firstKey);
+  });
+});
+
+describe('resolvePath', () => {
+  test('should fill the template with the encoded parameters', () => {
+    expect(
+      resolvePath('/v1/apps/{appId}/channels/{channelId}', {
+        appId: 'app',
+        channelId: 'a/b',
+      }),
+    ).toBe('/v1/apps/app/channels/a%2Fb');
+  });
+
+  test('should throw when a parameter is missing', () => {
+    expect(() => resolvePath('/v1/apps/{appId}', {})).toThrow(
+      'The path parameter appId of /v1/apps/{appId} is missing.',
+    );
   });
 });
 
@@ -214,9 +307,3 @@ describe('withTimeout', () => {
     ).rejects.toMatchObject({ name: 'TimeoutError' });
   });
 });
-
-function stubFetch(createResponse: () => Response): Mock<typeof fetch> {
-  const fetchMock = vi.fn<typeof fetch>(async () => createResponse());
-  vi.stubGlobal('fetch', fetchMock);
-  return fetchMock;
-}

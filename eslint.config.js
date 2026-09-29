@@ -15,7 +15,13 @@ export default defineConfig(
       '@typescript-eslint/consistent-type-imports': 'error',
       'import-x/no-extraneous-dependencies': [
         'error',
-        { devDependencies: ['**/*.test.ts', '**/*.config.*'] },
+        {
+          devDependencies: [
+            '**/*.config.*',
+            '**/*.test.ts',
+            'src/test-helpers.ts',
+          ],
+        },
       ],
       'import-x/order': ['error', { alphabetize: { order: 'asc' } }],
     },

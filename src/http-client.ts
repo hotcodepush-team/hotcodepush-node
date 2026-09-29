@@ -1,5 +1,7 @@
 import { version } from '../package.json';
 import { resolveHotCodePushError } from './errors';
+import type { paths } from './generated/schema';
+import type { IdempotencyOptions } from './types';
 
 const DEFAULT_BASE_URL = 'https://api.hotcodepush.com';
 const DEFAULT_CLIENT = `node/${version}`;
@@ -7,10 +9,20 @@ const INITIAL_RETRY_DELAY_MS = 500;
 const MAX_ATTEMPTS = 3;
 const TIMEOUT_MS = 60_000;
 
+export interface FetchCreatingPostOptions extends IdempotencyOptions {
+  body: unknown;
+  path: string;
+}
+
 export interface FetchJsonOptions {
   body?: unknown;
+  headers?: Record<string, string>;
   method: 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
   path: string;
+  /**
+   * Undefined values and empty lists are left out; a list is sent as a comma list.
+   */
+  query?: Record<string, number | readonly string[] | string | undefined>;
 }
 
 export interface HttpClientOptions {
@@ -41,9 +53,25 @@ export class HttpClient {
     this.headers = resolveHeaders(options);
   }
 
+  /**
+   * A creating `POST`, sent with an `Idempotency-Key`: the caller's, or one generated for this call and kept across its retries.
+   */
+  public async fetchCreatingPost<T>(
+    options: FetchCreatingPostOptions,
+  ): Promise<T> {
+    return this.fetchJson({
+      body: options.body,
+      headers: {
+        'Idempotency-Key': options.idempotencyKey ?? crypto.randomUUID(),
+      },
+      method: 'POST',
+      path: options.path,
+    });
+  }
+
   public async fetchJson<T>(options: FetchJsonOptions): Promise<T> {
     const fetchWithRetryAndTimeout = withRetry(withTimeout(fetch, TIMEOUT_MS));
-    const url = new URL(options.path, this.baseUrl);
+    const url = this.resolveUrl(options);
     const requestInit = this.resolveRequestInit(options);
     const response = await fetchWithRetryAndTimeout(url, requestInit);
     const text = await response.text();
@@ -54,14 +82,26 @@ export class HttpClient {
   }
 
   private resolveRequestInit(options: FetchJsonOptions): RequestInit {
+    const headers = { ...this.headers, ...options.headers };
     if (options.body === undefined) {
-      return { headers: this.headers, method: options.method };
+      return { headers, method: options.method };
     }
     return {
       body: JSON.stringify(options.body),
-      headers: { ...this.headers, 'Content-Type': 'application/json' },
+      headers: { ...headers, 'Content-Type': 'application/json' },
       method: options.method,
     };
+  }
+
+  private resolveUrl(options: FetchJsonOptions): URL {
+    const url = new URL(options.path, this.baseUrl);
+    for (const [name, value] of Object.entries(options.query ?? {})) {
+      const queryValue = typeof value === 'object' ? value.join(',') : value;
+      if (queryValue !== undefined && queryValue !== '') {
+        url.searchParams.set(name, String(queryValue));
+      }
+    }
+    return url;
   }
 }
 
@@ -78,6 +118,23 @@ function resolveHeaders(options: HttpClientOptions): Record<string, string> {
     headers.Authorization = `Bearer ${options.token}`;
   }
   return headers;
+}
+
+/**
+ * Fills a path template of the OpenAPI snapshot, `/v1/apps/{appId}`, with its encoded parameters;
+ * a template the document lacks does not compile.
+ */
+export function resolvePath(
+  template: keyof paths,
+  parameters: Record<string, string> = {},
+): string {
+  return template.replace(/\{(\w+)\}/g, (_placeholder, name: string) => {
+    const parameter = parameters[name];
+    if (parameter === undefined) {
+      throw new Error(`The path parameter ${name} of ${template} is missing.`);
+    }
+    return encodeURIComponent(parameter);
+  });
 }
 
 function sleep(milliseconds: number): Promise<void> {

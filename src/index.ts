@@ -1,3 +1,17 @@
 export { HotCodePush } from './client';
 export type { HotCodePushOptions } from './client';
 export { HotCodePushError } from './errors';
+export type * from './resources/apps';
+export type * from './resources/channel-indexes';
+export type * from './resources/channel-releases';
+export type * from './resources/channels';
+export type * from './resources/health';
+export type * from './resources/invitations';
+export type * from './resources/members';
+export type * from './resources/organization-apps';
+export type * from './resources/organization-invitations';
+export type * from './resources/organizations';
+export type * from './resources/releases';
+export type * from './resources/rollbacks';
+export type * from './resources/users';
+export type { IdempotencyOptions } from './types';

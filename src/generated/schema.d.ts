@@ -212,6 +212,114 @@ export interface paths {
         patch: operations["patchV1OrganizationsByOrganizationId"];
         trace?: never;
     };
+    "/v1/apps/{appId}/bundles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the bundles
+         * @description The app's uploaded bundles, newest first; the store builds' embedded bundles are listed under embedded-bundles. `isInUse` selects the bundles an active or paused release serves.
+         */
+        get: operations["getV1AppsByAppIdBundles"];
+        put?: never;
+        /**
+         * Create a bundle
+         * @description Creates the bundle from its manifest — platforms, version label, files with path, hash and size, fingerprint, git provenance — and answers the hashes the app lacks with their upload URLs; the bundle is `uploading` until completed.
+         */
+        post: operations["postV1AppsByAppIdBundles"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a bundle
+         * @description One bundle, with the derived expiry — `unusedSince` plus the retention — while it is in use nowhere.
+         */
+        get: operations["getV1AppsByAppIdBundlesByBundleId"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a bundle
+         * @description Deletes the bundle now, not by retention: refused while a release serves it or a store build registered it as its embedded bundle; its manifest, pack and delta packs go with it, and the files no other bundle of the app lists.
+         */
+        delete: operations["deleteV1AppsByAppIdBundlesByBundleId"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/pack": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Upload the full pack
+         * @description The full pack, one per bundle, streamed under its prefix; `Content-Length` declares the bytes.
+         */
+        put: operations["putV1AppsByAppIdBundlesByBundleIdPack"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Upload a delta pack
+         * @description The delta pack from a base bundle of the app, streamed under the bundle's prefix; `Content-Length` declares the bytes.
+         */
+        put: operations["putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleId"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Complete a bundle
+         * @description Verifies every listed file, the pack and the delta packs are present, writes the manifest envelope at the bundle's key and sets `ready`; a completed bundle answers itself again.
+         */
+        post: operations["postV1AppsByAppIdBundlesByBundleIdComplete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/apps/{appId}/channels": {
         parameters: {
             query?: never;
@@ -363,6 +471,150 @@ export interface paths {
          */
         post: operations["postV1AppsByAppIdChannelsByChannelIdRollbacks"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/embedded-bundles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the embedded bundles
+         * @description The app's registered store builds, newest first; `?relations=bundle` embeds each one's bundle.
+         */
+        get: operations["getV1AppsByAppIdEmbeddedBundles"];
+        put?: never;
+        /**
+         * Register an embedded bundle
+         * @description Registers the bundle compiled into a store build with its binary identity — platform, binary version, build, fingerprint — its files uploaded first through the file endpoints. Create-only on the identity: an identical re-registration answers the row, a conflicting fingerprint is refused, and `force` updates it.
+         */
+        post: operations["postV1AppsByAppIdEmbeddedBundles"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/embedded-bundles/{embeddedBundleId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get an embedded bundle
+         * @description One registered store build; `?relations=bundle` embeds its bundle.
+         */
+        get: operations["getV1AppsByAppIdEmbeddedBundlesByEmbeddedBundleId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/files/{sha256}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Upload a file
+         * @description Uploads one file of the web build: the body is the file gzip-compressed, `Content-Length` its size, and the path the SHA-256 of the uncompressed content, checked as the bytes pass; a hash the app already holds answers the existing file.
+         */
+        put: operations["putV1AppsByAppIdFilesBySha256"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/files/{sha256}/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start a multipart upload
+         * @description Starts a multipart upload for a larger file; the parts follow, every one but the last at least five mebibytes and all of one size.
+         */
+        post: operations["postV1AppsByAppIdFilesBySha256Uploads"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/files/{sha256}/uploads/{uploadId}/parts/{partNumber}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Upload a part
+         * @description One part of a multipart upload, its bytes as the body.
+         */
+        put: operations["putV1AppsByAppIdFilesBySha256UploadsByUploadIdPartsByPartNumber"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/files/{sha256}/uploads/{uploadId}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Complete a multipart upload
+         * @description Assembles the parts and checks the content's hash by one streamed read; a mismatch leaves nothing behind.
+         */
+        post: operations["postV1AppsByAppIdFilesBySha256UploadsByUploadIdComplete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/files/{sha256}/uploads/{uploadId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Abort a multipart upload
+         * @description Aborts a multipart upload, discarding its parts.
+         */
+        delete: operations["deleteV1AppsByAppIdFilesBySha256UploadsByUploadId"];
         options?: never;
         head?: never;
         patch?: never;
@@ -762,6 +1014,15 @@ export interface operations {
                         error: unknown[];
                         data: unknown;
                     };
+                };
+            };
+            /** @description E_APP_NAME_TAKEN */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, unknown>;
                 };
             };
             /** @description E_APPS_LIMIT_REACHED */
@@ -1369,6 +1630,441 @@ export interface operations {
             };
         };
     };
+    getV1AppsByAppIdBundles: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                bundleVersion?: string;
+                isInUse?: "false" | "true";
+                platform?: "android" | "ios";
+                state?: "ready" | "uploading";
+            };
+            header?: never;
+            path: {
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The bundles. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        bundleVersion: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        expiresAt: string | null;
+                        fingerprint: string | null;
+                        /** @enum {string} */
+                        framework: "capacitor" | "cordova" | "expo" | "react-native";
+                        gitMessage: string | null;
+                        gitRef: string | null;
+                        gitRemote: string | null;
+                        gitSha: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        isGitDirty: boolean | null;
+                        manifestSha256: string | null;
+                        number: number;
+                        platforms: ("android" | "ios")[];
+                        signature: string | null;
+                        sizeBytes: number;
+                        /** @enum {string} */
+                        state: "ready" | "uploading";
+                        unusedSince: string | null;
+                        /** Format: date-time */
+                        updatedAt: string;
+                    }[];
+                };
+            };
+            /** @description Validation Error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown[];
+                        data: unknown;
+                    };
+                };
+            };
+        };
+    };
+    postV1AppsByAppIdBundles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    bundleVersion: string;
+                    files: {
+                        path: string;
+                        sha256: string;
+                        sizeBytes: number;
+                    }[];
+                    /** @default null */
+                    fingerprint?: string | null;
+                    /** @default null */
+                    gitMessage?: string | null;
+                    /** @default null */
+                    gitRef?: string | null;
+                    /** @default null */
+                    gitRemote?: string | null;
+                    /** @default null */
+                    gitSha?: string | null;
+                    /** @default null */
+                    isGitDirty?: boolean | null;
+                    platforms: ("android" | "ios")[];
+                };
+            };
+        };
+        responses: {
+            /** @description The bundle. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        bundleVersion: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        expiresAt: string | null;
+                        fingerprint: string | null;
+                        /** @enum {string} */
+                        framework: "capacitor" | "cordova" | "expo" | "react-native";
+                        gitMessage: string | null;
+                        gitRef: string | null;
+                        gitRemote: string | null;
+                        gitSha: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        isGitDirty: boolean | null;
+                        manifestSha256: string | null;
+                        number: number;
+                        platforms: ("android" | "ios")[];
+                        signature: string | null;
+                        sizeBytes: number;
+                        /** @enum {string} */
+                        state: "ready" | "uploading";
+                        unusedSince: string | null;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        uploads: {
+                            files: {
+                                sha256: string;
+                                sizeBytes: number;
+                                /** Format: uri */
+                                url: string;
+                            }[];
+                            /** Format: uri */
+                            pack: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation Error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown[];
+                        data: unknown;
+                    };
+                };
+            };
+            /** @description E_BUNDLE_TOO_LARGE */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, unknown>;
+                };
+            };
+            /** @description E_STORAGE_LIMIT_REACHED or E_FILES_PER_BUNDLE_LIMIT_REACHED */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, unknown>;
+                };
+            };
+        };
+    };
+    getV1AppsByAppIdBundlesByBundleId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The bundle. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        bundleVersion: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        expiresAt: string | null;
+                        fingerprint: string | null;
+                        /** @enum {string} */
+                        framework: "capacitor" | "cordova" | "expo" | "react-native";
+                        gitMessage: string | null;
+                        gitRef: string | null;
+                        gitRemote: string | null;
+                        gitSha: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        isGitDirty: boolean | null;
+                        manifestSha256: string | null;
+                        number: number;
+                        platforms: ("android" | "ios")[];
+                        signature: string | null;
+                        sizeBytes: number;
+                        /** @enum {string} */
+                        state: "ready" | "uploading";
+                        unusedSince: string | null;
+                        /** Format: date-time */
+                        updatedAt: string;
+                    };
+                };
+            };
+        };
+    };
+    deleteV1AppsByAppIdBundlesByBundleId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The bundle is gone. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description E_BUNDLE_IN_USE */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, unknown>;
+                };
+            };
+        };
+    };
+    putV1AppsByAppIdBundlesByBundleIdPack: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        /** @description The pack bytes. */
+        requestBody?: {
+            content: {
+                "application/x-tar": unknown;
+            };
+        };
+        responses: {
+            /** @description The pack, stored. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        sizeBytes: number;
+                    };
+                };
+            };
+            /** @description E_BUNDLE_TOO_LARGE */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, unknown>;
+                };
+            };
+            /** @description E_STORAGE_LIMIT_REACHED */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, unknown>;
+                };
+            };
+        };
+    };
+    putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                baseBundleId: string;
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        /** @description The delta pack bytes. */
+        requestBody?: {
+            content: {
+                "application/x-tar": unknown;
+            };
+        };
+        responses: {
+            /** @description The delta pack, stored. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        sizeBytes: number;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown[];
+                        data: unknown;
+                    };
+                };
+            };
+            /** @description E_BUNDLE_TOO_LARGE */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, unknown>;
+                };
+            };
+            /** @description E_STORAGE_LIMIT_REACHED */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, unknown>;
+                };
+            };
+        };
+    };
+    postV1AppsByAppIdBundlesByBundleIdComplete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The bundle, ready. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        bundleVersion: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        expiresAt: string | null;
+                        fingerprint: string | null;
+                        /** @enum {string} */
+                        framework: "capacitor" | "cordova" | "expo" | "react-native";
+                        gitMessage: string | null;
+                        gitRef: string | null;
+                        gitRemote: string | null;
+                        gitSha: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        isGitDirty: boolean | null;
+                        manifestSha256: string | null;
+                        number: number;
+                        platforms: ("android" | "ios")[];
+                        signature: string | null;
+                        sizeBytes: number;
+                        /** @enum {string} */
+                        state: "ready" | "uploading";
+                        unusedSince: string | null;
+                        /** Format: date-time */
+                        updatedAt: string;
+                    };
+                };
+            };
+            /** @description E_UPLOAD_INCOMPLETE */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, unknown>;
+                };
+            };
+        };
+    };
     getV1AppsByAppIdChannels: {
         parameters: {
             query?: {
@@ -1814,6 +2510,7 @@ export interface operations {
                             bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
+                            expiresAt: string | null;
                             fingerprint: string | null;
                             /** @enum {string} */
                             framework: "capacitor" | "cordova" | "expo" | "react-native";
@@ -1824,7 +2521,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             isGitDirty: boolean | null;
-                            manifestSha256: string;
+                            manifestSha256: string | null;
                             number: number;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
@@ -2023,6 +2720,7 @@ export interface operations {
                             bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
+                            expiresAt: string | null;
                             fingerprint: string | null;
                             /** @enum {string} */
                             framework: "capacitor" | "cordova" | "expo" | "react-native";
@@ -2033,7 +2731,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             isGitDirty: boolean | null;
-                            manifestSha256: string;
+                            manifestSha256: string | null;
                             number: number;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
@@ -2214,6 +2912,7 @@ export interface operations {
                             bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
+                            expiresAt: string | null;
                             fingerprint: string | null;
                             /** @enum {string} */
                             framework: "capacitor" | "cordova" | "expo" | "react-native";
@@ -2224,7 +2923,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             isGitDirty: boolean | null;
-                            manifestSha256: string;
+                            manifestSha256: string | null;
                             number: number;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
@@ -2362,6 +3061,600 @@ export interface operations {
             };
         };
     };
+    getV1AppsByAppIdEmbeddedBundles: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                relations?: string;
+            };
+            header?: never;
+            path: {
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The embedded bundles. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        binaryBuild: string;
+                        binaryVersion: string;
+                        bundle?: {
+                            /** Format: uuid */
+                            appId: string;
+                            bundleVersion: string;
+                            /** Format: date-time */
+                            createdAt: string;
+                            expiresAt: string | null;
+                            fingerprint: string | null;
+                            /** @enum {string} */
+                            framework: "capacitor" | "cordova" | "expo" | "react-native";
+                            gitMessage: string | null;
+                            gitRef: string | null;
+                            gitRemote: string | null;
+                            gitSha: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            isGitDirty: boolean | null;
+                            manifestSha256: string | null;
+                            number: number;
+                            platforms: ("android" | "ios")[];
+                            signature: string | null;
+                            sizeBytes: number;
+                            /** @enum {string} */
+                            state: "ready" | "uploading";
+                            unusedSince: string | null;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                        /** Format: uuid */
+                        bundleId: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        fingerprint: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        platform: "android" | "ios";
+                        /** Format: date-time */
+                        updatedAt: string;
+                    }[];
+                };
+            };
+            /** @description Validation Error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown[];
+                        data: unknown;
+                    };
+                };
+            };
+        };
+    };
+    postV1AppsByAppIdEmbeddedBundles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    binaryBuild: string;
+                    binaryVersion: string;
+                    files: {
+                        path: string;
+                        sha256: string;
+                        sizeBytes: number;
+                    }[];
+                    /** @default null */
+                    fingerprint?: string | null;
+                    /** @default false */
+                    force?: boolean;
+                    /** @enum {string} */
+                    platform: "android" | "ios";
+                };
+            };
+        };
+        responses: {
+            /** @description The registration, unchanged or updated with `force`. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        binaryBuild: string;
+                        binaryVersion: string;
+                        bundle?: {
+                            /** Format: uuid */
+                            appId: string;
+                            bundleVersion: string;
+                            /** Format: date-time */
+                            createdAt: string;
+                            expiresAt: string | null;
+                            fingerprint: string | null;
+                            /** @enum {string} */
+                            framework: "capacitor" | "cordova" | "expo" | "react-native";
+                            gitMessage: string | null;
+                            gitRef: string | null;
+                            gitRemote: string | null;
+                            gitSha: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            isGitDirty: boolean | null;
+                            manifestSha256: string | null;
+                            number: number;
+                            platforms: ("android" | "ios")[];
+                            signature: string | null;
+                            sizeBytes: number;
+                            /** @enum {string} */
+                            state: "ready" | "uploading";
+                            unusedSince: string | null;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                        /** Format: uuid */
+                        bundleId: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        fingerprint: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        platform: "android" | "ios";
+                        /** Format: date-time */
+                        updatedAt: string;
+                    };
+                };
+            };
+            /** @description The registration. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        binaryBuild: string;
+                        binaryVersion: string;
+                        bundle?: {
+                            /** Format: uuid */
+                            appId: string;
+                            bundleVersion: string;
+                            /** Format: date-time */
+                            createdAt: string;
+                            expiresAt: string | null;
+                            fingerprint: string | null;
+                            /** @enum {string} */
+                            framework: "capacitor" | "cordova" | "expo" | "react-native";
+                            gitMessage: string | null;
+                            gitRef: string | null;
+                            gitRemote: string | null;
+                            gitSha: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            isGitDirty: boolean | null;
+                            manifestSha256: string | null;
+                            number: number;
+                            platforms: ("android" | "ios")[];
+                            signature: string | null;
+                            sizeBytes: number;
+                            /** @enum {string} */
+                            state: "ready" | "uploading";
+                            unusedSince: string | null;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                        /** Format: uuid */
+                        bundleId: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        fingerprint: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        platform: "android" | "ios";
+                        /** Format: date-time */
+                        updatedAt: string;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown[];
+                        data: unknown;
+                    };
+                };
+            };
+            /** @description E_EMBED_CONFLICT or E_UPLOAD_INCOMPLETE */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, unknown>;
+                };
+            };
+        };
+    };
+    getV1AppsByAppIdEmbeddedBundlesByEmbeddedBundleId: {
+        parameters: {
+            query?: {
+                relations?: string;
+            };
+            header?: never;
+            path: {
+                embeddedBundleId: string;
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The embedded bundle. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        binaryBuild: string;
+                        binaryVersion: string;
+                        bundle?: {
+                            /** Format: uuid */
+                            appId: string;
+                            bundleVersion: string;
+                            /** Format: date-time */
+                            createdAt: string;
+                            expiresAt: string | null;
+                            fingerprint: string | null;
+                            /** @enum {string} */
+                            framework: "capacitor" | "cordova" | "expo" | "react-native";
+                            gitMessage: string | null;
+                            gitRef: string | null;
+                            gitRemote: string | null;
+                            gitSha: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            isGitDirty: boolean | null;
+                            manifestSha256: string | null;
+                            number: number;
+                            platforms: ("android" | "ios")[];
+                            signature: string | null;
+                            sizeBytes: number;
+                            /** @enum {string} */
+                            state: "ready" | "uploading";
+                            unusedSince: string | null;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                        /** Format: uuid */
+                        bundleId: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        fingerprint: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        platform: "android" | "ios";
+                        /** Format: date-time */
+                        updatedAt: string;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown[];
+                        data: unknown;
+                    };
+                };
+            };
+        };
+    };
+    putV1AppsByAppIdFilesBySha256: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sha256: string;
+                appId: string;
+            };
+            cookie?: never;
+        };
+        /** @description The gzip bytes. */
+        requestBody?: {
+            content: {
+                "application/gzip": unknown;
+            };
+        };
+        responses: {
+            /** @description The file, already present. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        sha256: string;
+                        sizeBytes: number;
+                    };
+                };
+            };
+            /** @description The file, stored. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        sha256: string;
+                        sizeBytes: number;
+                    };
+                };
+            };
+            /** @description E_HASH_MISMATCH */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, unknown>;
+                };
+            };
+            /** @description E_BUNDLE_TOO_LARGE */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, unknown>;
+                };
+            };
+            /** @description E_STORAGE_LIMIT_REACHED */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, unknown>;
+                };
+            };
+        };
+    };
+    postV1AppsByAppIdFilesBySha256Uploads: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sha256: string;
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The upload id the parts carry. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        uploadId: string;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown[];
+                        data: unknown;
+                    };
+                };
+            };
+        };
+    };
+    putV1AppsByAppIdFilesBySha256UploadsByUploadIdPartsByPartNumber: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sha256: string;
+                uploadId: string;
+                partNumber: number;
+                appId: string;
+            };
+            cookie?: never;
+        };
+        /** @description The part's bytes. */
+        requestBody?: {
+            content: {
+                "application/gzip": unknown;
+            };
+        };
+        responses: {
+            /** @description The part, to hand back at completion. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        etag: string;
+                        partNumber: number;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown[];
+                        data: unknown;
+                    };
+                };
+            };
+            /** @description E_BUNDLE_TOO_LARGE */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, unknown>;
+                };
+            };
+        };
+    };
+    postV1AppsByAppIdFilesBySha256UploadsByUploadIdComplete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sha256: string;
+                uploadId: string;
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    parts: {
+                        etag: string;
+                        partNumber: number;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description The file, stored. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        sha256: string;
+                        sizeBytes: number;
+                    };
+                };
+            };
+            /** @description E_HASH_MISMATCH */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, unknown>;
+                };
+            };
+            /** @description E_UPLOAD_INCOMPLETE */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, unknown>;
+                };
+            };
+        };
+    };
+    deleteV1AppsByAppIdFilesBySha256UploadsByUploadId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sha256: string;
+                uploadId: string;
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The upload is gone. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown[];
+                        data: unknown;
+                    };
+                };
+            };
+        };
+    };
     getV1AppsByAppIdReleases: {
         parameters: {
             query?: {
@@ -2394,6 +3687,7 @@ export interface operations {
                             bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
+                            expiresAt: string | null;
                             fingerprint: string | null;
                             /** @enum {string} */
                             framework: "capacitor" | "cordova" | "expo" | "react-native";
@@ -2404,7 +3698,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             isGitDirty: boolean | null;
-                            manifestSha256: string;
+                            manifestSha256: string | null;
                             number: number;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
@@ -2553,6 +3847,7 @@ export interface operations {
                             bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
+                            expiresAt: string | null;
                             fingerprint: string | null;
                             /** @enum {string} */
                             framework: "capacitor" | "cordova" | "expo" | "react-native";
@@ -2563,7 +3858,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             isGitDirty: boolean | null;
-                            manifestSha256: string;
+                            manifestSha256: string | null;
                             number: number;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
@@ -2718,6 +4013,7 @@ export interface operations {
                             bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
+                            expiresAt: string | null;
                             fingerprint: string | null;
                             /** @enum {string} */
                             framework: "capacitor" | "cordova" | "expo" | "react-native";
@@ -2728,7 +4024,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             isGitDirty: boolean | null;
-                            manifestSha256: string;
+                            manifestSha256: string | null;
                             number: number;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
@@ -2893,6 +4189,7 @@ export interface operations {
                             bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
+                            expiresAt: string | null;
                             fingerprint: string | null;
                             /** @enum {string} */
                             framework: "capacitor" | "cordova" | "expo" | "react-native";
@@ -2903,7 +4200,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             isGitDirty: boolean | null;
-                            manifestSha256: string;
+                            manifestSha256: string | null;
                             number: number;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
@@ -3045,6 +4342,7 @@ export interface operations {
                             bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
+                            expiresAt: string | null;
                             fingerprint: string | null;
                             /** @enum {string} */
                             framework: "capacitor" | "cordova" | "expo" | "react-native";
@@ -3055,7 +4353,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             isGitDirty: boolean | null;
-                            manifestSha256: string;
+                            manifestSha256: string | null;
                             number: number;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
@@ -3197,6 +4495,7 @@ export interface operations {
                             bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
+                            expiresAt: string | null;
                             fingerprint: string | null;
                             /** @enum {string} */
                             framework: "capacitor" | "cordova" | "expo" | "react-native";
@@ -3207,7 +4506,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             isGitDirty: boolean | null;
-                            manifestSha256: string;
+                            manifestSha256: string | null;
                             number: number;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
@@ -3433,6 +4732,15 @@ export interface operations {
                         error: unknown[];
                         data: unknown;
                     };
+                };
+            };
+            /** @description E_APP_NAME_TAKEN */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, unknown>;
                 };
             };
         };

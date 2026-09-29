@@ -8,7 +8,7 @@ import { resolveSentRequest, stubFetch } from './test-helpers';
 
 interface OpenApiOperation {
   parameters?: { in: string; name: string }[];
-  requestBody?: unknown;
+  requestBody?: { content: Record<string, unknown> };
 }
 
 interface OpenApiDocument {
@@ -16,18 +16,62 @@ interface OpenApiDocument {
 }
 
 const APP_ID = '7c0f3a52-1d8e-4b6a-9f21-5e3c8a0d4b17';
+const BASE_BUNDLE_ID = '8e2d6b1f-5a47-4c93-b0e8-7f1a3d5c9e20';
 const BUNDLE_ID = '2a9e6c14-8b3f-4d70-a5e2-91c7f0b3d864';
 const CHANNEL_ID = 'e41b7d09-3c6a-4f85-b2d1-6a8f0c9e3b52';
+const EMBEDDED_BUNDLE_ID = '3f6a9c2e-7b14-4d58-9e03-b2c8d6f1a475';
+const FILE = { path: 'index.html', sha256: 'a'.repeat(64), sizeBytes: 5 };
 const INVITATION_ID = '9d3c5e81-6f2a-4b07-8c14-3e7a1f9b0d26';
 const MEMBER_ID = '5b8a2f47-0e9c-4d31-a6b8-2c4f7e1d9a03';
 const ORGANIZATION_ID = 'c6e0b3a8-4d1f-4a92-b7e5-8f3d2c0a6b19';
 const RELEASE_ID = '0f7d4c2b-9a6e-4e18-83b5-d1c9a7f2e604';
+const SHA256 = 'a'.repeat(64);
+const UPLOAD_ID = 'upload';
 
 /**
  * One call per resource method with every option it can send, so a path, method,
- * query parameter or body the document lacks fails here.
+ * query parameter, body or content type the document lacks fails here.
  */
 const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
+  'apps.bundles.complete': hotCodePush =>
+    hotCodePush.apps.bundles.complete({ appId: APP_ID, bundleId: BUNDLE_ID }),
+  'apps.bundles.create': hotCodePush =>
+    hotCodePush.apps.bundles.create({
+      appId: APP_ID,
+      bundleVersion: '1.0.0',
+      files: [FILE],
+      gitSha: 'b'.repeat(40),
+      idempotencyKey: 'key',
+      platforms: ['android'],
+    }),
+  'apps.bundles.delete': hotCodePush =>
+    hotCodePush.apps.bundles.delete({ appId: APP_ID, bundleId: BUNDLE_ID }),
+  'apps.bundles.deltas.upload': hotCodePush =>
+    hotCodePush.apps.bundles.deltas.upload({
+      appId: APP_ID,
+      baseBundleId: BASE_BUNDLE_ID,
+      body: new Blob(['delta']),
+      bundleId: BUNDLE_ID,
+    }),
+  'apps.bundles.get': hotCodePush =>
+    hotCodePush.apps.bundles.get({ appId: APP_ID, bundleId: BUNDLE_ID }),
+  'apps.bundles.list': hotCodePush =>
+    hotCodePush.apps.bundles.list({
+      appId: APP_ID,
+      bundleVersion: '1.0.0',
+      isInUse: 'true',
+      limit: 10,
+      offset: 10,
+      platform: 'ios',
+      state: 'ready',
+    }),
+  'apps.bundles.pack.upload': hotCodePush =>
+    hotCodePush.apps.bundles.pack.upload({
+      appId: APP_ID,
+      body: new Blob(['pack']).stream(),
+      bundleId: BUNDLE_ID,
+      contentLength: 4,
+    }),
   'apps.channels.create': hotCodePush =>
     hotCodePush.apps.channels.create({
       appId: APP_ID,
@@ -81,6 +125,62 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       name: 'beta',
     }),
   'apps.delete': hotCodePush => hotCodePush.apps.delete({ appId: APP_ID }),
+  'apps.embeddedBundles.create': hotCodePush =>
+    hotCodePush.apps.embeddedBundles.create({
+      appId: APP_ID,
+      binaryBuild: '42',
+      binaryVersion: '1.0.0',
+      files: [FILE],
+      force: true,
+      idempotencyKey: 'key',
+      platform: 'android',
+    }),
+  'apps.embeddedBundles.get': hotCodePush =>
+    hotCodePush.apps.embeddedBundles.get({
+      appId: APP_ID,
+      embeddedBundleId: EMBEDDED_BUNDLE_ID,
+      relations: ['bundle'],
+    }),
+  'apps.embeddedBundles.list': hotCodePush =>
+    hotCodePush.apps.embeddedBundles.list({
+      appId: APP_ID,
+      limit: 10,
+      offset: 10,
+      relations: ['bundle'],
+    }),
+  'apps.files.upload': hotCodePush =>
+    hotCodePush.apps.files.upload({
+      appId: APP_ID,
+      body: new Blob(['gzip']),
+      sha256: SHA256,
+    }),
+  'apps.files.uploads.complete': hotCodePush =>
+    hotCodePush.apps.files.uploads.complete({
+      appId: APP_ID,
+      parts: [{ etag: 'etag', partNumber: 1 }],
+      sha256: SHA256,
+      uploadId: UPLOAD_ID,
+    }),
+  'apps.files.uploads.create': hotCodePush =>
+    hotCodePush.apps.files.uploads.create({
+      appId: APP_ID,
+      idempotencyKey: 'key',
+      sha256: SHA256,
+    }),
+  'apps.files.uploads.delete': hotCodePush =>
+    hotCodePush.apps.files.uploads.delete({
+      appId: APP_ID,
+      sha256: SHA256,
+      uploadId: UPLOAD_ID,
+    }),
+  'apps.files.uploads.parts.upload': hotCodePush =>
+    hotCodePush.apps.files.uploads.parts.upload({
+      appId: APP_ID,
+      body: new Blob(['part']),
+      partNumber: 1,
+      sha256: SHA256,
+      uploadId: UPLOAD_ID,
+    }),
   'apps.get': hotCodePush => hotCodePush.apps.get({ appId: APP_ID }),
   'apps.releases.get': hotCodePush =>
     hotCodePush.apps.releases.get({
@@ -217,7 +317,7 @@ describe('the OpenAPI snapshot', () => {
   });
 
   test.each(Object.entries(CALLS))(
-    'should document the path, method, query and body %s sends',
+    'should document the path, method, query, body and content type %s sends',
     async (_name, callResourceMethod) => {
       const fetchMock = stubFetch();
 
@@ -229,6 +329,10 @@ describe('the OpenAPI snapshot', () => {
       const documentedQueryNames = (operation?.parameters ?? [])
         .filter(parameter => parameter.in === 'query')
         .map(parameter => parameter.name);
+      const documentedContentTypes = Object.keys(
+        operation?.requestBody?.content ?? {},
+      );
+      const sentContentType = sentRequest.headers['Content-Type'];
       expect(
         operation,
         `${sentRequest.method} ${url.pathname} is not in openapi.json`,
@@ -237,7 +341,12 @@ describe('the OpenAPI snapshot', () => {
         expect.arrayContaining([...url.searchParams.keys()]),
       );
       expect(sentRequest.body !== undefined).toBe(
-        operation?.requestBody !== undefined,
+        documentedContentTypes.length > 0,
+      );
+      expect(documentedContentTypes).toEqual(
+        expect.arrayContaining(
+          sentContentType === undefined ? [] : [sentContentType],
+        ),
       );
     },
   );

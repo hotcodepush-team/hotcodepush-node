@@ -203,6 +203,84 @@ describe('HttpClient.fetchCreatingPost', () => {
   });
 });
 
+describe('HttpClient.fetchUpload', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  test('should put a blob with its size as the content length', async () => {
+    const fetchMock = stubFetch();
+    const blob = new Blob(['gzip bytes']);
+
+    await new HttpClient({}).fetchUpload({
+      body: blob,
+      contentType: 'application/gzip',
+      path: '/v1/apps/app/files/sha256',
+    });
+
+    expect(fetchMock.mock.lastCall?.[1]).toMatchObject({
+      body: blob,
+      headers: { 'Content-Length': '10', 'Content-Type': 'application/gzip' },
+      method: 'PUT',
+    });
+  });
+
+  test('should put a stream half-duplex with the given content length', async () => {
+    const fetchMock = stubFetch();
+    const stream = new Blob(['tar bytes']).stream();
+
+    await new HttpClient({}).fetchUpload({
+      body: stream,
+      contentLength: 9,
+      contentType: 'application/x-tar',
+      path: '/v1/apps/app/bundles/bundle/pack',
+    });
+
+    expect(fetchMock.mock.lastCall?.[1]).toMatchObject({
+      body: stream,
+      duplex: 'half',
+      headers: { 'Content-Length': '9', 'Content-Type': 'application/x-tar' },
+      method: 'PUT',
+    });
+  });
+
+  test('should retry a blob when the status is retryable', async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response(null, { status: 503 }))
+      .mockResolvedValueOnce(Response.json({ sizeBytes: 9 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const uploadPromise = new HttpClient({}).fetchUpload({
+      body: new Blob(['tar bytes']),
+      contentType: 'application/x-tar',
+      path: '/v1/apps/app/bundles/bundle/pack',
+    });
+    await vi.runAllTimersAsync();
+
+    await expect(uploadPromise).resolves.toEqual({ sizeBytes: 9 });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  test('should not retry a stream, which is read once', async () => {
+    const fetchMock = stubFetch(() => new Response(null, { status: 503 }));
+
+    const uploadPromise = new HttpClient({}).fetchUpload({
+      body: new Blob(['tar bytes']).stream(),
+      contentLength: 9,
+      contentType: 'application/x-tar',
+      path: '/v1/apps/app/bundles/bundle/pack',
+    });
+
+    await expect(uploadPromise).rejects.toMatchObject({ status: 503 });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('resolvePath', () => {
   test('should fill the template with the encoded parameters', () => {
     expect(
@@ -211,6 +289,15 @@ describe('resolvePath', () => {
         channelId: 'a/b',
       }),
     ).toBe('/v1/apps/app/channels/a%2Fb');
+  });
+
+  test('should fill a number parameter as its digits', () => {
+    expect(
+      resolvePath(
+        '/v1/apps/{appId}/files/{sha256}/uploads/{uploadId}/parts/{partNumber}',
+        { appId: 'app', partNumber: 2, sha256: 'sha256', uploadId: 'upload' },
+      ),
+    ).toBe('/v1/apps/app/files/sha256/uploads/upload/parts/2');
   });
 
   test('should throw when a parameter is missing', () => {

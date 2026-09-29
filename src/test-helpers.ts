@@ -9,7 +9,7 @@ export interface SentRequest {
 }
 
 /**
- * The last request the stubbed `fetch` received, its JSON body parsed.
+ * The last request the stubbed `fetch` received, a JSON body parsed and any other body as it was passed.
  */
 export function resolveSentRequest(fetchMock: Mock<typeof fetch>): SentRequest {
   const [input, init] = fetchMock.mock.lastCall ?? [];
@@ -17,7 +17,7 @@ export function resolveSentRequest(fetchMock: Mock<typeof fetch>): SentRequest {
     throw new Error('fetch was not called.');
   }
   return {
-    body: typeof init?.body === 'string' ? JSON.parse(init.body) : undefined,
+    body: typeof init?.body === 'string' ? JSON.parse(init.body) : init?.body,
     headers: { ...(init?.headers as Record<string, string> | undefined) },
     method: init?.method ?? 'GET',
     url: String(input),

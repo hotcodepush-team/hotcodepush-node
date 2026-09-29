@@ -9,6 +9,14 @@ export interface ErrorBody {
   message: string;
 }
 
+/**
+ * A body a retry can read again; its size is the `Content-Length`.
+ * `fs.openAsBlob(path)` streams a file from disk this way.
+ */
+export interface BlobUploadBody {
+  body: Blob;
+}
+
 export interface IdempotencyOptions {
   /**
    * The `Idempotency-Key` header, kept by the API for 24 hours, so a retried call gets the same result back instead of a second one.
@@ -17,6 +25,19 @@ export interface IdempotencyOptions {
    */
   idempotencyKey?: string;
 }
+
+/**
+ * A body read once and sent as it streams, never retried; the API requires its `Content-Length`.
+ */
+export interface StreamUploadBody {
+  body: ReadableStream<Uint8Array>;
+  contentLength: number;
+}
+
+/**
+ * The binary body of an upload, streamed and never buffered.
+ */
+export type UploadBody = BlobUploadBody | StreamUploadBody;
 
 type HttpMethod = 'delete' | 'get' | 'patch' | 'post' | 'put';
 

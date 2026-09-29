@@ -54,7 +54,7 @@ Run `npm run fmt` before every commit; lint, typecheck, test and build must pass
 - Lists take `limit` and `offset`; `relations` is a typed list sent as the comma list `?relations=user`.
 - `me` is accepted wherever a `{userId}` appears; the client passes it through.
 - The `/v1/auth/*` slice is Better Auth's and outside the document; its client lives in the CLI and the console, never here.
-- Streaming upload bodies arrive with the bundles and files endpoints.
+- Every binary `PUT` goes through `fetchUpload`: the body is a `Blob` or a `ReadableStream` with its `contentLength`, streamed with `Content-Length` and the documented `Content-Type`, never a buffered string; a `Blob` is retried, a stream is read once and never retried.
 
 ## The OpenAPI snapshot
 

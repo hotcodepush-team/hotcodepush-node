@@ -1,8 +1,12 @@
+import { createHash } from 'node:crypto';
+import { gzipSync } from 'node:zlib';
+
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 
 import { HotCodePush } from './client';
 import { HotCodePushError } from './errors';
 import type { App } from './resources/apps';
+import type { Bundle } from './resources/bundles';
 import type { Channel } from './resources/channels';
 import type { Organization } from './resources/organizations';
 
@@ -17,6 +21,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
   const createdOrganizations: Organization[] = [];
   let app: App;
   let channel: Channel;
+  let completedBundle: Bundle;
   let organization: Organization;
 
   beforeAll(() => {
@@ -200,6 +205,170 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     });
   });
 
+  test('should create a bundle, upload its file and pack, complete it and read its manifest hash back', async () => {
+    const indexFile = resolveTestFile('index.html', '<h1>Node client</h1>');
+    const createdBundle = await hotCodePush.apps.bundles.create({
+      appId: app.id,
+      bundleVersion: '1.0.0',
+      files: [indexFile.manifestEntry],
+      platforms: ['android'],
+    });
+    const uploadedFile = await hotCodePush.apps.files.upload({
+      appId: app.id,
+      body: new Blob([indexFile.gzipBytes]).stream(),
+      contentLength: indexFile.gzipBytes.byteLength,
+      sha256: indexFile.manifestEntry.sha256,
+    });
+    await hotCodePush.apps.bundles.pack.upload({
+      appId: app.id,
+      body: new Blob([PACK_PLACEHOLDER]),
+      bundleId: createdBundle.id,
+    });
+    completedBundle = await hotCodePush.apps.bundles.complete({
+      appId: app.id,
+      bundleId: createdBundle.id,
+    });
+    const fetchedBundle = await hotCodePush.apps.bundles.get({
+      appId: app.id,
+      bundleId: createdBundle.id,
+    });
+
+    expect(createdBundle.uploads.files.map(({ sha256 }) => sha256)).toEqual([
+      indexFile.manifestEntry.sha256,
+    ]);
+    expect(uploadedFile.sha256).toBe(indexFile.manifestEntry.sha256);
+    expect(completedBundle.state).toBe('ready');
+    expect(completedBundle.manifestSha256).toMatch(/^[0-9a-f]{64}$/);
+    expect(fetchedBundle.manifestSha256).toBe(completedBundle.manifestSha256);
+  });
+
+  test('should upload a file in parts and complete it', async () => {
+    const mainFile = resolveTestFile('main.js', 'console.log("parts");');
+    const createdUpload = await hotCodePush.apps.files.uploads.create({
+      appId: app.id,
+      sha256: mainFile.manifestEntry.sha256,
+    });
+    const uploadedPart = await hotCodePush.apps.files.uploads.parts.upload({
+      appId: app.id,
+      body: new Blob([mainFile.gzipBytes]),
+      partNumber: 1,
+      sha256: mainFile.manifestEntry.sha256,
+      uploadId: createdUpload.uploadId,
+    });
+
+    const completedFile = await hotCodePush.apps.files.uploads.complete({
+      appId: app.id,
+      parts: [uploadedPart],
+      sha256: mainFile.manifestEntry.sha256,
+      uploadId: createdUpload.uploadId,
+    });
+
+    expect(completedFile.sha256).toBe(mainFile.manifestEntry.sha256);
+  });
+
+  test('should abort a multipart upload', async () => {
+    const abortedFile = resolveTestFile('aborted.js', 'never completed');
+    const createdUpload = await hotCodePush.apps.files.uploads.create({
+      appId: app.id,
+      sha256: abortedFile.manifestEntry.sha256,
+    });
+
+    await expect(
+      hotCodePush.apps.files.uploads.delete({
+        appId: app.id,
+        sha256: abortedFile.manifestEntry.sha256,
+        uploadId: createdUpload.uploadId,
+      }),
+    ).resolves.toBeUndefined();
+  });
+
+  test('should upload a delta pack against a base bundle and delete the bundle', async () => {
+    const mainFile = resolveTestFile('main.js', 'console.log("parts");');
+    const createdBundle = await hotCodePush.apps.bundles.create({
+      appId: app.id,
+      bundleVersion: '1.0.1',
+      files: [mainFile.manifestEntry],
+      platforms: ['android'],
+    });
+    await hotCodePush.apps.bundles.pack.upload({
+      appId: app.id,
+      body: new Blob([PACK_PLACEHOLDER]),
+      bundleId: createdBundle.id,
+    });
+    const uploadedDelta = await hotCodePush.apps.bundles.deltas.upload({
+      appId: app.id,
+      baseBundleId: completedBundle.id,
+      body: new Blob([PACK_PLACEHOLDER]),
+      bundleId: createdBundle.id,
+    });
+    await hotCodePush.apps.bundles.complete({
+      appId: app.id,
+      bundleId: createdBundle.id,
+    });
+    const readyBundles = await hotCodePush.apps.bundles.list({
+      appId: app.id,
+      state: 'ready',
+    });
+    await hotCodePush.apps.bundles.delete({
+      appId: app.id,
+      bundleId: createdBundle.id,
+    });
+
+    expect(createdBundle.uploads.files).toEqual([]);
+    expect(uploadedDelta.sizeBytes).toBe(PACK_PLACEHOLDER.byteLength);
+    expect(readyBundles.map(({ id }) => id)).toContain(createdBundle.id);
+    await expect(
+      hotCodePush.apps.bundles.get({
+        appId: app.id,
+        bundleId: createdBundle.id,
+      }),
+    ).rejects.toMatchObject({ code: 'E_NOT_FOUND', status: 404 });
+  });
+
+  test('should register an embedded bundle and read it with its bundle', async () => {
+    const indexFile = resolveTestFile('index.html', '<h1>Node client</h1>');
+    const createdEmbeddedBundle = await hotCodePush.apps.embeddedBundles.create(
+      {
+        appId: app.id,
+        binaryBuild: '1',
+        binaryVersion: '1.0.0',
+        files: [indexFile.manifestEntry],
+        fingerprint: `fp1:${'a'.repeat(64)}`,
+        platform: 'android',
+      },
+    );
+    const reregisteredEmbeddedBundle =
+      await hotCodePush.apps.embeddedBundles.create({
+        appId: app.id,
+        binaryBuild: '1',
+        binaryVersion: '1.0.0',
+        files: [indexFile.manifestEntry],
+        fingerprint: `fp1:${'b'.repeat(64)}`,
+        force: true,
+        platform: 'android',
+      });
+    const fetchedEmbeddedBundles = await hotCodePush.apps.embeddedBundles.list({
+      appId: app.id,
+      relations: ['bundle'],
+    });
+    const fetchedEmbeddedBundle = await hotCodePush.apps.embeddedBundles.get({
+      appId: app.id,
+      embeddedBundleId: createdEmbeddedBundle.id,
+      relations: ['bundle'],
+    });
+
+    expect(reregisteredEmbeddedBundle).toMatchObject({
+      fingerprint: `fp1:${'b'.repeat(64)}`,
+      id: createdEmbeddedBundle.id,
+    });
+    expect(fetchedEmbeddedBundles.map(({ id }) => id)).toEqual([
+      createdEmbeddedBundle.id,
+    ]);
+    expect(fetchedEmbeddedBundle.bundle?.id).toBe(
+      reregisteredEmbeddedBundle.bundleId,
+    );
+  });
+
   test('should delete the channel', async () => {
     await hotCodePush.apps.channels.delete({
       appId: app.id,
@@ -233,3 +402,26 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     );
   });
 });
+
+/**
+ * The API stores a pack without reading it; a real pack is the CLI's tar of the bundle.
+ */
+const PACK_PLACEHOLDER = new TextEncoder().encode('pack placeholder');
+
+function resolveTestFile(
+  path: string,
+  content: string,
+): {
+  gzipBytes: Uint8Array<ArrayBuffer>;
+  manifestEntry: { path: string; sha256: string; sizeBytes: number };
+} {
+  const bytes = new TextEncoder().encode(content);
+  return {
+    gzipBytes: new Uint8Array(gzipSync(bytes)),
+    manifestEntry: {
+      path,
+      sha256: createHash('sha256').update(bytes).digest('hex'),
+      sizeBytes: bytes.byteLength,
+    },
+  };
+}

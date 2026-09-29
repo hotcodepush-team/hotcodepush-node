@@ -1,7 +1,7 @@
 import { version } from '../package.json';
 import { resolveHotCodePushError } from './errors';
 import type { paths } from './generated/schema';
-import type { IdempotencyOptions } from './types';
+import type { BlobUploadBody, IdempotencyOptions, UploadBody } from './types';
 
 const DEFAULT_BASE_URL = 'https://api.hotcodepush.com';
 const DEFAULT_CLIENT = `node/${version}`;
@@ -10,7 +10,7 @@ const MAX_ATTEMPTS = 3;
 const TIMEOUT_MS = 60_000;
 
 export interface FetchCreatingPostOptions extends IdempotencyOptions {
-  body: unknown;
+  body?: unknown;
   path: string;
 }
 
@@ -24,6 +24,11 @@ export interface FetchJsonOptions {
    */
   query?: Record<string, number | readonly string[] | string | undefined>;
 }
+
+export type FetchUploadOptions = UploadBody & {
+  contentType: string;
+  path: string;
+};
 
 export interface HttpClientOptions {
   /**
@@ -74,11 +79,31 @@ export class HttpClient {
     const url = this.resolveUrl(options);
     const requestInit = this.resolveRequestInit(options);
     const response = await fetchWithRetryAndTimeout(url, requestInit);
-    const text = await response.text();
-    if (!response.ok) {
-      throw resolveHotCodePushError(response.status, text);
-    }
-    return (text ? JSON.parse(text) : undefined) as T;
+    return parseResponseBody(response);
+  }
+
+  /**
+   * A binary `PUT`, streamed as it is read; a stream is read once, so only a `Blob` is retried.
+   */
+  public async fetchUpload<T>(options: FetchUploadOptions): Promise<T> {
+    const fetchWithTimeout = withTimeout(fetch, TIMEOUT_MS);
+    const fetchFunction = isBlobUploadBody(options)
+      ? withRetry(fetchWithTimeout)
+      : fetchWithTimeout;
+    const contentLength = isBlobUploadBody(options)
+      ? options.body.size
+      : options.contentLength;
+    const response = await fetchFunction(new URL(options.path, this.baseUrl), {
+      body: options.body,
+      duplex: 'half',
+      headers: {
+        ...this.headers,
+        'Content-Length': String(contentLength),
+        'Content-Type': options.contentType,
+      },
+      method: 'PUT',
+    });
+    return parseResponseBody(response);
   }
 
   private resolveRequestInit(options: FetchJsonOptions): RequestInit {
@@ -105,8 +130,22 @@ export class HttpClient {
   }
 }
 
+function isBlobUploadBody(
+  uploadBody: UploadBody,
+): uploadBody is BlobUploadBody {
+  return uploadBody.body instanceof Blob;
+}
+
 function isRetryableStatus(status: number): boolean {
   return status === 408 || status === 429 || status >= 500;
+}
+
+async function parseResponseBody<T>(response: Response): Promise<T> {
+  const text = await response.text();
+  if (!response.ok) {
+    throw resolveHotCodePushError(response.status, text);
+  }
+  return (text ? JSON.parse(text) : undefined) as T;
 }
 
 function resolveHeaders(options: HttpClientOptions): Record<string, string> {
@@ -126,7 +165,7 @@ function resolveHeaders(options: HttpClientOptions): Record<string, string> {
  */
 export function resolvePath(
   template: keyof paths,
-  parameters: Record<string, string> = {},
+  parameters: Record<string, number | string> = {},
 ): string {
   return template.replace(/\{(\w+)\}/g, (_placeholder, name: string) => {
     const parameter = parameters[name];

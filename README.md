@@ -36,24 +36,44 @@ await hotCodePush.apps.channels.pause({ appId: app.id, channelId: channel.id });
 
 The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.channels`:
 
-| Resource                                  | Methods                                                        |
-| ----------------------------------------- | -------------------------------------------------------------- |
-| `health`                                  | `get`                                                          |
-| `organizations`                           | `create`, `delete`, `get`, `list`, `update`                    |
-| `organizations.apps`                      | `create`, `list`                                               |
-| `organizations.invitations`               | `create`, `delete`, `list`                                     |
-| `organizations.members`                   | `delete`, `get`, `list`, `update`                              |
-| `invitations`, the caller's               | `accept`, `list`                                               |
-| `apps`                                    | `delete`, `get`, `transfer`, `update`                          |
-| `apps.channels`                           | `create`, `delete`, `get`, `list`, `pause`, `resume`, `update` |
-| `apps.channels.indexes`                   | `get`                                                          |
-| `apps.channels.releases`, the release log | `create`, `list`                                               |
-| `apps.channels.rollbacks`                 | `create`                                                       |
-| `apps.releases`                           | `get`, `list`, `pause`, `resume`, `revoke`, `update`           |
-| `users`                                   | `delete`                                                       |
+| Resource                                   | Methods                                                        |
+| ------------------------------------------ | -------------------------------------------------------------- |
+| `health`                                   | `get`                                                          |
+| `organizations`                            | `create`, `delete`, `get`, `list`, `update`                    |
+| `organizations.apps`                       | `create`, `list`                                               |
+| `organizations.invitations`                | `create`, `delete`, `list`                                     |
+| `organizations.members`                    | `delete`, `get`, `list`, `update`                              |
+| `invitations`, the caller's                | `accept`, `list`                                               |
+| `apps`                                     | `delete`, `get`, `transfer`, `update`                          |
+| `apps.bundles`                             | `complete`, `create`, `delete`, `get`, `list`                  |
+| `apps.bundles.pack`, `apps.bundles.deltas` | `upload`                                                       |
+| `apps.channels`                            | `create`, `delete`, `get`, `list`, `pause`, `resume`, `update` |
+| `apps.channels.indexes`                    | `get`                                                          |
+| `apps.channels.releases`, the release log  | `create`, `list`                                               |
+| `apps.channels.rollbacks`                  | `create`                                                       |
+| `apps.embeddedBundles`                     | `create`, `get`, `list`                                        |
+| `apps.files`                               | `upload`                                                       |
+| `apps.files.uploads`, the multipart upload | `complete`, `create`, `delete`                                 |
+| `apps.files.uploads.parts`                 | `upload`                                                       |
+| `apps.releases`                            | `get`, `list`, `pause`, `resume`, `revoke`, `update`           |
+| `users`                                    | `delete`                                                       |
 
 Lists take `limit` and `offset`, and where the API embeds linked rows, `relations`: `organizations.members.list({ organizationId, relations: ['user'] })`.
 `users.delete({ userId: 'me' })` addresses the caller, as `me` does wherever the API takes a `{userId}`.
+
+An upload streams its body, a `Blob` or a `ReadableStream` with its `contentLength`, never buffering it:
+
+```ts
+import { openAsBlob } from 'node:fs';
+
+await hotCodePush.apps.files.upload({
+  appId: app.id,
+  body: await openAsBlob('dist/index.html.gz'),
+  sha256: '<sha256 of the uncompressed file>',
+});
+```
+
+A `Blob` is read again when a retry needs it; a stream is read once, so a failed stream upload is not retried.
 
 Every creating call sends an `Idempotency-Key`, a UUID per call kept across the client's own retries; pass `idempotencyKey` to reuse one when you retry the call yourself, and the API answers the first result again for 24 hours.
 

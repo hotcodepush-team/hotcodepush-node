@@ -5,7 +5,10 @@ import type {
   JsonResponseBody,
   PathParameters,
 } from '../types';
+import { BundlesResource } from './bundles';
 import { ChannelsResource } from './channels';
+import { EmbeddedBundlesResource } from './embedded-bundles';
+import { FilesResource } from './files';
 import { ReleasesResource } from './releases';
 
 export type App = JsonResponseBody<'/v1/apps/{appId}', 'get', 200>;
@@ -24,11 +27,17 @@ export type UpdateAppOptions = PathParameters<'/v1/apps/{appId}', 'patch'> &
   JsonRequestBody<'/v1/apps/{appId}', 'patch'>;
 
 export class AppsResource {
+  public readonly bundles: BundlesResource;
   public readonly channels: ChannelsResource;
+  public readonly embeddedBundles: EmbeddedBundlesResource;
+  public readonly files: FilesResource;
   public readonly releases: ReleasesResource;
 
   constructor(private readonly httpClient: HttpClient) {
+    this.bundles = new BundlesResource(httpClient);
     this.channels = new ChannelsResource(httpClient);
+    this.embeddedBundles = new EmbeddedBundlesResource(httpClient);
+    this.files = new FilesResource(httpClient);
     this.releases = new ReleasesResource(httpClient);
   }
 

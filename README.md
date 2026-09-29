@@ -56,10 +56,10 @@ The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.ch
 | `apps.files.uploads`, the multipart upload | `complete`, `create`, `delete`                                 |
 | `apps.files.uploads.parts`                 | `upload`                                                       |
 | `apps.releases`                            | `get`, `list`, `pause`, `resume`, `revoke`, `update`           |
-| `users`                                    | `delete`                                                       |
+| `users`                                    | `delete`, `get`                                                |
 
 Lists take `limit` and `offset`, and where the API embeds linked rows, `relations`: `organizations.members.list({ organizationId, relations: ['user'] })`.
-`users.delete({ userId: 'me' })` addresses the caller, as `me` does wherever the API takes a `{userId}`.
+`users.get({ userId: 'me' })` answers the caller behind the token, and `users.delete({ userId: 'me' })` deletes the caller's account, as `me` addresses the caller wherever the API takes a `{userId}`.
 
 An upload streams its body, a `Blob` or a `ReadableStream` with its `contentLength`, never buffering it:
 

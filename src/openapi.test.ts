@@ -290,6 +290,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       organizationId: ORGANIZATION_ID,
     }),
   'users.delete': hotCodePush => hotCodePush.users.delete({ userId: 'me' }),
+  'users.get': hotCodePush => hotCodePush.users.get({ userId: 'me' }),
 };
 
 /**

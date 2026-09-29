@@ -1,8 +1,12 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
-import type { PathParameters } from '../types';
+import type { JsonResponseBody, PathParameters } from '../types';
 
 export type DeleteUserOptions = PathParameters<'/v1/users/{userId}', 'delete'>;
+
+export type GetUserOptions = PathParameters<'/v1/users/{userId}', 'get'>;
+
+export type User = JsonResponseBody<'/v1/users/{userId}', 'get', 200>;
 
 export class UsersResource {
   constructor(private readonly httpClient: HttpClient) {}
@@ -14,6 +18,17 @@ export class UsersResource {
   public async delete(options: DeleteUserOptions): Promise<void> {
     await this.httpClient.fetchJson({
       method: 'DELETE',
+      path: resolvePath('/v1/users/{userId}', options),
+    });
+  }
+
+  /**
+   * The caller behind the token and whether it is a session or an API token.
+   * `userId` takes `me` for the caller; another user answers `E_FORBIDDEN`.
+   */
+  public async get(options: GetUserOptions): Promise<User> {
+    return this.httpClient.fetchJson({
+      method: 'GET',
       path: resolvePath('/v1/users/{userId}', options),
     });
   }

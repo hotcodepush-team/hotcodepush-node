@@ -141,7 +141,7 @@ export interface paths {
         };
         /**
          * Get a member
-         * @description One member of the organization.
+         * @description One member of the organization; `?relations=user` embeds the member's user.
          */
         get: operations["getV1OrganizationsByOrganizationIdMembersByMemberId"];
         put?: never;
@@ -158,6 +158,54 @@ export interface paths {
          * @description Changes a member's role. Setting `owner` transfers ownership: only the Owner may, they become Admin in the same transaction, and the organization keeps exactly one Owner.
          */
         patch: operations["patchV1OrganizationsByOrganizationIdMembersByMemberId"];
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/sso-provider": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the SSO provider
+         * @description The organization's SSO provider: its kind, domain, whether the domain is verified, the sign-in link, and the TXT record to set until it is.
+         */
+        get: operations["getV1OrganizationsByOrganizationIdSsoProvider"];
+        /**
+         * Set the SSO provider
+         * @description Sets the OIDC or SAML provider and its domain, replacing the one before; one per organization, paying plans only. A new or changed domain starts unverified, with the TXT record to set in the answer.
+         */
+        put: operations["putV1OrganizationsByOrganizationIdSsoProvider"];
+        post?: never;
+        /**
+         * Delete the SSO provider
+         * @description Removes the SSO provider: password sign-in works again for its members, and the domain is forgotten.
+         */
+        delete: operations["deleteV1OrganizationsByOrganizationIdSsoProvider"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/sso-provider/verifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Verify the SSO domain
+         * @description Checks the domain's TXT record for the token the provider waits for and marks the domain verified when it is there; the answer is the provider, its `isVerified` the result.
+         */
+        post: operations["postV1OrganizationsByOrganizationIdSsoProviderVerifications"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/organizations": {
@@ -441,7 +489,7 @@ export interface paths {
         };
         /**
          * List the releases of a channel
-         * @description The channel's release log, newest first, each release with the devices whose current release it is; `?relations=channel,bundle` embeds the linked rows.
+         * @description The channel's release log, newest first, each release with the devices whose current release it is; `?relations=channel,bundle,counters` embeds the linked rows.
          */
         get: operations["getV1AppsByAppIdChannelsByChannelIdReleases"];
         put?: never;
@@ -779,7 +827,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Get the user
+         * @description The caller behind the bearer, a session or an API token, and which of the two it is. Profiles are private: `me` or the caller's own id, any other user answers `E_FORBIDDEN`.
+         */
+        get: operations["getV1UsersByUserId"];
         put?: never;
         post?: never;
         /**
@@ -795,7 +847,17 @@ export interface paths {
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: never;
+    schemas: {
+        /** @description The one error shape: a context-free code from the catalog, one sentence of what happened and what to do, and the field, rule and target of a failed validation in `details`. */
+        Error: {
+            /** @enum {string} */
+            code: "E_ACCOUNT_BANNED" | "E_APP_NAME_TAKEN" | "E_APPS_LIMIT_REACHED" | "E_BUNDLE_IN_USE" | "E_BUNDLE_NOT_READY" | "E_BUNDLE_TOO_LARGE" | "E_CHANNEL_NAME_TAKEN" | "E_CHANNEL_PROTECTED" | "E_CHANNELS_PER_APP_LIMIT_REACHED" | "E_CLIENT_UPDATE_REQUIRED" | "E_DEFAULT_CHANNEL" | "E_EMBED_CONFLICT" | "E_FILES_PER_BUNDLE_LIMIT_REACHED" | "E_FORBIDDEN" | "E_HASH_MISMATCH" | "E_IDEMPOTENCY_KEY_REUSED" | "E_INTERNAL" | "E_INVITATION_INVALID" | "E_INVITATIONS_PER_DAY_LIMIT_REACHED" | "E_MAINTENANCE" | "E_MEMBERS_LIMIT_REACHED" | "E_NOT_FOUND" | "E_NOTIFICATION_MANDATORY" | "E_PLAN_REQUIRED" | "E_RATE_LIMITED" | "E_RELEASE_REVOKED" | "E_RELEASES_PER_DAY_LIMIT_REACHED" | "E_SIGNATURE_INVALID" | "E_SIGNATURE_REQUIRED" | "E_SOLE_OWNER" | "E_SOLE_SIGNING_KEY" | "E_SSO_REQUIRED" | "E_STORAGE_LIMIT_REACHED" | "E_TOKENS_LIMIT_REACHED" | "E_TURNSTILE_FAILED" | "E_UNAUTHENTICATED" | "E_UPLOAD_INCOMPLETE" | "E_VALIDATION";
+            details: {
+                [key: string]: unknown;
+            } | null;
+            message: string;
+        };
+    };
     responses: never;
     parameters: never;
     requestBodies: never;
@@ -806,7 +868,10 @@ export type $defs = Record<string, never>;
 export interface operations {
     getV1Invitations: {
         parameters: {
-            query?: never;
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -840,6 +905,69 @@ export interface operations {
                         /** Format: date-time */
                         updatedAt: string;
                     }[];
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -891,18 +1019,67 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -944,18 +1121,67 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -963,7 +1189,10 @@ export interface operations {
     postV1OrganizationsByOrganizationIdApps: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
+                "Idempotency-Key"?: string;
+            };
             path: {
                 organizationId: string;
             };
@@ -1002,27 +1231,49 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_APP_NAME_TAKEN */
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_APP_NAME_TAKEN or E_IDEMPOTENCY_KEY_REUSED */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_APPS_LIMIT_REACHED */
@@ -1031,7 +1282,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -1079,18 +1357,67 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -1098,7 +1425,10 @@ export interface operations {
     postV1OrganizationsByOrganizationIdInvitations: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
+                "Idempotency-Key"?: string;
+            };
             path: {
                 organizationId: string;
             };
@@ -1144,18 +1474,85 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_IDEMPOTENCY_KEY_REUSED */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INVITATIONS_PER_DAY_LIMIT_REACHED */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -1179,18 +1576,67 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -1200,7 +1646,7 @@ export interface operations {
             query?: {
                 limit?: number;
                 offset?: number;
-                relations?: string;
+                relations?: "user"[];
             };
             header?: never;
             path: {
@@ -1240,25 +1686,76 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
     };
     getV1OrganizationsByOrganizationIdMembersByMemberId: {
         parameters: {
-            query?: never;
+            query?: {
+                relations?: "user"[];
+            };
             header?: never;
             path: {
                 memberId: string;
@@ -1298,18 +1795,67 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -1333,18 +1879,67 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -1398,18 +1993,566 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1OrganizationsByOrganizationIdSsoProvider: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The provider. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
                     "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
+                        /** Format: date-time */
+                        createdAt: string;
+                        domain: string;
+                        /** Format: uuid */
+                        id: string;
+                        isVerified: boolean;
+                        oidc: {
+                            clientId: string;
+                            /** Format: uri */
+                            discoveryEndpoint: string;
+                            /** Format: uri */
+                            issuer: string;
+                            /** Format: uri */
+                            redirectUri: string;
+                            scopes: string[] | null;
+                        } | null;
+                        /** Format: uuid */
+                        organizationId: string;
+                        /** @enum {string} */
+                        provider: "oidc" | "saml";
+                        saml: {
+                            /** Format: uri */
+                            acsUrl: string;
+                            entityId: string | null;
+                            /** Format: uri */
+                            entryPoint: string;
+                            issuer: string;
+                            /** Format: uri */
+                            spMetadataUrl: string;
+                        } | null;
+                        /** Format: uri */
+                        signInUrl: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        verification: {
+                            name: string;
+                            value: string;
+                        } | null;
                     };
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    putV1OrganizationsByOrganizationIdSsoProvider: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    domain: string;
+                    oidc?: {
+                        clientId: string;
+                        clientSecret: string;
+                        /** Format: uri */
+                        discoveryEndpoint?: string;
+                        /** Format: uri */
+                        issuer: string;
+                        scopes?: string[];
+                    };
+                    saml?: {
+                        cert?: string;
+                        entityId?: string;
+                        /** Format: uri */
+                        entryPoint: string;
+                        issuer: string;
+                        metadata?: string;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description The replaced provider. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        createdAt: string;
+                        domain: string;
+                        /** Format: uuid */
+                        id: string;
+                        isVerified: boolean;
+                        oidc: {
+                            clientId: string;
+                            /** Format: uri */
+                            discoveryEndpoint: string;
+                            /** Format: uri */
+                            issuer: string;
+                            /** Format: uri */
+                            redirectUri: string;
+                            scopes: string[] | null;
+                        } | null;
+                        /** Format: uuid */
+                        organizationId: string;
+                        /** @enum {string} */
+                        provider: "oidc" | "saml";
+                        saml: {
+                            /** Format: uri */
+                            acsUrl: string;
+                            entityId: string | null;
+                            /** Format: uri */
+                            entryPoint: string;
+                            issuer: string;
+                            /** Format: uri */
+                            spMetadataUrl: string;
+                        } | null;
+                        /** Format: uri */
+                        signInUrl: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        verification: {
+                            name: string;
+                            value: string;
+                        } | null;
+                    };
+                };
+            };
+            /** @description The new provider. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        createdAt: string;
+                        domain: string;
+                        /** Format: uuid */
+                        id: string;
+                        isVerified: boolean;
+                        oidc: {
+                            clientId: string;
+                            /** Format: uri */
+                            discoveryEndpoint: string;
+                            /** Format: uri */
+                            issuer: string;
+                            /** Format: uri */
+                            redirectUri: string;
+                            scopes: string[] | null;
+                        } | null;
+                        /** Format: uuid */
+                        organizationId: string;
+                        /** @enum {string} */
+                        provider: "oidc" | "saml";
+                        saml: {
+                            /** Format: uri */
+                            acsUrl: string;
+                            entityId: string | null;
+                            /** Format: uri */
+                            entryPoint: string;
+                            issuer: string;
+                            /** Format: uri */
+                            spMetadataUrl: string;
+                        } | null;
+                        /** Format: uri */
+                        signInUrl: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        verification: {
+                            name: string;
+                            value: string;
+                        } | null;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    deleteV1OrganizationsByOrganizationIdSsoProvider: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The provider is removed. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1OrganizationsByOrganizationIdSsoProviderVerifications: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The provider, verified or still waiting for the record. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        createdAt: string;
+                        domain: string;
+                        /** Format: uuid */
+                        id: string;
+                        isVerified: boolean;
+                        oidc: {
+                            clientId: string;
+                            /** Format: uri */
+                            discoveryEndpoint: string;
+                            /** Format: uri */
+                            issuer: string;
+                            /** Format: uri */
+                            redirectUri: string;
+                            scopes: string[] | null;
+                        } | null;
+                        /** Format: uuid */
+                        organizationId: string;
+                        /** @enum {string} */
+                        provider: "oidc" | "saml";
+                        saml: {
+                            /** Format: uri */
+                            acsUrl: string;
+                            entityId: string | null;
+                            /** Format: uri */
+                            entryPoint: string;
+                            issuer: string;
+                            /** Format: uri */
+                            spMetadataUrl: string;
+                        } | null;
+                        /** Format: uri */
+                        signInUrl: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        verification: {
+                            name: string;
+                            value: string;
+                        } | null;
+                    };
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -1448,18 +2591,67 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -1467,7 +2659,10 @@ export interface operations {
     postV1Organizations: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
+                "Idempotency-Key"?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1501,18 +2696,76 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_IDEMPOTENCY_KEY_REUSED */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -1550,6 +2803,60 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     deleteV1OrganizationsByOrganizationId: {
@@ -1569,6 +2876,60 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
             };
         };
     };
@@ -1614,18 +2975,67 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -1684,18 +3094,67 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -1703,7 +3162,10 @@ export interface operations {
     postV1AppsByAppIdBundles: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
+                "Idempotency-Key"?: string;
+            };
             path: {
                 appId: string;
             };
@@ -1781,18 +3243,49 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_IDEMPOTENCY_KEY_REUSED */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_BUNDLE_TOO_LARGE */
@@ -1801,7 +3294,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_STORAGE_LIMIT_REACHED or E_FILES_PER_BUNDLE_LIMIT_REACHED */
@@ -1810,7 +3303,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -1863,6 +3383,60 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     deleteV1AppsByAppIdBundlesByBundleId: {
@@ -1884,13 +3458,67 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_BUNDLE_IN_USE */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -1923,13 +3551,40 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_BUNDLE_TOO_LARGE */
             413: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_STORAGE_LIMIT_REACHED */
@@ -1938,7 +3593,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -1972,18 +3654,40 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_BUNDLE_TOO_LARGE */
@@ -1992,7 +3696,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_STORAGE_LIMIT_REACHED */
@@ -2001,7 +3705,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -2054,13 +3785,67 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UPLOAD_INCOMPLETE */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -2105,18 +3890,67 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -2124,7 +3958,10 @@ export interface operations {
     postV1AppsByAppIdChannels: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
+                "Idempotency-Key"?: string;
+            };
             path: {
                 appId: string;
             };
@@ -2170,27 +4007,49 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_NAME_TAKEN */
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_CHANNEL_NAME_TAKEN or E_IDEMPOTENCY_KEY_REUSED */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_CHANNELS_PER_APP_LIMIT_REACHED */
@@ -2199,7 +4058,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -2245,6 +4131,60 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     deleteV1AppsByAppIdChannelsByChannelId: {
@@ -2266,13 +4206,67 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_DEFAULT_CHANNEL */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -2327,27 +4321,40 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED */
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_CHANNEL_NAME_TAKEN or E_DEFAULT_CHANNEL */
@@ -2356,7 +4363,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -2399,6 +4433,60 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     postV1AppsByAppIdChannelsByChannelIdResume: {
@@ -2439,6 +4527,60 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     getV1AppsByAppIdChannelsByChannelIdIndexesByPlatform: {
@@ -2460,21 +4602,153 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": {
+                        appId: string;
+                        cappedAt: string | null;
+                        channelId: string;
+                        isPaused: boolean;
+                        /** @enum {string} */
+                        platform: "android" | "ios";
+                        releases: ({
+                            bundleId: string;
+                            bundleVersion: string;
+                            conditions: ((({
+                                key: string;
+                                /** @constant */
+                                type: "attribute";
+                                valueSha256: string;
+                            } & {
+                                [key: string]: unknown;
+                            }) | ({
+                                range: string;
+                                /** @constant */
+                                type: "binary";
+                            } & {
+                                [key: string]: unknown;
+                            }) | ({
+                                hashedIds: string[];
+                                /** @constant */
+                                type: "device";
+                            } & {
+                                [key: string]: unknown;
+                            }) | ({
+                                hash: string;
+                                /** @constant */
+                                type: "fingerprint";
+                            } & {
+                                [key: string]: unknown;
+                            }) | ({
+                                range: string;
+                                /** @constant */
+                                type: "os";
+                            } & {
+                                [key: string]: unknown;
+                            }) | ({
+                                /** @constant */
+                                type: "runtime";
+                                version: string;
+                            } & {
+                                [key: string]: unknown;
+                            })) | ({
+                                type: string;
+                            } & {
+                                [key: string]: unknown;
+                            }))[];
+                            /** Format: date-time */
+                            createdAt: string;
+                            id: string;
+                            isMandatory: boolean;
+                            manifestSha256: string;
+                            /** Format: uri */
+                            manifestUrl: string;
+                            notes: string | null;
+                            number: number;
+                            rollout: number;
+                            sizeBytes: number;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                        revokedReleaseIds: string[];
+                        rollBackToEmbedded: ({
+                            aboveNumber: number;
+                            signature: ({
+                                keyId: string;
+                                value: string;
+                            } & {
+                                [key: string]: unknown;
+                            }) | null;
+                        } & {
+                            [key: string]: unknown;
+                        }) | null;
+                        /** @constant */
+                        schema: 1;
+                        sequence: number;
+                    } & {
+                        [key: string]: unknown;
+                    };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -2484,7 +4758,7 @@ export interface operations {
             query?: {
                 limit?: number;
                 offset?: number;
-                relations?: string;
+                relations?: ("bundle" | "channel" | "counters")[];
             };
             header?: never;
             path: {
@@ -2625,18 +4899,67 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -2644,7 +4967,10 @@ export interface operations {
     postV1AppsByAppIdChannelsByChannelIdReleases: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
+                "Idempotency-Key"?: string;
+            };
             path: {
                 appId: string;
                 channelId: string;
@@ -2835,27 +5161,40 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED */
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_BUNDLE_NOT_READY or E_IDEMPOTENCY_KEY_REUSED */
@@ -2864,7 +5203,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_RELEASES_PER_DAY_LIMIT_REACHED */
@@ -2873,7 +5212,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -2881,7 +5247,10 @@ export interface operations {
     postV1AppsByAppIdChannelsByChannelIdRollbacks: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
+                "Idempotency-Key"?: string;
+            };
             path: {
                 appId: string;
                 channelId: string;
@@ -3027,36 +5396,76 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED */
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RELEASE_REVOKED */
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RELEASE_REVOKED or E_IDEMPOTENCY_KEY_REUSED */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -3066,7 +5475,7 @@ export interface operations {
             query?: {
                 limit?: number;
                 offset?: number;
-                relations?: string;
+                relations?: "bundle"[];
             };
             header?: never;
             path: {
@@ -3129,18 +5538,67 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -3148,7 +5606,10 @@ export interface operations {
     postV1AppsByAppIdEmbeddedBundles: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
+                "Idempotency-Key"?: string;
+            };
             path: {
                 appId: string;
             };
@@ -3280,27 +5741,76 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_EMBED_CONFLICT or E_UPLOAD_INCOMPLETE */
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_EMBED_CONFLICT, E_UPLOAD_INCOMPLETE or E_IDEMPOTENCY_KEY_REUSED */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -3308,7 +5818,7 @@ export interface operations {
     getV1AppsByAppIdEmbeddedBundlesByEmbeddedBundleId: {
         parameters: {
             query?: {
-                relations?: string;
+                relations?: "bundle"[];
             };
             header?: never;
             path: {
@@ -3372,18 +5882,67 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -3443,7 +6002,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_BUNDLE_TOO_LARGE */
@@ -3452,7 +6038,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_STORAGE_LIMIT_REACHED */
@@ -3461,7 +6047,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -3489,18 +6102,67 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -3536,18 +6198,40 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_BUNDLE_TOO_LARGE */
@@ -3556,7 +6240,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -3605,7 +6316,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_UPLOAD_INCOMPLETE */
@@ -3614,7 +6352,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -3639,18 +6404,67 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -3802,18 +6616,67 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -3821,7 +6684,7 @@ export interface operations {
     getV1AppsByAppIdReleasesByReleaseId: {
         parameters: {
             query?: {
-                relations?: string;
+                relations?: ("bundle" | "channel" | "counters")[];
             };
             header?: never;
             path: {
@@ -3962,18 +6825,67 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -4128,27 +7040,40 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED */
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_RELEASE_REVOKED */
@@ -4157,7 +7082,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -4304,13 +7256,67 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_RELEASE_REVOKED */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -4457,13 +7463,67 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_RELEASE_REVOKED */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -4610,13 +7670,67 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_RELEASE_REVOKED */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -4655,6 +7769,60 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     deleteV1AppsByAppId: {
@@ -4674,6 +7842,60 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
             };
         };
     };
@@ -4720,18 +7942,40 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_APP_NAME_TAKEN */
@@ -4740,7 +7984,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -4786,18 +8057,162 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1UsersByUserId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: "me" | string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The user. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
                     "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
+                        /** Format: date-time */
+                        createdAt: string;
+                        /** @enum {string} */
+                        credential: "session" | "token";
+                        email: string;
+                        emailVerified: boolean;
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
                     };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -4820,18 +8235,40 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Validation Error */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: false;
-                        error: unknown[];
-                        data: unknown;
-                    };
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_SOLE_OWNER */
@@ -4840,7 +8277,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, unknown>;
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };

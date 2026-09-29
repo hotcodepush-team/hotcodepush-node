@@ -3,6 +3,15 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { HotCodePush } from '../client';
 import { resolveSentRequest, stubFetch } from '../test-helpers';
 
+const USER = {
+  createdAt: '2026-09-29T00:00:00.000Z',
+  credential: 'token',
+  email: 'user@example.test',
+  emailVerified: true,
+  id: 'user',
+  name: 'User',
+};
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });
@@ -17,6 +26,18 @@ describe('UsersResource', () => {
 
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'DELETE',
+      url: 'https://api.hotcodepush.com/v1/users/me',
+    });
+  });
+
+  test('should get the caller when the user id is me', async () => {
+    const fetchMock = stubFetch(() => Response.json(USER));
+
+    const fetchedUser = await new HotCodePush().users.get({ userId: 'me' });
+
+    expect(fetchedUser).toEqual(USER);
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
       url: 'https://api.hotcodepush.com/v1/users/me',
     });
   });

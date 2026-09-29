@@ -5,7 +5,7 @@ import { flatConfigs as importXConfigs } from 'eslint-plugin-import-x';
 import { configs as typescriptConfigs } from 'typescript-eslint';
 
 export default defineConfig(
-  { ignores: ['dist/**'] },
+  { ignores: ['dist/**', 'src/generated/**'] },
   js.configs.recommended,
   typescriptConfigs.recommended,
   importXConfigs.recommended,

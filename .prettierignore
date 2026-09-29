@@ -2,3 +2,7 @@
 .claude/skills
 .github/copilot-instructions.md
 .vscode/settings.json
+
+# Generated from the API's OpenAPI document, verbatim
+openapi.json
+src/generated

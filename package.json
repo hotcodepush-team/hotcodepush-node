@@ -27,7 +27,6 @@
     "build": "tsdown",
     "fmt": "eslint --fix . && prettier --write .",
     "lint": "eslint . && prettier --check .",
-    "prepare": "npm run build",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
@@ -37,6 +36,7 @@
     "eslint": "10.11.0",
     "eslint-import-resolver-typescript": "4.4.5",
     "eslint-plugin-import-x": "4.17.1",
+    "pkg-pr-new": "0.0.88",
     "prettier": "3.9.8",
     "tsdown": "0.23.0",
     "typescript": "5.9.3",

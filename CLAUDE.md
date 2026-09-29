@@ -23,15 +23,15 @@ Tests live beside the code they test, `*.test.ts` next to the file, and stub the
 
 ## Commands
 
-| Command             | Does                                                                        |
-| ------------------- | --------------------------------------------------------------------------- |
-| `npm run build`     | tsdown into `dist/`; `prepare` runs it, so a git install builds the package |
-| `npm run lint`      | ESLint and Prettier's check                                                 |
-| `npm run fmt`       | ESLint's fixes and Prettier                                                 |
-| `npm test`          | Vitest                                                                      |
-| `npm run typecheck` | `tsc --noEmit`                                                              |
+| Command             | Does                        |
+| ------------------- | --------------------------- |
+| `npm run build`     | tsdown into `dist/`         |
+| `npm run lint`      | ESLint and Prettier's check |
+| `npm run fmt`       | ESLint's fixes and Prettier |
+| `npm test`          | Vitest                      |
+| `npm run typecheck` | `tsc --noEmit`              |
 
-Run `npm run fmt` before every commit; lint, typecheck, test and build must pass, and CI runs the four on every pull request and push to `main`.
+Run `npm run fmt` before every commit; lint, typecheck, test and build must pass, and CI runs the four on every pull request and push to `main`, then publishes the build to pkg.pr.new.
 `.prettierignore` keeps the files copied from the monorepo and `.github` verbatim.
 
 ## The API contract
@@ -55,8 +55,9 @@ Run `npm run fmt` before every commit; lint, typecheck, test and build must pass
 
 ## Releases
 
-Nothing is published yet: consumers install `github:hotcodepush-team/hotcodepush-node#main`, built by `prepare` and pinned by their lockfile.
-The version stays `0.0.0`; release-please, the npm publish and the pkg.pr.new previews arrive with the publish decision.
+Nothing is on npm yet: CI's `preview` job publishes every pull request and every push to `main` to pkg.pr.new, with no secret, since the pkg.pr.new GitHub App authenticates.
+Consumers install `https://pkg.pr.new/hotcodepush-team/hotcodepush-node/@hotcodepush/node@<sha>`, pinning a commit and bumping it deliberately, never `@main`.
+The version stays `0.0.0`; release-please and the npm publish arrive with the publish decision.
 Commits are conventional commits, since release-please will read them; `main` is trunk and CI is the gate.
 
 ## Agent workspace

@@ -4,11 +4,13 @@ The typed Node client for the [HotCodePush](https://hotcodepush.com) REST API.
 
 ## Installation
 
-The package is not on npm yet; install it from GitHub, which builds it on install:
+The package is not on npm yet; every commit on `main` is built to pkg.pr.new, so install one by its commit SHA:
 
 ```sh
-npm install github:hotcodepush-team/hotcodepush-node#main
+npm install https://pkg.pr.new/hotcodepush-team/hotcodepush-node/@hotcodepush/node@<sha>
 ```
+
+A consumer pins a commit and bumps it deliberately, never `@main`.
 
 It requires Node.js 24 or later.
 

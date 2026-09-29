@@ -21,8 +21,41 @@ import { HotCodePush } from '@hotcodepush/node';
 
 const hotCodePush = new HotCodePush({ token: process.env.HOTCODEPUSH_TOKEN });
 
-await hotCodePush.health.get();
+const organization = await hotCodePush.organizations.create({ name: 'Acme' });
+const app = await hotCodePush.organizations.apps.create({
+  framework: 'capacitor',
+  name: 'Demo',
+  organizationId: organization.id,
+});
+const channel = await hotCodePush.apps.channels.create({
+  appId: app.id,
+  name: 'staging',
+});
+await hotCodePush.apps.channels.pause({ appId: app.id, channelId: channel.id });
 ```
+
+The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.channels`:
+
+| Resource                                  | Methods                                                        |
+| ----------------------------------------- | -------------------------------------------------------------- |
+| `health`                                  | `get`                                                          |
+| `organizations`                           | `create`, `delete`, `get`, `list`, `update`                    |
+| `organizations.apps`                      | `create`, `list`                                               |
+| `organizations.invitations`               | `create`, `delete`, `list`                                     |
+| `organizations.members`                   | `delete`, `get`, `list`, `update`                              |
+| `invitations`, the caller's               | `accept`, `list`                                               |
+| `apps`                                    | `delete`, `get`, `transfer`, `update`                          |
+| `apps.channels`                           | `create`, `delete`, `get`, `list`, `pause`, `resume`, `update` |
+| `apps.channels.indexes`                   | `get`                                                          |
+| `apps.channels.releases`, the release log | `create`, `list`                                               |
+| `apps.channels.rollbacks`                 | `create`                                                       |
+| `apps.releases`                           | `get`, `list`, `pause`, `resume`, `revoke`, `update`           |
+| `users`                                   | `delete`                                                       |
+
+Lists take `limit` and `offset`, and where the API embeds linked rows, `relations`: `organizations.members.list({ organizationId, relations: ['user'] })`.
+`users.delete({ userId: 'me' })` addresses the caller, as `me` does wherever the API takes a `{userId}`.
+
+Every creating call sends an `Idempotency-Key`, a UUID per call kept across the client's own retries; pass `idempotencyKey` to reuse one when you retry the call yourself, and the API answers the first result again for 24 hours.
 
 A failed request throws a `HotCodePushError` carrying the API's `code`, `message` and `details` and the HTTP `status`.
 

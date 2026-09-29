@@ -1,0 +1,46 @@
+# @hotcodepush/node
+
+The typed Node client for the [HotCodePush](https://hotcodepush.com) REST API.
+
+## Installation
+
+The package is not on npm yet; install it from GitHub, which builds it on install:
+
+```sh
+npm install github:hotcodepush-team/hotcodepush-node#main
+```
+
+It requires Node.js 24 or later.
+
+## Usage
+
+```ts
+import { HotCodePush } from '@hotcodepush/node';
+
+const hotCodePush = new HotCodePush({ token: process.env.HOTCODEPUSH_TOKEN });
+
+await hotCodePush.health.get();
+```
+
+A failed request throws a `HotCodePushError` carrying the API's `code`, `message` and `details` and the HTTP `status`.
+
+## Documentation
+
+The documentation lives at [hotcodepush.com/docs](https://hotcodepush.com/docs).
+
+## Development
+
+```sh
+nvm use
+npm ci
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+`npm run fmt` applies ESLint's fixes and Prettier.
+
+## License
+
+See [LICENSE](./LICENSE).

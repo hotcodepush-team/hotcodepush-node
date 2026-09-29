@@ -73,6 +73,7 @@ await hotCodePush.apps.files.upload({
 });
 ```
 
+An upload attempt may take ten minutes, `UPLOAD_TIMEOUT_MS`, enough for a 512 MB body at one megabyte a second; every other call gets sixty seconds.
 A `Blob` is read again when a retry needs it; a stream is read once, so a failed stream upload is not retried.
 
 Every creating call sends an `Idempotency-Key`, a UUID per call kept across the client's own retries; pass `idempotencyKey` to reuse one when you retry the call yourself, and the API answers the first result again for 24 hours.

@@ -10,6 +10,16 @@ afterEach(() => {
 });
 
 describe('HttpClient', () => {
+  test('should give each attempt sixty seconds', async () => {
+    stubFetch(() => new Response(null));
+    const timeoutSpy = vi.spyOn(AbortSignal, 'timeout');
+
+    await new HttpClient({}).fetchJson({ method: 'GET', path: '/health' });
+
+    expect(timeoutSpy).toHaveBeenCalledWith(60_000);
+    timeoutSpy.mockRestore();
+  });
+
   test('should request the default base url when no base url is set', async () => {
     const fetchMock = stubFetch(() => new Response(null));
 
@@ -246,6 +256,20 @@ describe('HttpClient.fetchUpload', () => {
       headers: { 'Content-Length': '9', 'Content-Type': 'application/x-tar' },
       method: 'PUT',
     });
+  });
+
+  test('should give each attempt ten minutes', async () => {
+    stubFetch();
+    const timeoutSpy = vi.spyOn(AbortSignal, 'timeout');
+
+    await new HttpClient({}).fetchUpload({
+      body: new Blob(['tar bytes']),
+      contentType: 'application/x-tar',
+      path: '/v1/apps/app/bundles/bundle/pack',
+    });
+
+    expect(timeoutSpy).toHaveBeenCalledWith(600_000);
+    timeoutSpy.mockRestore();
   });
 
   test('should retry a blob when the status is retryable', async () => {

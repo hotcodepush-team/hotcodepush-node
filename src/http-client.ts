@@ -6,8 +6,12 @@ import type { BlobUploadBody, IdempotencyOptions, UploadBody } from './types';
 const DEFAULT_BASE_URL = 'https://api.hotcodepush.com';
 const DEFAULT_CLIENT = `node/${version}`;
 const INITIAL_RETRY_DELAY_MS = 500;
+const JSON_TIMEOUT_MS = 60_000;
 const MAX_ATTEMPTS = 3;
-const TIMEOUT_MS = 60_000;
+/**
+ * Ten minutes per attempt: a 512 MB body, the one public size limit, at one megabyte a second.
+ */
+const UPLOAD_TIMEOUT_MS = 10 * 60_000;
 
 export interface FetchCreatingPostOptions extends IdempotencyOptions {
   body?: unknown;
@@ -75,7 +79,9 @@ export class HttpClient {
   }
 
   public async fetchJson<T>(options: FetchJsonOptions): Promise<T> {
-    const fetchWithRetryAndTimeout = withRetry(withTimeout(fetch, TIMEOUT_MS));
+    const fetchWithRetryAndTimeout = withRetry(
+      withTimeout(fetch, JSON_TIMEOUT_MS),
+    );
     const url = this.resolveUrl(options);
     const requestInit = this.resolveRequestInit(options);
     const response = await fetchWithRetryAndTimeout(url, requestInit);
@@ -86,7 +92,7 @@ export class HttpClient {
    * A binary `PUT`, streamed as it is read; a stream is read once, so only a `Blob` is retried.
    */
   public async fetchUpload<T>(options: FetchUploadOptions): Promise<T> {
-    const fetchWithTimeout = withTimeout(fetch, TIMEOUT_MS);
+    const fetchWithTimeout = withTimeout(fetch, UPLOAD_TIMEOUT_MS);
     const fetchFunction = isBlobUploadBody(options)
       ? withRetry(fetchWithTimeout)
       : fetchWithTimeout;

@@ -1,0 +1,4 @@
+# Copied verbatim from the monorepo and the .github repo, which hold the sources
+.claude/skills
+.github/copilot-instructions.md
+.vscode/settings.json

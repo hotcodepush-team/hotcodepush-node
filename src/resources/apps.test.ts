@@ -1,7 +1,11 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { HotCodePush } from '../client';
-import { resolveSentRequest, stubFetch } from '../test-helpers';
+import {
+  countAttemptsWhenUnavailable,
+  resolveSentRequest,
+  stubFetch,
+} from '../test-helpers';
 
 const APP_URL = 'https://api.hotcodepush.com/v1/apps/app';
 const APP = { framework: 'capacitor', id: 'app', name: 'Demo' };
@@ -49,6 +53,17 @@ describe('AppsResource', () => {
       method: 'POST',
       url: `${APP_URL}/transfer`,
     });
+  });
+
+  test('should not retry the transfer when the api is unavailable', async () => {
+    const attemptCount = await countAttemptsWhenUnavailable(() =>
+      new HotCodePush().apps.transfer({
+        appId: 'app',
+        organizationId: 'organization',
+      }),
+    );
+
+    expect(attemptCount).toBe(1);
   });
 
   test('should patch the app', async () => {

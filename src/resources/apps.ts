@@ -60,6 +60,7 @@ export class AppsResource {
 
   /**
    * Moves an app to another organization the caller is an Admin of.
+   * A repeat answers `E_VALIDATION`, the app being in the target already, so the call is never retried.
    */
   public async transfer(options: TransferAppOptions): Promise<App> {
     const { appId, ...body } = options;

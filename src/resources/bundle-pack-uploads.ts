@@ -1,7 +1,6 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
 import type {
-  IdempotencyOptions,
   JsonRequestBody,
   JsonResponseBody,
   PathParameters,
@@ -27,8 +26,7 @@ export type CompleteBundlePackUploadOptions = PathParameters<
 export type CreateBundlePackUploadOptions = PathParameters<
   '/v1/apps/{appId}/bundles/{bundleId}/pack/uploads',
   'post'
-> &
-  IdempotencyOptions;
+>;
 
 export type DeleteBundlePackUploadOptions = PathParameters<
   '/v1/apps/{appId}/bundles/{bundleId}/pack/uploads/{uploadId}',
@@ -47,6 +45,7 @@ export class BundlePackUploadsResource {
 
   /**
    * Assembles the parts into the pack, replacing one uploaded before.
+   * R2 refuses a second completion, so the call is never retried.
    */
   public async complete(
     options: CompleteBundlePackUploadOptions,
@@ -64,16 +63,16 @@ export class BundlePackUploadsResource {
 
   /**
    * Starts a multipart upload of the pack; every part but the last is at least five mebibytes, all of one size.
+   * The API keeps no idempotency key for it, so the call is never retried: a repeat would start a second upload.
    */
   public async create(
     options: CreateBundlePackUploadOptions,
   ): Promise<BundlePackUpload> {
-    const { idempotencyKey, ...pathParameters } = options;
-    return this.httpClient.fetchCreatingPost({
-      idempotencyKey,
+    return this.httpClient.fetchJson({
+      method: 'POST',
       path: resolvePath(
         '/v1/apps/{appId}/bundles/{bundleId}/pack/uploads',
-        pathParameters,
+        options,
       ),
     });
   }

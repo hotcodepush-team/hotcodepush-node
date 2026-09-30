@@ -1,7 +1,11 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { HotCodePush } from '../client';
-import { resolveSentRequest, stubFetch } from '../test-helpers';
+import {
+  countAttemptsWhenUnavailable,
+  resolveSentRequest,
+  stubFetch,
+} from '../test-helpers';
 
 const INVITATIONS_URL = 'https://api.hotcodepush.com/v1/invitations';
 
@@ -25,6 +29,17 @@ describe('InvitationsResource', () => {
       method: 'POST',
       url: `${INVITATIONS_URL}/invitation/accept`,
     });
+  });
+
+  test('should not retry the acceptance when the api is unavailable', async () => {
+    const attemptCount = await countAttemptsWhenUnavailable(() =>
+      new HotCodePush().invitations.accept({
+        invitationId: 'invitation',
+        token: 'token',
+      }),
+    );
+
+    expect(attemptCount).toBe(1);
   });
 
   test("should list the caller's pending invitations", async () => {

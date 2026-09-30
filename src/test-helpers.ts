@@ -9,6 +9,24 @@ export interface SentRequest {
 }
 
 /**
+ * Runs a call against an API answering 503 on every attempt and counts the attempts the call makes.
+ */
+export async function countAttemptsWhenUnavailable(
+  call: () => Promise<unknown>,
+): Promise<number> {
+  vi.useFakeTimers();
+  try {
+    const fetchMock = stubFetch(() => new Response(null, { status: 503 }));
+    const settledCall = call().catch(() => undefined);
+    await vi.runAllTimersAsync();
+    await settledCall;
+    return fetchMock.mock.calls.length;
+  } finally {
+    vi.useRealTimers();
+  }
+}
+
+/**
  * The last request the stubbed `fetch` received, a JSON body parsed and any other body as it was passed.
  */
 export function resolveSentRequest(fetchMock: Mock<typeof fetch>): SentRequest {

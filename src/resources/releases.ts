@@ -87,9 +87,11 @@ export class ReleasesResource {
 
   /**
    * Stops offering a release; devices on it keep it.
+   * Pausing a paused release answers it unchanged, so the call is retried.
    */
   public async pause(options: PauseReleaseOptions): Promise<Release> {
     return this.httpClient.fetchJson({
+      isRetryable: true,
       method: 'POST',
       path: resolvePath('/v1/apps/{appId}/releases/{releaseId}/pause', options),
     });
@@ -97,9 +99,11 @@ export class ReleasesResource {
 
   /**
    * Offers a paused release again.
+   * Resuming an active release answers it unchanged, so the call is retried.
    */
   public async resume(options: ResumeReleaseOptions): Promise<Release> {
     return this.httpClient.fetchJson({
+      isRetryable: true,
       method: 'POST',
       path: resolvePath(
         '/v1/apps/{appId}/releases/{releaseId}/resume',
@@ -110,6 +114,7 @@ export class ReleasesResource {
 
   /**
    * Revokes a release for good: devices on it move to the newest eligible older release or the embedded bundle.
+   * A repeat answers `E_RELEASE_REVOKED`, so the call is never retried.
    */
   public async revoke(options: RevokeReleaseOptions): Promise<Release> {
     return this.httpClient.fetchJson({

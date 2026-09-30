@@ -64,9 +64,11 @@ export class BundlesResource {
 
   /**
    * Checks every listed file, the pack and the delta packs are uploaded, writes the manifest and sets the bundle `ready`.
+   * A completed bundle answers itself again, so the call is retried.
    */
   public async complete(options: CompleteBundleOptions): Promise<Bundle> {
     return this.httpClient.fetchJson({
+      isRetryable: true,
       method: 'POST',
       path: resolvePath(
         '/v1/apps/{appId}/bundles/{bundleId}/complete',

@@ -24,6 +24,7 @@ export class InvitationsResource {
 
   /**
    * Accepts an invitation addressed to the caller with the token from its mail.
+   * A repeat answers `E_INVITATION_INVALID`, so the call is never retried.
    */
   public async accept(options: AcceptInvitationOptions): Promise<Member> {
     const { invitationId, ...body } = options;

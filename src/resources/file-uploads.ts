@@ -1,7 +1,6 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
 import type {
-  IdempotencyOptions,
   JsonRequestBody,
   JsonResponseBody,
   PathParameters,
@@ -21,8 +20,7 @@ export type CompleteFileUploadOptions = PathParameters<
 export type CreateFileUploadOptions = PathParameters<
   '/v1/apps/{appId}/files/{sha256}/uploads',
   'post'
-> &
-  IdempotencyOptions;
+>;
 
 export type DeleteFileUploadOptions = PathParameters<
   '/v1/apps/{appId}/files/{sha256}/uploads/{uploadId}',
@@ -47,6 +45,7 @@ export class FileUploadsResource {
 
   /**
    * Assembles the parts into the file and checks its hash.
+   * R2 refuses a second completion, so the call is never retried.
    */
   public async complete(options: CompleteFileUploadOptions): Promise<AppFile> {
     const { appId, sha256, uploadId, ...body } = options;
@@ -62,15 +61,12 @@ export class FileUploadsResource {
 
   /**
    * Starts a multipart upload; every part but the last is at least five mebibytes, all of one size.
+   * The API keeps no idempotency key for it, so the call is never retried: a repeat would start a second upload.
    */
   public async create(options: CreateFileUploadOptions): Promise<FileUpload> {
-    const { idempotencyKey, ...pathParameters } = options;
-    return this.httpClient.fetchCreatingPost({
-      idempotencyKey,
-      path: resolvePath(
-        '/v1/apps/{appId}/files/{sha256}/uploads',
-        pathParameters,
-      ),
+    return this.httpClient.fetchJson({
+      method: 'POST',
+      path: resolvePath('/v1/apps/{appId}/files/{sha256}/uploads', options),
     });
   }
 

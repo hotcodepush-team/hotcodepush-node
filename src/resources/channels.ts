@@ -118,9 +118,11 @@ export class ChannelsResource {
 
   /**
    * Pauses a channel: it serves nothing new, and devices keep what they have.
+   * Pausing a paused channel answers it unchanged, so the call is retried.
    */
   public async pause(options: PauseChannelOptions): Promise<Channel> {
     return this.httpClient.fetchJson({
+      isRetryable: true,
       method: 'POST',
       path: resolvePath('/v1/apps/{appId}/channels/{channelId}/pause', options),
     });
@@ -128,9 +130,11 @@ export class ChannelsResource {
 
   /**
    * Resumes a paused channel.
+   * Resuming a running channel answers it unchanged, so the call is retried.
    */
   public async resume(options: ResumeChannelOptions): Promise<Channel> {
     return this.httpClient.fetchJson({
+      isRetryable: true,
       method: 'POST',
       path: resolvePath(
         '/v1/apps/{appId}/channels/{channelId}/resume',

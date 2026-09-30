@@ -1,7 +1,11 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { HotCodePush } from '../client';
-import { resolveSentRequest, stubFetch } from '../test-helpers';
+import {
+  countAttemptsWhenUnavailable,
+  resolveSentRequest,
+  stubFetch,
+} from '../test-helpers';
 
 const CHANNELS_URL = 'https://api.hotcodepush.com/v1/apps/app/channels';
 const CHANNEL = { id: 'channel', name: 'staging', pausedAt: null };
@@ -90,6 +94,17 @@ describe('ChannelsResource', () => {
     });
   });
 
+  test('should retry the pause when the api is unavailable', async () => {
+    const attemptCount = await countAttemptsWhenUnavailable(() =>
+      new HotCodePush().apps.channels.pause({
+        appId: 'app',
+        channelId: 'channel',
+      }),
+    );
+
+    expect(attemptCount).toBe(3);
+  });
+
   test('should post to resume the channel', async () => {
     const fetchMock = stubFetch(() => Response.json(CHANNEL));
 
@@ -103,6 +118,17 @@ describe('ChannelsResource', () => {
       method: 'POST',
       url: `${CHANNELS_URL}/channel/resume`,
     });
+  });
+
+  test('should retry the resume when the api is unavailable', async () => {
+    const attemptCount = await countAttemptsWhenUnavailable(() =>
+      new HotCodePush().apps.channels.resume({
+        appId: 'app',
+        channelId: 'channel',
+      }),
+    );
+
+    expect(attemptCount).toBe(3);
   });
 
   test('should patch the channel', async () => {

@@ -1,7 +1,11 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { HotCodePush } from '../client';
-import { resolveSentRequest, stubFetch } from '../test-helpers';
+import {
+  countAttemptsWhenUnavailable,
+  resolveSentRequest,
+  stubFetch,
+} from '../test-helpers';
 
 const BUNDLES_URL = 'https://api.hotcodepush.com/v1/apps/app/bundles';
 const BUNDLE = { id: 'bundle', state: 'uploading' };
@@ -28,6 +32,17 @@ describe('BundlesResource', () => {
       method: 'POST',
       url: `${BUNDLES_URL}/bundle/complete`,
     });
+  });
+
+  test('should retry the completion when the api is unavailable', async () => {
+    const attemptCount = await countAttemptsWhenUnavailable(() =>
+      new HotCodePush().apps.bundles.complete({
+        appId: 'app',
+        bundleId: 'bundle',
+      }),
+    );
+
+    expect(attemptCount).toBe(3);
   });
 
   test('should post the manifest with its idempotency key', async () => {

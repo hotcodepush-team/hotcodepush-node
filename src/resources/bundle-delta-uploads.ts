@@ -1,7 +1,6 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
 import type {
-  IdempotencyOptions,
   JsonRequestBody,
   JsonResponseBody,
   PathParameters,
@@ -27,8 +26,7 @@ export type CompleteBundleDeltaUploadOptions = PathParameters<
 export type CreateBundleDeltaUploadOptions = PathParameters<
   '/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}/uploads',
   'post'
-> &
-  IdempotencyOptions;
+>;
 
 export type DeleteBundleDeltaUploadOptions = PathParameters<
   '/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}/uploads/{uploadId}',
@@ -47,6 +45,7 @@ export class BundleDeltaUploadsResource {
 
   /**
    * Assembles the parts into the delta pack, replacing one uploaded before.
+   * R2 refuses a second completion, so the call is never retried.
    */
   public async complete(
     options: CompleteBundleDeltaUploadOptions,
@@ -64,16 +63,16 @@ export class BundleDeltaUploadsResource {
 
   /**
    * Starts a multipart upload of the delta pack from a base bundle of the app; every part but the last is at least five mebibytes, all of one size.
+   * The API keeps no idempotency key for it, so the call is never retried: a repeat would start a second upload.
    */
   public async create(
     options: CreateBundleDeltaUploadOptions,
   ): Promise<BundleDeltaUpload> {
-    const { idempotencyKey, ...pathParameters } = options;
-    return this.httpClient.fetchCreatingPost({
-      idempotencyKey,
+    return this.httpClient.fetchJson({
+      method: 'POST',
       path: resolvePath(
         '/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}/uploads',
-        pathParameters,
+        options,
       ),
     });
   }

@@ -1,7 +1,11 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { HotCodePush } from '../client';
-import { resolveSentRequest, stubFetch } from '../test-helpers';
+import {
+  countAttemptsWhenUnavailable,
+  resolveSentRequest,
+  stubFetch,
+} from '../test-helpers';
 
 const UPLOADS_URL =
   'https://api.hotcodepush.com/v1/apps/app/bundles/bundle/pack/uploads';
@@ -30,7 +34,20 @@ describe('BundlePackUploadsResource', () => {
     });
   });
 
-  test('should post to start the upload with its idempotency key', async () => {
+  test('should not retry the completion when the api is unavailable', async () => {
+    const attemptCount = await countAttemptsWhenUnavailable(() =>
+      new HotCodePush().apps.bundles.pack.uploads.complete({
+        appId: 'app',
+        bundleId: 'bundle',
+        parts: [{ etag: 'etag', partNumber: 1 }],
+        uploadId: 'upload',
+      }),
+    );
+
+    expect(attemptCount).toBe(1);
+  });
+
+  test('should post to start the upload without an idempotency key', async () => {
     const fetchMock = stubFetch(() =>
       Response.json({ uploadId: 'upload' }, { status: 201 }),
     );
@@ -39,16 +56,28 @@ describe('BundlePackUploadsResource', () => {
       await new HotCodePush().apps.bundles.pack.uploads.create({
         appId: 'app',
         bundleId: 'bundle',
-        idempotencyKey: 'key',
       });
 
     expect(createdUpload).toEqual({ uploadId: 'upload' });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       body: undefined,
-      headers: { 'Idempotency-Key': 'key' },
       method: 'POST',
       url: UPLOADS_URL,
     });
+    expect(resolveSentRequest(fetchMock).headers).not.toHaveProperty(
+      'Idempotency-Key',
+    );
+  });
+
+  test('should not retry the start when the api is unavailable', async () => {
+    const attemptCount = await countAttemptsWhenUnavailable(() =>
+      new HotCodePush().apps.bundles.pack.uploads.create({
+        appId: 'app',
+        bundleId: 'bundle',
+      }),
+    );
+
+    expect(attemptCount).toBe(1);
   });
 
   test('should delete the upload to abort it', async () => {

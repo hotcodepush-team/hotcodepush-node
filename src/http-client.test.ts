@@ -3,7 +3,11 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { version } from '../package.json';
 import { HotCodePushError } from './errors';
 import { HttpClient, resolvePath, withRetry, withTimeout } from './http-client';
-import { resolveSentRequest, stubFetch } from './test-helpers';
+import {
+  countAttemptsWhenUnavailable,
+  resolveSentRequest,
+  stubFetch,
+} from './test-helpers';
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -142,6 +146,40 @@ describe('HttpClient', () => {
     });
 
     expect(fetchedChannel).toEqual({ id: 'channel' });
+  });
+
+  test.each(['DELETE', 'GET', 'PUT'] as const)(
+    'should retry a %s when the api is unavailable',
+    async method => {
+      const attemptCount = await countAttemptsWhenUnavailable(() =>
+        new HttpClient({}).fetchJson({ method, path: '/v1/apps/app' }),
+      );
+
+      expect(attemptCount).toBe(3);
+    },
+  );
+
+  test.each(['PATCH', 'POST'] as const)(
+    'should not retry a %s when the api is unavailable',
+    async method => {
+      const attemptCount = await countAttemptsWhenUnavailable(() =>
+        new HttpClient({}).fetchJson({ method, path: '/v1/apps/app' }),
+      );
+
+      expect(attemptCount).toBe(1);
+    },
+  );
+
+  test('should retry a post when the api is unavailable and the call is retryable', async () => {
+    const attemptCount = await countAttemptsWhenUnavailable(() =>
+      new HttpClient({}).fetchJson({
+        isRetryable: true,
+        method: 'POST',
+        path: '/v1/apps/app/channels/channel/pause',
+      }),
+    );
+
+    expect(attemptCount).toBe(3);
   });
 
   test('should throw a HotCodePushError when the response is not ok', async () => {

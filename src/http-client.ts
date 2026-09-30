@@ -5,6 +5,11 @@ import type { BlobUploadBody, IdempotencyOptions, UploadBody } from './types';
 
 const DEFAULT_BASE_URL = 'https://api.hotcodepush.com';
 const DEFAULT_CLIENT = `node/${version}`;
+const IDEMPOTENT_METHODS: ReadonlySet<FetchJsonOptions['method']> = new Set([
+  'DELETE',
+  'GET',
+  'PUT',
+]);
 const INITIAL_RETRY_DELAY_MS = 500;
 const JSON_TIMEOUT_MS = 60_000;
 const MAX_ATTEMPTS = 3;
@@ -21,6 +26,13 @@ export interface FetchCreatingPostOptions extends IdempotencyOptions {
 export interface FetchJsonOptions {
   body?: unknown;
   headers?: Record<string, string>;
+  /**
+   * Whether a failed attempt is sent again; a `POST` sets it where the API makes a repeat safe,
+   * through a stored idempotency key or a transition that answers a repeat unchanged.
+   *
+   * @default true for `DELETE`, `GET` and `PUT`, false for `PATCH` and `POST`
+   */
+  isRetryable?: boolean;
   method: 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
   path: string;
   /**
@@ -63,7 +75,8 @@ export class HttpClient {
   }
 
   /**
-   * A creating `POST`, sent with an `Idempotency-Key`: the caller's, or one generated for this call and kept across its retries.
+   * A creating `POST`, sent with an `Idempotency-Key`: the caller's, or one generated for this call and kept across its retries,
+   * which the API answers with the first result.
    */
   public async fetchCreatingPost<T>(
     options: FetchCreatingPostOptions,
@@ -73,6 +86,7 @@ export class HttpClient {
       headers: {
         'Idempotency-Key': options.idempotencyKey ?? crypto.randomUUID(),
       },
+      isRetryable: true,
       method: 'POST',
       path: options.path,
     });
@@ -117,12 +131,15 @@ export class HttpClient {
   }
 
   private async fetchResponse(options: FetchJsonOptions): Promise<Response> {
-    const fetchWithRetryAndTimeout = withRetry(
-      withTimeout(fetch, JSON_TIMEOUT_MS),
-    );
+    const fetchWithTimeout = withTimeout(fetch, JSON_TIMEOUT_MS);
+    const isRetryable =
+      options.isRetryable ?? IDEMPOTENT_METHODS.has(options.method);
+    const fetchFunction = isRetryable
+      ? withRetry(fetchWithTimeout)
+      : fetchWithTimeout;
     const url = this.resolveUrl(options);
     const requestInit = this.resolveRequestInit(options);
-    return fetchWithRetryAndTimeout(url, requestInit);
+    return fetchFunction(url, requestInit);
   }
 
   private resolveRequestInit(options: FetchJsonOptions): RequestInit {

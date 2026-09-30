@@ -1,7 +1,11 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { HotCodePush } from '../client';
-import { resolveSentRequest, stubFetch } from '../test-helpers';
+import {
+  countAttemptsWhenUnavailable,
+  resolveSentRequest,
+  stubFetch,
+} from '../test-helpers';
 
 const SHA256 = 'a'.repeat(64);
 const UPLOADS_URL = `https://api.hotcodepush.com/v1/apps/app/files/${SHA256}/uploads`;
@@ -30,24 +34,49 @@ describe('FileUploadsResource', () => {
     });
   });
 
-  test('should post to start the upload with its idempotency key', async () => {
+  test('should not retry the completion when the api is unavailable', async () => {
+    const attemptCount = await countAttemptsWhenUnavailable(() =>
+      new HotCodePush().apps.files.uploads.complete({
+        appId: 'app',
+        sha256: SHA256,
+        parts: [{ etag: 'etag', partNumber: 1 }],
+        uploadId: 'upload',
+      }),
+    );
+
+    expect(attemptCount).toBe(1);
+  });
+
+  test('should post to start the upload without an idempotency key', async () => {
     const fetchMock = stubFetch(() =>
       Response.json({ uploadId: 'upload' }, { status: 201 }),
     );
 
     const createdUpload = await new HotCodePush().apps.files.uploads.create({
       appId: 'app',
-      idempotencyKey: 'key',
       sha256: SHA256,
     });
 
     expect(createdUpload).toEqual({ uploadId: 'upload' });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       body: undefined,
-      headers: { 'Idempotency-Key': 'key' },
       method: 'POST',
       url: UPLOADS_URL,
     });
+    expect(resolveSentRequest(fetchMock).headers).not.toHaveProperty(
+      'Idempotency-Key',
+    );
+  });
+
+  test('should not retry the start when the api is unavailable', async () => {
+    const attemptCount = await countAttemptsWhenUnavailable(() =>
+      new HotCodePush().apps.files.uploads.create({
+        appId: 'app',
+        sha256: SHA256,
+      }),
+    );
+
+    expect(attemptCount).toBe(1);
   });
 
   test('should delete the upload to abort it', async () => {

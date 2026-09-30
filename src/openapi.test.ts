@@ -66,7 +66,6 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       appId: APP_ID,
       baseBundleId: BASE_BUNDLE_ID,
       bundleId: BUNDLE_ID,
-      idempotencyKey: 'key',
     }),
   'apps.bundles.deltas.uploads.delete': hotCodePush =>
     hotCodePush.apps.bundles.deltas.uploads.delete({
@@ -114,7 +113,6 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.apps.bundles.pack.uploads.create({
       appId: APP_ID,
       bundleId: BUNDLE_ID,
-      idempotencyKey: 'key',
     }),
   'apps.bundles.pack.uploads.delete': hotCodePush =>
     hotCodePush.apps.bundles.pack.uploads.delete({
@@ -222,7 +220,6 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
   'apps.files.uploads.create': hotCodePush =>
     hotCodePush.apps.files.uploads.create({
       appId: APP_ID,
-      idempotencyKey: 'key',
       sha256: SHA256,
     }),
   'apps.files.uploads.delete': hotCodePush =>

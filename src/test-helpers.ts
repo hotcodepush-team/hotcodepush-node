@@ -43,12 +43,58 @@ export function resolveSentRequest(fetchMock: Mock<typeof fetch>): SentRequest {
 }
 
 /**
+ * Every request the stubbed `fetch` received, as its method and URL.
+ */
+export function resolveSentMethodsAndUrls(
+  fetchMock: Mock<typeof fetch>,
+): string[] {
+  return fetchMock.mock.calls.map(
+    ([input, init]) => `${init?.method ?? 'GET'} ${String(input)}`,
+  );
+}
+
+/**
  * Replaces the global `fetch`; undo with `vi.unstubAllGlobals()`.
  */
 export function stubFetch(
   createResponse: () => Response = () => Response.json({}),
 ): Mock<typeof fetch> {
   const fetchMock = vi.fn<typeof fetch>(async () => createResponse());
+  vi.stubGlobal('fetch', fetchMock);
+  return fetchMock;
+}
+
+/**
+ * Replaces the global `fetch` with the API's side of a multipart upload: the upload id on its start, each part's number
+ * in its etag, `E_UPLOAD_INCOMPLETE` for the failed part, `E_NOT_FOUND` on its deletion and the completed body on its completion.
+ */
+export function stubMultipartUploadFetch(
+  completedBody: unknown,
+  failedPartNumber?: number,
+): Mock<typeof fetch> {
+  const fetchMock = vi.fn<typeof fetch>(async (input, init) => {
+    const { pathname } = new URL(String(input));
+    const partNumber = Number(/\/parts\/(\d+)$/.exec(pathname)?.[1]);
+    if (init?.method === 'DELETE') {
+      return Response.json(
+        { code: 'E_NOT_FOUND', message: 'The upload does not exist.' },
+        { status: 404 },
+      );
+    }
+    if (init?.method === 'PUT' && partNumber === failedPartNumber) {
+      return Response.json(
+        { code: 'E_UPLOAD_INCOMPLETE', message: 'The part was refused.' },
+        { status: 409 },
+      );
+    }
+    if (init?.method === 'PUT') {
+      return Response.json({ etag: `etag-${partNumber}`, partNumber });
+    }
+    if (pathname.endsWith('/complete')) {
+      return Response.json(completedBody);
+    }
+    return Response.json({ uploadId: 'upload' }, { status: 201 });
+  });
   vi.stubGlobal('fetch', fetchMock);
   return fetchMock;
 }

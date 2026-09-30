@@ -1,6 +1,10 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
 import type { JsonResponseBody, PathParameters, UploadBody } from '../types';
+import {
+  isBlobAboveSingleUploadLimit,
+  uploadInParts,
+} from '../upload-in-parts';
 import { BundleDeltaUploadsResource } from './bundle-delta-uploads';
 
 export type UploadBundleDeltaOptions = PathParameters<
@@ -24,11 +28,19 @@ export class BundleDeltasResource {
 
   /**
    * Uploads the delta pack from a base bundle of the app, a tar, before the bundle is completed.
+   * A `Blob` above `SINGLE_UPLOAD_LIMIT_BYTES` goes up in parts; a stream goes up in one request, so it stays within the limit.
    */
   public async upload(
     options: UploadBundleDeltaOptions,
   ): Promise<UploadedBundleDelta> {
     const { appId, baseBundleId, bundleId, ...uploadBody } = options;
+    if (isBlobAboveSingleUploadLimit(uploadBody)) {
+      return uploadInParts(
+        this.uploads,
+        { appId, baseBundleId, bundleId },
+        uploadBody.body,
+      );
+    }
     return this.httpClient.fetchUpload({
       ...uploadBody,
       contentType: 'application/x-tar',

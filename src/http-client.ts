@@ -14,7 +14,7 @@ const INITIAL_RETRY_DELAY_MS = 500;
 const JSON_TIMEOUT_MS = 60_000;
 const MAX_ATTEMPTS = 3;
 /**
- * Ten minutes per attempt: a 512 MB body, the one public size limit, at one megabyte a second.
+ * Ten minutes per attempt: `SINGLE_UPLOAD_LIMIT_BYTES`, the largest `Blob` sent in one request, at about a hundred kilobytes a second.
  */
 const UPLOAD_TIMEOUT_MS = 10 * 60_000;
 

@@ -34,3 +34,4 @@ export type {
   StreamUploadBody,
   UploadBody,
 } from './types';
+export { PART_SIZE_BYTES, SINGLE_UPLOAD_LIMIT_BYTES } from './upload-in-parts';

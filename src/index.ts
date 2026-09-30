@@ -24,6 +24,8 @@ export type * from './resources/organization-invitations';
 export type * from './resources/organizations';
 export type * from './resources/releases';
 export type * from './resources/rollbacks';
+export type * from './resources/sso-provider';
+export type * from './resources/sso-provider-verifications';
 export type * from './resources/users';
 export type {
   BlobUploadBody,

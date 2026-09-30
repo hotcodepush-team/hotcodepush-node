@@ -10,6 +10,7 @@ import type {
 import { MembersResource } from './members';
 import { OrganizationAppsResource } from './organization-apps';
 import { OrganizationInvitationsResource } from './organization-invitations';
+import { SsoProviderResource } from './sso-provider';
 
 export type CreateOrganizationOptions = JsonRequestBody<
   '/v1/organizations',
@@ -48,11 +49,13 @@ export class OrganizationsResource {
   public readonly apps: OrganizationAppsResource;
   public readonly invitations: OrganizationInvitationsResource;
   public readonly members: MembersResource;
+  public readonly ssoProvider: SsoProviderResource;
 
   constructor(private readonly httpClient: HttpClient) {
     this.apps = new OrganizationAppsResource(httpClient);
     this.invitations = new OrganizationInvitationsResource(httpClient);
     this.members = new MembersResource(httpClient);
+    this.ssoProvider = new SsoProviderResource(httpClient);
   }
 
   /**

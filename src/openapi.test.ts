@@ -21,6 +21,7 @@ const BUNDLE_ID = '2a9e6c14-8b3f-4d70-a5e2-91c7f0b3d864';
 const CHANNEL_ID = 'e41b7d09-3c6a-4f85-b2d1-6a8f0c9e3b52';
 const EMBEDDED_BUNDLE_ID = '3f6a9c2e-7b14-4d58-9e03-b2c8d6f1a475';
 const FILE = { path: 'index.html', sha256: 'a'.repeat(64), sizeBytes: 5 };
+const HTTP_METHODS = ['delete', 'get', 'patch', 'post', 'put'];
 const INVITATION_ID = '9d3c5e81-6f2a-4b07-8c14-3e7a1f9b0d26';
 const MEMBER_ID = '5b8a2f47-0e9c-4d31-a6b8-2c4f7e1d9a03';
 const ORGANIZATION_ID = 'c6e0b3a8-4d1f-4a92-b7e5-8f3d2c0a6b19';
@@ -345,6 +346,31 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       name: 'Acme',
       organizationId: ORGANIZATION_ID,
     }),
+  'organizations.ssoProvider.delete': hotCodePush =>
+    hotCodePush.organizations.ssoProvider.delete({
+      organizationId: ORGANIZATION_ID,
+    }),
+  'organizations.ssoProvider.get': hotCodePush =>
+    hotCodePush.organizations.ssoProvider.get({
+      organizationId: ORGANIZATION_ID,
+    }),
+  'organizations.ssoProvider.put': hotCodePush =>
+    hotCodePush.organizations.ssoProvider.put({
+      domain: 'example.com',
+      oidc: {
+        clientId: 'client',
+        clientSecret: 'secret',
+        discoveryEndpoint:
+          'https://idp.example.com/.well-known/openid-configuration',
+        issuer: 'https://idp.example.com',
+        scopes: ['openid'],
+      },
+      organizationId: ORGANIZATION_ID,
+    }),
+  'organizations.ssoProvider.verifications.create': hotCodePush =>
+    hotCodePush.organizations.ssoProvider.verifications.create({
+      organizationId: ORGANIZATION_ID,
+    }),
   'users.delete': hotCodePush => hotCodePush.users.delete({ userId: 'me' }),
   'users.get': hotCodePush => hotCodePush.users.get({ userId: 'me' }),
 };
@@ -371,6 +397,21 @@ describe('the OpenAPI snapshot', () => {
       );
 
     expect(Object.keys(CALLS).sort()).toEqual(resourceMethodNames.sort());
+  });
+
+  test('should hold a call for every operation it documents', async () => {
+    const fetchMock = stubFetch();
+
+    for (const callResourceMethod of Object.values(CALLS)) {
+      await callResourceMethod(new HotCodePush());
+    }
+
+    const calledOperationNames = fetchMock.mock.calls.map(([input, init]) =>
+      resolveOperationName(init?.method ?? 'GET', new URL(String(input))),
+    );
+    expect([...new Set(calledOperationNames)].sort()).toEqual(
+      resolveDocumentedOperationNames().sort(),
+    );
   });
 
   test.each(Object.entries(CALLS))(
@@ -409,14 +450,32 @@ describe('the OpenAPI snapshot', () => {
   );
 });
 
+function resolveDocumentedOperationNames(): string[] {
+  return Object.entries(openApiDocument.paths).flatMap(([template, pathItem]) =>
+    Object.keys(pathItem)
+      .filter(method => HTTP_METHODS.includes(method))
+      .map(method => `${method.toUpperCase()} ${template}`),
+  );
+}
+
 function resolveOperation(
   method: string,
   pathname: string,
 ): OpenApiOperation | undefined {
-  const matchedPathItem = Object.entries(openApiDocument.paths).find(
-    ([template]) => resolveTemplatePattern(template).test(pathname),
-  )?.[1];
-  return matchedPathItem?.[method.toLowerCase()];
+  const template = resolvePathTemplate(pathname);
+  return template === undefined
+    ? undefined
+    : openApiDocument.paths[template]?.[method.toLowerCase()];
+}
+
+function resolveOperationName(method: string, url: URL): string {
+  return `${method} ${resolvePathTemplate(url.pathname) ?? url.pathname}`;
+}
+
+function resolvePathTemplate(pathname: string): string | undefined {
+  return Object.keys(openApiDocument.paths).find(template =>
+    resolveTemplatePattern(template).test(pathname),
+  );
 }
 
 function resolveResourceMethodNames(resource: object, path: string): string[] {

@@ -2,7 +2,8 @@ import type { ErrorBody, HotCodePushErrorCode } from './types';
 
 /**
  * Thrown when the API answers with a status outside 2xx.
- * `code`, `message` and `details` are the API's, verbatim.
+ * `code`, `message` and `details` are the API's, verbatim; a response outside the API's error shape
+ * is `E_UNEXPECTED_RESPONSE` with the status, its body left out.
  */
 export class HotCodePushError extends Error {
   public readonly code: HotCodePushErrorCode;
@@ -43,7 +44,7 @@ export function resolveHotCodePushError(
   text: string,
 ): HotCodePushError {
   const errorBody = resolveErrorBody(text) ?? {
-    code: 'E_INTERNAL',
+    code: 'E_UNEXPECTED_RESPONSE',
     message: `Request failed with status ${status}.`,
   };
   return new HotCodePushError(errorBody, status);

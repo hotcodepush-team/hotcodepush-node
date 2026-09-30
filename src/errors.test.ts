@@ -22,23 +22,36 @@ describe('resolveHotCodePushError', () => {
     });
   });
 
-  test('should fall back to E_INTERNAL when the body is not json', () => {
+  test('should answer E_UNEXPECTED_RESPONSE with the status and without the body when the body is html', () => {
     const resolvedError = resolveHotCodePushError(
-      502,
-      '<html>Bad Gateway</html>',
+      429,
+      '<html>Too Many Requests</html>',
     );
 
     expect(resolvedError).toMatchObject({
-      code: 'E_INTERNAL',
+      code: 'E_UNEXPECTED_RESPONSE',
       details: undefined,
-      message: 'Request failed with status 502.',
-      status: 502,
+      message: 'Request failed with status 429.',
+      status: 429,
     });
   });
 
-  test('should fall back to E_INTERNAL when the json lacks the error shape', () => {
+  test('should answer E_UNEXPECTED_RESPONSE with the status and without the body when the body is plain text', () => {
+    const resolvedError = resolveHotCodePushError(503, 'unavailable');
+
+    expect(resolvedError).toMatchObject({
+      code: 'E_UNEXPECTED_RESPONSE',
+      message: 'Request failed with status 503.',
+      status: 503,
+    });
+  });
+
+  test('should answer E_UNEXPECTED_RESPONSE when the json lacks the error shape', () => {
     const resolvedError = resolveHotCodePushError(404, '{"error":"Not Found"}');
 
-    expect(resolvedError).toMatchObject({ code: 'E_INTERNAL', status: 404 });
+    expect(resolvedError).toMatchObject({
+      code: 'E_UNEXPECTED_RESPONSE',
+      status: 404,
+    });
   });
 });

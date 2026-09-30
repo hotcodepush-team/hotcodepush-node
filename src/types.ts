@@ -1,7 +1,7 @@
 import type { components, paths } from './generated/schema';
 
 /**
- * The one error shape every API error answers with.
+ * The one error shape every API error answers with, and the one the client fills for a response outside it.
  */
 export interface ErrorBody {
   code: HotCodePushErrorCode;
@@ -18,9 +18,11 @@ export interface BlobUploadBody {
 }
 
 /**
- * A code of the API's error catalog.
+ * A code of the API's error catalog, or the client's own `E_UNEXPECTED_RESPONSE` for a response outside the API's error shape,
+ * such as a page of the platform in front of the API; the catalog's `E_INTERNAL` is the API's own failure.
  */
-export type HotCodePushErrorCode = components['schemas']['Error']['code'];
+export type HotCodePushErrorCode =
+  components['schemas']['Error']['code'] | 'E_UNEXPECTED_RESPONSE';
 
 export interface IdempotencyOptions {
   /**

@@ -25,7 +25,7 @@ describe('HealthResource', () => {
     });
   });
 
-  test('should throw a HotCodePushError with the status when the api answers unavailable', async () => {
+  test('should throw E_UNEXPECTED_RESPONSE with the status when the api answers unavailable', async () => {
     stubFetch(() => new Response('unavailable', { status: 503 }));
 
     const getPromise = new HotCodePush().health.get();
@@ -34,6 +34,9 @@ describe('HealthResource', () => {
     await vi.runAllTimersAsync();
 
     await assertion;
-    await expect(getPromise).rejects.toMatchObject({ status: 503 });
+    await expect(getPromise).rejects.toMatchObject({
+      code: 'E_UNEXPECTED_RESPONSE',
+      status: 503,
+    });
   });
 });

@@ -148,6 +148,23 @@ describe('HttpClient', () => {
     expect(fetchedChannel).toEqual({ id: 'channel' });
   });
 
+  test('should throw E_UNEXPECTED_RESPONSE with the status when a rate limit in front of the api answers html', async () => {
+    stubFetch(
+      () => new Response('<html>Too Many Requests</html>', { status: 429 }),
+    );
+
+    const fetchPromise = new HttpClient({}).fetchJson({
+      method: 'POST',
+      path: '/v1/invitations/invitation/accept',
+    });
+
+    await expect(fetchPromise).rejects.toBeInstanceOf(HotCodePushError);
+    await expect(fetchPromise).rejects.toMatchObject({
+      code: 'E_UNEXPECTED_RESPONSE',
+      status: 429,
+    });
+  });
+
   test.each(['DELETE', 'GET', 'PUT'] as const)(
     'should retry a %s when the api is unavailable',
     async method => {

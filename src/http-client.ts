@@ -79,13 +79,17 @@ export class HttpClient {
   }
 
   public async fetchJson<T>(options: FetchJsonOptions): Promise<T> {
-    const fetchWithRetryAndTimeout = withRetry(
-      withTimeout(fetch, JSON_TIMEOUT_MS),
-    );
-    const url = this.resolveUrl(options);
-    const requestInit = this.resolveRequestInit(options);
-    const response = await fetchWithRetryAndTimeout(url, requestInit);
+    const response = await this.fetchResponse(options);
     return parseResponseBody(response);
+  }
+
+  /**
+   * A request whose status is the whole answer: the body, such as `/health`'s plain-text `ok`, is discarded.
+   */
+  public async fetchStatus(options: FetchJsonOptions): Promise<void> {
+    const response = await this.fetchResponse(options);
+    await assertResponseOk(response);
+    await response.body?.cancel();
   }
 
   /**
@@ -112,6 +116,15 @@ export class HttpClient {
     return parseResponseBody(response);
   }
 
+  private async fetchResponse(options: FetchJsonOptions): Promise<Response> {
+    const fetchWithRetryAndTimeout = withRetry(
+      withTimeout(fetch, JSON_TIMEOUT_MS),
+    );
+    const url = this.resolveUrl(options);
+    const requestInit = this.resolveRequestInit(options);
+    return fetchWithRetryAndTimeout(url, requestInit);
+  }
+
   private resolveRequestInit(options: FetchJsonOptions): RequestInit {
     const headers = { ...this.headers, ...options.headers };
     if (options.body === undefined) {
@@ -136,6 +149,12 @@ export class HttpClient {
   }
 }
 
+async function assertResponseOk(response: Response): Promise<void> {
+  if (!response.ok) {
+    throw resolveHotCodePushError(response.status, await response.text());
+  }
+}
+
 function isBlobUploadBody(
   uploadBody: UploadBody,
 ): uploadBody is BlobUploadBody {
@@ -147,10 +166,8 @@ function isRetryableStatus(status: number): boolean {
 }
 
 async function parseResponseBody<T>(response: Response): Promise<T> {
+  await assertResponseOk(response);
   const text = await response.text();
-  if (!response.ok) {
-    throw resolveHotCodePushError(response.status, text);
-  }
   return (text ? JSON.parse(text) : undefined) as T;
 }
 

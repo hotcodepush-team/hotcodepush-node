@@ -1,21 +1,39 @@
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { HotCodePush } from '../client';
+import { HotCodePushError } from '../errors';
+import { resolveSentRequest, stubFetch } from '../test-helpers';
+
+beforeEach(() => {
+  vi.useFakeTimers();
+});
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.useRealTimers();
 });
 
 describe('HealthResource', () => {
-  test('should get /health', async () => {
-    const fetchMock = vi.fn<typeof fetch>(async () => new Response(null));
-    vi.stubGlobal('fetch', fetchMock);
+  test('should resolve when the api answers its plain-text ok', async () => {
+    const fetchMock = stubFetch(() => new Response('ok'));
 
     await expect(new HotCodePush().health.get()).resolves.toBeUndefined();
 
-    expect(String(fetchMock.mock.lastCall?.[0])).toBe(
-      'https://api.hotcodepush.com/health',
-    );
-    expect(fetchMock.mock.lastCall?.[1]).toMatchObject({ method: 'GET' });
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: 'https://api.hotcodepush.com/health',
+    });
+  });
+
+  test('should throw a HotCodePushError with the status when the api answers unavailable', async () => {
+    stubFetch(() => new Response('unavailable', { status: 503 }));
+
+    const getPromise = new HotCodePush().health.get();
+    const assertion =
+      expect(getPromise).rejects.toBeInstanceOf(HotCodePushError);
+    await vi.runAllTimersAsync();
+
+    await assertion;
+    await expect(getPromise).rejects.toMatchObject({ status: 503 });
   });
 });

@@ -27,6 +27,7 @@ export type * from './resources/rollbacks';
 export type * from './resources/users';
 export type {
   BlobUploadBody,
+  HotCodePushErrorCode,
   IdempotencyOptions,
   StreamUploadBody,
   UploadBody,

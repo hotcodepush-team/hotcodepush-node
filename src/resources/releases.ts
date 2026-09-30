@@ -10,12 +10,8 @@ import type {
 export type GetReleaseOptions = PathParameters<
   '/v1/apps/{appId}/releases/{releaseId}',
   'get'
-> & {
-  /**
-   * The linked rows to embed.
-   */
-  relations?: readonly ReleaseRelation[];
-};
+> &
+  QueryParameters<'/v1/apps/{appId}/releases/{releaseId}', 'get'>;
 
 export type ListReleasesOptions = PathParameters<
   '/v1/apps/{appId}/releases',
@@ -33,11 +29,6 @@ export type Release = JsonResponseBody<
   'get',
   200
 >;
-
-/**
- * The document types `relations` as a free string; the allow-list is the API's.
- */
-export type ReleaseRelation = 'bundle' | 'channel' | 'counters';
 
 export type ResumeReleaseOptions = PathParameters<
   '/v1/apps/{appId}/releases/{releaseId}/resume',

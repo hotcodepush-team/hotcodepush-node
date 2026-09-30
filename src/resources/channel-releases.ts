@@ -6,7 +6,7 @@ import type {
   PathParameters,
   QueryParameters,
 } from '../types';
-import type { Release, ReleaseRelation } from './releases';
+import type { Release } from './releases';
 
 export type CreateReleaseOptions = PathParameters<
   '/v1/apps/{appId}/channels/{channelId}/releases',
@@ -19,15 +19,7 @@ export type ListChannelReleasesOptions = PathParameters<
   '/v1/apps/{appId}/channels/{channelId}/releases',
   'get'
 > &
-  Omit<
-    QueryParameters<'/v1/apps/{appId}/channels/{channelId}/releases', 'get'>,
-    'relations'
-  > & {
-    /**
-     * The linked rows to embed in each release.
-     */
-    relations?: readonly Exclude<ReleaseRelation, 'counters'>[];
-  };
+  QueryParameters<'/v1/apps/{appId}/channels/{channelId}/releases', 'get'>;
 
 export class ChannelReleasesResource {
   constructor(private readonly httpClient: HttpClient) {}

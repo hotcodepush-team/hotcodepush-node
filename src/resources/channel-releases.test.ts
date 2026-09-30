@@ -37,13 +37,17 @@ describe('ChannelReleasesResource', () => {
     const fetchMock = stubFetch(() => Response.json([RELEASE]));
 
     const fetchedReleases = await new HotCodePush().apps.channels.releases.list(
-      { appId: 'app', channelId: 'channel', relations: ['bundle', 'channel'] },
+      {
+        appId: 'app',
+        channelId: 'channel',
+        relations: ['bundle', 'channel', 'counters'],
+      },
     );
 
     expect(fetchedReleases).toEqual([RELEASE]);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${RELEASES_URL}?relations=bundle%2Cchannel`,
+      url: `${RELEASES_URL}?relations=bundle%2Cchannel%2Ccounters`,
     });
   });
 });

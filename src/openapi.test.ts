@@ -325,6 +325,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.organizations.members.get({
       memberId: MEMBER_ID,
       organizationId: ORGANIZATION_ID,
+      relations: ['user'],
     }),
   'organizations.members.list': hotCodePush =>
     hotCodePush.organizations.members.list({

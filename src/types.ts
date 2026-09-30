@@ -1,10 +1,10 @@
-import type { paths } from './generated/schema';
+import type { components, paths } from './generated/schema';
 
 /**
  * The one error shape every API error answers with.
  */
 export interface ErrorBody {
-  code: string;
+  code: HotCodePushErrorCode;
   details?: unknown;
   message: string;
 }
@@ -16,6 +16,11 @@ export interface ErrorBody {
 export interface BlobUploadBody {
   body: Blob;
 }
+
+/**
+ * A code of the API's error catalog.
+ */
+export type HotCodePushErrorCode = components['schemas']['Error']['code'];
 
 export interface IdempotencyOptions {
   /**

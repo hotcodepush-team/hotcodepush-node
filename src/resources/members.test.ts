@@ -41,6 +41,20 @@ describe('MembersResource', () => {
     });
   });
 
+  test('should get the member with its user when the user relation is set', async () => {
+    const fetchMock = stubFetch(() => Response.json(MEMBER));
+
+    await new HotCodePush().organizations.members.get({
+      memberId: 'member',
+      organizationId: 'organization',
+      relations: ['user'],
+    });
+
+    expect(resolveSentRequest(fetchMock).url).toBe(
+      `${MEMBERS_URL}/member?relations=user`,
+    );
+  });
+
   test('should list the members with their users when the user relation is set', async () => {
     const fetchMock = stubFetch(() => Response.json([MEMBER]));
 

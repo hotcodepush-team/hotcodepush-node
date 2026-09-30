@@ -15,32 +15,23 @@ export type DeleteMemberOptions = PathParameters<
 export type GetMemberOptions = PathParameters<
   '/v1/organizations/{organizationId}/members/{memberId}',
   'get'
->;
+> &
+  QueryParameters<
+    '/v1/organizations/{organizationId}/members/{memberId}',
+    'get'
+  >;
 
 export type ListMembersOptions = PathParameters<
   '/v1/organizations/{organizationId}/members',
   'get'
 > &
-  Omit<
-    QueryParameters<'/v1/organizations/{organizationId}/members', 'get'>,
-    'relations'
-  > & {
-    /**
-     * The linked rows to embed in each member.
-     */
-    relations?: readonly MemberRelation[];
-  };
+  QueryParameters<'/v1/organizations/{organizationId}/members', 'get'>;
 
 export type Member = JsonResponseBody<
   '/v1/organizations/{organizationId}/members/{memberId}',
   'get',
   200
 >;
-
-/**
- * The document types `relations` as a free string; the allow-list is the API's.
- */
-export type MemberRelation = 'user';
 
 export type UpdateMemberOptions = PathParameters<
   '/v1/organizations/{organizationId}/members/{memberId}',
@@ -68,12 +59,14 @@ export class MembersResource {
   }
 
   public async get(options: GetMemberOptions): Promise<Member> {
+    const { memberId, organizationId, ...query } = options;
     return this.httpClient.fetchJson({
       method: 'GET',
       path: resolvePath(
         '/v1/organizations/{organizationId}/members/{memberId}',
-        options,
+        { memberId, organizationId },
       ),
+      query,
     });
   }
 

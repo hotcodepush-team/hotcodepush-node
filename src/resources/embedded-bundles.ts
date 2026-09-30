@@ -21,34 +21,20 @@ export type EmbeddedBundle = JsonResponseBody<
   200
 >;
 
-/**
- * The document types `relations` as a free string; the allow-list is the API's.
- */
-export type EmbeddedBundleRelation = 'bundle';
-
 export type GetEmbeddedBundleOptions = PathParameters<
   '/v1/apps/{appId}/embedded-bundles/{embeddedBundleId}',
   'get'
-> & {
-  /**
-   * The linked rows to embed.
-   */
-  relations?: readonly EmbeddedBundleRelation[];
-};
+> &
+  QueryParameters<
+    '/v1/apps/{appId}/embedded-bundles/{embeddedBundleId}',
+    'get'
+  >;
 
 export type ListEmbeddedBundlesOptions = PathParameters<
   '/v1/apps/{appId}/embedded-bundles',
   'get'
 > &
-  Omit<
-    QueryParameters<'/v1/apps/{appId}/embedded-bundles', 'get'>,
-    'relations'
-  > & {
-    /**
-     * The linked rows to embed in each embedded bundle.
-     */
-    relations?: readonly EmbeddedBundleRelation[];
-  };
+  QueryParameters<'/v1/apps/{appId}/embedded-bundles', 'get'>;
 
 export class EmbeddedBundlesResource {
   constructor(private readonly httpClient: HttpClient) {}

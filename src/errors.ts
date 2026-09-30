@@ -1,11 +1,11 @@
-import type { ErrorBody } from './types';
+import type { ErrorBody, HotCodePushErrorCode } from './types';
 
 /**
  * Thrown when the API answers with a status outside 2xx.
  * `code`, `message` and `details` are the API's, verbatim.
  */
 export class HotCodePushError extends Error {
-  public readonly code: string;
+  public readonly code: HotCodePushErrorCode;
   public readonly details: unknown;
   public readonly status: number;
 

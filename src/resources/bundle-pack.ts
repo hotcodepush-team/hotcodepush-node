@@ -1,6 +1,7 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
 import type { JsonResponseBody, PathParameters, UploadBody } from '../types';
+import { BundlePackUploadsResource } from './bundle-pack-uploads';
 
 export type UploadBundlePackOptions = PathParameters<
   '/v1/apps/{appId}/bundles/{bundleId}/pack',
@@ -15,7 +16,11 @@ export type UploadedBundlePack = JsonResponseBody<
 >;
 
 export class BundlePackResource {
-  constructor(private readonly httpClient: HttpClient) {}
+  public readonly uploads: BundlePackUploadsResource;
+
+  constructor(private readonly httpClient: HttpClient) {
+    this.uploads = new BundlePackUploadsResource(httpClient);
+  }
 
   /**
    * Uploads the bundle's full pack, a tar, before the bundle is completed.

@@ -1,6 +1,17 @@
 {
   "openapi": "3.1.0",
   "components": {
+    "parameters": {
+      "ClientHeader": {
+        "description": "The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`.",
+        "in": "header",
+        "name": "X-HotCodePush-Client",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
     "schemas": {
       "Error": {
         "type": "object",
@@ -101,6 +112,7 @@
     "/v1/invitations": {
       "get": {
         "operationId": "getV1Invitations",
+        "description": "The caller's pending invitations, newest first.",
         "responses": {
           "200": {
             "content": {
@@ -191,7 +203,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -211,7 +223,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -254,7 +266,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The caller's pending invitations, newest first.",
         "summary": "List the caller's invitations",
         "tags": [
           "Invitations"
@@ -279,6 +290,9 @@
               "minimum": 0,
               "maximum": 9007199254740991
             }
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -286,6 +300,7 @@
     "/v1/invitations/{invitationId}/accept": {
       "post": {
         "operationId": "postV1InvitationsByInvitationIdAccept",
+        "description": "Accepts an invitation with the token from its mail; the caller's address must be the invited one, and the membership counts against the members limit.",
         "responses": {
           "201": {
             "content": {
@@ -385,7 +400,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -405,7 +420,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -416,6 +431,26 @@
               }
             },
             "description": "E_NOT_FOUND"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INVITATION_INVALID"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MEMBERS_LIMIT_REACHED"
           },
           "429": {
             "content": {
@@ -448,7 +483,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Accepts an invitation with the token from its mail; the caller's address must be the invited one, and the membership counts against the members limit.",
         "summary": "Accept an invitation",
         "tags": [
           "Invitations"
@@ -463,6 +497,9 @@
               "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             },
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ],
         "requestBody": {
@@ -489,6 +526,7 @@
     "/v1/organizations/{organizationId}/apps": {
       "get": {
         "operationId": "getV1OrganizationsByOrganizationIdApps",
+        "description": "The organization's apps, newest first.",
         "responses": {
           "200": {
             "content": {
@@ -573,7 +611,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -593,7 +631,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -636,7 +674,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The organization's apps, newest first.",
         "summary": "List the apps",
         "tags": [
           "Apps"
@@ -664,16 +701,46 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "organizationId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       },
       "post": {
         "operationId": "postV1OrganizationsByOrganizationIdApps",
+        "description": "Creates an app with its default channel `production`; the name is unique among the organization's live apps and the count against `apps_limit`.",
+        "parameters": [
+          {
+            "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "organizationId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ],
         "responses": {
           "201": {
             "content": {
@@ -755,7 +822,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -775,7 +842,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -838,28 +905,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Creates an app with its default channel `production`; the name is unique among the organization's live apps and the count against `apps_limit`.",
-        "parameters": [
-          {
-            "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
-            "in": "header",
-            "name": "Idempotency-Key",
-            "required": false,
-            "schema": {
-              "maxLength": 255,
-              "minLength": 1,
-              "type": "string"
-            }
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "organizationId",
-            "required": true
-          }
-        ],
         "summary": "Create an app",
         "tags": [
           "Apps"
@@ -899,6 +944,7 @@
     "/v1/organizations/{organizationId}/invitations": {
       "get": {
         "operationId": "getV1OrganizationsByOrganizationIdInvitations",
+        "description": "The organization's invitations, newest first.",
         "responses": {
           "200": {
             "content": {
@@ -989,7 +1035,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -1009,7 +1055,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -1052,7 +1098,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The organization's invitations, newest first.",
         "summary": "List the invitations",
         "tags": [
           "Invitations"
@@ -1080,16 +1125,46 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "organizationId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       },
       "post": {
         "operationId": "postV1OrganizationsByOrganizationIdInvitations",
+        "description": "Invites an address with a role and sends the invitation mail; counts against the daily invitation limit.",
+        "parameters": [
+          {
+            "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "organizationId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ],
         "responses": {
           "201": {
             "content": {
@@ -1177,7 +1252,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -1197,7 +1272,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -1260,28 +1335,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Invites an address with a role and sends the invitation mail; counts against the daily invitation limit.",
-        "parameters": [
-          {
-            "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
-            "in": "header",
-            "name": "Idempotency-Key",
-            "required": false,
-            "schema": {
-              "maxLength": 255,
-              "minLength": 1,
-              "type": "string"
-            }
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "organizationId",
-            "required": true
-          }
-        ],
         "summary": "Create an invitation",
         "tags": [
           "Invitations"
@@ -1320,6 +1373,7 @@
     "/v1/organizations/{organizationId}/invitations/{invitationId}": {
       "delete": {
         "operationId": "deleteV1OrganizationsByOrganizationIdInvitationsByInvitationId",
+        "description": "Withdraws an invitation; its link stops working at once.",
         "responses": {
           "204": {
             "description": "The invitation is withdrawn."
@@ -1332,7 +1386,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -1352,7 +1406,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -1395,7 +1449,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Withdraws an invitation; its link stops working at once.",
         "summary": "Delete an invitation",
         "tags": [
           "Invitations"
@@ -1413,11 +1466,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "organizationId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -1425,6 +1482,7 @@
     "/v1/organizations/{organizationId}/members": {
       "get": {
         "operationId": "getV1OrganizationsByOrganizationIdMembers",
+        "description": "The organization's members, newest first; `?relations=user` embeds each member's user.",
         "responses": {
           "200": {
             "content": {
@@ -1527,7 +1585,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -1547,7 +1605,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -1590,7 +1648,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The organization's members, newest first; `?relations=user` embeds each member's user.",
         "summary": "List the members",
         "tags": [
           "Members"
@@ -1631,11 +1688,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "organizationId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -1643,6 +1704,7 @@
     "/v1/organizations/{organizationId}/members/{memberId}": {
       "get": {
         "operationId": "getV1OrganizationsByOrganizationIdMembersByMemberId",
+        "description": "One member of the organization; `?relations=user` embeds the member's user.",
         "responses": {
           "200": {
             "content": {
@@ -1742,7 +1804,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -1762,7 +1824,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -1805,7 +1867,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "One member of the organization; `?relations=user` embeds the member's user.",
         "summary": "Get a member",
         "tags": [
           "Members"
@@ -1836,16 +1897,21 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "organizationId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       },
       "patch": {
         "operationId": "patchV1OrganizationsByOrganizationIdMembersByMemberId",
+        "description": "Changes a member's role; the role the member has already answers the member unchanged. Setting `owner` transfers ownership: only the Owner may, they become Admin in the same transaction, and the organization keeps exactly one Owner.",
         "responses": {
           "200": {
             "content": {
@@ -1945,7 +2011,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -1965,7 +2031,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -2008,7 +2074,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Changes a member's role. Setting `owner` transfers ownership: only the Owner may, they become Admin in the same transaction, and the organization keeps exactly one Owner.",
         "summary": "Change a member's role",
         "tags": [
           "Members"
@@ -2026,11 +2091,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "organizationId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ],
         "requestBody": {
@@ -2060,6 +2129,7 @@
       },
       "delete": {
         "operationId": "deleteV1OrganizationsByOrganizationIdMembersByMemberId",
+        "description": "Removes a member; removing others needs Admin or Owner, and any member deletes their own row to leave. The Owner leaves only after transferring ownership.",
         "responses": {
           "204": {
             "description": "The member is removed."
@@ -2072,7 +2142,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -2092,7 +2162,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -2103,6 +2173,16 @@
               }
             },
             "description": "E_NOT_FOUND"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_SOLE_OWNER"
           },
           "429": {
             "content": {
@@ -2135,7 +2215,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Removes a member; removing others needs Admin or Owner, and any member deletes their own row to leave. The Owner leaves only after transferring ownership.",
         "summary": "Remove a member",
         "tags": [
           "Members"
@@ -2153,11 +2232,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "organizationId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -2165,6 +2248,7 @@
     "/v1/organizations/{organizationId}/sso-provider": {
       "get": {
         "operationId": "getV1OrganizationsByOrganizationIdSsoProvider",
+        "description": "The organization's SSO provider: its kind, domain, whether the domain is verified, the sign-in link, and the TXT record to set until it is.",
         "responses": {
           "200": {
             "content": {
@@ -2337,6 +2421,16 @@
             },
             "description": "The provider."
           },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
           "401": {
             "content": {
               "application/json": {
@@ -2355,7 +2449,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -2398,7 +2492,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The organization's SSO provider: its kind, domain, whether the domain is verified, the sign-in link, and the TXT record to set until it is.",
         "summary": "Get the SSO provider",
         "tags": [
           "SSO provider"
@@ -2406,16 +2499,21 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "organizationId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       },
       "put": {
         "operationId": "putV1OrganizationsByOrganizationIdSsoProvider",
+        "description": "Sets the OIDC or SAML provider and its domain, replacing the one before; one per organization, paying plans only. A new or changed domain starts unverified, with the TXT record to set in the answer.",
         "responses": {
           "200": {
             "content": {
@@ -2767,7 +2865,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -2779,6 +2877,16 @@
             },
             "description": "E_UNAUTHENTICATED"
           },
+          "402": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_PLAN_REQUIRED"
+          },
           "403": {
             "content": {
               "application/json": {
@@ -2787,7 +2895,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -2830,7 +2938,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Sets the OIDC or SAML provider and its domain, replacing the one before; one per organization, paying plans only. A new or changed domain starts unverified, with the TXT record to set in the answer.",
         "summary": "Set the SSO provider",
         "tags": [
           "SSO provider"
@@ -2923,19 +3030,34 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "organizationId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       },
       "delete": {
         "operationId": "deleteV1OrganizationsByOrganizationIdSsoProvider",
+        "description": "Removes the SSO provider: password sign-in works again for its members, and the domain is forgotten.",
         "responses": {
           "204": {
             "description": "The provider is removed."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -2955,7 +3077,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -2998,7 +3120,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Removes the SSO provider: password sign-in works again for its members, and the domain is forgotten.",
         "summary": "Delete the SSO provider",
         "tags": [
           "SSO provider"
@@ -3006,11 +3127,15 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "organizationId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -3018,6 +3143,7 @@
     "/v1/organizations/{organizationId}/sso-provider/verifications": {
       "post": {
         "operationId": "postV1OrganizationsByOrganizationIdSsoProviderVerifications",
+        "description": "Checks the domain's TXT record for the token the provider waits for and marks the domain verified when it is there; the answer is the provider, its `isVerified` the result. A resolver that cannot be asked leaves the domain unverified, `details.reason` then `lookup_failed`.",
         "responses": {
           "200": {
             "content": {
@@ -3170,6 +3296,27 @@
                           "type": "null"
                         }
                       ]
+                    },
+                    "details": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "reason": {
+                              "type": "string",
+                              "enum": [
+                                "lookup_failed"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "reason"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   },
                   "required": [
@@ -3183,12 +3330,23 @@
                     "saml",
                     "signInUrl",
                     "updatedAt",
-                    "verification"
+                    "verification",
+                    "details"
                   ]
                 }
               }
             },
             "description": "The provider, verified or still waiting for the record."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -3208,7 +3366,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -3251,7 +3409,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Checks the domain's TXT record for the token the provider waits for and marks the domain verified when it is there; the answer is the provider, its `isVerified` the result.",
         "summary": "Verify the SSO domain",
         "tags": [
           "SSO provider"
@@ -3259,11 +3416,15 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "organizationId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -3271,6 +3432,23 @@
     "/v1/organizations": {
       "post": {
         "operationId": "postV1Organizations",
+        "description": "Creates an organization; the creator becomes its Owner.",
+        "parameters": [
+          {
+            "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ],
         "responses": {
           "201": {
             "content": {
@@ -3278,6 +3456,19 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "countryAllowlist": {
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time",
@@ -3287,6 +3478,22 @@
                       "type": "string",
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "ipAllowlist": {
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "isTwoFactorRequired": {
+                      "type": "boolean"
                     },
                     "name": {
                       "type": "string"
@@ -3318,8 +3525,11 @@
                     }
                   },
                   "required": [
+                    "countryAllowlist",
                     "createdAt",
                     "id",
+                    "ipAllowlist",
+                    "isTwoFactorRequired",
                     "name",
                     "plan",
                     "region",
@@ -3338,7 +3548,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -3358,7 +3568,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -3411,20 +3621,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Creates an organization; the creator becomes its Owner.",
-        "parameters": [
-          {
-            "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
-            "in": "header",
-            "name": "Idempotency-Key",
-            "required": false,
-            "schema": {
-              "maxLength": 255,
-              "minLength": 1,
-              "type": "string"
-            }
-          }
-        ],
         "summary": "Create an organization",
         "tags": [
           "Organizations"
@@ -3452,6 +3648,7 @@
       },
       "get": {
         "operationId": "getV1Organizations",
+        "description": "The caller's organizations with their roles, newest first.",
         "responses": {
           "200": {
             "content": {
@@ -3461,6 +3658,19 @@
                   "items": {
                     "type": "object",
                     "properties": {
+                      "countryAllowlist": {
+                        "anyOf": [
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
                       "createdAt": {
                         "type": "string",
                         "format": "date-time",
@@ -3470,6 +3680,22 @@
                         "type": "string",
                         "format": "uuid",
                         "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "ipAllowlist": {
+                        "anyOf": [
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "isTwoFactorRequired": {
+                        "type": "boolean"
                       },
                       "name": {
                         "type": "string"
@@ -3501,8 +3727,11 @@
                       }
                     },
                     "required": [
+                      "countryAllowlist",
                       "createdAt",
                       "id",
+                      "ipAllowlist",
+                      "isTwoFactorRequired",
                       "name",
                       "plan",
                       "region",
@@ -3522,7 +3751,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -3542,7 +3771,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -3585,7 +3814,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The caller's organizations with their roles, newest first.",
         "summary": "List the organizations",
         "tags": [
           "Organizations"
@@ -3610,6 +3838,9 @@
               "minimum": 0,
               "maximum": 9007199254740991
             }
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -3617,144 +3848,7 @@
     "/v1/organizations/{organizationId}": {
       "get": {
         "operationId": "getV1OrganizationsByOrganizationId",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                    },
-                    "id": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "plan": {
-                      "type": "string",
-                      "enum": [
-                        "enterprise",
-                        "free",
-                        "pay_as_you_go"
-                      ]
-                    },
-                    "region": {
-                      "type": "string"
-                    },
-                    "role": {
-                      "type": "string",
-                      "enum": [
-                        "admin",
-                        "billing",
-                        "member",
-                        "owner"
-                      ]
-                    },
-                    "updatedAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                    }
-                  },
-                  "required": [
-                    "createdAt",
-                    "id",
-                    "name",
-                    "plan",
-                    "region",
-                    "updatedAt"
-                  ]
-                }
-              }
-            },
-            "description": "The organization."
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_UNAUTHENTICATED"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_FORBIDDEN"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_NOT_FOUND"
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_RATE_LIMITED"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_INTERNAL"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_MAINTENANCE"
-          }
-        },
         "description": "The organization with its plan; any role of it.",
-        "summary": "Get an organization",
-        "tags": [
-          "Organizations"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "organizationId",
-            "required": true
-          }
-        ]
-      },
-      "patch": {
-        "operationId": "patchV1OrganizationsByOrganizationId",
         "responses": {
           "200": {
             "content": {
@@ -3762,6 +3856,19 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "countryAllowlist": {
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time",
@@ -3771,6 +3878,22 @@
                       "type": "string",
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "ipAllowlist": {
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "isTwoFactorRequired": {
+                      "type": "boolean"
                     },
                     "name": {
                       "type": "string"
@@ -3802,8 +3925,11 @@
                     }
                   },
                   "required": [
+                    "countryAllowlist",
                     "createdAt",
                     "id",
+                    "ipAllowlist",
+                    "isTwoFactorRequired",
                     "name",
                     "plan",
                     "region",
@@ -3822,7 +3948,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -3842,7 +3968,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -3885,7 +4011,200 @@
             "description": "E_MAINTENANCE"
           }
         },
+        "summary": "Get an organization",
+        "tags": [
+          "Organizations"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "organizationId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "patchV1OrganizationsByOrganizationId",
         "description": "Changes the name and the security settings; the security settings need a paying plan, and the region is read-only after creation.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "countryAllowlist": {
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "ipAllowlist": {
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "isTwoFactorRequired": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "plan": {
+                      "type": "string",
+                      "enum": [
+                        "enterprise",
+                        "free",
+                        "pay_as_you_go"
+                      ]
+                    },
+                    "region": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "admin",
+                        "billing",
+                        "member",
+                        "owner"
+                      ]
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    }
+                  },
+                  "required": [
+                    "countryAllowlist",
+                    "createdAt",
+                    "id",
+                    "ipAllowlist",
+                    "isTwoFactorRequired",
+                    "name",
+                    "plan",
+                    "region",
+                    "updatedAt"
+                  ]
+                }
+              }
+            },
+            "description": "The organization."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "402": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_PLAN_REQUIRED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
         "summary": "Update an organization",
         "tags": [
           "Organizations"
@@ -3943,19 +4262,34 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "organizationId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       },
       "delete": {
         "operationId": "deleteV1OrganizationsByOrganizationId",
+        "description": "Soft-deletes the organization: gone at once for everyone, hard-deleted after seven days with everything under it, restorable only by support within the window.",
         "responses": {
           "204": {
             "description": "The organization is scheduled for deletion."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -3975,7 +4309,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -4018,7 +4352,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Soft-deletes the organization: gone at once for everyone, hard-deleted after seven days with everything under it, restorable only by support within the window.",
         "summary": "Delete an organization",
         "tags": [
           "Organizations"
@@ -4026,11 +4359,15 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "organizationId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -4038,6 +4375,7 @@
     "/v1/apps/{appId}/bundles": {
       "get": {
         "operationId": "getV1AppsByAppIdBundles",
+        "description": "The app's uploaded bundles, newest first; the store builds' embedded bundles are listed under embedded-bundles. `isInUse` selects the bundles an active or paused release serves.",
         "responses": {
           "200": {
             "content": {
@@ -4215,7 +4553,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -4235,7 +4573,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -4278,7 +4616,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The app's uploaded bundles, newest first; the store builds' embedded bundles are listed under embedded-bundles. `isInUse` selects the bundles an active or paused release serves.",
         "summary": "List the bundles",
         "tags": [
           "Bundles"
@@ -4346,16 +4683,46 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       },
       "post": {
         "operationId": "postV1AppsByAppIdBundles",
+        "description": "Creates the bundle from its manifest — platforms, version label, files with path, hash and size, fingerprint, git provenance — and answers the hashes the app lacks with their upload URLs; the bundle is `uploading` until completed.",
+        "parameters": [
+          {
+            "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ],
         "responses": {
           "201": {
             "content": {
@@ -4569,7 +4936,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -4589,7 +4956,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -4662,28 +5029,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Creates the bundle from its manifest — platforms, version label, files with path, hash and size, fingerprint, git provenance — and answers the hashes the app lacks with their upload URLs; the bundle is `uploading` until completed.",
-        "parameters": [
-          {
-            "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
-            "in": "header",
-            "name": "Idempotency-Key",
-            "required": false,
-            "schema": {
-              "maxLength": 255,
-              "minLength": 1,
-              "type": "string"
-            }
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "appId",
-            "required": true
-          }
-        ],
         "summary": "Create a bundle",
         "tags": [
           "Bundles"
@@ -4821,6 +5166,7 @@
     "/v1/apps/{appId}/bundles/{bundleId}": {
       "get": {
         "operationId": "getV1AppsByAppIdBundlesByBundleId",
+        "description": "One bundle, with the derived expiry — `unusedSince` plus the retention — while it is in use nowhere.",
         "responses": {
           "200": {
             "content": {
@@ -4987,6 +5333,16 @@
             },
             "description": "The bundle."
           },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
           "401": {
             "content": {
               "application/json": {
@@ -5005,7 +5361,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -5048,7 +5404,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "One bundle, with the derived expiry — `unusedSince` plus the retention — while it is in use nowhere.",
         "summary": "Get a bundle",
         "tags": [
           "Bundles"
@@ -5056,7 +5411,8 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
@@ -5064,19 +5420,34 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "bundleId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       },
       "delete": {
         "operationId": "deleteV1AppsByAppIdBundlesByBundleId",
+        "description": "Deletes the bundle now, not by retention: refused while a release serves it or a store build registered it as its embedded bundle; its manifest, pack and delta packs go with it, and the files no other bundle of the app lists.",
         "responses": {
           "204": {
             "description": "The bundle is gone."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -5096,7 +5467,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -5149,7 +5520,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Deletes the bundle now, not by retention: refused while a release serves it or a store build registered it as its embedded bundle; its manifest, pack and delta packs go with it, and the files no other bundle of the app lists.",
         "summary": "Delete a bundle",
         "tags": [
           "Bundles"
@@ -5157,7 +5527,8 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
@@ -5165,11 +5536,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "bundleId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -5177,6 +5552,17 @@
     "/v1/apps/{appId}/bundles/{bundleId}/pack": {
       "put": {
         "operationId": "putV1AppsByAppIdBundlesByBundleIdPack",
+        "description": "The full pack, one per bundle, streamed under its prefix; `Content-Length` declares the bytes.",
+        "requestBody": {
+          "content": {
+            "application/x-tar": {
+              "schema": {
+                "format": "binary"
+              }
+            }
+          },
+          "description": "The pack bytes."
+        },
         "responses": {
           "200": {
             "content": {
@@ -5198,6 +5584,16 @@
             },
             "description": "The pack, stored."
           },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
           "401": {
             "content": {
               "application/json": {
@@ -5216,7 +5612,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -5279,7 +5675,39 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The full pack, one per bundle, streamed under its prefix; `Content-Length` declares the bytes.",
+        "summary": "Upload the full pack",
+        "tags": [
+          "Bundles"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "bundleId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      }
+    },
+    "/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}": {
+      "put": {
+        "operationId": "putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleId",
+        "description": "The delta pack from a base bundle of the app, streamed under the bundle's prefix; `Content-Length` declares the bytes.",
         "requestBody": {
           "content": {
             "application/x-tar": {
@@ -5288,35 +5716,8 @@
               }
             }
           },
-          "description": "The pack bytes."
+          "description": "The delta pack bytes."
         },
-        "summary": "Upload the full pack",
-        "tags": [
-          "Bundles"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "appId",
-            "required": true
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "bundleId",
-            "required": true
-          }
-        ]
-      }
-    },
-    "/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}": {
-      "put": {
-        "operationId": "putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleId",
         "responses": {
           "200": {
             "content": {
@@ -5346,7 +5747,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -5366,7 +5767,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -5429,17 +5830,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The delta pack from a base bundle of the app, streamed under the bundle's prefix; `Content-Length` declares the bytes.",
-        "requestBody": {
-          "content": {
-            "application/x-tar": {
-              "schema": {
-                "format": "binary"
-              }
-            }
-          },
-          "description": "The delta pack bytes."
-        },
         "summary": "Upload a delta pack",
         "tags": [
           "Bundles"
@@ -5457,7 +5847,8 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
@@ -5465,11 +5856,1295 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "bundleId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      }
+    },
+    "/v1/apps/{appId}/bundles/{bundleId}/pack/uploads": {
+      "post": {
+        "operationId": "postV1AppsByAppIdBundlesByBundleIdPackUploads",
+        "description": "Starts a multipart upload of the full pack, for a pack above the request body limit; the parts follow, and the single PUT stays for small packs.",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uploadId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "uploadId"
+                  ]
+                }
+              }
+            },
+            "description": "The upload id the parts carry."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Start a multipart pack upload",
+        "tags": [
+          "Bundles"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "bundleId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      }
+    },
+    "/v1/apps/{appId}/bundles/{bundleId}/pack/uploads/{uploadId}/parts/{partNumber}": {
+      "put": {
+        "operationId": "putV1AppsByAppIdBundlesByBundleIdPackUploadsByUploadIdPartsByPartNumber",
+        "description": "One part of a multipart upload, its bytes as the body and `Content-Length` their count; every part but the last is at least five mebibytes, all are of one size, and an upload has at most 10,000.",
+        "requestBody": {
+          "content": {
+            "application/x-tar": {
+              "schema": {
+                "format": "binary"
+              }
+            }
+          },
+          "description": "The part's bytes."
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "etag": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "partNumber": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10000
+                    }
+                  },
+                  "required": [
+                    "etag",
+                    "partNumber"
+                  ]
+                }
+              }
+            },
+            "description": "The part, to hand back at completion."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UPLOAD_INCOMPLETE"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_BUNDLE_TOO_LARGE"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_STORAGE_LIMIT_REACHED"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Upload a pack part",
+        "tags": [
+          "Bundles"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "uploadId",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "partNumber",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000
+            },
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "bundleId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      }
+    },
+    "/v1/apps/{appId}/bundles/{bundleId}/pack/uploads/{uploadId}/complete": {
+      "post": {
+        "operationId": "postV1AppsByAppIdBundlesByBundleIdPackUploadsByUploadIdComplete",
+        "description": "Assembles the parts into the full pack and counts its bytes, as the single PUT does; a pack uploaded before is replaced, and one above the byte limit is deleted.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sizeBytes": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "sizeBytes"
+                  ]
+                }
+              }
+            },
+            "description": "The pack, stored."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UPLOAD_INCOMPLETE"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_BUNDLE_TOO_LARGE"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Complete a multipart pack upload",
+        "tags": [
+          "Bundles"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "uploadId",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "bundleId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "parts": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "etag": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "partNumber": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 10000
+                        }
+                      },
+                      "required": [
+                        "etag",
+                        "partNumber"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "parts"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/apps/{appId}/bundles/{bundleId}/pack/uploads/{uploadId}": {
+      "delete": {
+        "operationId": "deleteV1AppsByAppIdBundlesByBundleIdPackUploadsByUploadId",
+        "description": "Aborts a multipart pack upload, discarding its parts.",
+        "responses": {
+          "204": {
+            "description": "The upload is gone."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Abort a multipart pack upload",
+        "tags": [
+          "Bundles"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "uploadId",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "bundleId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      }
+    },
+    "/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}/uploads": {
+      "post": {
+        "operationId": "postV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploads",
+        "description": "Starts a multipart upload of the delta pack from a base bundle of the app, for a delta pack above the request body limit; the parts follow, and the single PUT stays for small ones.",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uploadId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "uploadId"
+                  ]
+                }
+              }
+            },
+            "description": "The upload id the parts carry."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Start a multipart delta pack upload",
+        "tags": [
+          "Bundles"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "baseBundleId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "bundleId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      }
+    },
+    "/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}/uploads/{uploadId}/parts/{partNumber}": {
+      "put": {
+        "operationId": "putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadIdPartsByPartNumber",
+        "description": "One part of a multipart upload, its bytes as the body and `Content-Length` their count; every part but the last is at least five mebibytes, all are of one size, and an upload has at most 10,000.",
+        "requestBody": {
+          "content": {
+            "application/x-tar": {
+              "schema": {
+                "format": "binary"
+              }
+            }
+          },
+          "description": "The part's bytes."
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "etag": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "partNumber": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10000
+                    }
+                  },
+                  "required": [
+                    "etag",
+                    "partNumber"
+                  ]
+                }
+              }
+            },
+            "description": "The part, to hand back at completion."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UPLOAD_INCOMPLETE"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_BUNDLE_TOO_LARGE"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_STORAGE_LIMIT_REACHED"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Upload a delta pack part",
+        "tags": [
+          "Bundles"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "baseBundleId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "uploadId",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "partNumber",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000
+            },
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "bundleId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      }
+    },
+    "/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}/uploads/{uploadId}/complete": {
+      "post": {
+        "operationId": "postV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadIdComplete",
+        "description": "Assembles the parts into the delta pack and counts its bytes, as the single PUT does; a delta pack uploaded before is replaced, and one above the byte limit is deleted.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sizeBytes": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "sizeBytes"
+                  ]
+                }
+              }
+            },
+            "description": "The delta pack, stored."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UPLOAD_INCOMPLETE"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_BUNDLE_TOO_LARGE"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Complete a multipart delta pack upload",
+        "tags": [
+          "Bundles"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "baseBundleId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "uploadId",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "bundleId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "parts": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "etag": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "partNumber": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 10000
+                        }
+                      },
+                      "required": [
+                        "etag",
+                        "partNumber"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "parts"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}/uploads/{uploadId}": {
+      "delete": {
+        "operationId": "deleteV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadId",
+        "description": "Aborts a multipart delta pack upload, discarding its parts.",
+        "responses": {
+          "204": {
+            "description": "The upload is gone."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Abort a multipart delta pack upload",
+        "tags": [
+          "Bundles"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "baseBundleId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "uploadId",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "bundleId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -5477,6 +7152,7 @@
     "/v1/apps/{appId}/bundles/{bundleId}/complete": {
       "post": {
         "operationId": "postV1AppsByAppIdBundlesByBundleIdComplete",
+        "description": "Verifies every listed file, the pack and the delta packs are present, writes the manifest envelope at the bundle's key and sets `ready`; a completed bundle answers itself again.",
         "responses": {
           "200": {
             "content": {
@@ -5643,6 +7319,16 @@
             },
             "description": "The bundle, ready."
           },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
           "401": {
             "content": {
               "application/json": {
@@ -5661,7 +7347,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -5714,7 +7400,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Verifies every listed file, the pack and the delta packs are present, writes the manifest envelope at the bundle's key and sets `ready`; a completed bundle answers itself again.",
         "summary": "Complete a bundle",
         "tags": [
           "Bundles"
@@ -5722,7 +7407,8 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
@@ -5730,11 +7416,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "bundleId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -5742,6 +7432,7 @@
     "/v1/apps/{appId}/channels": {
       "get": {
         "operationId": "getV1AppsByAppIdChannels",
+        "description": "The app's channels, newest first.",
         "responses": {
           "200": {
             "content": {
@@ -5872,7 +7563,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -5892,7 +7583,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -5935,7 +7626,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The app's channels, newest first.",
         "summary": "List the channels",
         "tags": [
           "Channels"
@@ -5963,16 +7653,46 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       },
       "post": {
         "operationId": "postV1AppsByAppIdChannels",
+        "description": "Creates a channel: the name is one to 64 letters, digits, hyphens or underscores and unique per app; only Owners and Admins protect one; an expiry never sits on a protected channel; the count is bounded by `channels_per_app_limit`.",
+        "parameters": [
+          {
+            "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ],
         "responses": {
           "201": {
             "content": {
@@ -6100,7 +7820,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -6120,7 +7840,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -6183,28 +7903,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Creates a channel: the name is one to 64 letters, digits, hyphens or underscores and unique per app; only Owners and Admins protect one; an expiry never sits on a protected channel; the count is bounded by `channels_per_app_limit`.",
-        "parameters": [
-          {
-            "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
-            "in": "header",
-            "name": "Idempotency-Key",
-            "required": false,
-            "schema": {
-              "maxLength": 255,
-              "minLength": 1,
-              "type": "string"
-            }
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "appId",
-            "required": true
-          }
-        ],
         "summary": "Create a channel",
         "tags": [
           "Channels"
@@ -6290,6 +7988,7 @@
     "/v1/apps/{appId}/channels/{channelId}": {
       "get": {
         "operationId": "getV1AppsByAppIdChannelsByChannelId",
+        "description": "One channel with the header numbers of its page; the device counts come from the registry once devices report.",
         "responses": {
           "200": {
             "content": {
@@ -6427,6 +8126,16 @@
             },
             "description": "The channel."
           },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
           "401": {
             "content": {
               "application/json": {
@@ -6445,7 +8154,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -6488,7 +8197,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "One channel with the header numbers of its page; the device counts come from the registry once devices report.",
         "summary": "Get a channel",
         "tags": [
           "Channels"
@@ -6496,7 +8204,8 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
@@ -6504,16 +8213,21 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "channelId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       },
       "patch": {
         "operationId": "patchV1AppsByAppIdChannelsByChannelId",
+        "description": "Edits the name, the protected and discoverable flags, the expiry and the auto-pause policy; every change to a protected channel is Admin or Owner, and the expiry is refused on the default channel.",
         "responses": {
           "200": {
             "content": {
@@ -6641,7 +8355,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -6661,7 +8375,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -6714,7 +8428,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Edits the name, the protected and discoverable flags, the expiry and the auto-pause policy; every change to a protected channel is Admin or Owner, and the expiry is refused on the default channel.",
         "summary": "Update a channel",
         "tags": [
           "Channels"
@@ -6795,7 +8508,8 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
@@ -6803,19 +8517,34 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "channelId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       },
       "delete": {
         "operationId": "deleteV1AppsByAppIdChannelsByChannelId",
+        "description": "Deletes the channel with its releases: it leaves the frontier and starts its bundles' retention clocks; refused on the app's default channel.",
         "responses": {
           "204": {
             "description": "The channel is gone."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -6835,7 +8564,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -6888,7 +8617,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Deletes the channel with its releases: it leaves the frontier and starts its bundles' retention clocks; refused on the app's default channel.",
         "summary": "Delete a channel",
         "tags": [
           "Channels"
@@ -6896,7 +8624,8 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
@@ -6904,11 +8633,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "channelId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -6916,6 +8649,7 @@
     "/v1/apps/{appId}/channels/{channelId}/pause": {
       "post": {
         "operationId": "postV1AppsByAppIdChannelsByChannelIdPause",
+        "description": "A paused channel serves nothing new: its index carries `isPaused` and devices keep what they have — the kill switch for a whole channel.",
         "responses": {
           "200": {
             "content": {
@@ -7035,6 +8769,16 @@
             },
             "description": "The channel."
           },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
           "401": {
             "content": {
               "application/json": {
@@ -7053,7 +8797,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -7096,7 +8840,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "A paused channel serves nothing new: its index carries `isPaused` and devices keep what they have — the kill switch for a whole channel.",
         "summary": "Pause a channel",
         "tags": [
           "Channels"
@@ -7104,7 +8847,8 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
@@ -7112,11 +8856,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "channelId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -7124,6 +8872,7 @@
     "/v1/apps/{appId}/channels/{channelId}/resume": {
       "post": {
         "operationId": "postV1AppsByAppIdChannelsByChannelIdResume",
+        "description": "The channel serves its frontier again.",
         "responses": {
           "200": {
             "content": {
@@ -7243,6 +8992,16 @@
             },
             "description": "The channel."
           },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
           "401": {
             "content": {
               "application/json": {
@@ -7261,7 +9020,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -7304,7 +9063,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The channel serves its frontier again.",
         "summary": "Resume a channel",
         "tags": [
           "Channels"
@@ -7312,7 +9070,8 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
@@ -7320,11 +9079,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "channelId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -7332,6 +9095,7 @@
     "/v1/apps/{appId}/channels/{channelId}/indexes/{platform}": {
       "get": {
         "operationId": "getV1AppsByAppIdChannelsByChannelIdIndexesByPlatform",
+        "description": "The channel's index for a platform as the database sees it, for the probe and the verifier to compare with the copy the CDN serves.",
         "responses": {
           "200": {
             "content": {
@@ -7669,7 +9433,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -7689,7 +9453,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -7732,7 +9496,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The channel's index for a platform as the database sees it, for the probe and the verifier to compare with the copy the CDN serves.",
         "summary": "Get a channel index",
         "tags": [
           "Channels"
@@ -7752,7 +9515,8 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
@@ -7760,11 +9524,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "channelId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -7772,6 +9540,7 @@
     "/v1/apps/{appId}/channels/{channelId}/releases": {
       "get": {
         "operationId": "getV1AppsByAppIdChannelsByChannelIdReleases",
+        "description": "The channel's release log, newest first, each release with the devices whose current release it is; `?relations=channel,bundle,counters` embeds the linked rows.",
         "responses": {
           "200": {
             "content": {
@@ -8421,7 +10190,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -8441,7 +10210,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -8484,7 +10253,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The channel's release log, newest first, each release with the devices whose current release it is; `?relations=channel,bundle,counters` embeds the linked rows.",
         "summary": "List the releases of a channel",
         "tags": [
           "Releases"
@@ -8527,7 +10295,8 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
@@ -8535,16 +10304,55 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "channelId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       },
       "post": {
         "operationId": "postV1AppsByAppIdChannelsByChannelIdReleases",
+        "description": "Creates a release of a ready bundle in the channel with its conditions, rollout, mandatory flag and notes, numbered next in the channel; refused on a protected channel below Admin and past `releases_per_app_per_day_limit`; an `Idempotency-Key` answers the same release again for 24 hours.",
+        "parameters": [
+          {
+            "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "channelId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ],
         "responses": {
           "201": {
             "content": {
@@ -9191,7 +10999,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -9211,7 +11019,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -9274,36 +11082,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Creates a release of a ready bundle in the channel with its conditions, rollout, mandatory flag and notes, numbered next in the channel; refused on a protected channel below Admin and past `releases_per_app_per_day_limit`; an `Idempotency-Key` answers the same release again for 24 hours.",
-        "parameters": [
-          {
-            "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
-            "in": "header",
-            "name": "Idempotency-Key",
-            "required": false,
-            "schema": {
-              "maxLength": 255,
-              "minLength": 1,
-              "type": "string"
-            }
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "appId",
-            "required": true
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "channelId",
-            "required": true
-          }
-        ],
         "summary": "Create a release",
         "tags": [
           "Releases"
@@ -9479,6 +11257,41 @@
     "/v1/apps/{appId}/channels/{channelId}/rollbacks": {
       "post": {
         "operationId": "postV1AppsByAppIdChannelsByChannelIdRollbacks",
+        "description": "Creates a release of the channel's previous bundle, or of the release named by `toReleaseId`, with the rollback recorded as its provenance; a rollback is a release, never a mutation.",
+        "parameters": [
+          {
+            "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "channelId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ],
         "responses": {
           "201": {
             "content": {
@@ -10125,7 +11938,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -10145,7 +11958,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -10166,6 +11979,16 @@
               }
             },
             "description": "E_RELEASE_REVOKED or E_IDEMPOTENCY_KEY_REUSED"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RELEASES_PER_DAY_LIMIT_REACHED"
           },
           "429": {
             "content": {
@@ -10198,36 +12021,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Creates a release of the channel's previous bundle, or of the release named by `toReleaseId`, with the rollback recorded as its provenance; a rollback is a release, never a mutation.",
-        "parameters": [
-          {
-            "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
-            "in": "header",
-            "name": "Idempotency-Key",
-            "required": false,
-            "schema": {
-              "maxLength": 255,
-              "minLength": 1,
-              "type": "string"
-            }
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "appId",
-            "required": true
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "channelId",
-            "required": true
-          }
-        ],
         "summary": "Roll a channel back",
         "tags": [
           "Releases"
@@ -10262,6 +12055,7 @@
     "/v1/apps/{appId}/embedded-bundles": {
       "get": {
         "operationId": "getV1AppsByAppIdEmbeddedBundles",
+        "description": "The app's registered store builds, newest first; `?relations=bundle` embeds each one's bundle.",
         "responses": {
           "200": {
             "content": {
@@ -10499,7 +12293,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -10519,7 +12313,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -10562,7 +12356,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The app's registered store builds, newest first; `?relations=bundle` embeds each one's bundle.",
         "summary": "List the embedded bundles",
         "tags": [
           "Embedded bundles"
@@ -10603,16 +12396,46 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       },
       "post": {
         "operationId": "postV1AppsByAppIdEmbeddedBundles",
+        "description": "Registers the bundle compiled into a store build with its binary identity — platform, binary version, build, fingerprint — its files uploaded first through the file endpoints. Create-only on the identity: an identical re-registration answers the row, a conflicting fingerprint is refused, and `force` updates it.",
+        "parameters": [
+          {
+            "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -11072,7 +12895,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -11092,7 +12915,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -11145,28 +12968,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Registers the bundle compiled into a store build with its binary identity — platform, binary version, build, fingerprint — its files uploaded first through the file endpoints. Create-only on the identity: an identical re-registration answers the row, a conflicting fingerprint is refused, and `force` updates it.",
-        "parameters": [
-          {
-            "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
-            "in": "header",
-            "name": "Idempotency-Key",
-            "required": false,
-            "schema": {
-              "maxLength": 255,
-              "minLength": 1,
-              "type": "string"
-            }
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "appId",
-            "required": true
-          }
-        ],
         "summary": "Register an embedded bundle",
         "tags": [
           "Embedded bundles"
@@ -11255,6 +13056,7 @@
     "/v1/apps/{appId}/embedded-bundles/{embeddedBundleId}": {
       "get": {
         "operationId": "getV1AppsByAppIdEmbeddedBundlesByEmbeddedBundleId",
+        "description": "One registered store build; `?relations=bundle` embeds its bundle.",
         "responses": {
           "200": {
             "content": {
@@ -11489,7 +13291,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -11509,7 +13311,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -11552,7 +13354,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "One registered store build; `?relations=bundle` embeds its bundle.",
         "summary": "Get an embedded bundle",
         "tags": [
           "Embedded bundles"
@@ -11583,11 +13384,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -11595,6 +13400,17 @@
     "/v1/apps/{appId}/files/{sha256}": {
       "put": {
         "operationId": "putV1AppsByAppIdFilesBySha256",
+        "description": "Uploads one file of the web build: the body is the file gzip-compressed, `Content-Length` its size, and the path the SHA-256 of the uncompressed content, checked as the bytes pass; a hash the app already holds answers the existing file.",
+        "requestBody": {
+          "content": {
+            "application/gzip": {
+              "schema": {
+                "format": "binary"
+              }
+            }
+          },
+          "description": "The gzip bytes."
+        },
         "responses": {
           "200": {
             "content": {
@@ -11676,7 +13492,7 @@
                 }
               }
             },
-            "description": "E_HASH_MISMATCH"
+            "description": "E_HASH_MISMATCH or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -11696,7 +13512,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -11759,17 +13575,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Uploads one file of the web build: the body is the file gzip-compressed, `Content-Length` its size, and the path the SHA-256 of the uncompressed content, checked as the bytes pass; a hash the app already holds answers the existing file.",
-        "requestBody": {
-          "content": {
-            "application/gzip": {
-              "schema": {
-                "format": "binary"
-              }
-            }
-          },
-          "description": "The gzip bytes."
-        },
         "summary": "Upload a file",
         "tags": [
           "Files"
@@ -11786,11 +13591,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -11798,6 +13607,7 @@
     "/v1/apps/{appId}/files/{sha256}/uploads": {
       "post": {
         "operationId": "postV1AppsByAppIdFilesBySha256Uploads",
+        "description": "Starts a multipart upload for a larger file; the parts follow, every one but the last at least five mebibytes and all of one size.",
         "responses": {
           "201": {
             "content": {
@@ -11825,7 +13635,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -11845,7 +13655,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -11888,7 +13698,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Starts a multipart upload for a larger file; the parts follow, every one but the last at least five mebibytes and all of one size.",
         "summary": "Start a multipart upload",
         "tags": [
           "Files"
@@ -11905,11 +13714,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -11917,6 +13730,17 @@
     "/v1/apps/{appId}/files/{sha256}/uploads/{uploadId}/parts/{partNumber}": {
       "put": {
         "operationId": "putV1AppsByAppIdFilesBySha256UploadsByUploadIdPartsByPartNumber",
+        "description": "One part of a multipart upload, its bytes as the body and `Content-Length` their count; every part but the last is at least five mebibytes, all are of one size, and an upload has at most 10,000.",
+        "requestBody": {
+          "content": {
+            "application/gzip": {
+              "schema": {
+                "format": "binary"
+              }
+            }
+          },
+          "description": "The part's bytes."
+        },
         "responses": {
           "200": {
             "content": {
@@ -11951,7 +13775,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -11971,7 +13795,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -11983,6 +13807,16 @@
             },
             "description": "E_NOT_FOUND"
           },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UPLOAD_INCOMPLETE"
+          },
           "413": {
             "content": {
               "application/json": {
@@ -11992,6 +13826,16 @@
               }
             },
             "description": "E_BUNDLE_TOO_LARGE"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_STORAGE_LIMIT_REACHED"
           },
           "429": {
             "content": {
@@ -12023,17 +13867,6 @@
             },
             "description": "E_MAINTENANCE"
           }
-        },
-        "description": "One part of a multipart upload, its bytes as the body.",
-        "requestBody": {
-          "content": {
-            "application/gzip": {
-              "schema": {
-                "format": "binary"
-              }
-            }
-          },
-          "description": "The part's bytes."
         },
         "summary": "Upload a part",
         "tags": [
@@ -12070,11 +13903,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -12082,6 +13919,7 @@
     "/v1/apps/{appId}/files/{sha256}/uploads/{uploadId}/complete": {
       "post": {
         "operationId": "postV1AppsByAppIdFilesBySha256UploadsByUploadIdComplete",
+        "description": "Assembles the parts, checks the assembled size against the byte limit and the content's hash by one streamed read; a refusal leaves nothing behind.",
         "responses": {
           "201": {
             "content": {
@@ -12127,7 +13965,7 @@
                 }
               }
             },
-            "description": "E_HASH_MISMATCH"
+            "description": "E_HASH_MISMATCH or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -12147,7 +13985,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -12168,6 +14006,16 @@
               }
             },
             "description": "E_UPLOAD_INCOMPLETE"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_BUNDLE_TOO_LARGE"
           },
           "429": {
             "content": {
@@ -12200,7 +14048,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Assembles the parts and checks the content's hash by one streamed read; a mismatch leaves nothing behind.",
         "summary": "Complete a multipart upload",
         "tags": [
           "Files"
@@ -12226,11 +14073,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ],
         "requestBody": {
@@ -12275,6 +14126,7 @@
     "/v1/apps/{appId}/files/{sha256}/uploads/{uploadId}": {
       "delete": {
         "operationId": "deleteV1AppsByAppIdFilesBySha256UploadsByUploadId",
+        "description": "Aborts a multipart upload, discarding its parts.",
         "responses": {
           "204": {
             "description": "The upload is gone."
@@ -12287,7 +14139,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -12307,7 +14159,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -12350,7 +14202,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Aborts a multipart upload, discarding its parts.",
         "summary": "Abort a multipart upload",
         "tags": [
           "Files"
@@ -12376,11 +14227,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -12388,6 +14243,7 @@
     "/v1/apps/{appId}/releases": {
       "get": {
         "operationId": "getV1AppsByAppIdReleases",
+        "description": "Every release of the app, newest first, filtered by `channelId`, `bundleId` or `state`; `?relations=channel,bundle,counters` embeds the linked rows.",
         "responses": {
           "200": {
             "content": {
@@ -13037,7 +14893,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -13057,7 +14913,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -13100,7 +14956,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Every release of the app, newest first, filtered by `channelId`, `bundleId` or `state`.",
         "summary": "List the releases",
         "tags": [
           "Releases"
@@ -13146,6 +15001,21 @@
           },
           {
             "in": "query",
+            "name": "relations",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "bundle",
+                  "channel",
+                  "counters"
+                ]
+              }
+            }
+          },
+          {
+            "in": "query",
             "name": "state",
             "schema": {
               "type": "string",
@@ -13158,11 +15028,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -13170,6 +15044,7 @@
     "/v1/apps/{appId}/releases/{releaseId}": {
       "get": {
         "operationId": "getV1AppsByAppIdReleasesByReleaseId",
+        "description": "One release with its status — when it went live in the index and when the purge completed; `?relations=channel,bundle,counters` embeds the linked rows.",
         "responses": {
           "200": {
             "content": {
@@ -13816,7 +15691,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -13836,7 +15711,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -13879,7 +15754,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "One release with its status — when it went live in the index and when the purge completed; `?relations=channel,bundle,counters` embeds the linked rows.",
         "summary": "Get a release",
         "tags": [
           "Releases"
@@ -13902,7 +15776,8 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
@@ -13910,16 +15785,21 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "releaseId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       },
       "patch": {
         "operationId": "patchV1AppsByAppIdReleasesByReleaseId",
+        "description": "Edits the rollout percentage in both directions — a device that has the release keeps it — the mandatory flag and the notes; the index re-materializes and devices see the change on their next check; revoked is terminal.",
         "responses": {
           "200": {
             "content": {
@@ -14566,7 +16446,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -14586,7 +16466,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -14639,7 +16519,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Edits the rollout percentage in both directions — a device that has the release keeps it — the mandatory flag and the notes; the index re-materializes and devices see the change on their next check; revoked is terminal.",
         "summary": "Update a release",
         "tags": [
           "Releases"
@@ -14678,7 +16557,8 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
@@ -14686,11 +16566,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "releaseId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -14698,6 +16582,7 @@
     "/v1/apps/{appId}/releases/{releaseId}/pause": {
       "post": {
         "operationId": "postV1AppsByAppIdReleasesByReleaseIdPause",
+        "description": "Stops offering the release; devices on it keep it. Admin or Owner on a protected channel.",
         "responses": {
           "200": {
             "content": {
@@ -15336,6 +17221,16 @@
             },
             "description": "The release."
           },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
           "401": {
             "content": {
               "application/json": {
@@ -15354,7 +17249,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -15407,7 +17302,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Stops offering the release; devices on it keep it. Admin or Owner on a protected channel.",
         "summary": "Pause a release",
         "tags": [
           "Releases"
@@ -15415,7 +17309,8 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
@@ -15423,11 +17318,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "releaseId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -15435,6 +17334,7 @@
     "/v1/apps/{appId}/releases/{releaseId}/resume": {
       "post": {
         "operationId": "postV1AppsByAppIdReleasesByReleaseIdResume",
+        "description": "Offers the release again and starts a new auto-pause window. Admin or Owner on a protected channel.",
         "responses": {
           "200": {
             "content": {
@@ -16073,6 +17973,16 @@
             },
             "description": "The release."
           },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
           "401": {
             "content": {
               "application/json": {
@@ -16091,7 +18001,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -16144,7 +18054,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Offers the release again and starts a new auto-pause window. Admin or Owner on a protected channel.",
         "summary": "Resume a release",
         "tags": [
           "Releases"
@@ -16152,7 +18061,8 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
@@ -16160,11 +18070,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "releaseId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -16172,6 +18086,7 @@
     "/v1/apps/{appId}/releases/{releaseId}/revoke": {
       "post": {
         "operationId": "postV1AppsByAppIdReleasesByReleaseIdRevoke",
+        "description": "The release is dead: devices on it move to the newest eligible older release or the embedded bundle. Admin or Owner on a protected channel; revoked is terminal.",
         "responses": {
           "200": {
             "content": {
@@ -16810,6 +18725,16 @@
             },
             "description": "The release."
           },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
           "401": {
             "content": {
               "application/json": {
@@ -16828,7 +18753,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -16881,7 +18806,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The release is dead: devices on it move to the newest eligible older release or the embedded bundle. Admin or Owner on a protected channel; revoked is terminal.",
         "summary": "Revoke a release",
         "tags": [
           "Releases"
@@ -16889,7 +18813,8 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
@@ -16897,11 +18822,15 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "releaseId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -16909,158 +18838,7 @@
     "/v1/apps/{appId}": {
       "get": {
         "operationId": "getV1AppsByAppId",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "channelLinkTemplate": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                    },
-                    "defaultChannelId": {
-                      "anyOf": [
-                        {
-                          "type": "string",
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "framework": {
-                      "type": "string",
-                      "enum": [
-                        "capacitor",
-                        "cordova",
-                        "expo",
-                        "react-native"
-                      ]
-                    },
-                    "id": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "organizationId": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "updatedAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                    }
-                  },
-                  "required": [
-                    "channelLinkTemplate",
-                    "createdAt",
-                    "defaultChannelId",
-                    "framework",
-                    "id",
-                    "name",
-                    "organizationId",
-                    "updatedAt"
-                  ]
-                }
-              }
-            },
-            "description": "The app."
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_UNAUTHENTICATED"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_FORBIDDEN"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_NOT_FOUND"
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_RATE_LIMITED"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_INTERNAL"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_MAINTENANCE"
-          }
-        },
         "description": "One app.",
-        "summary": "Get an app",
-        "tags": [
-          "Apps"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "appId",
-            "required": true
-          }
-        ]
-      },
-      "patch": {
-        "operationId": "patchV1AppsByAppId",
         "responses": {
           "200": {
             "content": {
@@ -17142,7 +18920,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -17162,7 +18940,173 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Get an app",
+        "tags": [
+          "Apps"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "patchV1AppsByAppId",
+        "description": "Edits the name, the default channel or the deep-link template behind the QR surfaces; the template is a URI with a scheme and `{channelId}` exactly once.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "channelLinkTemplate": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "defaultChannelId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "framework": {
+                      "type": "string",
+                      "enum": [
+                        "capacitor",
+                        "cordova",
+                        "expo",
+                        "react-native"
+                      ]
+                    },
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "organizationId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    }
+                  },
+                  "required": [
+                    "channelLinkTemplate",
+                    "createdAt",
+                    "defaultChannelId",
+                    "framework",
+                    "id",
+                    "name",
+                    "organizationId",
+                    "updatedAt"
+                  ]
+                }
+              }
+            },
+            "description": "The app."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -17215,7 +19159,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Edits the name, the default channel or the deep-link template behind the QR surfaces; the template is a URI with a scheme and `{channelId}` exactly once.",
         "summary": "Update an app",
         "tags": [
           "Apps"
@@ -17256,19 +19199,34 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       },
       "delete": {
         "operationId": "deleteV1AppsByAppId",
+        "description": "Soft-deletes the app: gone at once, its channel indexes removed from the bucket, the rows and the prefix hard-deleted after seven days; restorable only by support within the window.",
         "responses": {
           "204": {
             "description": "The app is scheduled for deletion."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -17288,7 +19246,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -17331,7 +19289,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Soft-deletes the app: gone at once, its channel indexes removed from the bucket, the rows and the prefix hard-deleted after seven days; restorable only by support within the window.",
         "summary": "Delete an app",
         "tags": [
           "Apps"
@@ -17339,11 +19296,15 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -17351,6 +19312,7 @@
     "/v1/apps/{appId}/transfer": {
       "post": {
         "operationId": "postV1AppsByAppIdTransfer",
+        "description": "Moves the app to another organization the caller is an Admin of, in one transaction, with the target's `apps_limit` and storage limit checked; audited in both organizations.",
         "responses": {
           "200": {
             "content": {
@@ -17432,7 +19394,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -17452,7 +19414,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -17463,6 +19425,26 @@
               }
             },
             "description": "E_NOT_FOUND"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_APP_NAME_TAKEN"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_APPS_LIMIT_REACHED or E_STORAGE_LIMIT_REACHED"
           },
           "429": {
             "content": {
@@ -17495,7 +19477,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Moves the app to another organization the caller is an Admin of, in one transaction, with the target's `apps_limit` and storage limit checked; audited in both organizations.",
         "summary": "Transfer an app",
         "tags": [
           "Apps"
@@ -17523,11 +19504,15 @@
         "parameters": [
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             },
             "in": "path",
             "name": "appId",
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }
@@ -17535,6 +19520,7 @@
     "/v1/users/{userId}": {
       "get": {
         "operationId": "getV1UsersByUserId",
+        "description": "The caller behind the bearer, a session or an API token, and which of the two it is. Profiles are private: `me` or the caller's own id, any other user answers `E_FORBIDDEN`.",
         "responses": {
           "200": {
             "content": {
@@ -17557,13 +19543,13 @@
                     "email": {
                       "type": "string"
                     },
-                    "emailVerified": {
-                      "type": "boolean"
-                    },
                     "id": {
                       "type": "string",
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "isEmailVerified": {
+                      "type": "boolean"
                     },
                     "name": {
                       "type": "string"
@@ -17573,8 +19559,8 @@
                     "createdAt",
                     "credential",
                     "email",
-                    "emailVerified",
                     "id",
+                    "isEmailVerified",
                     "name"
                   ]
                 }
@@ -17590,7 +19576,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -17610,7 +19596,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -17653,7 +19639,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The caller behind the bearer, a session or an API token, and which of the two it is. Profiles are private: `me` or the caller's own id, any other user answers `E_FORBIDDEN`.",
         "summary": "Get the user",
         "tags": [
           "Users"
@@ -17676,11 +19661,15 @@
               ]
             },
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       },
       "delete": {
         "operationId": "deleteV1UsersByUserId",
+        "description": "Soft-deletes the account: gone at once, hard-deleted after seven days by a job, restorable only by support within the window. Refused while the user is the only Owner of an organization with other members.",
         "responses": {
           "204": {
             "description": "The account is scheduled for deletion."
@@ -17693,7 +19682,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -17713,7 +19702,7 @@
                 }
               }
             },
-            "description": "E_FORBIDDEN"
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
           },
           "404": {
             "content": {
@@ -17766,7 +19755,6 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Soft-deletes the account: gone at once, hard-deleted after seven days by a job, restorable only by support within the window. Refused while the user is the only Owner of an organization with other members.",
         "summary": "Delete the account",
         "tags": [
           "Users"
@@ -17789,6 +19777,9 @@
               ]
             },
             "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
           }
         ]
       }

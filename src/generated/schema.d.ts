@@ -155,7 +155,7 @@ export interface paths {
         head?: never;
         /**
          * Change a member's role
-         * @description Changes a member's role. Setting `owner` transfers ownership: only the Owner may, they become Admin in the same transaction, and the organization keeps exactly one Owner.
+         * @description Changes a member's role; the role the member has already answers the member unchanged. Setting `owner` transfers ownership: only the Owner may, they become Admin in the same transaction, and the organization keeps exactly one Owner.
          */
         patch: operations["patchV1OrganizationsByOrganizationIdMembersByMemberId"];
         trace?: never;
@@ -199,7 +199,7 @@ export interface paths {
         put?: never;
         /**
          * Verify the SSO domain
-         * @description Checks the domain's TXT record for the token the provider waits for and marks the domain verified when it is there; the answer is the provider, its `isVerified` the result.
+         * @description Checks the domain's TXT record for the token the provider waits for and marks the domain verified when it is there; the answer is the provider, its `isVerified` the result. A resolver that cannot be asked leaves the domain unverified, `details.reason` then `lookup_failed`.
          */
         post: operations["postV1OrganizationsByOrganizationIdSsoProviderVerifications"];
         delete?: never;
@@ -343,6 +343,166 @@ export interface paths {
         put: operations["putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleId"];
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/pack/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start a multipart pack upload
+         * @description Starts a multipart upload of the full pack, for a pack above the request body limit; the parts follow, and the single PUT stays for small packs.
+         */
+        post: operations["postV1AppsByAppIdBundlesByBundleIdPackUploads"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/pack/uploads/{uploadId}/parts/{partNumber}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Upload a pack part
+         * @description One part of a multipart upload, its bytes as the body and `Content-Length` their count; every part but the last is at least five mebibytes, all are of one size, and an upload has at most 10,000.
+         */
+        put: operations["putV1AppsByAppIdBundlesByBundleIdPackUploadsByUploadIdPartsByPartNumber"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/pack/uploads/{uploadId}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Complete a multipart pack upload
+         * @description Assembles the parts into the full pack and counts its bytes, as the single PUT does; a pack uploaded before is replaced, and one above the byte limit is deleted.
+         */
+        post: operations["postV1AppsByAppIdBundlesByBundleIdPackUploadsByUploadIdComplete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/pack/uploads/{uploadId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Abort a multipart pack upload
+         * @description Aborts a multipart pack upload, discarding its parts.
+         */
+        delete: operations["deleteV1AppsByAppIdBundlesByBundleIdPackUploadsByUploadId"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start a multipart delta pack upload
+         * @description Starts a multipart upload of the delta pack from a base bundle of the app, for a delta pack above the request body limit; the parts follow, and the single PUT stays for small ones.
+         */
+        post: operations["postV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploads"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}/uploads/{uploadId}/parts/{partNumber}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Upload a delta pack part
+         * @description One part of a multipart upload, its bytes as the body and `Content-Length` their count; every part but the last is at least five mebibytes, all are of one size, and an upload has at most 10,000.
+         */
+        put: operations["putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadIdPartsByPartNumber"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}/uploads/{uploadId}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Complete a multipart delta pack upload
+         * @description Assembles the parts into the delta pack and counts its bytes, as the single PUT does; a delta pack uploaded before is replaced, and one above the byte limit is deleted.
+         */
+        post: operations["postV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadIdComplete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}/uploads/{uploadId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Abort a multipart delta pack upload
+         * @description Aborts a multipart delta pack upload, discarding its parts.
+         */
+        delete: operations["deleteV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadId"];
         options?: never;
         head?: never;
         patch?: never;
@@ -618,7 +778,7 @@ export interface paths {
         get?: never;
         /**
          * Upload a part
-         * @description One part of a multipart upload, its bytes as the body.
+         * @description One part of a multipart upload, its bytes as the body and `Content-Length` their count; every part but the last is at least five mebibytes, all are of one size, and an upload has at most 10,000.
          */
         put: operations["putV1AppsByAppIdFilesBySha256UploadsByUploadIdPartsByPartNumber"];
         post?: never;
@@ -639,7 +799,7 @@ export interface paths {
         put?: never;
         /**
          * Complete a multipart upload
-         * @description Assembles the parts and checks the content's hash by one streamed read; a mismatch leaves nothing behind.
+         * @description Assembles the parts, checks the assembled size against the byte limit and the content's hash by one streamed read; a refusal leaves nothing behind.
          */
         post: operations["postV1AppsByAppIdFilesBySha256UploadsByUploadIdComplete"];
         delete?: never;
@@ -677,7 +837,7 @@ export interface paths {
         };
         /**
          * List the releases
-         * @description Every release of the app, newest first, filtered by `channelId`, `bundleId` or `state`.
+         * @description Every release of the app, newest first, filtered by `channelId`, `bundleId` or `state`; `?relations=channel,bundle,counters` embeds the linked rows.
          */
         get: operations["getV1AppsByAppIdReleases"];
         put?: never;
@@ -859,7 +1019,10 @@ export interface components {
         };
     };
     responses: never;
-    parameters: never;
+    parameters: {
+        /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+        ClientHeader: string;
+    };
     requestBodies: never;
     headers: never;
     pathItems: never;
@@ -872,7 +1035,10 @@ export interface operations {
                 limit?: number;
                 offset?: number;
             };
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -907,7 +1073,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -925,7 +1091,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -975,7 +1141,10 @@ export interface operations {
     postV1InvitationsByInvitationIdAccept: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 invitationId: string;
             };
@@ -1019,7 +1188,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1037,7 +1206,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1048,6 +1217,24 @@ export interface operations {
             };
             /** @description E_NOT_FOUND */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INVITATION_INVALID */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MEMBERS_LIMIT_REACHED */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1090,7 +1277,10 @@ export interface operations {
                 limit?: number;
                 offset?: number;
             };
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 organizationId: string;
             };
@@ -1121,7 +1311,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1139,7 +1329,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1192,6 +1382,8 @@ export interface operations {
             header?: {
                 /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
                 organizationId: string;
@@ -1231,7 +1423,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1249,7 +1441,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1320,7 +1512,10 @@ export interface operations {
                 limit?: number;
                 offset?: number;
             };
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 organizationId: string;
             };
@@ -1357,7 +1552,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1375,7 +1570,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1428,6 +1623,8 @@ export interface operations {
             header?: {
                 /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
                 organizationId: string;
@@ -1474,7 +1671,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1492,7 +1689,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1560,7 +1757,10 @@ export interface operations {
     deleteV1OrganizationsByOrganizationIdInvitationsByInvitationId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 invitationId: string;
                 organizationId: string;
@@ -1576,7 +1776,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1594,7 +1794,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1648,7 +1848,10 @@ export interface operations {
                 offset?: number;
                 relations?: "user"[];
             };
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 organizationId: string;
             };
@@ -1686,7 +1889,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1704,7 +1907,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1756,7 +1959,10 @@ export interface operations {
             query?: {
                 relations?: "user"[];
             };
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 memberId: string;
                 organizationId: string;
@@ -1795,7 +2001,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1813,7 +2019,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1863,7 +2069,10 @@ export interface operations {
     deleteV1OrganizationsByOrganizationIdMembersByMemberId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 memberId: string;
                 organizationId: string;
@@ -1879,7 +2088,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1897,7 +2106,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1908,6 +2117,15 @@ export interface operations {
             };
             /** @description E_NOT_FOUND */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_SOLE_OWNER */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1947,7 +2165,10 @@ export interface operations {
     patchV1OrganizationsByOrganizationIdMembersByMemberId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 memberId: string;
                 organizationId: string;
@@ -1993,7 +2214,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2011,7 +2232,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2061,7 +2282,10 @@ export interface operations {
     getV1OrganizationsByOrganizationIdSsoProvider: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 organizationId: string;
             };
@@ -2117,6 +2341,15 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UNAUTHENTICATED */
             401: {
                 headers: {
@@ -2126,7 +2359,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2176,7 +2409,10 @@ export interface operations {
     putV1OrganizationsByOrganizationIdSsoProvider: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 organizationId: string;
             };
@@ -2303,7 +2539,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2321,7 +2557,16 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_PLAN_REQUIRED */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2371,7 +2616,10 @@ export interface operations {
     deleteV1OrganizationsByOrganizationIdSsoProvider: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 organizationId: string;
             };
@@ -2386,6 +2634,15 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UNAUTHENTICATED */
             401: {
                 headers: {
@@ -2395,7 +2652,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2445,7 +2702,10 @@ export interface operations {
     postV1OrganizationsByOrganizationIdSsoProviderVerifications: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 organizationId: string;
             };
@@ -2498,7 +2758,20 @@ export interface operations {
                             name: string;
                             value: string;
                         } | null;
+                        details: {
+                            /** @enum {string} */
+                            reason: "lookup_failed";
+                        } | null;
                     };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description E_UNAUTHENTICATED */
@@ -2510,7 +2783,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2563,7 +2836,10 @@ export interface operations {
                 limit?: number;
                 offset?: number;
             };
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -2576,10 +2852,13 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        countryAllowlist: string[] | null;
                         /** Format: date-time */
                         createdAt: string;
                         /** Format: uuid */
                         id: string;
+                        ipAllowlist: string[] | null;
+                        isTwoFactorRequired: boolean;
                         name: string;
                         /** @enum {string} */
                         plan: "enterprise" | "free" | "pay_as_you_go";
@@ -2591,7 +2870,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2609,7 +2888,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2662,6 +2941,8 @@ export interface operations {
             header?: {
                 /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
             cookie?: never;
@@ -2681,10 +2962,13 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        countryAllowlist: string[] | null;
                         /** Format: date-time */
                         createdAt: string;
                         /** Format: uuid */
                         id: string;
+                        ipAllowlist: string[] | null;
+                        isTwoFactorRequired: boolean;
                         name: string;
                         /** @enum {string} */
                         plan: "enterprise" | "free" | "pay_as_you_go";
@@ -2696,7 +2980,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2714,7 +2998,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2773,7 +3057,10 @@ export interface operations {
     getV1OrganizationsByOrganizationId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 organizationId: string;
             };
@@ -2788,10 +3075,13 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        countryAllowlist: string[] | null;
                         /** Format: date-time */
                         createdAt: string;
                         /** Format: uuid */
                         id: string;
+                        ipAllowlist: string[] | null;
+                        isTwoFactorRequired: boolean;
                         name: string;
                         /** @enum {string} */
                         plan: "enterprise" | "free" | "pay_as_you_go";
@@ -2803,6 +3093,15 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UNAUTHENTICATED */
             401: {
                 headers: {
@@ -2812,7 +3111,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2862,7 +3161,10 @@ export interface operations {
     deleteV1OrganizationsByOrganizationId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 organizationId: string;
             };
@@ -2877,6 +3179,15 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UNAUTHENTICATED */
             401: {
                 headers: {
@@ -2886,7 +3197,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2936,7 +3247,10 @@ export interface operations {
     patchV1OrganizationsByOrganizationId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 organizationId: string;
             };
@@ -2960,10 +3274,13 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        countryAllowlist: string[] | null;
                         /** Format: date-time */
                         createdAt: string;
                         /** Format: uuid */
                         id: string;
+                        ipAllowlist: string[] | null;
+                        isTwoFactorRequired: boolean;
                         name: string;
                         /** @enum {string} */
                         plan: "enterprise" | "free" | "pay_as_you_go";
@@ -2975,7 +3292,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2993,7 +3310,16 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_PLAN_REQUIRED */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3050,7 +3376,10 @@ export interface operations {
                 platform?: "android" | "ios";
                 state?: "ready" | "uploading";
             };
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
             };
@@ -3094,7 +3423,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3112,7 +3441,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3165,6 +3494,8 @@ export interface operations {
             header?: {
                 /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
                 appId: string;
@@ -3243,7 +3574,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3261,7 +3592,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3338,7 +3669,10 @@ export interface operations {
     getV1AppsByAppIdBundlesByBundleId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
                 bundleId: string;
@@ -3383,6 +3717,15 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UNAUTHENTICATED */
             401: {
                 headers: {
@@ -3392,7 +3735,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3442,7 +3785,10 @@ export interface operations {
     deleteV1AppsByAppIdBundlesByBundleId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
                 bundleId: string;
@@ -3458,6 +3804,15 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UNAUTHENTICATED */
             401: {
                 headers: {
@@ -3467,7 +3822,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3526,7 +3881,10 @@ export interface operations {
     putV1AppsByAppIdBundlesByBundleIdPack: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
                 bundleId: string;
@@ -3551,6 +3909,15 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UNAUTHENTICATED */
             401: {
                 headers: {
@@ -3560,7 +3927,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3628,7 +3995,10 @@ export interface operations {
     putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 baseBundleId: string;
                 appId: string;
@@ -3654,7 +4024,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3672,7 +4042,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3737,10 +4107,865 @@ export interface operations {
             };
         };
     };
+    postV1AppsByAppIdBundlesByBundleIdPackUploads: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The upload id the parts carry. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        uploadId: string;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    putV1AppsByAppIdBundlesByBundleIdPackUploadsByUploadIdPartsByPartNumber: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                uploadId: string;
+                partNumber: number;
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        /** @description The part's bytes. */
+        requestBody?: {
+            content: {
+                "application/x-tar": unknown;
+            };
+        };
+        responses: {
+            /** @description The part, to hand back at completion. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        etag: string;
+                        partNumber: number;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UPLOAD_INCOMPLETE */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_BUNDLE_TOO_LARGE */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_STORAGE_LIMIT_REACHED */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1AppsByAppIdBundlesByBundleIdPackUploadsByUploadIdComplete: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                uploadId: string;
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    parts: {
+                        etag: string;
+                        partNumber: number;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description The pack, stored. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        sizeBytes: number;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UPLOAD_INCOMPLETE */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_BUNDLE_TOO_LARGE */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    deleteV1AppsByAppIdBundlesByBundleIdPackUploadsByUploadId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                uploadId: string;
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The upload is gone. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploads: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                baseBundleId: string;
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The upload id the parts carry. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        uploadId: string;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadIdPartsByPartNumber: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                baseBundleId: string;
+                uploadId: string;
+                partNumber: number;
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        /** @description The part's bytes. */
+        requestBody?: {
+            content: {
+                "application/x-tar": unknown;
+            };
+        };
+        responses: {
+            /** @description The part, to hand back at completion. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        etag: string;
+                        partNumber: number;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UPLOAD_INCOMPLETE */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_BUNDLE_TOO_LARGE */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_STORAGE_LIMIT_REACHED */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadIdComplete: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                baseBundleId: string;
+                uploadId: string;
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    parts: {
+                        etag: string;
+                        partNumber: number;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description The delta pack, stored. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        sizeBytes: number;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UPLOAD_INCOMPLETE */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_BUNDLE_TOO_LARGE */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    deleteV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                baseBundleId: string;
+                uploadId: string;
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The upload is gone. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     postV1AppsByAppIdBundlesByBundleIdComplete: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
                 bundleId: string;
@@ -3785,6 +5010,15 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UNAUTHENTICATED */
             401: {
                 headers: {
@@ -3794,7 +5028,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3856,7 +5090,10 @@ export interface operations {
                 limit?: number;
                 offset?: number;
             };
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
             };
@@ -3890,7 +5127,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3908,7 +5145,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3961,6 +5198,8 @@ export interface operations {
             header?: {
                 /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
                 appId: string;
@@ -4007,7 +5246,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4025,7 +5264,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4093,7 +5332,10 @@ export interface operations {
     getV1AppsByAppIdChannelsByChannelId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
                 channelId: string;
@@ -4131,6 +5373,15 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UNAUTHENTICATED */
             401: {
                 headers: {
@@ -4140,7 +5391,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4190,7 +5441,10 @@ export interface operations {
     deleteV1AppsByAppIdChannelsByChannelId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
                 channelId: string;
@@ -4206,6 +5460,15 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UNAUTHENTICATED */
             401: {
                 headers: {
@@ -4215,7 +5478,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4274,7 +5537,10 @@ export interface operations {
     patchV1AppsByAppIdChannelsByChannelId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
                 channelId: string;
@@ -4321,7 +5587,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4339,7 +5605,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4398,7 +5664,10 @@ export interface operations {
     postV1AppsByAppIdChannelsByChannelIdPause: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
                 channelId: string;
@@ -4433,6 +5702,15 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UNAUTHENTICATED */
             401: {
                 headers: {
@@ -4442,7 +5720,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4492,7 +5770,10 @@ export interface operations {
     postV1AppsByAppIdChannelsByChannelIdResume: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
                 channelId: string;
@@ -4527,6 +5808,15 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UNAUTHENTICATED */
             401: {
                 headers: {
@@ -4536,7 +5826,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4586,7 +5876,10 @@ export interface operations {
     getV1AppsByAppIdChannelsByChannelIdIndexesByPlatform: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 platform: "android" | "ios";
                 appId: string;
@@ -4688,7 +5981,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4706,7 +5999,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4760,7 +6053,10 @@ export interface operations {
                 offset?: number;
                 relations?: ("bundle" | "channel" | "counters")[];
             };
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
                 channelId: string;
@@ -4899,7 +6195,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4917,7 +6213,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4970,6 +6266,8 @@ export interface operations {
             header?: {
                 /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
                 appId: string;
@@ -5161,7 +6459,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5179,7 +6477,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5250,6 +6548,8 @@ export interface operations {
             header?: {
                 /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
                 appId: string;
@@ -5396,7 +6696,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5414,7 +6714,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5434,6 +6734,15 @@ export interface operations {
             };
             /** @description E_RELEASE_REVOKED or E_IDEMPOTENCY_KEY_REUSED */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RELEASES_PER_DAY_LIMIT_REACHED */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5477,7 +6786,10 @@ export interface operations {
                 offset?: number;
                 relations?: "bundle"[];
             };
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
             };
@@ -5538,7 +6850,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5556,7 +6868,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5609,6 +6921,8 @@ export interface operations {
             header?: {
                 /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
                 appId: string;
@@ -5741,7 +7055,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5759,7 +7073,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5820,7 +7134,10 @@ export interface operations {
             query?: {
                 relations?: "bundle"[];
             };
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 embeddedBundleId: string;
                 appId: string;
@@ -5882,7 +7199,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5900,7 +7217,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5950,7 +7267,10 @@ export interface operations {
     putV1AppsByAppIdFilesBySha256: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 sha256: string;
                 appId: string;
@@ -5996,7 +7316,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_HASH_MISMATCH */
+            /** @description E_HASH_MISMATCH or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6014,7 +7334,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6082,7 +7402,10 @@ export interface operations {
     postV1AppsByAppIdFilesBySha256Uploads: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 sha256: string;
                 appId: string;
@@ -6102,7 +7425,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6120,7 +7443,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6170,7 +7493,10 @@ export interface operations {
     putV1AppsByAppIdFilesBySha256UploadsByUploadIdPartsByPartNumber: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 sha256: string;
                 uploadId: string;
@@ -6198,7 +7524,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6216,7 +7542,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6227,6 +7553,148 @@ export interface operations {
             };
             /** @description E_NOT_FOUND */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UPLOAD_INCOMPLETE */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_BUNDLE_TOO_LARGE */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_STORAGE_LIMIT_REACHED */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1AppsByAppIdFilesBySha256UploadsByUploadIdComplete: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                sha256: string;
+                uploadId: string;
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    parts: {
+                        etag: string;
+                        partNumber: number;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description The file, stored. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        sha256: string;
+                        sizeBytes: number;
+                    };
+                };
+            };
+            /** @description E_HASH_MISMATCH or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UPLOAD_INCOMPLETE */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6272,122 +7740,13 @@ export interface operations {
             };
         };
     };
-    postV1AppsByAppIdFilesBySha256UploadsByUploadIdComplete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                sha256: string;
-                uploadId: string;
-                appId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    parts: {
-                        etag: string;
-                        partNumber: number;
-                    }[];
-                };
-            };
-        };
-        responses: {
-            /** @description The file, stored. */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** Format: uuid */
-                        appId: string;
-                        /** Format: date-time */
-                        createdAt: string;
-                        sha256: string;
-                        sizeBytes: number;
-                    };
-                };
-            };
-            /** @description E_HASH_MISMATCH */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UPLOAD_INCOMPLETE */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
     deleteV1AppsByAppIdFilesBySha256UploadsByUploadId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 sha256: string;
                 uploadId: string;
@@ -6404,7 +7763,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6422,7 +7781,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6476,9 +7835,13 @@ export interface operations {
                 offset?: number;
                 bundleId?: string;
                 channelId?: string;
+                relations?: ("bundle" | "channel" | "counters")[];
                 state?: "active" | "paused" | "revoked";
             };
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
             };
@@ -6616,7 +7979,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6634,7 +7997,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6686,7 +8049,10 @@ export interface operations {
             query?: {
                 relations?: ("bundle" | "channel" | "counters")[];
             };
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
                 releaseId: string;
@@ -6825,7 +8191,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6843,7 +8209,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6893,7 +8259,10 @@ export interface operations {
     patchV1AppsByAppIdReleasesByReleaseId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
                 releaseId: string;
@@ -7040,7 +8409,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7058,7 +8427,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7117,7 +8486,10 @@ export interface operations {
     postV1AppsByAppIdReleasesByReleaseIdPause: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
                 releaseId: string;
@@ -7256,6 +8628,15 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UNAUTHENTICATED */
             401: {
                 headers: {
@@ -7265,7 +8646,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7324,7 +8705,10 @@ export interface operations {
     postV1AppsByAppIdReleasesByReleaseIdResume: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
                 releaseId: string;
@@ -7463,6 +8847,15 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UNAUTHENTICATED */
             401: {
                 headers: {
@@ -7472,7 +8865,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7531,7 +8924,10 @@ export interface operations {
     postV1AppsByAppIdReleasesByReleaseIdRevoke: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
                 releaseId: string;
@@ -7670,6 +9066,15 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UNAUTHENTICATED */
             401: {
                 headers: {
@@ -7679,7 +9084,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7738,7 +9143,10 @@ export interface operations {
     getV1AppsByAppId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
             };
@@ -7769,6 +9177,15 @@ export interface operations {
                     };
                 };
             };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UNAUTHENTICATED */
             401: {
                 headers: {
@@ -7778,7 +9195,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7828,7 +9245,10 @@ export interface operations {
     deleteV1AppsByAppId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
             };
@@ -7843,6 +9263,15 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_UNAUTHENTICATED */
             401: {
                 headers: {
@@ -7852,7 +9281,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7902,7 +9331,10 @@ export interface operations {
     patchV1AppsByAppId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
             };
@@ -7942,7 +9374,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7960,7 +9392,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8019,7 +9451,10 @@ export interface operations {
     postV1AppsByAppIdTransfer: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 appId: string;
             };
@@ -8057,7 +9492,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -8075,7 +9510,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8086,6 +9521,24 @@ export interface operations {
             };
             /** @description E_NOT_FOUND */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_APP_NAME_TAKEN */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_APPS_LIMIT_REACHED or E_STORAGE_LIMIT_REACHED */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -8125,7 +9578,10 @@ export interface operations {
     getV1UsersByUserId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 userId: "me" | string;
             };
@@ -8145,14 +9601,14 @@ export interface operations {
                         /** @enum {string} */
                         credential: "session" | "token";
                         email: string;
-                        emailVerified: boolean;
                         /** Format: uuid */
                         id: string;
+                        isEmailVerified: boolean;
                         name: string;
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -8170,7 +9626,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8220,7 +9676,10 @@ export interface operations {
     deleteV1UsersByUserId: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
             path: {
                 userId: "me" | string;
             };
@@ -8235,7 +9694,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details` */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -8253,7 +9712,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN */
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
             403: {
                 headers: {
                     [name: string]: unknown;

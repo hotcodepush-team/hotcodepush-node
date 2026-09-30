@@ -1,6 +1,7 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
 import type { JsonResponseBody, PathParameters, UploadBody } from '../types';
+import { BundleDeltaUploadsResource } from './bundle-delta-uploads';
 
 export type UploadBundleDeltaOptions = PathParameters<
   '/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}',
@@ -15,7 +16,11 @@ export type UploadedBundleDelta = JsonResponseBody<
 >;
 
 export class BundleDeltasResource {
-  constructor(private readonly httpClient: HttpClient) {}
+  public readonly uploads: BundleDeltaUploadsResource;
+
+  constructor(private readonly httpClient: HttpClient) {
+    this.uploads = new BundleDeltaUploadsResource(httpClient);
+  }
 
   /**
    * Uploads the delta pack from a base bundle of the app, a tar, before the bundle is completed.

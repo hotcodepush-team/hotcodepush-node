@@ -2,13 +2,14 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { HotCodePush } from '../client';
 import { resolveSentRequest, stubFetch } from '../test-helpers';
+import type { User } from './users';
 
-const USER = {
+const USER: User = {
   createdAt: '2026-09-29T00:00:00.000Z',
   credential: 'token',
   email: 'user@example.test',
-  emailVerified: true,
   id: 'user',
+  isEmailVerified: true,
   name: 'User',
 };
 

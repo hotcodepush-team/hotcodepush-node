@@ -53,6 +53,37 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       body: new Blob(['delta']),
       bundleId: BUNDLE_ID,
     }),
+  'apps.bundles.deltas.uploads.complete': hotCodePush =>
+    hotCodePush.apps.bundles.deltas.uploads.complete({
+      appId: APP_ID,
+      baseBundleId: BASE_BUNDLE_ID,
+      bundleId: BUNDLE_ID,
+      parts: [{ etag: 'etag', partNumber: 1 }],
+      uploadId: UPLOAD_ID,
+    }),
+  'apps.bundles.deltas.uploads.create': hotCodePush =>
+    hotCodePush.apps.bundles.deltas.uploads.create({
+      appId: APP_ID,
+      baseBundleId: BASE_BUNDLE_ID,
+      bundleId: BUNDLE_ID,
+      idempotencyKey: 'key',
+    }),
+  'apps.bundles.deltas.uploads.delete': hotCodePush =>
+    hotCodePush.apps.bundles.deltas.uploads.delete({
+      appId: APP_ID,
+      baseBundleId: BASE_BUNDLE_ID,
+      bundleId: BUNDLE_ID,
+      uploadId: UPLOAD_ID,
+    }),
+  'apps.bundles.deltas.uploads.parts.upload': hotCodePush =>
+    hotCodePush.apps.bundles.deltas.uploads.parts.upload({
+      appId: APP_ID,
+      baseBundleId: BASE_BUNDLE_ID,
+      body: new Blob(['part']),
+      bundleId: BUNDLE_ID,
+      partNumber: 1,
+      uploadId: UPLOAD_ID,
+    }),
   'apps.bundles.get': hotCodePush =>
     hotCodePush.apps.bundles.get({ appId: APP_ID, bundleId: BUNDLE_ID }),
   'apps.bundles.list': hotCodePush =>
@@ -71,6 +102,33 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       body: new Blob(['pack']).stream(),
       bundleId: BUNDLE_ID,
       contentLength: 4,
+    }),
+  'apps.bundles.pack.uploads.complete': hotCodePush =>
+    hotCodePush.apps.bundles.pack.uploads.complete({
+      appId: APP_ID,
+      bundleId: BUNDLE_ID,
+      parts: [{ etag: 'etag', partNumber: 1 }],
+      uploadId: UPLOAD_ID,
+    }),
+  'apps.bundles.pack.uploads.create': hotCodePush =>
+    hotCodePush.apps.bundles.pack.uploads.create({
+      appId: APP_ID,
+      bundleId: BUNDLE_ID,
+      idempotencyKey: 'key',
+    }),
+  'apps.bundles.pack.uploads.delete': hotCodePush =>
+    hotCodePush.apps.bundles.pack.uploads.delete({
+      appId: APP_ID,
+      bundleId: BUNDLE_ID,
+      uploadId: UPLOAD_ID,
+    }),
+  'apps.bundles.pack.uploads.parts.upload': hotCodePush =>
+    hotCodePush.apps.bundles.pack.uploads.parts.upload({
+      appId: APP_ID,
+      body: new Blob(['part']),
+      bundleId: BUNDLE_ID,
+      partNumber: 1,
+      uploadId: UPLOAD_ID,
     }),
   'apps.channels.create': hotCodePush =>
     hotCodePush.apps.channels.create({

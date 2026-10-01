@@ -308,7 +308,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/apps/{appId}/bundles/{bundleId}/pack": {
+    "/v1/apps/{appId}/bundles/{bundleId}/complete": {
         parameters: {
             query?: never;
             header?: never;
@@ -316,12 +316,12 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        put?: never;
         /**
-         * Upload the full pack
-         * @description The full pack, one per bundle, streamed under its prefix; `Content-Length` declares the bytes.
+         * Complete a bundle
+         * @description Verifies every listed file, the pack and the delta packs are present, writes the manifest envelope at the bundle's key and sets `ready`; a completed bundle answers itself again.
          */
-        put: operations["putV1AppsByAppIdBundlesByBundleIdPack"];
-        post?: never;
+        post: operations["postV1AppsByAppIdBundlesByBundleIdComplete"];
         delete?: never;
         options?: never;
         head?: never;
@@ -343,86 +343,6 @@ export interface paths {
         put: operations["putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleId"];
         post?: never;
         delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/apps/{appId}/bundles/{bundleId}/pack/uploads": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Start a multipart pack upload
-         * @description Starts a multipart upload of the full pack, for a pack above the request body limit; the parts follow, and the single PUT stays for small packs.
-         */
-        post: operations["postV1AppsByAppIdBundlesByBundleIdPackUploads"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/apps/{appId}/bundles/{bundleId}/pack/uploads/{uploadId}/parts/{partNumber}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Upload a pack part
-         * @description One part of a multipart upload, its bytes as the body and `Content-Length` their count; every part but the last is at least five mebibytes, all are of one size, and an upload has at most 10,000.
-         */
-        put: operations["putV1AppsByAppIdBundlesByBundleIdPackUploadsByUploadIdPartsByPartNumber"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/apps/{appId}/bundles/{bundleId}/pack/uploads/{uploadId}/complete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Complete a multipart pack upload
-         * @description Assembles the parts into the full pack and counts its bytes, as the single PUT does; a pack uploaded before is replaced, and one above the byte limit is deleted.
-         */
-        post: operations["postV1AppsByAppIdBundlesByBundleIdPackUploadsByUploadIdComplete"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/apps/{appId}/bundles/{bundleId}/pack/uploads/{uploadId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Abort a multipart pack upload
-         * @description Aborts a multipart pack upload, discarding its parts.
-         */
-        delete: operations["deleteV1AppsByAppIdBundlesByBundleIdPackUploadsByUploadId"];
         options?: never;
         head?: never;
         patch?: never;
@@ -508,7 +428,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/apps/{appId}/bundles/{bundleId}/complete": {
+    "/v1/apps/{appId}/bundles/{bundleId}/pack": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Upload the full pack
+         * @description The full pack, one per bundle, streamed under its prefix; `Content-Length` declares the bytes.
+         */
+        put: operations["putV1AppsByAppIdBundlesByBundleIdPack"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/pack/uploads": {
         parameters: {
             query?: never;
             header?: never;
@@ -518,11 +458,71 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Complete a bundle
-         * @description Verifies every listed file, the pack and the delta packs are present, writes the manifest envelope at the bundle's key and sets `ready`; a completed bundle answers itself again.
+         * Start a multipart pack upload
+         * @description Starts a multipart upload of the full pack, for a pack above the request body limit; the parts follow, and the single PUT stays for small packs.
          */
-        post: operations["postV1AppsByAppIdBundlesByBundleIdComplete"];
+        post: operations["postV1AppsByAppIdBundlesByBundleIdPackUploads"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/pack/uploads/{uploadId}/parts/{partNumber}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Upload a pack part
+         * @description One part of a multipart upload, its bytes as the body and `Content-Length` their count; every part but the last is at least five mebibytes, all are of one size, and an upload has at most 10,000.
+         */
+        put: operations["putV1AppsByAppIdBundlesByBundleIdPackUploadsByUploadIdPartsByPartNumber"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/pack/uploads/{uploadId}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Complete a multipart pack upload
+         * @description Assembles the parts into the full pack and counts its bytes, as the single PUT does; a pack uploaded before is replaced, and one above the byte limit is deleted.
+         */
+        post: operations["postV1AppsByAppIdBundlesByBundleIdPackUploadsByUploadIdComplete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/pack/uploads/{uploadId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Abort a multipart pack upload
+         * @description Aborts a multipart pack upload, discarding its parts.
+         */
+        delete: operations["deleteV1AppsByAppIdBundlesByBundleIdPackUploadsByUploadId"];
         options?: never;
         head?: never;
         patch?: never;
@@ -699,7 +699,7 @@ export interface paths {
         put?: never;
         /**
          * Register an embedded bundle
-         * @description Registers the bundle compiled into a store build with its binary identity — platform, binary version, build, fingerprint — its files uploaded first through the file endpoints. Create-only on the identity: an identical re-registration answers the row, a conflicting fingerprint is refused, and `force` updates it.
+         * @description Registers the bundle compiled into a store build with its binary identity — platform, binary version, build, fingerprint — its files uploaded first through the file endpoints. Create-only on the identity: a re-registration with the same fingerprint and files answers the row, one with another fingerprint or other files is refused, and `force` updates it.
          */
         post: operations["postV1AppsByAppIdEmbeddedBundles"];
         delete?: never;
@@ -799,7 +799,7 @@ export interface paths {
         put?: never;
         /**
          * Complete a multipart upload
-         * @description Assembles the parts, checks the assembled size against the byte limit and the content's hash by one streamed read; a refusal leaves nothing behind.
+         * @description Assembles the parts, checks the assembled size against the byte limit and the content's hash by one streamed read; a refusal leaves nothing behind, and a hash the app already holds answers the existing file.
          */
         post: operations["postV1AppsByAppIdFilesBySha256UploadsByUploadIdComplete"];
         delete?: never;
@@ -955,7 +955,7 @@ export interface paths {
         head?: never;
         /**
          * Update an app
-         * @description Edits the name, the default channel or the deep-link template behind the QR surfaces; the template is a URI with a scheme and `{channelId}` exactly once.
+         * @description Edits the name, the framework, the default channel or the deep-link template behind the QR surfaces; the template is a URI with a scheme and `{channelId}` exactly once.
          */
         patch: operations["patchV1AppsByAppId"];
         trace?: never;
@@ -3878,7 +3878,7 @@ export interface operations {
             };
         };
     };
-    putV1AppsByAppIdBundlesByBundleIdPack: {
+    postV1AppsByAppIdBundlesByBundleIdComplete: {
         parameters: {
             query?: never;
             header?: {
@@ -3891,14 +3891,140 @@ export interface operations {
             };
             cookie?: never;
         };
-        /** @description The pack bytes. */
+        requestBody?: never;
+        responses: {
+            /** @description The bundle, ready. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        bundleVersion: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        expiresAt: string | null;
+                        fingerprint: string | null;
+                        /** @enum {string} */
+                        framework: "capacitor" | "cordova" | "expo" | "react-native";
+                        gitMessage: string | null;
+                        gitRef: string | null;
+                        gitRemote: string | null;
+                        gitSha: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        isGitDirty: boolean | null;
+                        manifestSha256: string | null;
+                        number: number;
+                        platforms: ("android" | "ios")[];
+                        signature: string | null;
+                        sizeBytes: number;
+                        /** @enum {string} */
+                        state: "ready" | "uploading";
+                        unusedSince: string | null;
+                        /** Format: date-time */
+                        updatedAt: string;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UPLOAD_INCOMPLETE */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                baseBundleId: string;
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        /** @description The delta pack bytes. */
         requestBody?: {
             content: {
                 "application/x-tar": unknown;
             };
         };
         responses: {
-            /** @description The pack, stored. */
+            /** @description The delta pack, stored. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -3992,7 +4118,7 @@ export interface operations {
             };
         };
     };
-    putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleId: {
+    postV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploads: {
         parameters: {
             query?: never;
             header?: {
@@ -4006,14 +4132,441 @@ export interface operations {
             };
             cookie?: never;
         };
-        /** @description The delta pack bytes. */
+        requestBody?: never;
+        responses: {
+            /** @description The upload id the parts carry. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        uploadId: string;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadIdPartsByPartNumber: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                baseBundleId: string;
+                uploadId: string;
+                partNumber: number;
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        /** @description The part's bytes. */
         requestBody?: {
             content: {
                 "application/x-tar": unknown;
             };
         };
         responses: {
+            /** @description The part, to hand back at completion. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        etag: string;
+                        partNumber: number;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UPLOAD_INCOMPLETE */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_BUNDLE_TOO_LARGE */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_STORAGE_LIMIT_REACHED */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadIdComplete: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                baseBundleId: string;
+                uploadId: string;
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    parts: {
+                        etag: string;
+                        partNumber: number;
+                    }[];
+                };
+            };
+        };
+        responses: {
             /** @description The delta pack, stored. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        sizeBytes: number;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UPLOAD_INCOMPLETE */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_BUNDLE_TOO_LARGE */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    deleteV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                baseBundleId: string;
+                uploadId: string;
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The upload is gone. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    putV1AppsByAppIdBundlesByBundleIdPack: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        /** @description The pack bytes. */
+        requestBody?: {
+            content: {
+                "application/x-tar": unknown;
+            };
+        };
+        responses: {
+            /** @description The pack, stored. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -4495,559 +5048,6 @@ export interface operations {
             };
             /** @description E_NOT_FOUND */
             404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    postV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploads: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                baseBundleId: string;
-                appId: string;
-                bundleId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The upload id the parts carry. */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        uploadId: string;
-                    };
-                };
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadIdPartsByPartNumber: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                baseBundleId: string;
-                uploadId: string;
-                partNumber: number;
-                appId: string;
-                bundleId: string;
-            };
-            cookie?: never;
-        };
-        /** @description The part's bytes. */
-        requestBody?: {
-            content: {
-                "application/x-tar": unknown;
-            };
-        };
-        responses: {
-            /** @description The part, to hand back at completion. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        etag: string;
-                        partNumber: number;
-                    };
-                };
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UPLOAD_INCOMPLETE */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_BUNDLE_TOO_LARGE */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_STORAGE_LIMIT_REACHED */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    postV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadIdComplete: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                baseBundleId: string;
-                uploadId: string;
-                appId: string;
-                bundleId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    parts: {
-                        etag: string;
-                        partNumber: number;
-                    }[];
-                };
-            };
-        };
-        responses: {
-            /** @description The delta pack, stored. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        sizeBytes: number;
-                    };
-                };
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UPLOAD_INCOMPLETE */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_BUNDLE_TOO_LARGE */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    deleteV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadId: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                baseBundleId: string;
-                uploadId: string;
-                appId: string;
-                bundleId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The upload is gone. */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    postV1AppsByAppIdBundlesByBundleIdComplete: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                appId: string;
-                bundleId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The bundle, ready. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** Format: uuid */
-                        appId: string;
-                        bundleVersion: string;
-                        /** Format: date-time */
-                        createdAt: string;
-                        expiresAt: string | null;
-                        fingerprint: string | null;
-                        /** @enum {string} */
-                        framework: "capacitor" | "cordova" | "expo" | "react-native";
-                        gitMessage: string | null;
-                        gitRef: string | null;
-                        gitRemote: string | null;
-                        gitSha: string | null;
-                        /** Format: uuid */
-                        id: string;
-                        isGitDirty: boolean | null;
-                        manifestSha256: string | null;
-                        number: number;
-                        platforms: ("android" | "ios")[];
-                        signature: string | null;
-                        sizeBytes: number;
-                        /** @enum {string} */
-                        state: "ready" | "uploading";
-                        unusedSince: string | null;
-                        /** Format: date-time */
-                        updatedAt: string;
-                    };
-                };
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UPLOAD_INCOMPLETE */
-            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7641,6 +7641,22 @@ export interface operations {
             };
         };
         responses: {
+            /** @description The file, already present. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        sha256: string;
+                        sizeBytes: number;
+                    };
+                };
+            };
             /** @description The file, stored. */
             201: {
                 headers: {
@@ -9346,6 +9362,8 @@ export interface operations {
                     channelLinkTemplate?: string | null;
                     /** Format: uuid */
                     defaultChannelId?: string;
+                    /** @enum {string} */
+                    framework?: "capacitor" | "cordova" | "expo" | "react-native";
                     name?: string;
                 };
             };

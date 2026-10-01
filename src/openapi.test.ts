@@ -271,7 +271,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       organizationId: ORGANIZATION_ID,
     }),
   'apps.update': hotCodePush =>
-    hotCodePush.apps.update({ appId: APP_ID, name: 'Demo' }),
+    hotCodePush.apps.update({ appId: APP_ID, framework: 'expo', name: 'Demo' }),
   'invitations.accept': hotCodePush =>
     hotCodePush.invitations.accept({
       invitationId: INVITATION_ID,

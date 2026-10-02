@@ -12,6 +12,22 @@ afterEach(() => {
 });
 
 describe('OrganizationInvitationsResource', () => {
+  test('should count the pending invitations of the organization', async () => {
+    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+
+    const fetchedCount =
+      await new HotCodePush().organizations.invitations.count({
+        organizationId: 'organization',
+        status: 'pending',
+      });
+
+    expect(fetchedCount).toEqual({ total: 3 });
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: `${INVITATIONS_URL}/count?status=pending`,
+    });
+  });
+
   test('should post the invitation with its idempotency key', async () => {
     const fetchMock = stubFetch(() =>
       Response.json(INVITATION, { status: 201 }),

@@ -1,12 +1,18 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
 import type {
+  Count,
   IdempotencyOptions,
   JsonRequestBody,
   JsonResponseBody,
   PathParameters,
   QueryParameters,
 } from '../types';
+
+export type CountEmbeddedBundlesOptions = PathParameters<
+  '/v1/apps/{appId}/embedded-bundles/count',
+  'get'
+>;
 
 export type CreateEmbeddedBundleOptions = PathParameters<
   '/v1/apps/{appId}/embedded-bundles',
@@ -38,6 +44,16 @@ export type ListEmbeddedBundlesOptions = PathParameters<
 
 export class EmbeddedBundlesResource {
   constructor(private readonly httpClient: HttpClient) {}
+
+  /**
+   * The number of the app's registered store builds.
+   */
+  public async count(options: CountEmbeddedBundlesOptions): Promise<Count> {
+    return this.httpClient.fetchJson({
+      method: 'GET',
+      path: resolvePath('/v1/apps/{appId}/embedded-bundles/count', options),
+    });
+  }
 
   /**
    * Registers the bundle compiled into a store build on its binary identity, its files uploaded first.

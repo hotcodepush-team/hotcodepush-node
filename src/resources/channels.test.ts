@@ -15,6 +15,20 @@ afterEach(() => {
 });
 
 describe('ChannelsResource', () => {
+  test('should count the channels of the app', async () => {
+    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+
+    const fetchedCount = await new HotCodePush().apps.channels.count({
+      appId: 'app',
+    });
+
+    expect(fetchedCount).toEqual({ total: 3 });
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: `${CHANNELS_URL}/count`,
+    });
+  });
+
   test('should post the channel to its app with its idempotency key', async () => {
     const fetchMock = stubFetch(() => Response.json(CHANNEL, { status: 201 }));
 

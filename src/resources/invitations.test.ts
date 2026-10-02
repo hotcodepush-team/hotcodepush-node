@@ -42,6 +42,18 @@ describe('InvitationsResource', () => {
     expect(attemptCount).toBe(1);
   });
 
+  test("should count the caller's pending invitations", async () => {
+    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+
+    const fetchedCount = await new HotCodePush().invitations.count();
+
+    expect(fetchedCount).toEqual({ total: 3 });
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: `${INVITATIONS_URL}/count`,
+    });
+  });
+
   test("should list the caller's pending invitations", async () => {
     const invitation = { id: 'invitation', status: 'pending' };
     const fetchMock = stubFetch(() => Response.json([invitation]));

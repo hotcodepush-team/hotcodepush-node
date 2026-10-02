@@ -1,6 +1,7 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
 import type {
+  Count,
   IdempotencyOptions,
   JsonRequestBody,
   JsonResponseBody,
@@ -8,6 +9,7 @@ import type {
   QueryParameters,
 } from '../types';
 import { ChannelIndexesResource } from './channel-indexes';
+import { ChannelQrResource } from './channel-qr';
 import { ChannelReleasesResource } from './channel-releases';
 import { RollbacksResource } from './rollbacks';
 
@@ -21,6 +23,11 @@ export type ChannelWithDeviceCounts = JsonResponseBody<
   '/v1/apps/{appId}/channels/{channelId}',
   'get',
   200
+>;
+
+export type CountChannelsOptions = PathParameters<
+  '/v1/apps/{appId}/channels/count',
+  'get'
 >;
 
 export type CreateChannelOptions = PathParameters<
@@ -64,13 +71,25 @@ export type UpdateChannelOptions = PathParameters<
 
 export class ChannelsResource {
   public readonly indexes: ChannelIndexesResource;
+  public readonly qr: ChannelQrResource;
   public readonly releases: ChannelReleasesResource;
   public readonly rollbacks: RollbacksResource;
 
   constructor(private readonly httpClient: HttpClient) {
     this.indexes = new ChannelIndexesResource(httpClient);
+    this.qr = new ChannelQrResource(httpClient);
     this.releases = new ChannelReleasesResource(httpClient);
     this.rollbacks = new RollbacksResource(httpClient);
+  }
+
+  /**
+   * The number of the app's channels.
+   */
+  public async count(options: CountChannelsOptions): Promise<Count> {
+    return this.httpClient.fetchJson({
+      method: 'GET',
+      path: resolvePath('/v1/apps/{appId}/channels/count', options),
+    });
   }
 
   public async create(options: CreateChannelOptions): Promise<Channel> {

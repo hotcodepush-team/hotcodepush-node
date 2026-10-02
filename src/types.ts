@@ -18,6 +18,11 @@ export interface BlobUploadBody {
 }
 
 /**
+ * What every list's `/count` answers: `total`, the rows the list's filters match.
+ */
+export type Count = JsonResponseBody<'/v1/organizations/count', 'get', 200>;
+
+/**
  * A code of the API's error catalog, or the client's own `E_UNEXPECTED_RESPONSE` for a response outside the API's error shape,
  * such as a page of the platform in front of the API; the catalog's `E_INTERNAL` is the API's own failure.
  */

@@ -45,6 +45,22 @@ describe('BundlesResource', () => {
     expect(attemptCount).toBe(3);
   });
 
+  test('should count the bundles of the app filtered by use and platform', async () => {
+    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+
+    const fetchedCount = await new HotCodePush().apps.bundles.count({
+      appId: 'app',
+      isInUse: 'true',
+      platform: 'ios',
+    });
+
+    expect(fetchedCount).toEqual({ total: 3 });
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: `${BUNDLES_URL}/count?isInUse=true&platform=ios`,
+    });
+  });
+
   test('should post the manifest with its idempotency key', async () => {
     const fetchMock = stubFetch(() => Response.json(BUNDLE, { status: 201 }));
 

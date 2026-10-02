@@ -15,6 +15,22 @@ afterEach(() => {
 });
 
 describe('ReleasesResource', () => {
+  test('should count the releases of the app filtered by channel and state', async () => {
+    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+
+    const fetchedCount = await new HotCodePush().apps.releases.count({
+      appId: 'app',
+      channelId: 'channel',
+      state: 'paused',
+    });
+
+    expect(fetchedCount).toEqual({ total: 3 });
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: `${RELEASES_URL}/count?channelId=channel&state=paused`,
+    });
+  });
+
   test('should get the release with the linked rows', async () => {
     const fetchMock = stubFetch(() => Response.json(RELEASE));
 

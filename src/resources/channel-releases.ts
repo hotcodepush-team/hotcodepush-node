@@ -1,12 +1,18 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
 import type {
+  Count,
   IdempotencyOptions,
   JsonRequestBody,
   PathParameters,
   QueryParameters,
 } from '../types';
 import type { Release } from './releases';
+
+export type CountChannelReleasesOptions = PathParameters<
+  '/v1/apps/{appId}/channels/{channelId}/releases/count',
+  'get'
+>;
 
 export type CreateReleaseOptions = PathParameters<
   '/v1/apps/{appId}/channels/{channelId}/releases',
@@ -23,6 +29,19 @@ export type ListChannelReleasesOptions = PathParameters<
 
 export class ChannelReleasesResource {
   constructor(private readonly httpClient: HttpClient) {}
+
+  /**
+   * The number of releases in the channel's log.
+   */
+  public async count(options: CountChannelReleasesOptions): Promise<Count> {
+    return this.httpClient.fetchJson({
+      method: 'GET',
+      path: resolvePath(
+        '/v1/apps/{appId}/channels/{channelId}/releases/count',
+        options,
+      ),
+    });
+  }
 
   /**
    * Releases a ready bundle in the channel, numbered next in the channel.

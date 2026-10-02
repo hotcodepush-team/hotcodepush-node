@@ -1,11 +1,18 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
 import type {
+  Count,
   JsonRequestBody,
   JsonResponseBody,
   PathParameters,
   QueryParameters,
 } from '../types';
+
+export type CountReleasesOptions = PathParameters<
+  '/v1/apps/{appId}/releases/count',
+  'get'
+> &
+  QueryParameters<'/v1/apps/{appId}/releases/count', 'get'>;
 
 export type GetReleaseOptions = PathParameters<
   '/v1/apps/{appId}/releases/{releaseId}',
@@ -48,6 +55,18 @@ export type UpdateReleaseOptions = PathParameters<
 
 export class ReleasesResource {
   constructor(private readonly httpClient: HttpClient) {}
+
+  /**
+   * The number of the app's releases under the list's filters.
+   */
+  public async count(options: CountReleasesOptions): Promise<Count> {
+    const { appId, ...query } = options;
+    return this.httpClient.fetchJson({
+      method: 'GET',
+      path: resolvePath('/v1/apps/{appId}/releases/count', { appId }),
+      query,
+    });
+  }
 
   /**
    * A release with its status: when it went live in the index and when the purge completed.

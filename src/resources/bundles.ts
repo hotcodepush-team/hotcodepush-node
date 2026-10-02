@@ -1,6 +1,7 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
 import type {
+  Count,
   IdempotencyOptions,
   JsonRequestBody,
   JsonResponseBody,
@@ -29,6 +30,12 @@ export type CompleteBundleOptions = PathParameters<
   '/v1/apps/{appId}/bundles/{bundleId}/complete',
   'post'
 >;
+
+export type CountBundlesOptions = PathParameters<
+  '/v1/apps/{appId}/bundles/count',
+  'get'
+> &
+  QueryParameters<'/v1/apps/{appId}/bundles/count', 'get'>;
 
 export type CreateBundleOptions = PathParameters<
   '/v1/apps/{appId}/bundles',
@@ -74,6 +81,18 @@ export class BundlesResource {
         '/v1/apps/{appId}/bundles/{bundleId}/complete',
         options,
       ),
+    });
+  }
+
+  /**
+   * The number of the app's bundles under the list's filters.
+   */
+  public async count(options: CountBundlesOptions): Promise<Count> {
+    const { appId, ...query } = options;
+    return this.httpClient.fetchJson({
+      method: 'GET',
+      path: resolvePath('/v1/apps/{appId}/bundles/count', { appId }),
+      query,
     });
   }
 

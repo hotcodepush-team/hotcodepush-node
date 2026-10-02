@@ -12,6 +12,20 @@ afterEach(() => {
 });
 
 describe('OrganizationAppsResource', () => {
+  test('should count the apps of the organization', async () => {
+    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+
+    const fetchedCount = await new HotCodePush().organizations.apps.count({
+      organizationId: 'organization',
+    });
+
+    expect(fetchedCount).toEqual({ total: 3 });
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: `${APPS_URL}/count`,
+    });
+  });
+
   test('should post the app to its organization with its idempotency key', async () => {
     const fetchMock = stubFetch(() => Response.json(APP, { status: 201 }));
 

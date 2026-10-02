@@ -1,6 +1,7 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
 import type {
+  Count,
   JsonRequestBody,
   JsonResponseBody,
   PathParameters,
@@ -34,6 +35,16 @@ export class InvitationsResource {
       path: resolvePath('/v1/invitations/{invitationId}/accept', {
         invitationId,
       }),
+    });
+  }
+
+  /**
+   * The number of the caller's pending invitations across organizations.
+   */
+  public async count(): Promise<Count> {
+    return this.httpClient.fetchJson({
+      method: 'GET',
+      path: resolvePath('/v1/invitations/count'),
     });
   }
 

@@ -75,6 +75,15 @@ export class HttpClient {
   }
 
   /**
+   * A request answered with a binary body, such as a channel's QR image, read whole.
+   */
+  public async fetchBlob(options: FetchJsonOptions): Promise<Blob> {
+    const response = await this.fetchResponse(options);
+    await assertResponseOk(response);
+    return response.blob();
+  }
+
+  /**
    * A creating `POST`, sent with an `Idempotency-Key`: the caller's, or one generated for this call and kept across its retries,
    * which the API answers with the first result.
    */

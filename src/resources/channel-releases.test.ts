@@ -12,6 +12,21 @@ afterEach(() => {
 });
 
 describe('ChannelReleasesResource', () => {
+  test("should count the channel's release log", async () => {
+    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+
+    const fetchedCount = await new HotCodePush().apps.channels.releases.count({
+      appId: 'app',
+      channelId: 'channel',
+    });
+
+    expect(fetchedCount).toEqual({ total: 3 });
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: `${RELEASES_URL}/count`,
+    });
+  });
+
   test('should post the release to its channel with its idempotency key', async () => {
     const fetchMock = stubFetch(() => Response.json(RELEASE, { status: 201 }));
 

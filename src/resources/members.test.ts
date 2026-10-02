@@ -12,6 +12,20 @@ afterEach(() => {
 });
 
 describe('MembersResource', () => {
+  test('should count the members of the organization', async () => {
+    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+
+    const fetchedCount = await new HotCodePush().organizations.members.count({
+      organizationId: 'organization',
+    });
+
+    expect(fetchedCount).toEqual({ total: 3 });
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: `${MEMBERS_URL}/count`,
+    });
+  });
+
   test('should delete the member', async () => {
     const fetchMock = stubFetch(() => new Response(null, { status: 204 }));
 

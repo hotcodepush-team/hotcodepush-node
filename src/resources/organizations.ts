@@ -1,6 +1,7 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
 import type {
+  Count,
   IdempotencyOptions,
   JsonRequestBody,
   JsonResponseBody,
@@ -56,6 +57,16 @@ export class OrganizationsResource {
     this.invitations = new OrganizationInvitationsResource(httpClient);
     this.members = new MembersResource(httpClient);
     this.ssoProvider = new SsoProviderResource(httpClient);
+  }
+
+  /**
+   * The number of the caller's organizations.
+   */
+  public async count(): Promise<Count> {
+    return this.httpClient.fetchJson({
+      method: 'GET',
+      path: resolvePath('/v1/organizations/count'),
+    });
   }
 
   /**

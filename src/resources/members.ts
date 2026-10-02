@@ -1,11 +1,17 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
 import type {
+  Count,
   JsonRequestBody,
   JsonResponseBody,
   PathParameters,
   QueryParameters,
 } from '../types';
+
+export type CountMembersOptions = PathParameters<
+  '/v1/organizations/{organizationId}/members/count',
+  'get'
+>;
 
 export type DeleteMemberOptions = PathParameters<
   '/v1/organizations/{organizationId}/members/{memberId}',
@@ -44,6 +50,19 @@ export type UpdateMemberOptions = PathParameters<
 
 export class MembersResource {
   constructor(private readonly httpClient: HttpClient) {}
+
+  /**
+   * The number of the organization's members.
+   */
+  public async count(options: CountMembersOptions): Promise<Count> {
+    return this.httpClient.fetchJson({
+      method: 'GET',
+      path: resolvePath(
+        '/v1/organizations/{organizationId}/members/count',
+        options,
+      ),
+    });
+  }
 
   /**
    * Removes a member; any member may remove themselves, which is leaving the organization.

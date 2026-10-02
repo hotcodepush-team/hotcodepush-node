@@ -13,6 +13,20 @@ afterEach(() => {
 });
 
 describe('EmbeddedBundlesResource', () => {
+  test('should count the embedded bundles of the app', async () => {
+    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+
+    const fetchedCount = await new HotCodePush().apps.embeddedBundles.count({
+      appId: 'app',
+    });
+
+    expect(fetchedCount).toEqual({ total: 3 });
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: `${EMBEDDED_BUNDLES_URL}/count`,
+    });
+  });
+
   test('should post the binary identity with force and its idempotency key', async () => {
     const fetchMock = stubFetch(() =>
       Response.json(EMBEDDED_BUNDLE, { status: 201 }),

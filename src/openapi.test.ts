@@ -36,6 +36,14 @@ const UPLOAD_ID = 'upload';
 const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
   'apps.bundles.complete': hotCodePush =>
     hotCodePush.apps.bundles.complete({ appId: APP_ID, bundleId: BUNDLE_ID }),
+  'apps.bundles.count': hotCodePush =>
+    hotCodePush.apps.bundles.count({
+      appId: APP_ID,
+      bundleVersion: '1.0.0',
+      isInUse: 'true',
+      platform: 'ios',
+      state: 'ready',
+    }),
   'apps.bundles.create': hotCodePush =>
     hotCodePush.apps.bundles.create({
       appId: APP_ID,
@@ -129,6 +137,8 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       partNumber: 1,
       uploadId: UPLOAD_ID,
     }),
+  'apps.channels.count': hotCodePush =>
+    hotCodePush.apps.channels.count({ appId: APP_ID }),
   'apps.channels.create': hotCodePush =>
     hotCodePush.apps.channels.create({
       appId: APP_ID,
@@ -150,6 +160,17 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.apps.channels.list({ appId: APP_ID, limit: 10, offset: 10 }),
   'apps.channels.pause': hotCodePush =>
     hotCodePush.apps.channels.pause({ appId: APP_ID, channelId: CHANNEL_ID }),
+  'apps.channels.qr.get': hotCodePush =>
+    hotCodePush.apps.channels.qr.get({
+      appId: APP_ID,
+      channelId: CHANNEL_ID,
+      format: 'png',
+    }),
+  'apps.channels.releases.count': hotCodePush =>
+    hotCodePush.apps.channels.releases.count({
+      appId: APP_ID,
+      channelId: CHANNEL_ID,
+    }),
   'apps.channels.releases.create': hotCodePush =>
     hotCodePush.apps.channels.releases.create({
       appId: APP_ID,
@@ -182,6 +203,8 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       name: 'beta',
     }),
   'apps.delete': hotCodePush => hotCodePush.apps.delete({ appId: APP_ID }),
+  'apps.embeddedBundles.count': hotCodePush =>
+    hotCodePush.apps.embeddedBundles.count({ appId: APP_ID }),
   'apps.embeddedBundles.create': hotCodePush =>
     hotCodePush.apps.embeddedBundles.create({
       appId: APP_ID,
@@ -238,6 +261,13 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       uploadId: UPLOAD_ID,
     }),
   'apps.get': hotCodePush => hotCodePush.apps.get({ appId: APP_ID }),
+  'apps.releases.count': hotCodePush =>
+    hotCodePush.apps.releases.count({
+      appId: APP_ID,
+      bundleId: BUNDLE_ID,
+      channelId: CHANNEL_ID,
+      state: 'active',
+    }),
   'apps.releases.get': hotCodePush =>
     hotCodePush.apps.releases.get({
       appId: APP_ID,
@@ -251,6 +281,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       channelId: CHANNEL_ID,
       limit: 10,
       offset: 10,
+      relations: ['channel'],
       state: 'active',
     }),
   'apps.releases.pause': hotCodePush =>
@@ -277,7 +308,10 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       invitationId: INVITATION_ID,
       token: 'token',
     }),
+  'invitations.count': hotCodePush => hotCodePush.invitations.count(),
   'invitations.list': hotCodePush => hotCodePush.invitations.list(),
+  'organizations.apps.count': hotCodePush =>
+    hotCodePush.organizations.apps.count({ organizationId: ORGANIZATION_ID }),
   'organizations.apps.create': hotCodePush =>
     hotCodePush.organizations.apps.create({
       framework: 'capacitor',
@@ -291,12 +325,18 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       offset: 10,
       organizationId: ORGANIZATION_ID,
     }),
+  'organizations.count': hotCodePush => hotCodePush.organizations.count(),
   'organizations.create': hotCodePush =>
     hotCodePush.organizations.create({ idempotencyKey: 'key', name: 'Acme' }),
   'organizations.delete': hotCodePush =>
     hotCodePush.organizations.delete({ organizationId: ORGANIZATION_ID }),
   'organizations.get': hotCodePush =>
     hotCodePush.organizations.get({ organizationId: ORGANIZATION_ID }),
+  'organizations.invitations.count': hotCodePush =>
+    hotCodePush.organizations.invitations.count({
+      organizationId: ORGANIZATION_ID,
+      status: 'pending',
+    }),
   'organizations.invitations.create': hotCodePush =>
     hotCodePush.organizations.invitations.create({
       email: 'jane@example.com',
@@ -314,9 +354,14 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       limit: 10,
       offset: 10,
       organizationId: ORGANIZATION_ID,
+      status: 'pending',
     }),
   'organizations.list': hotCodePush =>
     hotCodePush.organizations.list({ limit: 10, offset: 10 }),
+  'organizations.members.count': hotCodePush =>
+    hotCodePush.organizations.members.count({
+      organizationId: ORGANIZATION_ID,
+    }),
   'organizations.members.delete': hotCodePush =>
     hotCodePush.organizations.members.delete({
       memberId: MEMBER_ID,

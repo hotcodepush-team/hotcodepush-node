@@ -1,12 +1,18 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
 import type {
+  Count,
   IdempotencyOptions,
   JsonRequestBody,
   PathParameters,
   QueryParameters,
 } from '../types';
 import type { App } from './apps';
+
+export type CountAppsOptions = PathParameters<
+  '/v1/organizations/{organizationId}/apps/count',
+  'get'
+>;
 
 export type CreateAppOptions = PathParameters<
   '/v1/organizations/{organizationId}/apps',
@@ -23,6 +29,19 @@ export type ListAppsOptions = PathParameters<
 
 export class OrganizationAppsResource {
   constructor(private readonly httpClient: HttpClient) {}
+
+  /**
+   * The number of the organization's apps.
+   */
+  public async count(options: CountAppsOptions): Promise<Count> {
+    return this.httpClient.fetchJson({
+      method: 'GET',
+      path: resolvePath(
+        '/v1/organizations/{organizationId}/apps/count',
+        options,
+      ),
+    });
+  }
 
   /**
    * Creates an app with its default channel `production`.

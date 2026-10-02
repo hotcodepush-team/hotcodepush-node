@@ -22,6 +22,7 @@
               "E_ACCOUNT_BANNED",
               "E_APP_NAME_TAKEN",
               "E_APPS_LIMIT_REACHED",
+              "E_AUTH_FLOW_FAILED",
               "E_BUNDLE_IN_USE",
               "E_BUNDLE_NOT_READY",
               "E_BUNDLE_TOO_LARGE",
@@ -56,7 +57,8 @@
               "E_TURNSTILE_FAILED",
               "E_UNAUTHENTICATED",
               "E_UPLOAD_INCOMPLETE",
-              "E_VALIDATION"
+              "E_VALIDATION",
+              "E_WEBHOOK_NAME_TAKEN"
             ]
           },
           "details": {
@@ -291,6 +293,113 @@
               "maximum": 9007199254740991
             }
           },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      }
+    },
+    "/v1/invitations/count": {
+      "get": {
+        "operationId": "getV1InvitationsCount",
+        "description": "The number of the caller's pending invitations, which the list pages through.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "total"
+                  ]
+                }
+              }
+            },
+            "description": "The number of rows the list's filters match."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Count the caller's invitations",
+        "tags": [
+          "Invitations"
+        ],
+        "parameters": [
           {
             "$ref": "#/components/parameters/ClientHeader"
           }
@@ -941,10 +1050,126 @@
         }
       }
     },
+    "/v1/organizations/{organizationId}/apps/count": {
+      "get": {
+        "operationId": "getV1OrganizationsByOrganizationIdAppsCount",
+        "description": "The number of the organization's apps, which the list pages through.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "total"
+                  ]
+                }
+              }
+            },
+            "description": "The number of rows the list's filters match."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Count the apps",
+        "tags": [
+          "Apps"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "organizationId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      }
+    },
     "/v1/organizations/{organizationId}/invitations": {
       "get": {
         "operationId": "getV1OrganizationsByOrganizationIdInvitations",
-        "description": "The organization's invitations, newest first.",
+        "description": "The organization's invitations, newest first; `status=pending` selects those still pending and not yet expired.",
         "responses": {
           "200": {
             "content": {
@@ -1121,6 +1346,16 @@
               "type": "integer",
               "minimum": 0,
               "maximum": 9007199254740991
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending"
+              ]
             }
           },
           {
@@ -1368,6 +1603,132 @@
             }
           }
         }
+      }
+    },
+    "/v1/organizations/{organizationId}/invitations/count": {
+      "get": {
+        "operationId": "getV1OrganizationsByOrganizationIdInvitationsCount",
+        "description": "The number of the organization's invitations under the list's filter, `status`, which the list pages through.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "total"
+                  ]
+                }
+              }
+            },
+            "description": "The number of rows the list's filters match."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Count the invitations",
+        "tags": [
+          "Invitations"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending"
+              ]
+            }
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "organizationId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
       }
     },
     "/v1/organizations/{organizationId}/invitations/{invitationId}": {
@@ -1686,6 +2047,122 @@
               }
             }
           },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "organizationId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      }
+    },
+    "/v1/organizations/{organizationId}/members/count": {
+      "get": {
+        "operationId": "getV1OrganizationsByOrganizationIdMembersCount",
+        "description": "The number of the organization's members, which the list pages through.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "total"
+                  ]
+                }
+              }
+            },
+            "description": "The number of rows the list's filters match."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Count the members",
+        "tags": [
+          "Members"
+        ],
+        "parameters": [
           {
             "schema": {
               "type": "string",
@@ -3845,6 +4322,113 @@
         ]
       }
     },
+    "/v1/organizations/count": {
+      "get": {
+        "operationId": "getV1OrganizationsCount",
+        "description": "The number of the caller's organizations, which the list pages through.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "total"
+                  ]
+                }
+              }
+            },
+            "description": "The number of rows the list's filters match."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Count the organizations",
+        "tags": [
+          "Organizations"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      }
+    },
     "/v1/organizations/{organizationId}": {
       "get": {
         "operationId": "getV1OrganizationsByOrganizationId",
@@ -5161,6 +5745,162 @@
             }
           }
         }
+      }
+    },
+    "/v1/apps/{appId}/bundles/count": {
+      "get": {
+        "operationId": "getV1AppsByAppIdBundlesCount",
+        "description": "The number of the app's uploaded bundles under the list's filters, which the list pages through.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "total"
+                  ]
+                }
+              }
+            },
+            "description": "The number of rows the list's filters match."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Count the bundles",
+        "tags": [
+          "Bundles"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "bundleVersion",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "isInUse",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "false",
+                "true"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "platform",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "android",
+                "ios"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "state",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ready",
+                "uploading"
+              ]
+            }
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
       }
     },
     "/v1/apps/{appId}/bundles/{bundleId}": {
@@ -7429,6 +8169,142 @@
         ]
       }
     },
+    "/v1/apps/{appId}/channels/{channelId}/qr": {
+      "get": {
+        "operationId": "getV1AppsByAppIdChannelsByChannelIdQr",
+        "description": "The channel's deep link, the app's `channelLinkTemplate` with the channel id substituted, rendered as a QR image — SVG by default, PNG with `format=png` — cached an hour. No auth: the channel id is the capability and the content is never caller-chosen. `E_NOT_FOUND` while the template is unset.",
+        "responses": {
+          "200": {
+            "content": {
+              "image/png": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              },
+              "image/svg+xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The QR image."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "security": [],
+        "summary": "Get a channel QR code",
+        "tags": [
+          "Channels"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "appId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "channelId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "default": "svg",
+              "type": "string",
+              "enum": [
+                "png",
+                "svg"
+              ]
+            }
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      }
+    },
     "/v1/apps/{appId}/channels": {
       "get": {
         "operationId": "getV1AppsByAppIdChannels",
@@ -7983,6 +8859,122 @@
             }
           }
         }
+      }
+    },
+    "/v1/apps/{appId}/channels/count": {
+      "get": {
+        "operationId": "getV1AppsByAppIdChannelsCount",
+        "description": "The number of the app's channels, which the list pages through.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "total"
+                  ]
+                }
+              }
+            },
+            "description": "The number of rows the list's filters match."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Count the channels",
+        "tags": [
+          "Channels"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
       }
     },
     "/v1/apps/{appId}/channels/{channelId}": {
@@ -11255,6 +12247,131 @@
         }
       }
     },
+    "/v1/apps/{appId}/channels/{channelId}/releases/count": {
+      "get": {
+        "operationId": "getV1AppsByAppIdChannelsByChannelIdReleasesCount",
+        "description": "The number of releases in the channel's release log, which the list pages through.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "total"
+                  ]
+                }
+              }
+            },
+            "description": "The number of rows the list's filters match."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Count the releases of a channel",
+        "tags": [
+          "Releases"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "channelId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      }
+    },
     "/v1/apps/{appId}/channels/{channelId}/rollbacks": {
       "post": {
         "operationId": "postV1AppsByAppIdChannelsByChannelIdRollbacks",
@@ -13052,6 +14169,122 @@
             }
           }
         }
+      }
+    },
+    "/v1/apps/{appId}/embedded-bundles/count": {
+      "get": {
+        "operationId": "getV1AppsByAppIdEmbeddedBundlesCount",
+        "description": "The number of the app's registered store builds, which the list pages through.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "total"
+                  ]
+                }
+              }
+            },
+            "description": "The number of rows the list's filters match."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Count the embedded bundles",
+        "tags": [
+          "Embedded bundles"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
       }
     },
     "/v1/apps/{appId}/embedded-bundles/{embeddedBundleId}": {
@@ -15038,6 +16271,18 @@
           },
           {
             "in": "query",
+            "name": "state",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "paused",
+                "revoked"
+              ]
+            }
+          },
+          {
+            "in": "query",
             "name": "relations",
             "schema": {
               "type": "array",
@@ -15049,6 +16294,140 @@
                   "counters"
                 ]
               }
+            }
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      }
+    },
+    "/v1/apps/{appId}/releases/count": {
+      "get": {
+        "operationId": "getV1AppsByAppIdReleasesCount",
+        "description": "The number of the app's releases under the list's filters, `channelId`, `bundleId` and `state`, which the list pages through.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "total"
+                  ]
+                }
+              }
+            },
+            "description": "The number of rows the list's filters match."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Count the releases",
+        "tags": [
+          "Releases"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "bundleId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "in": "query",
+            "name": "channelId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             }
           },
           {

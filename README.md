@@ -12,7 +12,7 @@ npm install https://pkg.pr.new/hotcodepush-team/hotcodepush-node/@hotcodepush/no
 
 A consumer pins a commit and bumps it deliberately, never `@main`.
 
-It requires Node.js 24 or later.
+It requires Node.js 22 or later.
 
 ## Usage
 
@@ -36,31 +36,35 @@ await hotCodePush.apps.channels.pause({ appId: app.id, channelId: channel.id });
 
 The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.channels`:
 
-| Resource                                                                         | Methods                                                        |
-| -------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `health`                                                                         | `get`                                                          |
-| `organizations`                                                                  | `create`, `delete`, `get`, `list`, `update`                    |
-| `organizations.apps`                                                             | `create`, `list`                                               |
-| `organizations.invitations`                                                      | `create`, `delete`, `list`                                     |
-| `organizations.members`                                                          | `delete`, `get`, `list`, `update`                              |
-| `invitations`, the caller's                                                      | `accept`, `list`                                               |
-| `apps`                                                                           | `delete`, `get`, `transfer`, `update`                          |
-| `apps.bundles`                                                                   | `complete`, `create`, `delete`, `get`, `list`                  |
-| `apps.bundles.pack`, `apps.bundles.deltas`                                       | `upload`                                                       |
-| `apps.bundles.pack.uploads`, `apps.bundles.deltas.uploads`, the multipart upload | `complete`, `create`, `delete`                                 |
-| `apps.bundles.pack.uploads.parts`, `apps.bundles.deltas.uploads.parts`           | `upload`                                                       |
-| `apps.channels`                                                                  | `create`, `delete`, `get`, `list`, `pause`, `resume`, `update` |
-| `apps.channels.indexes`                                                          | `get`                                                          |
-| `apps.channels.releases`, the release log                                        | `create`, `list`                                               |
-| `apps.channels.rollbacks`                                                        | `create`                                                       |
-| `apps.embeddedBundles`                                                           | `create`, `get`, `list`                                        |
-| `apps.files`                                                                     | `upload`                                                       |
-| `apps.files.uploads`, the multipart upload                                       | `complete`, `create`, `delete`                                 |
-| `apps.files.uploads.parts`                                                       | `upload`                                                       |
-| `apps.releases`                                                                  | `get`, `list`, `pause`, `resume`, `revoke`, `update`           |
-| `users`                                                                          | `delete`, `get`                                                |
+| Resource                                                                         | Methods                                                                 |
+| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `health`                                                                         | `get`                                                                   |
+| `organizations`                                                                  | `count`, `create`, `delete`, `get`, `list`, `update`                    |
+| `organizations.apps`                                                             | `count`, `create`, `list`                                               |
+| `organizations.invitations`                                                      | `count`, `create`, `delete`, `list`                                     |
+| `organizations.members`                                                          | `count`, `delete`, `get`, `list`, `update`                              |
+| `organizations.ssoProvider`, one per organization                                | `delete`, `get`, `put`                                                  |
+| `organizations.ssoProvider.verifications`                                        | `create`                                                                |
+| `invitations`, the caller's                                                      | `accept`, `count`, `list`                                               |
+| `apps`                                                                           | `delete`, `get`, `transfer`, `update`                                   |
+| `apps.bundles`                                                                   | `complete`, `count`, `create`, `delete`, `get`, `list`                  |
+| `apps.bundles.pack`, `apps.bundles.deltas`                                       | `upload`                                                                |
+| `apps.bundles.pack.uploads`, `apps.bundles.deltas.uploads`, the multipart upload | `complete`, `create`, `delete`                                          |
+| `apps.bundles.pack.uploads.parts`, `apps.bundles.deltas.uploads.parts`           | `upload`                                                                |
+| `apps.channels`                                                                  | `count`, `create`, `delete`, `get`, `list`, `pause`, `resume`, `update` |
+| `apps.channels.indexes`                                                          | `get`                                                                   |
+| `apps.channels.qr`, the channel's deep link as an image                          | `get`                                                                   |
+| `apps.channels.releases`, the release log                                        | `count`, `create`, `list`                                               |
+| `apps.channels.rollbacks`                                                        | `create`                                                                |
+| `apps.embeddedBundles`                                                           | `count`, `create`, `get`, `list`                                        |
+| `apps.files`                                                                     | `upload`                                                                |
+| `apps.files.uploads`, the multipart upload                                       | `complete`, `create`, `delete`                                          |
+| `apps.files.uploads.parts`                                                       | `upload`                                                                |
+| `apps.releases`                                                                  | `count`, `get`, `list`, `pause`, `resume`, `revoke`, `update`           |
+| `users`                                                                          | `delete`, `get`                                                         |
 
 Lists take `limit` and `offset`, and where the API embeds linked rows, `relations`: `organizations.members.list({ organizationId, relations: ['user'] })`.
+Every list has a `count` beside it taking the same filters and answering `{ total }`, the number a paginated table reads.
 `users.get({ userId: 'me' })` answers the caller behind the token, and `users.delete({ userId: 'me' })` deletes the caller's account, as `me` addresses the caller wherever the API takes a `{userId}`.
 
 An upload streams its body, a `Blob` or a `ReadableStream` with its `contentLength`, never buffering it:

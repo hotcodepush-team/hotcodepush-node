@@ -7,6 +7,7 @@ import type {
   PathParameters,
   QueryParameters,
 } from '../types';
+import { ReleaseAudienceResource } from './release-audience';
 
 export type CountReleasesOptions = PathParameters<
   '/v1/apps/{appId}/releases/count',
@@ -54,7 +55,11 @@ export type UpdateReleaseOptions = PathParameters<
   JsonRequestBody<'/v1/apps/{appId}/releases/{releaseId}', 'patch'>;
 
 export class ReleasesResource {
-  constructor(private readonly httpClient: HttpClient) {}
+  public readonly audience: ReleaseAudienceResource;
+
+  constructor(private readonly httpClient: HttpClient) {
+    this.audience = new ReleaseAudienceResource(httpClient);
+  }
 
   /**
    * The number of the app's releases under the list's filters.

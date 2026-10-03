@@ -17,12 +17,13 @@ describe('RollbacksResource', () => {
         appId: 'app',
         channelId: 'channel',
         idempotencyKey: 'key',
+        isMandatory: false,
         toReleaseId: 'target',
       });
 
     expect(createdRelease).toEqual(release);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
-      body: { toReleaseId: 'target' },
+      body: { isMandatory: false, toReleaseId: 'target' },
       headers: { 'Idempotency-Key': 'key' },
       method: 'POST',
       url: 'https://api.hotcodepush.com/v1/apps/app/channels/channel/rollbacks',

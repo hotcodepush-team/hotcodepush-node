@@ -1,7 +1,11 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { HotCodePush } from '../client';
-import { resolveSentRequest, stubFetch } from '../test-helpers';
+import {
+  countAttemptsWhenUnavailable,
+  resolveSentRequest,
+  stubFetch,
+} from '../test-helpers';
 
 const RELEASES_URL =
   'https://api.hotcodepush.com/v1/apps/app/channels/channel/releases';
@@ -48,6 +52,35 @@ describe('ChannelReleasesResource', () => {
     });
   });
 
+  test('should post a release of what another channel serves with its auto-pause overrides', async () => {
+    const fetchMock = stubFetch(() =>
+      Response.json({ ...RELEASE, warnings: [] }, { status: 201 }),
+    );
+
+    const createdRelease =
+      await new HotCodePush().apps.channels.releases.create({
+        appId: 'app',
+        channelId: 'channel',
+        failureAction: 'revoke',
+        failureMinSample: 20,
+        failureThresholdPercent: 10,
+        fromChannelId: 'source',
+        idempotencyKey: 'key',
+      });
+
+    expect(createdRelease).toEqual({ ...RELEASE, warnings: [] });
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      body: {
+        failureAction: 'revoke',
+        failureMinSample: 20,
+        failureThresholdPercent: 10,
+        fromChannelId: 'source',
+      },
+      method: 'POST',
+      url: RELEASES_URL,
+    });
+  });
+
   test("should list the channel's release log with the linked rows", async () => {
     const fetchMock = stubFetch(() => Response.json([RELEASE]));
 
@@ -64,5 +97,37 @@ describe('ChannelReleasesResource', () => {
       method: 'GET',
       url: `${RELEASES_URL}?relations=bundle%2Cchannel%2Ccounters`,
     });
+  });
+
+  test('should post the bulk revocation from a release number', async () => {
+    const fetchMock = stubFetch(() =>
+      Response.json([{ ...RELEASE, state: 'revoked' }]),
+    );
+
+    const revokedReleases =
+      await new HotCodePush().apps.channels.releases.revoke({
+        appId: 'app',
+        channelId: 'channel',
+        fromNumber: 1,
+      });
+
+    expect(revokedReleases).toEqual([{ ...RELEASE, state: 'revoked' }]);
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      body: { fromNumber: 1 },
+      method: 'POST',
+      url: `${RELEASES_URL}/revoke`,
+    });
+  });
+
+  test('should retry the bulk revocation when the API is unavailable', async () => {
+    const attemptCount = await countAttemptsWhenUnavailable(() =>
+      new HotCodePush().apps.channels.releases.revoke({
+        appId: 'app',
+        channelId: 'channel',
+        releaseIds: ['release'],
+      }),
+    );
+
+    expect(attemptCount).toBe(3);
   });
 });

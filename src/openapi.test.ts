@@ -216,6 +216,10 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       appId: APP_ID,
       bundleId: BUNDLE_ID,
       channelId: CHANNEL_ID,
+      conditions: [{ range: '>=2.0.0', type: 'binary' }],
+      failureAction: 'pause',
+      failureMinSample: 20,
+      failureThresholdPercent: 10,
       idempotencyKey: 'key',
       isMandatory: true,
     }),
@@ -227,6 +231,12 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       offset: 10,
       relations: ['bundle'],
     }),
+  'apps.channels.releases.revoke': hotCodePush =>
+    hotCodePush.apps.channels.releases.revoke({
+      appId: APP_ID,
+      channelId: CHANNEL_ID,
+      fromNumber: 3,
+    }),
   'apps.channels.resume': hotCodePush =>
     hotCodePush.apps.channels.resume({ appId: APP_ID, channelId: CHANNEL_ID }),
   'apps.channels.rollbacks.create': hotCodePush =>
@@ -234,6 +244,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       appId: APP_ID,
       channelId: CHANNEL_ID,
       idempotencyKey: 'key',
+      isMandatory: false,
       toReleaseId: RELEASE_ID,
     }),
   'apps.channels.update': hotCodePush =>
@@ -320,6 +331,11 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       fromSha256: SHA256,
       toSha256: 'b'.repeat(64),
     }),
+  'apps.releases.audience.get': hotCodePush =>
+    hotCodePush.apps.releases.audience.get({
+      appId: APP_ID,
+      releaseId: RELEASE_ID,
+    }),
   'apps.releases.count': hotCodePush =>
     hotCodePush.apps.releases.count({
       appId: APP_ID,
@@ -373,6 +389,19 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.apps.statistics.fleet.get({
       appId: APP_ID,
       channelId: CHANNEL_ID,
+    }),
+  'apps.statistics.updates.get': hotCodePush =>
+    hotCodePush.apps.statistics.updates.get({
+      appId: APP_ID,
+      channelId: CHANNEL_ID,
+      periodSince: '2026-09-01',
+      periodUntil: '2026-09-30',
+    }),
+  'apps.statistics.usage.get': hotCodePush =>
+    hotCodePush.apps.statistics.usage.get({
+      appId: APP_ID,
+      periodSince: '2026-09-01',
+      periodUntil: '2026-09-30',
     }),
   'apps.transfer': hotCodePush =>
     hotCodePush.apps.transfer({

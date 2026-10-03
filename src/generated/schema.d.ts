@@ -439,7 +439,7 @@ export interface paths {
         put?: never;
         /**
          * Create a bundle
-         * @description Creates the bundle from its manifest — platforms, version label, files with path, hash and size, the patches the CLI computed, fingerprint, git provenance — and answers the hashes and patch pairs the app lacks with their upload URLs; the bundle is `uploading` until completed. `warnings` carries `FINGERPRINT_UNREGISTERED` when the fingerprint matches no binary of the app.
+         * @description Creates the bundle from its manifest — platforms, version label, files with path, hash and size, the patches the CLI computed, fingerprint, git provenance — and answers the hashes and patch pairs the app lacks with their upload URLs; the bundle is `uploading` until completed. The signed content is the manifest the CLI builds from those fields with the signing key’s fingerprint as `keyId` — the files sorted by path, the patches by path then base, the platforms sorted, each by UTF-16 code units — as canonical JSON; `signature` covers those bytes and is verified here against the app’s keys, `E_SIGNATURE_INVALID` otherwise, and required once the app has a key, `E_SIGNATURE_REQUIRED`. `warnings` carries `FINGERPRINT_UNREGISTERED` when the fingerprint matches no binary of the app.
          */
         post: operations["postV1AppsByAppIdBundles"];
         delete?: never;
@@ -503,7 +503,7 @@ export interface paths {
         put?: never;
         /**
          * Complete a bundle
-         * @description Verifies every listed file, patch and the pack are present, writes the manifest envelope at the bundle's key with the delta packs and the patches and sets `ready`; a completed bundle answers itself again.
+         * @description Verifies every listed file, patch and the pack are present, rebuilds the signed manifest from the rows and checks its signature against the app's keys again, writes the envelope at the bundle's key — the manifest, the signature and, unsigned beside them, the bundle's id and creation time, the pack, the delta packs and the patches with their URLs and stored sizes — and sets `ready`; a completed bundle answers itself again.
          */
         post: operations["postV1AppsByAppIdBundlesByBundleIdComplete"];
         delete?: never;
@@ -919,9 +919,29 @@ export interface paths {
         put?: never;
         /**
          * Roll a channel back
-         * @description Creates a release of the channel's previous bundle, or of the release named by `toReleaseId`, with the rollback recorded as its provenance; a rollback is a release, never a mutation.
+         * @description Creates a release of the channel's previous bundle, or of the release named by `toReleaseId`, with the rollback recorded as its provenance; a rollback is a release, never a mutation, and mandatory unless `isMandatory` is false, since an incident fix should land now.
          */
         post: operations["postV1AppsByAppIdChannelsByChannelIdRollbacks"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/channels/{channelId}/releases/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Revoke releases in bulk
+         * @description Revokes several releases of the channel at once — the ones named by `releaseIds`, or every release numbered at or above `fromNumber` — in one transaction with one index rewrite: each release revoked gets its own `release.revoked` audit row with the devices it moves, a release already revoked is a no-op, so a retried call answers the same, and the answer lists the releases newest first with their device counts, as the single revoke answers. Revoking every release of the channel sends its devices to the embedded bundle. Admin or Owner on a protected channel.
+         */
+        post: operations["postV1AppsByAppIdChannelsByChannelIdReleasesRevoke"];
         delete?: never;
         options?: never;
         head?: never;
@@ -937,7 +957,7 @@ export interface paths {
         };
         /**
          * Preview the audience of a release
-         * @description The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges, `runtime` versions, `fingerprint` hashes, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; the `rollout` percentage, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. The registry holds no runtime version, so a `runtime` condition reaches no device.
+         * @description The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `runtime` versions, `fingerprint` hashes, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; the `rollout` percentage, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type asked for. A `runtime` condition matches the runtime version a bridge reports, which our SDKs leave empty.
          */
         get: operations["getV1AppsByAppIdChannelsByChannelIdAudience"];
         put?: never;
@@ -957,7 +977,7 @@ export interface paths {
         };
         /**
          * List the devices
-         * @description The app's devices, the newest `lastSeenAt` first, filtered by `channelId`, `platform`, `binaryVersion`, `binaryBuild`, `sdkVersion`, `fingerprint`, an `attribute` as `key=value`, and `lastSeenSince` and `lastSeenUntil`, both inclusive; `?relations=channel` embeds the channel.
+         * @description The app's devices, the newest `lastSeenAt` first, filtered by `channelId`, `platform`, `binaryVersion`, `binaryBuild`, `sdkVersion`, `runtimeVersion`, `fingerprint`, an `attribute` as `key=value`, and `lastSeenSince` and `lastSeenUntil`, both inclusive; `?relations=channel` embeds the channel.
          */
         get: operations["getV1AppsByAppIdDevices"];
         put?: never;
@@ -1181,7 +1201,7 @@ export interface paths {
         };
         /**
          * Get a release
-         * @description One release with its status — when it went live in the index and when the purge completed; `?relations=channel,bundle,counters` embeds the linked rows.
+         * @description One release with its status — when it went live in the index, when the purge completed and the verifier's last result on its channel; `?relations=channel,bundle,counters` embeds the linked rows.
          */
         get: operations["getV1AppsByAppIdReleasesByReleaseId"];
         put?: never;
@@ -1194,6 +1214,26 @@ export interface paths {
          * @description Edits the rollout percentage in both directions — a device that has the release keeps it — the mandatory flag, the notes and the nullable auto-pause overrides, null inheriting the channel; the index re-materializes and devices see the change on their next check; revoked is terminal.
          */
         patch: operations["patchV1AppsByAppIdReleasesByReleaseId"];
+        trace?: never;
+    };
+    "/v1/apps/{appId}/releases/{releaseId}/audience": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read the audience of a release
+         * @description The channel's devices seen in the last thirty days that the release's own conditions reach, evaluated over the registry the way the device evaluates the index — the stored attribute hashes and device-id hashes against the devices' values hashed the same way — and the release's rollout percentage as its estimated share; the release detail's audience, where the channel's preview takes the raw values the create dialog has. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` for the condition types the channel's SDKs do not know.
+         */
+        get: operations["getV1AppsByAppIdReleasesByReleaseIdAudience"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/apps/{appId}/releases/{releaseId}/pause": {
@@ -1329,9 +1369,49 @@ export interface paths {
         };
         /**
          * Get the device statistics
-         * @description The registry's snapshot of the devices seen in the last thirty days, counted per release with the embedded bundles as `null`, binary version, SDK version, platform, OS version and country, each the most common first; `channelId` narrows it to one channel's devices.
+         * @description The registry's snapshot of the devices seen in the last thirty days, counted per release with the embedded bundles as `null`, binary version, SDK version, runtime version, platform, OS version and country, each the most common first; `channelId` narrows it to one channel's devices.
          */
         get: operations["getV1AppsByAppIdStatisticsFleet"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/statistics/updates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the update statistics
+         * @description What the devices did per day over the period — updates installed, failed and rolled back, from the nightly rollup — the adoption curve of the newest live releases since each went live with the moments it reached half and nine tenths of the channel's active devices, and the failure and skip reasons the devices reported in the period; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default, and `channelId` narrows it to one channel.
+         */
+        get: operations["getV1AppsByAppIdStatisticsUpdates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/statistics/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the usage statistics
+         * @description The monthly active devices per month the period touches — the closed months as the rollup wrote them, the number the invoice shows, the open month counted live — and the checks and bytes per day from the HTTP analytics beside the bytes the devices reported, approximate by design; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default.
+         */
+        get: operations["getV1AppsByAppIdStatisticsUsage"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4275,6 +4355,7 @@ export interface operations {
                             number: number | null;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
+                            signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
@@ -4429,6 +4510,7 @@ export interface operations {
                             number: number | null;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
+                            signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
@@ -4484,6 +4566,7 @@ export interface operations {
                             number: number | null;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
+                            signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
@@ -4720,6 +4803,7 @@ export interface operations {
                             number: number | null;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
+                            signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
@@ -4856,6 +4940,7 @@ export interface operations {
                         number: number | null;
                         platforms: ("android" | "ios")[];
                         signature: string | null;
+                        signatureKeyId: string | null;
                         sizeBytes: number;
                         /** @enum {string} */
                         state: "ready" | "uploading";
@@ -4974,6 +5059,13 @@ export interface operations {
                         toSha256: string;
                     }[];
                     platforms: ("android" | "ios")[];
+                    /** @default null */
+                    signature?: ({
+                        keyId: string;
+                        value: string;
+                    } & {
+                        [key: string]: unknown;
+                    }) | null;
                 };
             };
         };
@@ -5005,6 +5097,7 @@ export interface operations {
                         number: number | null;
                         platforms: ("android" | "ios")[];
                         signature: string | null;
+                        signatureKeyId: string | null;
                         sizeBytes: number;
                         /** @enum {string} */
                         state: "ready" | "uploading";
@@ -5039,7 +5132,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description E_SIGNATURE_INVALID or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5093,7 +5186,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_STORAGE_LIMIT_REACHED or E_FILES_PER_BUNDLE_LIMIT_REACHED */
+            /** @description E_STORAGE_LIMIT_REACHED, E_FILES_PER_BUNDLE_LIMIT_REACHED or E_SIGNATURE_REQUIRED */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -5268,6 +5361,7 @@ export interface operations {
                         number: number | null;
                         platforms: ("android" | "ios")[];
                         signature: string | null;
+                        signatureKeyId: string | null;
                         sizeBytes: number;
                         /** @enum {string} */
                         state: "ready" | "uploading";
@@ -5480,6 +5574,7 @@ export interface operations {
                         number: number | null;
                         platforms: ("android" | "ios")[];
                         signature: string | null;
+                        signatureKeyId: string | null;
                         sizeBytes: number;
                         /** @enum {string} */
                         state: "ready" | "uploading";
@@ -5489,7 +5584,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description E_SIGNATURE_INVALID or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7704,17 +7799,6 @@ export interface operations {
                             [key: string]: unknown;
                         })[];
                         revokedReleaseIds: string[];
-                        rollBackToEmbedded: ({
-                            aboveNumber: number;
-                            signature: ({
-                                keyId: string;
-                                value: string;
-                            } & {
-                                [key: string]: unknown;
-                            }) | null;
-                        } & {
-                            [key: string]: unknown;
-                        }) | null;
                         /** @constant */
                         schema: 1;
                         sequence: number;
@@ -7837,6 +7921,7 @@ export interface operations {
                             number: number | null;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
+                            signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
@@ -7934,6 +8019,12 @@ export interface operations {
                         state: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
+                        verifier: {
+                            /** @enum {string} */
+                            result: "drifted" | "matched";
+                            /** Format: date-time */
+                            verifiedAt: string;
+                        } | null;
                     }[];
                 };
             };
@@ -8109,6 +8200,7 @@ export interface operations {
                             number: number | null;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
+                            signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
@@ -8206,6 +8298,12 @@ export interface operations {
                         state: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
+                        verifier: {
+                            /** @enum {string} */
+                            result: "drifted" | "matched";
+                            /** Format: date-time */
+                            verifiedAt: string;
+                        } | null;
                         warnings: {
                             /** @enum {string} */
                             code: "FINGERPRINT_UNREGISTERED" | "UNSUPPORTED_CONDITION_SHARE";
@@ -8409,6 +8507,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @default true */
+                    isMandatory?: boolean;
                     /** @default null */
                     toReleaseId?: string | null;
                 };
@@ -8445,6 +8545,7 @@ export interface operations {
                             number: number | null;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
+                            signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
@@ -8542,6 +8643,12 @@ export interface operations {
                         state: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
+                        verifier: {
+                            /** @enum {string} */
+                            result: "drifted" | "matched";
+                            /** Format: date-time */
+                            verifiedAt: string;
+                        } | null;
                     };
                 };
             };
@@ -8628,6 +8735,230 @@ export interface operations {
             };
         };
     };
+    postV1AppsByAppIdChannelsByChannelIdReleasesRevoke: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                appId: string;
+                channelId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    fromNumber?: number;
+                    releaseIds?: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description The releases named, revoked. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        bundle?: {
+                            /** Format: uuid */
+                            appId: string;
+                            bundleVersion: string;
+                            /** Format: date-time */
+                            createdAt: string;
+                            expiresAt: string | null;
+                            fingerprint: string | null;
+                            /** @enum {string} */
+                            framework: "capacitor" | "cordova" | "expo" | "react-native";
+                            gitMessage: string | null;
+                            gitRef: string | null;
+                            gitRemote: string | null;
+                            gitSha: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            isGitDirty: boolean | null;
+                            manifestSha256: string | null;
+                            number: number | null;
+                            platforms: ("android" | "ios")[];
+                            signature: string | null;
+                            signatureKeyId: string | null;
+                            sizeBytes: number;
+                            /** @enum {string} */
+                            state: "ready" | "uploading";
+                            unusedSince: string | null;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                        /** Format: uuid */
+                        bundleId: string;
+                        channel?: {
+                            /** Format: uuid */
+                            appId: string;
+                            /** Format: date-time */
+                            createdAt: string;
+                            expiresAt: string | null;
+                            failureAction: ("notify" | "pause" | "revoke") | null;
+                            failureMinSample: number | null;
+                            failureThresholdPercent: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            isDiscoverable: boolean;
+                            isProtected: boolean;
+                            name: string;
+                            pausedAt: string | null;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                        /** Format: uuid */
+                        channelId: string;
+                        conditions: (({
+                            key: string;
+                            /** @constant */
+                            type: "attribute";
+                            valueSha256: string;
+                        } & {
+                            [key: string]: unknown;
+                        }) | ({
+                            range: string;
+                            /** @constant */
+                            type: "binary";
+                        } & {
+                            [key: string]: unknown;
+                        }) | ({
+                            hashedIds: string[];
+                            /** @constant */
+                            type: "device";
+                        } & {
+                            [key: string]: unknown;
+                        }) | ({
+                            hash: string;
+                            /** @constant */
+                            type: "fingerprint";
+                        } & {
+                            [key: string]: unknown;
+                        }) | ({
+                            range: string;
+                            /** @constant */
+                            type: "os";
+                        } & {
+                            [key: string]: unknown;
+                        }) | ({
+                            /** @constant */
+                            type: "runtime";
+                            version: string;
+                        } & {
+                            [key: string]: unknown;
+                        }))[];
+                        counters?: {
+                            attempted: number;
+                            failedCrashed: number;
+                            failedDownload: number;
+                            failedReadyTimeout: number;
+                            failedReported: number;
+                            failedVerification: number;
+                            installed: number;
+                        };
+                        /** Format: date-time */
+                        createdAt: string;
+                        createdFromReleaseId: string | null;
+                        deviceCount: number;
+                        failureAction: ("notify" | "pause" | "revoke") | null;
+                        failureMinSample: number | null;
+                        failureThresholdPercent: number | null;
+                        /** Format: uuid */
+                        id: string;
+                        isMandatory: boolean;
+                        liveAt: string | null;
+                        notes: string | null;
+                        number: number;
+                        pausedAt: string | null;
+                        purgedAt: string | null;
+                        rolledBackFromReleaseId: string | null;
+                        rolloutPercentage: number;
+                        /** @enum {string} */
+                        state: "active" | "paused" | "revoked";
+                        /** Format: date-time */
+                        updatedAt: string;
+                        verifier: {
+                            /** @enum {string} */
+                            result: "drifted" | "matched";
+                            /** Format: date-time */
+                            verifiedAt: string;
+                        } | null;
+                    }[];
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND or E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     getV1AppsByAppIdChannelsByChannelIdAudience: {
         parameters: {
             query?: {
@@ -8669,6 +9000,14 @@ export interface operations {
                         estimatedAtRollout: number;
                         reached: number;
                         total: number;
+                        warnings: {
+                            /** @enum {string} */
+                            code: "FINGERPRINT_UNREGISTERED" | "UNSUPPORTED_CONDITION_SHARE";
+                            details: {
+                                [key: string]: unknown;
+                            } | null;
+                            message: string;
+                        }[];
                     };
                 };
             };
@@ -8750,6 +9089,7 @@ export interface operations {
                 lastSeenSince?: string;
                 lastSeenUntil?: string;
                 platform?: "android" | "ios";
+                runtimeVersion?: string;
                 sdkVersion?: string;
                 relations?: "channel"[];
             };
@@ -8812,6 +9152,7 @@ export interface operations {
                         osVersion: string;
                         /** @enum {string} */
                         platform: "android" | "ios";
+                        runtimeVersion: string | null;
                         sdkVersion: string;
                         /** Format: date-time */
                         updatedAt: string;
@@ -8894,6 +9235,7 @@ export interface operations {
                 lastSeenSince?: string;
                 lastSeenUntil?: string;
                 platform?: "android" | "ios";
+                runtimeVersion?: string;
                 sdkVersion?: string;
             };
             header?: {
@@ -9048,6 +9390,7 @@ export interface operations {
                         osVersion: string;
                         /** @enum {string} */
                         platform: "android" | "ios";
+                        runtimeVersion: string | null;
                         sdkVersion: string;
                         /** Format: date-time */
                         updatedAt: string;
@@ -9986,6 +10329,7 @@ export interface operations {
                             number: number | null;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
+                            signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
@@ -10083,6 +10427,12 @@ export interface operations {
                         state: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
+                        verifier: {
+                            /** @enum {string} */
+                            result: "drifted" | "matched";
+                            /** Format: date-time */
+                            verifiedAt: string;
+                        } | null;
                     }[];
                 };
             };
@@ -10292,6 +10642,7 @@ export interface operations {
                             number: number | null;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
+                            signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
@@ -10389,6 +10740,12 @@ export interface operations {
                         state: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
+                        verifier: {
+                            /** @enum {string} */
+                            result: "drifted" | "matched";
+                            /** Format: date-time */
+                            verifiedAt: string;
+                        } | null;
                     };
                 };
             };
@@ -10513,6 +10870,7 @@ export interface operations {
                             number: number | null;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
+                            signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
@@ -10610,6 +10968,12 @@ export interface operations {
                         state: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
+                        verifier: {
+                            /** @enum {string} */
+                            result: "drifted" | "matched";
+                            /** Format: date-time */
+                            verifiedAt: string;
+                        } | null;
                     };
                 };
             };
@@ -10651,6 +11015,115 @@ export interface operations {
             };
             /** @description E_RELEASE_REVOKED */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1AppsByAppIdReleasesByReleaseIdAudience: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                appId: string;
+                releaseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The audience. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        byBinaryVersion: {
+                            count: number;
+                            value: string | null;
+                        }[];
+                        byPlatform: {
+                            count: number;
+                            value: string | null;
+                        }[];
+                        estimatedAtRollout: number;
+                        reached: number;
+                        total: number;
+                        warnings: {
+                            /** @enum {string} */
+                            code: "FINGERPRINT_UNREGISTERED" | "UNSUPPORTED_CONDITION_SHARE";
+                            details: {
+                                [key: string]: unknown;
+                            } | null;
+                            message: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -10732,6 +11205,7 @@ export interface operations {
                             number: number | null;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
+                            signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
@@ -10829,6 +11303,12 @@ export interface operations {
                         state: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
+                        verifier: {
+                            /** @enum {string} */
+                            result: "drifted" | "matched";
+                            /** Format: date-time */
+                            verifiedAt: string;
+                        } | null;
                     };
                 };
             };
@@ -10951,6 +11431,7 @@ export interface operations {
                             number: number | null;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
+                            signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
@@ -11048,6 +11529,12 @@ export interface operations {
                         state: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
+                        verifier: {
+                            /** @enum {string} */
+                            result: "drifted" | "matched";
+                            /** Format: date-time */
+                            verifiedAt: string;
+                        } | null;
                     };
                 };
             };
@@ -11170,6 +11657,7 @@ export interface operations {
                             number: number | null;
                             platforms: ("android" | "ios")[];
                             signature: string | null;
+                            signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
@@ -11267,6 +11755,12 @@ export interface operations {
                         state: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
+                        verifier: {
+                            /** @enum {string} */
+                            result: "drifted" | "matched";
+                            /** Format: date-time */
+                            verifiedAt: string;
+                        } | null;
                     };
                 };
             };
@@ -11778,6 +12272,10 @@ export interface operations {
                             count: number;
                             value: string | null;
                         }[];
+                        runtimeVersion: {
+                            count: number;
+                            value: string | null;
+                        }[];
                         sdkVersion: {
                             count: number;
                             value: string | null;
@@ -11786,6 +12284,237 @@ export interface operations {
                 };
             };
             /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1AppsByAppIdStatisticsUpdates: {
+        parameters: {
+            query?: {
+                periodSince?: string;
+                periodUntil?: string;
+                channelId?: string;
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The daily counts, the adoption curves and the reasons. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        days: {
+                            /** Format: date */
+                            day: string;
+                            failed: number;
+                            installed: number;
+                            rolledBack: number;
+                        }[];
+                        failureReasons: {
+                            count: number;
+                            reason: string;
+                        }[];
+                        releases: {
+                            adoption: {
+                                /** Format: date-time */
+                                at: string;
+                                installed: number;
+                            }[];
+                            /** Format: uuid */
+                            channelId: string;
+                            /** Format: date-time */
+                            liveAt: string;
+                            number: number;
+                            /** Format: uuid */
+                            releaseId: string;
+                            timeToAdoption: {
+                                percent50At: string | null;
+                                percent90At: string | null;
+                            };
+                        }[];
+                        skippedReasons: {
+                            count: number;
+                            reason: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description E_VALIDATION or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1AppsByAppIdStatisticsUsage: {
+        parameters: {
+            query?: {
+                periodSince?: string;
+                periodUntil?: string;
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The months and the days. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        days: {
+                            bytes: number;
+                            checks: number;
+                            /** Format: date */
+                            day: string;
+                            downloadedBytes: number;
+                        }[];
+                        months: {
+                            bytes: number;
+                            mau: number;
+                            /** Format: date */
+                            month: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description E_VALIDATION or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;

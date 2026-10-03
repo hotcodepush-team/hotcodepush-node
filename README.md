@@ -56,14 +56,19 @@ The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.ch
 | `apps.channels.qr`, the channel's deep link as an image                          | `get`                                                                   |
 | `apps.channels.releases`, the release log                                        | `count`, `create`, `list`                                               |
 | `apps.channels.rollbacks`                                                        | `create`                                                                |
-| `apps.embeddedBundles`                                                           | `count`, `create`, `get`, `list`                                        |
+| `apps.binaries`, the store builds the embed step registers                       | `count`, `create`, `get`, `list`                                        |
+| `apps.channels.audience`, the audience preview                                   | `get`                                                                   |
+| `apps.devices`                                                                   | `count`, `delete`, `get`, `list`                                        |
+| `apps.patches`                                                                   | `upload`                                                                |
+| `apps.signingKeys`                                                               | `count`, `create`, `delete`, `list`                                     |
+| `apps.statistics.fleet`, the registry counted by dimension                       | `get`                                                                   |
 | `apps.files`                                                                     | `upload`                                                                |
 | `apps.files.uploads`, the multipart upload                                       | `complete`, `create`, `delete`                                          |
 | `apps.files.uploads.parts`                                                       | `upload`                                                                |
 | `apps.releases`                                                                  | `count`, `get`, `list`, `pause`, `resume`, `revoke`, `update`           |
 | `users`                                                                          | `delete`, `get`                                                         |
 
-Lists take `limit` and `offset`, and where the API embeds linked rows, `relations`: `organizations.members.list({ organizationId, relations: ['user'] })`.
+Lists take `limit` and `offset`, and where the API embeds linked rows, `relations`: `organizations.members.list({ organizationId, relations: ['user'] })`; any other list parameter, an audience's `attribute` say, repeats itself in the query.
 Every list has a `count` beside it taking the same filters and answering `{ total }`, the number a paginated table reads.
 `users.get({ userId: 'me' })` answers the caller behind the token, and `users.delete({ userId: 'me' })` deletes the caller's account, as `me` addresses the caller wherever the API takes a `{userId}`.
 

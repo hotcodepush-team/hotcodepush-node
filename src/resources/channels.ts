@@ -8,6 +8,7 @@ import type {
   PathParameters,
   QueryParameters,
 } from '../types';
+import { ChannelAudienceResource } from './channel-audience';
 import { ChannelIndexesResource } from './channel-indexes';
 import { ChannelQrResource } from './channel-qr';
 import { ChannelReleasesResource } from './channel-releases';
@@ -70,12 +71,14 @@ export type UpdateChannelOptions = PathParameters<
   JsonRequestBody<'/v1/apps/{appId}/channels/{channelId}', 'patch'>;
 
 export class ChannelsResource {
+  public readonly audience: ChannelAudienceResource;
   public readonly indexes: ChannelIndexesResource;
   public readonly qr: ChannelQrResource;
   public readonly releases: ChannelReleasesResource;
   public readonly rollbacks: RollbacksResource;
 
   constructor(private readonly httpClient: HttpClient) {
+    this.audience = new ChannelAudienceResource(httpClient);
     this.indexes = new ChannelIndexesResource(httpClient);
     this.qr = new ChannelQrResource(httpClient);
     this.releases = new ChannelReleasesResource(httpClient);

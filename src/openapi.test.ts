@@ -17,9 +17,10 @@ interface OpenApiDocument {
 
 const APP_ID = '7c0f3a52-1d8e-4b6a-9f21-5e3c8a0d4b17';
 const BASE_BUNDLE_ID = '8e2d6b1f-5a47-4c93-b0e8-7f1a3d5c9e20';
+const BINARY_ID = '3f6a9c2e-7b14-4d58-9e03-b2c8d6f1a475';
 const BUNDLE_ID = '2a9e6c14-8b3f-4d70-a5e2-91c7f0b3d864';
 const CHANNEL_ID = 'e41b7d09-3c6a-4f85-b2d1-6a8f0c9e3b52';
-const EMBEDDED_BUNDLE_ID = '3f6a9c2e-7b14-4d58-9e03-b2c8d6f1a475';
+const DEVICE_ID = '6b1e9d37-2f5c-4a80-9c46-d8e3a1f7b259';
 const FILE = { path: 'index.html', sha256: 'a'.repeat(64), sizeBytes: 5 };
 const HTTP_METHODS = ['delete', 'get', 'patch', 'post', 'put'];
 const INVITATION_ID = '9d3c5e81-6f2a-4b07-8c14-3e7a1f9b0d26';
@@ -27,6 +28,7 @@ const MEMBER_ID = '5b8a2f47-0e9c-4d31-a6b8-2c4f7e1d9a03';
 const ORGANIZATION_ID = 'c6e0b3a8-4d1f-4a92-b7e5-8f3d2c0a6b19';
 const RELEASE_ID = '0f7d4c2b-9a6e-4e18-83b5-d1c9a7f2e604';
 const SHA256 = 'a'.repeat(64);
+const SIGNING_KEY_ID = '1c4f8a6d-3e92-4b57-a0d8-5f2b7c9e1a34';
 const UPLOAD_ID = 'upload';
 
 /**
@@ -34,6 +36,32 @@ const UPLOAD_ID = 'upload';
  * query parameter, body or content type the document lacks fails here.
  */
 const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
+  'apps.binaries.count': hotCodePush =>
+    hotCodePush.apps.binaries.count({ appId: APP_ID }),
+  'apps.binaries.create': hotCodePush =>
+    hotCodePush.apps.binaries.create({
+      appId: APP_ID,
+      binaryBuild: '42',
+      binaryVersion: '1.0.0',
+      files: [FILE],
+      fingerprint: `fp1:${SHA256}`,
+      force: true,
+      idempotencyKey: 'key',
+      platform: 'android',
+    }),
+  'apps.binaries.get': hotCodePush =>
+    hotCodePush.apps.binaries.get({
+      appId: APP_ID,
+      binaryId: BINARY_ID,
+      relations: ['bundle'],
+    }),
+  'apps.binaries.list': hotCodePush =>
+    hotCodePush.apps.binaries.list({
+      appId: APP_ID,
+      limit: 10,
+      offset: 10,
+      relations: ['bundle'],
+    }),
   'apps.bundles.complete': hotCodePush =>
     hotCodePush.apps.bundles.complete({ appId: APP_ID, bundleId: BUNDLE_ID }),
   'apps.bundles.count': hotCodePush =>
@@ -137,6 +165,18 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       partNumber: 1,
       uploadId: UPLOAD_ID,
     }),
+  'apps.channels.audience.get': hotCodePush =>
+    hotCodePush.apps.channels.audience.get({
+      appId: APP_ID,
+      attribute: ['tier=gold'],
+      binary: ['>=2.0.0'],
+      channelId: CHANNEL_ID,
+      device: [DEVICE_ID],
+      fingerprint: [`fp1:${SHA256}`],
+      os: ['>=17'],
+      rollout: 10,
+      runtime: ['1.0.0'],
+    }),
   'apps.channels.count': hotCodePush =>
     hotCodePush.apps.channels.count({ appId: APP_ID }),
   'apps.channels.create': hotCodePush =>
@@ -203,30 +243,42 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       name: 'beta',
     }),
   'apps.delete': hotCodePush => hotCodePush.apps.delete({ appId: APP_ID }),
-  'apps.embeddedBundles.count': hotCodePush =>
-    hotCodePush.apps.embeddedBundles.count({ appId: APP_ID }),
-  'apps.embeddedBundles.create': hotCodePush =>
-    hotCodePush.apps.embeddedBundles.create({
+  'apps.devices.count': hotCodePush =>
+    hotCodePush.apps.devices.count({
       appId: APP_ID,
+      attribute: 'tier=gold',
       binaryBuild: '42',
       binaryVersion: '1.0.0',
-      files: [FILE],
-      force: true,
-      idempotencyKey: 'key',
-      platform: 'android',
+      channelId: CHANNEL_ID,
+      fingerprint: `fp1:${SHA256}`,
+      lastSeenSince: '2026-01-01T00:00:00.000Z',
+      lastSeenUntil: '2026-02-01T00:00:00.000Z',
+      platform: 'ios',
+      sdkVersion: '1.0.0',
     }),
-  'apps.embeddedBundles.get': hotCodePush =>
-    hotCodePush.apps.embeddedBundles.get({
+  'apps.devices.delete': hotCodePush =>
+    hotCodePush.apps.devices.delete({ appId: APP_ID, deviceId: DEVICE_ID }),
+  'apps.devices.get': hotCodePush =>
+    hotCodePush.apps.devices.get({
       appId: APP_ID,
-      embeddedBundleId: EMBEDDED_BUNDLE_ID,
-      relations: ['bundle'],
+      deviceId: DEVICE_ID,
+      relations: ['channel'],
     }),
-  'apps.embeddedBundles.list': hotCodePush =>
-    hotCodePush.apps.embeddedBundles.list({
+  'apps.devices.list': hotCodePush =>
+    hotCodePush.apps.devices.list({
       appId: APP_ID,
+      attribute: 'tier=gold',
+      binaryBuild: '42',
+      binaryVersion: '1.0.0',
+      channelId: CHANNEL_ID,
+      fingerprint: `fp1:${SHA256}`,
+      lastSeenSince: '2026-01-01T00:00:00.000Z',
+      lastSeenUntil: '2026-02-01T00:00:00.000Z',
       limit: 10,
       offset: 10,
-      relations: ['bundle'],
+      platform: 'ios',
+      relations: ['channel'],
+      sdkVersion: '1.0.0',
     }),
   'apps.files.upload': hotCodePush =>
     hotCodePush.apps.files.upload({
@@ -261,6 +313,13 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       uploadId: UPLOAD_ID,
     }),
   'apps.get': hotCodePush => hotCodePush.apps.get({ appId: APP_ID }),
+  'apps.patches.upload': hotCodePush =>
+    hotCodePush.apps.patches.upload({
+      appId: APP_ID,
+      body: new Blob(['patch']),
+      fromSha256: SHA256,
+      toSha256: 'b'.repeat(64),
+    }),
   'apps.releases.count': hotCodePush =>
     hotCodePush.apps.releases.count({
       appId: APP_ID,
@@ -295,6 +354,25 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       appId: APP_ID,
       releaseId: RELEASE_ID,
       rolloutPercentage: 50,
+    }),
+  'apps.signingKeys.count': hotCodePush =>
+    hotCodePush.apps.signingKeys.count({ appId: APP_ID }),
+  'apps.signingKeys.create': hotCodePush =>
+    hotCodePush.apps.signingKeys.create({
+      appId: APP_ID,
+      publicKey: 'ed25519:key',
+    }),
+  'apps.signingKeys.delete': hotCodePush =>
+    hotCodePush.apps.signingKeys.delete({
+      appId: APP_ID,
+      signingKeyId: SIGNING_KEY_ID,
+    }),
+  'apps.signingKeys.list': hotCodePush =>
+    hotCodePush.apps.signingKeys.list({ appId: APP_ID, limit: 10, offset: 10 }),
+  'apps.statistics.fleet.get': hotCodePush =>
+    hotCodePush.apps.statistics.fleet.get({
+      appId: APP_ID,
+      channelId: CHANNEL_ID,
     }),
   'apps.transfer': hotCodePush =>
     hotCodePush.apps.transfer({

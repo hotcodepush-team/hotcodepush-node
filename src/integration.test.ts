@@ -325,48 +325,42 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     ).rejects.toMatchObject({ code: 'E_NOT_FOUND', status: 404 });
   });
 
-  test('should register an embedded bundle and read it with its bundle', async () => {
+  test('should register a binary and read it with its bundle', async () => {
     const indexFile = resolveTestFile('index.html', '<h1>Node client</h1>');
-    const createdEmbeddedBundle = await hotCodePush.apps.embeddedBundles.create(
-      {
-        appId: app.id,
-        binaryBuild: '1',
-        binaryVersion: '1.0.0',
-        files: [indexFile.manifestEntry],
-        fingerprint: `fp1:${'a'.repeat(64)}`,
-        platform: 'android',
-      },
-    );
-    const reregisteredEmbeddedBundle =
-      await hotCodePush.apps.embeddedBundles.create({
-        appId: app.id,
-        binaryBuild: '1',
-        binaryVersion: '1.0.0',
-        files: [indexFile.manifestEntry],
-        fingerprint: `fp1:${'b'.repeat(64)}`,
-        force: true,
-        platform: 'android',
-      });
-    const fetchedEmbeddedBundles = await hotCodePush.apps.embeddedBundles.list({
+    const createdBinary = await hotCodePush.apps.binaries.create({
+      appId: app.id,
+      binaryBuild: '1',
+      binaryVersion: '1.0.0',
+      files: [indexFile.manifestEntry],
+      fingerprint: `fp1:${'a'.repeat(64)}`,
+      platform: 'android',
+    });
+    const reregisteredBinary = await hotCodePush.apps.binaries.create({
+      appId: app.id,
+      binaryBuild: '1',
+      binaryVersion: '1.0.0',
+      files: [indexFile.manifestEntry],
+      fingerprint: `fp1:${'b'.repeat(64)}`,
+      force: true,
+      platform: 'android',
+    });
+    const fetchedBinaries = await hotCodePush.apps.binaries.list({
       appId: app.id,
       relations: ['bundle'],
     });
-    const fetchedEmbeddedBundle = await hotCodePush.apps.embeddedBundles.get({
+    const fetchedBinary = await hotCodePush.apps.binaries.get({
       appId: app.id,
-      embeddedBundleId: createdEmbeddedBundle.id,
+      binaryId: createdBinary.id,
       relations: ['bundle'],
     });
 
-    expect(reregisteredEmbeddedBundle).toMatchObject({
+    expect(reregisteredBinary).toMatchObject({
       fingerprint: `fp1:${'b'.repeat(64)}`,
-      id: createdEmbeddedBundle.id,
+      id: createdBinary.id,
     });
-    expect(fetchedEmbeddedBundles.map(({ id }) => id)).toEqual([
-      createdEmbeddedBundle.id,
-    ]);
-    expect(fetchedEmbeddedBundle.bundle?.id).toBe(
-      reregisteredEmbeddedBundle.bundleId,
-    );
+    expect(fetchedBinaries.map(({ id }) => id)).toEqual([createdBinary.id]);
+    expect(fetchedBinary.bundle?.id).toBe(reregisteredBinary.bundleId);
+    expect(fetchedBinary.bundle?.number).toBeNull();
   });
 
   test('should delete the channel', async () => {

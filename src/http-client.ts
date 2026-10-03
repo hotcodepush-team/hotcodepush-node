@@ -36,7 +36,7 @@ export interface FetchJsonOptions {
   method: 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
   path: string;
   /**
-   * Undefined values and empty lists are left out; a list is sent as a comma list.
+   * Undefined values and empty lists are left out; `relations` is sent as a comma list, any other list repeats its parameter.
    */
   query?: Record<string, number | readonly string[] | string | undefined>;
 }
@@ -166,9 +166,8 @@ export class HttpClient {
   private resolveUrl(options: FetchJsonOptions): URL {
     const url = new URL(options.path, this.baseUrl);
     for (const [name, value] of Object.entries(options.query ?? {})) {
-      const queryValue = typeof value === 'object' ? value.join(',') : value;
-      if (queryValue !== undefined && queryValue !== '') {
-        url.searchParams.set(name, String(queryValue));
+      for (const queryValue of resolveQueryValues(name, value)) {
+        url.searchParams.append(name, queryValue);
       }
     }
     return url;
@@ -223,6 +222,26 @@ export function resolvePath(
     }
     return encodeURIComponent(parameter);
   });
+}
+
+/**
+ * The values a query parameter is sent with: `relations` is the API's one comma list,
+ * and every other list repeats, `?binary=…&binary=…`, since its values may hold a comma.
+ */
+function resolveQueryValues(
+  name: string,
+  value: number | readonly string[] | string | undefined,
+): string[] {
+  if (value === undefined || value === '') {
+    return [];
+  }
+  if (typeof value !== 'object') {
+    return [String(value)];
+  }
+  if (name === 'relations') {
+    return value.length === 0 ? [] : [value.join(',')];
+  }
+  return [...value];
 }
 
 function sleep(milliseconds: number): Promise<void> {

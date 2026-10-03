@@ -5,11 +5,15 @@ import type {
   JsonResponseBody,
   PathParameters,
 } from '../types';
+import { BinariesResource } from './binaries';
 import { BundlesResource } from './bundles';
 import { ChannelsResource } from './channels';
-import { EmbeddedBundlesResource } from './embedded-bundles';
+import { DevicesResource } from './devices';
 import { FilesResource } from './files';
+import { PatchesResource } from './patches';
 import { ReleasesResource } from './releases';
+import { SigningKeysResource } from './signing-keys';
+import { StatisticsResource } from './statistics';
 
 export type App = JsonResponseBody<'/v1/apps/{appId}', 'get', 200>;
 
@@ -27,18 +31,26 @@ export type UpdateAppOptions = PathParameters<'/v1/apps/{appId}', 'patch'> &
   JsonRequestBody<'/v1/apps/{appId}', 'patch'>;
 
 export class AppsResource {
+  public readonly binaries: BinariesResource;
   public readonly bundles: BundlesResource;
   public readonly channels: ChannelsResource;
-  public readonly embeddedBundles: EmbeddedBundlesResource;
+  public readonly devices: DevicesResource;
   public readonly files: FilesResource;
+  public readonly patches: PatchesResource;
   public readonly releases: ReleasesResource;
+  public readonly signingKeys: SigningKeysResource;
+  public readonly statistics: StatisticsResource;
 
   constructor(private readonly httpClient: HttpClient) {
+    this.binaries = new BinariesResource(httpClient);
     this.bundles = new BundlesResource(httpClient);
     this.channels = new ChannelsResource(httpClient);
-    this.embeddedBundles = new EmbeddedBundlesResource(httpClient);
+    this.devices = new DevicesResource(httpClient);
     this.files = new FilesResource(httpClient);
+    this.patches = new PatchesResource(httpClient);
     this.releases = new ReleasesResource(httpClient);
+    this.signingKeys = new SigningKeysResource(httpClient);
+    this.statistics = new StatisticsResource(httpClient);
   }
 
   /**

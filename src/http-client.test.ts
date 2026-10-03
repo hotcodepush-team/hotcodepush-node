@@ -123,7 +123,7 @@ describe('HttpClient', () => {
     );
   });
 
-  test('should send a list in the query as a comma list', async () => {
+  test('should send the relations in the query as a comma list', async () => {
     const fetchMock = stubFetch();
 
     await new HttpClient({}).fetchJson({
@@ -134,6 +134,20 @@ describe('HttpClient', () => {
 
     expect(resolveSentRequest(fetchMock).url).toBe(
       'https://api.hotcodepush.com/v1/apps/app/releases/release?relations=bundle%2Cchannel',
+    );
+  });
+
+  test('should repeat the parameter of any other list in the query', async () => {
+    const fetchMock = stubFetch();
+
+    await new HttpClient({}).fetchJson({
+      method: 'GET',
+      path: '/v1/apps/app/channels/channel/audience',
+      query: { attribute: ['tier=gold,silver'], binary: ['>=2.0.0', '<3.0.0'] },
+    });
+
+    expect(resolveSentRequest(fetchMock).url).toBe(
+      'https://api.hotcodepush.com/v1/apps/app/channels/channel/audience?attribute=tier%3Dgold%2Csilver&binary=%3E%3D2.0.0&binary=%3C3.0.0',
     );
   });
 

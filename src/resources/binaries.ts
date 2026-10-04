@@ -21,7 +21,8 @@ export type Binary = JsonResponseBody<
 export type CountBinariesOptions = PathParameters<
   '/v1/apps/{appId}/binaries/count',
   'get'
->;
+> &
+  QueryParameters<'/v1/apps/{appId}/binaries/count', 'get'>;
 
 export type CreateBinaryOptions = PathParameters<
   '/v1/apps/{appId}/binaries',
@@ -46,12 +47,14 @@ export class BinariesResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The number of the app's registered store builds.
+   * The number of the app's registered store builds under the list's filters.
    */
   public async count(options: CountBinariesOptions): Promise<Count> {
+    const { appId, ...query } = options;
     return this.httpClient.fetchJson({
       method: 'GET',
-      path: resolvePath('/v1/apps/{appId}/binaries/count', options),
+      path: resolvePath('/v1/apps/{appId}/binaries/count', { appId }),
+      query,
     });
   }
 

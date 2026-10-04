@@ -369,7 +369,7 @@ export interface paths {
         };
         /**
          * List the binaries
-         * @description The app's registered store builds, newest first, each with the devices running it; `?relations=bundle` embeds the bundle each ships.
+         * @description The app's registered store builds, newest first, each with the devices running it, filtered by `platform` and `fingerprint`; `?relations=bundle` embeds the bundle each ships.
          */
         get: operations["getV1AppsByAppIdBinaries"];
         put?: never;
@@ -393,7 +393,7 @@ export interface paths {
         };
         /**
          * Count the binaries
-         * @description The number of the app's registered store builds, which the list pages through.
+         * @description The number of the app's registered store builds under the list's filters, which the list pages through.
          */
         get: operations["getV1AppsByAppIdBinariesCount"];
         put?: never;
@@ -433,7 +433,7 @@ export interface paths {
         };
         /**
          * List the bundles
-         * @description The app's bundles, newest first, every type unless `type` selects one: `embedded` for the bundle a store build ships, which carries no number, or `uploaded`. `isInUse` selects the bundles an active or paused release serves.
+         * @description The app's bundles, newest first, every type unless `type` selects one: `embedded` for the bundle a store build ships, which carries no number and no fingerprint, or `uploaded`. `isInUse` selects the bundles an active or paused release serves, `fingerprint` those built for that native layer.
          */
         get: operations["getV1AppsByAppIdBundles"];
         put?: never;
@@ -625,6 +625,46 @@ export interface paths {
          * @description Stores the bundle's Expo-format manifest for one of its platforms: `manifest` is the canonical JSON the CLI built with `@hotcodepush/protocol`, whose `id` and `hotcodepush-update` metadata are the bundle's update id on the platform; `signature` covers those bytes with the app's `rsa-v1_5-sha256` key, verified here, `E_SIGNATURE_INVALID` otherwise, and required once the app holds such a key, `E_SIGNATURE_REQUIRED`. The bundle is still `uploading`; a second PUT replaces the first.
          */
         put: operations["putV1AppsByAppIdBundlesByBundleIdExpoByPlatformManifest"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the files of a bundle
+         * @description The bundle's files, ordered by path, each with its content hash and uncompressed size; an embedded bundle answers the files its binary registered.
+         */
+        get: operations["getV1AppsByAppIdBundlesByBundleIdFiles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/files/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Count the files of a bundle
+         * @description The number of files the bundle lists, which the list pages through.
+         */
+        get: operations["getV1AppsByAppIdBundlesByBundleIdFilesCount"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -4394,6 +4434,8 @@ export interface operations {
             query?: {
                 limit?: number;
                 offset?: number;
+                fingerprint?: string;
+                platform?: "android" | "ios";
                 relations?: "bundle"[];
             };
             header?: {
@@ -4756,7 +4798,10 @@ export interface operations {
     };
     getV1AppsByAppIdBinariesCount: {
         parameters: {
-            query?: never;
+            query?: {
+                fingerprint?: string;
+                platform?: "android" | "ios";
+            };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
@@ -4989,6 +5034,7 @@ export interface operations {
             query?: {
                 limit?: number;
                 offset?: number;
+                fingerprint?: string;
                 isInUse?: "false" | "true";
                 platform?: "android" | "ios";
                 state?: "ready" | "uploading";
@@ -5324,6 +5370,7 @@ export interface operations {
     getV1AppsByAppIdBundlesCount: {
         parameters: {
             query?: {
+                fingerprint?: string;
                 isInUse?: "false" | "true";
                 platform?: "android" | "ios";
                 state?: "ready" | "uploading";
@@ -6378,6 +6425,193 @@ export interface operations {
             };
             /** @description E_SIGNATURE_REQUIRED */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1AppsByAppIdBundlesByBundleIdFiles: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The files. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        path: string;
+                        sha256: string;
+                        sizeBytes: number;
+                    }[];
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1AppsByAppIdBundlesByBundleIdFilesCount: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The number of rows the list's filters match. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        total: number;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

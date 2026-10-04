@@ -10,6 +10,7 @@ import {
 const BUNDLES_URL = 'https://api.hotcodepush.com/v1/apps/app/bundles';
 const BUNDLE = { id: 'bundle', state: 'uploading' };
 const FILE = { path: 'index.html', sha256: 'a'.repeat(64), sizeBytes: 5 };
+const FINGERPRINT = `fp1:${'a'.repeat(64)}`;
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -114,11 +115,12 @@ describe('BundlesResource', () => {
     });
   });
 
-  test('should list the bundles of the app filtered by use, platform and type', async () => {
+  test('should list the bundles of the app filtered by fingerprint, use, platform and type', async () => {
     const fetchMock = stubFetch(() => Response.json([BUNDLE]));
 
     const fetchedBundles = await new HotCodePush().apps.bundles.list({
       appId: 'app',
+      fingerprint: FINGERPRINT,
       isInUse: 'false',
       platform: 'ios',
       type: 'uploaded',
@@ -127,7 +129,7 @@ describe('BundlesResource', () => {
     expect(fetchedBundles).toEqual([BUNDLE]);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${BUNDLES_URL}?isInUse=false&platform=ios&type=uploaded`,
+      url: `${BUNDLES_URL}?fingerprint=${encodeURIComponent(FINGERPRINT)}&isInUse=false&platform=ios&type=uploaded`,
     });
   });
 });

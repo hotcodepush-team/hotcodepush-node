@@ -37,7 +37,11 @@ const UPLOAD_ID = 'upload';
  */
 const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
   'apps.binaries.count': hotCodePush =>
-    hotCodePush.apps.binaries.count({ appId: APP_ID }),
+    hotCodePush.apps.binaries.count({
+      appId: APP_ID,
+      fingerprint: `fp1:${SHA256}`,
+      platform: 'ios',
+    }),
   'apps.binaries.create': hotCodePush =>
     hotCodePush.apps.binaries.create({
       appId: APP_ID,
@@ -58,8 +62,10 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
   'apps.binaries.list': hotCodePush =>
     hotCodePush.apps.binaries.list({
       appId: APP_ID,
+      fingerprint: `fp1:${SHA256}`,
       limit: 10,
       offset: 10,
+      platform: 'ios',
       relations: ['bundle'],
     }),
   'apps.bundles.complete': hotCodePush =>
@@ -67,6 +73,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
   'apps.bundles.count': hotCodePush =>
     hotCodePush.apps.bundles.count({
       appId: APP_ID,
+      fingerprint: `fp1:${SHA256}`,
       isInUse: 'true',
       platform: 'ios',
       state: 'ready',
@@ -129,11 +136,24 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       platform: 'ios',
       signature: { keyId: 'key', value: 'rsa-v1_5-sha256:c2ln' },
     }),
+  'apps.bundles.files.count': hotCodePush =>
+    hotCodePush.apps.bundles.files.count({
+      appId: APP_ID,
+      bundleId: BUNDLE_ID,
+    }),
+  'apps.bundles.files.list': hotCodePush =>
+    hotCodePush.apps.bundles.files.list({
+      appId: APP_ID,
+      bundleId: BUNDLE_ID,
+      limit: 10,
+      offset: 10,
+    }),
   'apps.bundles.get': hotCodePush =>
     hotCodePush.apps.bundles.get({ appId: APP_ID, bundleId: BUNDLE_ID }),
   'apps.bundles.list': hotCodePush =>
     hotCodePush.apps.bundles.list({
       appId: APP_ID,
+      fingerprint: `fp1:${SHA256}`,
       isInUse: 'true',
       limit: 10,
       offset: 10,

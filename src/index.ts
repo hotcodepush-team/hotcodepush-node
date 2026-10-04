@@ -7,6 +7,7 @@ export type * from './resources/bundle-delta-upload-parts';
 export type * from './resources/bundle-delta-uploads';
 export type * from './resources/bundle-deltas';
 export type * from './resources/bundle-expo-manifest';
+export type * from './resources/bundle-files';
 export type * from './resources/bundle-pack';
 export type * from './resources/bundle-pack-upload-parts';
 export type * from './resources/bundle-pack-uploads';

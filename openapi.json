@@ -4967,7 +4967,7 @@
     "/v1/apps/{appId}/binaries": {
       "get": {
         "operationId": "getV1AppsByAppIdBinaries",
-        "description": "The app's registered store builds, newest first, each with the devices running it; `?relations=bundle` embeds the bundle each ships.",
+        "description": "The app's registered store builds, newest first, each with the devices running it, filtered by `platform` and `fingerprint`; `?relations=bundle` embeds the bundle each ships.",
         "responses": {
           "200": {
             "content": {
@@ -5332,6 +5332,25 @@
               "type": "integer",
               "minimum": 0,
               "maximum": 9007199254740991
+            }
+          },
+          {
+            "in": "query",
+            "name": "fingerprint",
+            "schema": {
+              "type": "string",
+              "pattern": "^fp1:[0-9a-f]{64}$"
+            }
+          },
+          {
+            "in": "query",
+            "name": "platform",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "android",
+                "ios"
+              ]
             }
           },
           {
@@ -6091,7 +6110,7 @@
     "/v1/apps/{appId}/binaries/count": {
       "get": {
         "operationId": "getV1AppsByAppIdBinariesCount",
-        "description": "The number of the app's registered store builds, which the list pages through.",
+        "description": "The number of the app's registered store builds under the list's filters, which the list pages through.",
         "responses": {
           "200": {
             "content": {
@@ -6189,6 +6208,25 @@
           "Binaries"
         ],
         "parameters": [
+          {
+            "in": "query",
+            "name": "fingerprint",
+            "schema": {
+              "type": "string",
+              "pattern": "^fp1:[0-9a-f]{64}$"
+            }
+          },
+          {
+            "in": "query",
+            "name": "platform",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "android",
+                "ios"
+              ]
+            }
+          },
           {
             "schema": {
               "type": "string",
@@ -6592,7 +6630,7 @@
     "/v1/apps/{appId}/bundles": {
       "get": {
         "operationId": "getV1AppsByAppIdBundles",
-        "description": "The app's bundles, newest first, every type unless `type` selects one: `embedded` for the bundle a store build ships, which carries no number, or `uploaded`. `isInUse` selects the bundles an active or paused release serves.",
+        "description": "The app's bundles, newest first, every type unless `type` selects one: `embedded` for the bundle a store build ships, which carries no number and no fingerprint, or `uploaded`. `isInUse` selects the bundles an active or paused release serves, `fingerprint` those built for that native layer.",
         "responses": {
           "200": {
             "content": {
@@ -6878,6 +6916,14 @@
               "type": "integer",
               "minimum": 0,
               "maximum": 9007199254740991
+            }
+          },
+          {
+            "in": "query",
+            "name": "fingerprint",
+            "schema": {
+              "type": "string",
+              "pattern": "^fp1:[0-9a-f]{64}$"
             }
           },
           {
@@ -7668,6 +7714,14 @@
           "Bundles"
         ],
         "parameters": [
+          {
+            "in": "query",
+            "name": "fingerprint",
+            "schema": {
+              "type": "string",
+              "pattern": "^fp1:[0-9a-f]{64}$"
+            }
+          },
           {
             "in": "query",
             "name": "isInUse",
@@ -9442,6 +9496,290 @@
             }
           }
         }
+      }
+    },
+    "/v1/apps/{appId}/bundles/{bundleId}/files": {
+      "get": {
+        "operationId": "getV1AppsByAppIdBundlesByBundleIdFiles",
+        "description": "The bundle's files, ordered by path, each with its content hash and uncompressed size; an embedded bundle answers the files its binary registered.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "path": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024
+                      },
+                      "sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "sizeBytes": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": [
+                      "path",
+                      "sha256",
+                      "sizeBytes"
+                    ]
+                  }
+                }
+              }
+            },
+            "description": "The files."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "List the files of a bundle",
+        "tags": [
+          "Bundles"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 50,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0,
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "bundleId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      }
+    },
+    "/v1/apps/{appId}/bundles/{bundleId}/files/count": {
+      "get": {
+        "operationId": "getV1AppsByAppIdBundlesByBundleIdFilesCount",
+        "description": "The number of files the bundle lists, which the list pages through.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "total"
+                  ]
+                }
+              }
+            },
+            "description": "The number of rows the list's filters match."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Count the files of a bundle",
+        "tags": [
+          "Bundles"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "bundleId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
       }
     },
     "/v1/apps/{appId}/bundles/{bundleId}/pack": {

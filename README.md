@@ -48,6 +48,7 @@ The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.ch
 | `invitations`, the caller's                                                      | `accept`, `count`, `list`                                               |
 | `apps`                                                                           | `delete`, `get`, `transfer`, `update`                                   |
 | `apps.bundles`                                                                   | `complete`, `count`, `create`, `delete`, `get`, `list`                  |
+| `apps.bundles.files`, a bundle's files ordered by path                           | `count`, `list`                                                         |
 | `apps.bundles.pack`, `apps.bundles.deltas`                                       | `upload`                                                                |
 | `apps.bundles.expoManifest`, the Expo-format manifest per platform               | `upload`                                                                |
 | `apps.bundles.pack.uploads`, `apps.bundles.deltas.uploads`, the multipart upload | `complete`, `create`, `delete`                                          |

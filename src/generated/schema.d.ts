@@ -641,7 +641,7 @@ export interface paths {
         };
         /**
          * List the files of a bundle
-         * @description The bundle's files, ordered by path, each with its content hash and uncompressed size; an embedded bundle answers the files its binary registered.
+         * @description The bundle's files, ordered by path, each with its content hash and uncompressed size; an embedded bundle answers the files its binary registered. `limit` goes up to 1000, beyond every other list's 100, since a tool reads the whole list of each base bundle it builds a delta pack against.
          */
         get: operations["getV1AppsByAppIdBundlesByBundleIdFiles"];
         put?: never;

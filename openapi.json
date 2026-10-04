@@ -23,6 +23,7 @@
               "E_APP_NAME_TAKEN",
               "E_APPS_LIMIT_REACHED",
               "E_AUTH_FLOW_FAILED",
+              "E_BINARY_CONFLICT",
               "E_BUNDLE_IN_USE",
               "E_BUNDLE_NOT_READY",
               "E_BUNDLE_TOO_LARGE",
@@ -31,7 +32,6 @@
               "E_CHANNELS_PER_APP_LIMIT_REACHED",
               "E_CLIENT_UPDATE_REQUIRED",
               "E_DEFAULT_CHANNEL",
-              "E_EMBED_CONFLICT",
               "E_FILES_PER_BUNDLE_LIMIT_REACHED",
               "E_FORBIDDEN",
               "E_HASH_MISMATCH",
@@ -4982,10 +4982,7 @@
                         "format": "uuid",
                         "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                       },
-                      "binaryBuild": {
-                        "type": "string"
-                      },
-                      "binaryVersion": {
+                      "build": {
                         "type": "string"
                       },
                       "bundle": {
@@ -4995,9 +4992,6 @@
                             "type": "string",
                             "format": "uuid",
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                          },
-                          "bundleVersion": {
-                            "type": "string"
                           },
                           "createdAt": {
                             "type": "string",
@@ -5118,6 +5112,13 @@
                               "uploading"
                             ]
                           },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "embedded",
+                              "uploaded"
+                            ]
+                          },
                           "unusedSince": {
                             "anyOf": [
                               {
@@ -5134,11 +5135,13 @@
                             "type": "string",
                             "format": "date-time",
                             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          "version": {
+                            "type": "string"
                           }
                         },
                         "required": [
                           "appId",
-                          "bundleVersion",
                           "createdAt",
                           "expiresAt",
                           "fingerprint",
@@ -5156,8 +5159,10 @@
                           "signatureKeyId",
                           "sizeBytes",
                           "state",
+                          "type",
                           "unusedSince",
-                          "updatedAt"
+                          "updatedAt",
+                          "version"
                         ]
                       },
                       "bundleId": {
@@ -5209,12 +5214,14 @@
                         "type": "string",
                         "format": "date-time",
                         "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      },
+                      "version": {
+                        "type": "string"
                       }
                     },
                     "required": [
                       "appId",
-                      "binaryBuild",
-                      "binaryVersion",
+                      "build",
                       "bundleId",
                       "createdAt",
                       "deviceCount",
@@ -5222,7 +5229,8 @@
                       "id",
                       "lastSeenAt",
                       "platform",
-                      "updatedAt"
+                      "updatedAt",
+                      "version"
                     ]
                   }
                 }
@@ -5355,7 +5363,7 @@
       },
       "post": {
         "operationId": "postV1AppsByAppIdBinaries",
-        "description": "Registers a store build with its identity — platform, binary version, build, fingerprint — and the bundle compiled into it, its files uploaded first through the file endpoints. Create-only on the identity: a re-registration with the same fingerprint and files answers the row, one with another fingerprint or other files is refused, and `force` updates it.",
+        "description": "Registers a store build with its identity — platform, version, build, fingerprint — and the bundle compiled into it, its files uploaded first through the file endpoints. Create-only on the identity: a re-registration with the same fingerprint and files answers the row, one with another fingerprint or other files is refused, and `force` updates it.",
         "parameters": [
           {
             "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
@@ -5393,10 +5401,7 @@
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
-                    "binaryBuild": {
-                      "type": "string"
-                    },
-                    "binaryVersion": {
+                    "build": {
                       "type": "string"
                     },
                     "bundle": {
@@ -5406,9 +5411,6 @@
                           "type": "string",
                           "format": "uuid",
                           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                        },
-                        "bundleVersion": {
-                          "type": "string"
                         },
                         "createdAt": {
                           "type": "string",
@@ -5529,6 +5531,13 @@
                             "uploading"
                           ]
                         },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "embedded",
+                            "uploaded"
+                          ]
+                        },
                         "unusedSince": {
                           "anyOf": [
                             {
@@ -5545,11 +5554,13 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "version": {
+                          "type": "string"
                         }
                       },
                       "required": [
                         "appId",
-                        "bundleVersion",
                         "createdAt",
                         "expiresAt",
                         "fingerprint",
@@ -5567,8 +5578,10 @@
                         "signatureKeyId",
                         "sizeBytes",
                         "state",
+                        "type",
                         "unusedSince",
-                        "updatedAt"
+                        "updatedAt",
+                        "version"
                       ]
                     },
                     "bundleId": {
@@ -5620,12 +5633,14 @@
                       "type": "string",
                       "format": "date-time",
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "version": {
+                      "type": "string"
                     }
                   },
                   "required": [
                     "appId",
-                    "binaryBuild",
-                    "binaryVersion",
+                    "build",
                     "bundleId",
                     "createdAt",
                     "deviceCount",
@@ -5633,7 +5648,8 @@
                     "id",
                     "lastSeenAt",
                     "platform",
-                    "updatedAt"
+                    "updatedAt",
+                    "version"
                   ]
                 }
               }
@@ -5651,10 +5667,7 @@
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
-                    "binaryBuild": {
-                      "type": "string"
-                    },
-                    "binaryVersion": {
+                    "build": {
                       "type": "string"
                     },
                     "bundle": {
@@ -5664,9 +5677,6 @@
                           "type": "string",
                           "format": "uuid",
                           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                        },
-                        "bundleVersion": {
-                          "type": "string"
                         },
                         "createdAt": {
                           "type": "string",
@@ -5787,6 +5797,13 @@
                             "uploading"
                           ]
                         },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "embedded",
+                            "uploaded"
+                          ]
+                        },
                         "unusedSince": {
                           "anyOf": [
                             {
@@ -5803,11 +5820,13 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "version": {
+                          "type": "string"
                         }
                       },
                       "required": [
                         "appId",
-                        "bundleVersion",
                         "createdAt",
                         "expiresAt",
                         "fingerprint",
@@ -5825,8 +5844,10 @@
                         "signatureKeyId",
                         "sizeBytes",
                         "state",
+                        "type",
                         "unusedSince",
-                        "updatedAt"
+                        "updatedAt",
+                        "version"
                       ]
                     },
                     "bundleId": {
@@ -5878,12 +5899,14 @@
                       "type": "string",
                       "format": "date-time",
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "version": {
+                      "type": "string"
                     }
                   },
                   "required": [
                     "appId",
-                    "binaryBuild",
-                    "binaryVersion",
+                    "build",
                     "bundleId",
                     "createdAt",
                     "deviceCount",
@@ -5891,7 +5914,8 @@
                     "id",
                     "lastSeenAt",
                     "platform",
-                    "updatedAt"
+                    "updatedAt",
+                    "version"
                   ]
                 }
               }
@@ -5946,7 +5970,7 @@
                 }
               }
             },
-            "description": "E_EMBED_CONFLICT, E_UPLOAD_INCOMPLETE or E_IDEMPOTENCY_KEY_REUSED"
+            "description": "E_BINARY_CONFLICT, E_UPLOAD_INCOMPLETE or E_IDEMPOTENCY_KEY_REUSED"
           },
           "429": {
             "content": {
@@ -5990,12 +6014,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "binaryBuild": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 64
-                  },
-                  "binaryVersion": {
+                  "build": {
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 64
@@ -6050,13 +6069,18 @@
                       "android",
                       "ios"
                     ]
+                  },
+                  "version": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
                   }
                 },
                 "required": [
-                  "binaryBuild",
-                  "binaryVersion",
+                  "build",
                   "files",
-                  "platform"
+                  "platform",
+                  "version"
                 ]
               }
             }
@@ -6196,10 +6220,7 @@
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
-                    "binaryBuild": {
-                      "type": "string"
-                    },
-                    "binaryVersion": {
+                    "build": {
                       "type": "string"
                     },
                     "bundle": {
@@ -6209,9 +6230,6 @@
                           "type": "string",
                           "format": "uuid",
                           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                        },
-                        "bundleVersion": {
-                          "type": "string"
                         },
                         "createdAt": {
                           "type": "string",
@@ -6332,6 +6350,13 @@
                             "uploading"
                           ]
                         },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "embedded",
+                            "uploaded"
+                          ]
+                        },
                         "unusedSince": {
                           "anyOf": [
                             {
@@ -6348,11 +6373,13 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "version": {
+                          "type": "string"
                         }
                       },
                       "required": [
                         "appId",
-                        "bundleVersion",
                         "createdAt",
                         "expiresAt",
                         "fingerprint",
@@ -6370,8 +6397,10 @@
                         "signatureKeyId",
                         "sizeBytes",
                         "state",
+                        "type",
                         "unusedSince",
-                        "updatedAt"
+                        "updatedAt",
+                        "version"
                       ]
                     },
                     "bundleId": {
@@ -6423,12 +6452,14 @@
                       "type": "string",
                       "format": "date-time",
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "version": {
+                      "type": "string"
                     }
                   },
                   "required": [
                     "appId",
-                    "binaryBuild",
-                    "binaryVersion",
+                    "build",
                     "bundleId",
                     "createdAt",
                     "deviceCount",
@@ -6436,7 +6467,8 @@
                     "id",
                     "lastSeenAt",
                     "platform",
-                    "updatedAt"
+                    "updatedAt",
+                    "version"
                   ]
                 }
               }
@@ -6560,7 +6592,7 @@
     "/v1/apps/{appId}/bundles": {
       "get": {
         "operationId": "getV1AppsByAppIdBundles",
-        "description": "The app's uploaded bundles, newest first; a bundle a store build ships carries no number and is listed with its binary under binaries. `isInUse` selects the bundles an active or paused release serves.",
+        "description": "The app's bundles, newest first, every type unless `type` selects one: `embedded` for the bundle a store build ships, which carries no number, or `uploaded`. `isInUse` selects the bundles an active or paused release serves.",
         "responses": {
           "200": {
             "content": {
@@ -6574,9 +6606,6 @@
                         "type": "string",
                         "format": "uuid",
                         "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                      },
-                      "bundleVersion": {
-                        "type": "string"
                       },
                       "createdAt": {
                         "type": "string",
@@ -6697,6 +6726,13 @@
                           "uploading"
                         ]
                       },
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "embedded",
+                          "uploaded"
+                        ]
+                      },
                       "unusedSince": {
                         "anyOf": [
                           {
@@ -6713,11 +6749,13 @@
                         "type": "string",
                         "format": "date-time",
                         "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      },
+                      "version": {
+                        "type": "string"
                       }
                     },
                     "required": [
                       "appId",
-                      "bundleVersion",
                       "createdAt",
                       "expiresAt",
                       "fingerprint",
@@ -6735,8 +6773,10 @@
                       "signatureKeyId",
                       "sizeBytes",
                       "state",
+                      "type",
                       "unusedSince",
-                      "updatedAt"
+                      "updatedAt",
+                      "version"
                     ]
                   }
                 }
@@ -6842,13 +6882,6 @@
           },
           {
             "in": "query",
-            "name": "bundleVersion",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "isInUse",
             "schema": {
               "type": "string",
@@ -6878,6 +6911,24 @@
                 "ready",
                 "uploading"
               ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "embedded",
+                "uploaded"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -6933,9 +6984,6 @@
                       "type": "string",
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "bundleVersion": {
-                      "type": "string"
                     },
                     "createdAt": {
                       "type": "string",
@@ -7056,6 +7104,13 @@
                         "uploading"
                       ]
                     },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "embedded",
+                        "uploaded"
+                      ]
+                    },
                     "unusedSince": {
                       "anyOf": [
                         {
@@ -7072,6 +7127,9 @@
                       "type": "string",
                       "format": "date-time",
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "version": {
+                      "type": "string"
                     },
                     "uploads": {
                       "type": "object",
@@ -7181,7 +7239,6 @@
                   },
                   "required": [
                     "appId",
-                    "bundleVersion",
                     "createdAt",
                     "expiresAt",
                     "fingerprint",
@@ -7199,8 +7256,10 @@
                     "signatureKeyId",
                     "sizeBytes",
                     "state",
+                    "type",
                     "unusedSince",
                     "updatedAt",
+                    "version",
                     "uploads",
                     "warnings"
                   ]
@@ -7321,11 +7380,6 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "bundleVersion": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 100
-                  },
                   "files": {
                     "minItems": 1,
                     "type": "array",
@@ -7495,12 +7549,17 @@
                         "type": "null"
                       }
                     ]
+                  },
+                  "version": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
                   }
                 },
                 "required": [
-                  "bundleVersion",
                   "files",
-                  "platforms"
+                  "platforms",
+                  "version"
                 ]
               }
             }
@@ -7511,7 +7570,7 @@
     "/v1/apps/{appId}/bundles/count": {
       "get": {
         "operationId": "getV1AppsByAppIdBundlesCount",
-        "description": "The number of the app's uploaded bundles under the list's filters, which the list pages through.",
+        "description": "The number of the app's bundles under the list's filters, which the list pages through.",
         "responses": {
           "200": {
             "content": {
@@ -7611,13 +7670,6 @@
         "parameters": [
           {
             "in": "query",
-            "name": "bundleVersion",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "isInUse",
             "schema": {
               "type": "string",
@@ -7650,6 +7702,24 @@
             }
           },
           {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "embedded",
+                "uploaded"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -7679,9 +7749,6 @@
                       "type": "string",
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "bundleVersion": {
-                      "type": "string"
                     },
                     "createdAt": {
                       "type": "string",
@@ -7802,6 +7869,13 @@
                         "uploading"
                       ]
                     },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "embedded",
+                        "uploaded"
+                      ]
+                    },
                     "unusedSince": {
                       "anyOf": [
                         {
@@ -7818,11 +7892,13 @@
                       "type": "string",
                       "format": "date-time",
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "version": {
+                      "type": "string"
                     }
                   },
                   "required": [
                     "appId",
-                    "bundleVersion",
                     "createdAt",
                     "expiresAt",
                     "fingerprint",
@@ -7840,8 +7916,10 @@
                     "signatureKeyId",
                     "sizeBytes",
                     "state",
+                    "type",
                     "unusedSince",
-                    "updatedAt"
+                    "updatedAt",
+                    "version"
                   ]
                 }
               }
@@ -8080,9 +8158,6 @@
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
-                    "bundleVersion": {
-                      "type": "string"
-                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time",
@@ -8202,6 +8277,13 @@
                         "uploading"
                       ]
                     },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "embedded",
+                        "uploaded"
+                      ]
+                    },
                     "unusedSince": {
                       "anyOf": [
                         {
@@ -8218,11 +8300,13 @@
                       "type": "string",
                       "format": "date-time",
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "version": {
+                      "type": "string"
                     }
                   },
                   "required": [
                     "appId",
-                    "bundleVersion",
                     "createdAt",
                     "expiresAt",
                     "fingerprint",
@@ -8240,8 +8324,10 @@
                     "signatureKeyId",
                     "sizeBytes",
                     "state",
+                    "type",
                     "unusedSince",
-                    "updatedAt"
+                    "updatedAt",
+                    "version"
                   ]
                 }
               }
@@ -9181,6 +9267,181 @@
             "$ref": "#/components/parameters/ClientHeader"
           }
         ]
+      }
+    },
+    "/v1/apps/{appId}/bundles/{bundleId}/expo/{platform}/manifest": {
+      "put": {
+        "operationId": "putV1AppsByAppIdBundlesByBundleIdExpoByPlatformManifest",
+        "description": "Stores the bundle's Expo-format manifest for one of its platforms: `manifest` is the canonical JSON the CLI built with `@hotcodepush/protocol`, whose `id` and `hotcodepush-update` metadata are the bundle's update id on the platform; `signature` covers those bytes with the app's `rsa-v1_5-sha256` key, verified here, `E_SIGNATURE_INVALID` otherwise, and required once the app holds such a key, `E_SIGNATURE_REQUIRED`. The bundle is still `uploading`; a second PUT replaces the first.",
+        "responses": {
+          "204": {
+            "description": "The manifest, stored."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_SIGNATURE_INVALID or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_SIGNATURE_REQUIRED"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Upload the Expo manifest",
+        "tags": [
+          "Bundles"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "platform",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "android",
+                "ios"
+              ]
+            },
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "bundleId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "manifest": {
+                    "type": "string"
+                  },
+                  "signature": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "keyId": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "value": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9_-]+:[A-Za-z0-9+/]+=*$"
+                          }
+                        },
+                        "required": [
+                          "keyId",
+                          "value"
+                        ],
+                        "additionalProperties": {}
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "manifest",
+                  "signature"
+                ],
+                "additionalProperties": {}
+              }
+            }
+          }
+        }
       }
     },
     "/v1/apps/{appId}/bundles/{bundleId}/pack": {
@@ -12296,9 +12557,6 @@
                             "format": "uuid",
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                           },
-                          "bundleVersion": {
-                            "type": "string"
-                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time",
@@ -12418,6 +12676,13 @@
                               "uploading"
                             ]
                           },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "embedded",
+                              "uploaded"
+                            ]
+                          },
                           "unusedSince": {
                             "anyOf": [
                               {
@@ -12434,11 +12699,13 @@
                             "type": "string",
                             "format": "date-time",
                             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          "version": {
+                            "type": "string"
                           }
                         },
                         "required": [
                           "appId",
-                          "bundleVersion",
                           "createdAt",
                           "expiresAt",
                           "fingerprint",
@@ -12456,8 +12723,10 @@
                           "signatureKeyId",
                           "sizeBytes",
                           "state",
+                          "type",
                           "unusedSince",
-                          "updatedAt"
+                          "updatedAt",
+                          "version"
                         ]
                       },
                       "bundleId": {
@@ -13149,9 +13418,6 @@
                           "format": "uuid",
                           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                         },
-                        "bundleVersion": {
-                          "type": "string"
-                        },
                         "createdAt": {
                           "type": "string",
                           "format": "date-time",
@@ -13271,6 +13537,13 @@
                             "uploading"
                           ]
                         },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "embedded",
+                            "uploaded"
+                          ]
+                        },
                         "unusedSince": {
                           "anyOf": [
                             {
@@ -13287,11 +13560,13 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "version": {
+                          "type": "string"
                         }
                       },
                       "required": [
                         "appId",
-                        "bundleVersion",
                         "createdAt",
                         "expiresAt",
                         "fingerprint",
@@ -13309,8 +13584,10 @@
                         "signatureKeyId",
                         "sizeBytes",
                         "state",
+                        "type",
                         "unusedSince",
-                        "updatedAt"
+                        "updatedAt",
+                        "version"
                       ]
                     },
                     "bundleId": {
@@ -14339,9 +14616,6 @@
                           "format": "uuid",
                           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                         },
-                        "bundleVersion": {
-                          "type": "string"
-                        },
                         "createdAt": {
                           "type": "string",
                           "format": "date-time",
@@ -14461,6 +14735,13 @@
                             "uploading"
                           ]
                         },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "embedded",
+                            "uploaded"
+                          ]
+                        },
                         "unusedSince": {
                           "anyOf": [
                             {
@@ -14477,11 +14758,13 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "version": {
+                          "type": "string"
                         }
                       },
                       "required": [
                         "appId",
-                        "bundleVersion",
                         "createdAt",
                         "expiresAt",
                         "fingerprint",
@@ -14499,8 +14782,10 @@
                         "signatureKeyId",
                         "sizeBytes",
                         "state",
+                        "type",
                         "unusedSince",
-                        "updatedAt"
+                        "updatedAt",
+                        "version"
                       ]
                     },
                     "bundleId": {
@@ -15152,9 +15437,6 @@
                             "format": "uuid",
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                           },
-                          "bundleVersion": {
-                            "type": "string"
-                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time",
@@ -15274,6 +15556,13 @@
                               "uploading"
                             ]
                           },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "embedded",
+                              "uploaded"
+                            ]
+                          },
                           "unusedSince": {
                             "anyOf": [
                               {
@@ -15290,11 +15579,13 @@
                             "type": "string",
                             "format": "date-time",
                             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          "version": {
+                            "type": "string"
                           }
                         },
                         "required": [
                           "appId",
-                          "bundleVersion",
                           "createdAt",
                           "expiresAt",
                           "fingerprint",
@@ -15312,8 +15603,10 @@
                           "signatureKeyId",
                           "sizeBytes",
                           "state",
+                          "type",
                           "unusedSince",
-                          "updatedAt"
+                          "updatedAt",
+                          "version"
                         ]
                       },
                       "bundleId": {
@@ -16230,6 +16523,606 @@
             },
             "in": "path",
             "name": "channelId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      }
+    },
+    "/v1/apps/{appId}/deployment-keys": {
+      "get": {
+        "operationId": "getV1AppsByAppIdDeploymentKeys",
+        "description": "The app's CodePush bridge keys, newest first; `lastUsedAt` idle for thirty days says no legacy client is left and the key can go.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "appId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "channelId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      },
+                      "key": {
+                        "type": "string"
+                      },
+                      "lastUsedAt": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "platform": {
+                        "type": "string",
+                        "enum": [
+                          "android",
+                          "ios"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "appId",
+                      "channelId",
+                      "createdAt",
+                      "key",
+                      "lastUsedAt",
+                      "platform"
+                    ]
+                  }
+                }
+              }
+            },
+            "description": "The deployment keys."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "List the deployment keys",
+        "tags": [
+          "Deployment keys"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 50,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0,
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      },
+      "post": {
+        "operationId": "postV1AppsByAppIdDeploymentKeys",
+        "description": "Issues a key for a channel and a platform, which a CodePush client is configured with beside the bridge's server URL; the bridge serves it within about a minute.",
+        "parameters": [
+          {
+            "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "appId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "channelId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "lastUsedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "platform": {
+                      "type": "string",
+                      "enum": [
+                        "android",
+                        "ios"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "appId",
+                    "channelId",
+                    "createdAt",
+                    "key",
+                    "lastUsedAt",
+                    "platform"
+                  ]
+                }
+              }
+            },
+            "description": "The deployment key."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_IDEMPOTENCY_KEY_REUSED"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Create a deployment key",
+        "tags": [
+          "Deployment keys"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "channelId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "platform": {
+                    "type": "string",
+                    "enum": [
+                      "android",
+                      "ios"
+                    ]
+                  }
+                },
+                "required": [
+                  "channelId",
+                  "platform"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/apps/{appId}/deployment-keys/count": {
+      "get": {
+        "operationId": "getV1AppsByAppIdDeploymentKeysCount",
+        "description": "The number of the app's deployment keys, which the list pages through.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "total"
+                  ]
+                }
+              }
+            },
+            "description": "The number of rows the list's filters match."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Count the deployment keys",
+        "tags": [
+          "Deployment keys"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/ClientHeader"
+          }
+        ]
+      }
+    },
+    "/v1/apps/{appId}/deployment-keys/{key}": {
+      "delete": {
+        "operationId": "deleteV1AppsByAppIdDeploymentKeysByKey",
+        "description": "Retires a key once no legacy client checks under it; the bridge stops serving it within about a minute.",
+        "responses": {
+          "204": {
+            "description": "The deployment key is gone."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_UNAUTHENTICATED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_NOT_FOUND"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_RATE_LIMITED"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_INTERNAL"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "E_MAINTENANCE"
+          }
+        },
+        "summary": "Delete a deployment key",
+        "tags": [
+          "Deployment keys"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "appId",
             "required": true
           },
           {
@@ -18559,9 +19452,6 @@
                             "format": "uuid",
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                           },
-                          "bundleVersion": {
-                            "type": "string"
-                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time",
@@ -18681,6 +19571,13 @@
                               "uploading"
                             ]
                           },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "embedded",
+                              "uploaded"
+                            ]
+                          },
                           "unusedSince": {
                             "anyOf": [
                               {
@@ -18697,11 +19594,13 @@
                             "type": "string",
                             "format": "date-time",
                             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          "version": {
+                            "type": "string"
                           }
                         },
                         "required": [
                           "appId",
-                          "bundleVersion",
                           "createdAt",
                           "expiresAt",
                           "fingerprint",
@@ -18719,8 +19618,10 @@
                           "signatureKeyId",
                           "sizeBytes",
                           "state",
+                          "type",
                           "unusedSince",
-                          "updatedAt"
+                          "updatedAt",
+                          "version"
                         ]
                       },
                       "bundleId": {
@@ -19547,9 +20448,6 @@
                           "format": "uuid",
                           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                         },
-                        "bundleVersion": {
-                          "type": "string"
-                        },
                         "createdAt": {
                           "type": "string",
                           "format": "date-time",
@@ -19669,6 +20567,13 @@
                             "uploading"
                           ]
                         },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "embedded",
+                            "uploaded"
+                          ]
+                        },
                         "unusedSince": {
                           "anyOf": [
                             {
@@ -19685,11 +20590,13 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "version": {
+                          "type": "string"
                         }
                       },
                       "required": [
                         "appId",
-                        "bundleVersion",
                         "createdAt",
                         "expiresAt",
                         "fingerprint",
@@ -19707,8 +20614,10 @@
                         "signatureKeyId",
                         "sizeBytes",
                         "state",
+                        "type",
                         "unusedSince",
-                        "updatedAt"
+                        "updatedAt",
+                        "version"
                       ]
                     },
                     "bundleId": {
@@ -20345,9 +21254,6 @@
                           "format": "uuid",
                           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                         },
-                        "bundleVersion": {
-                          "type": "string"
-                        },
                         "createdAt": {
                           "type": "string",
                           "format": "date-time",
@@ -20467,6 +21373,13 @@
                             "uploading"
                           ]
                         },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "embedded",
+                            "uploaded"
+                          ]
+                        },
                         "unusedSince": {
                           "anyOf": [
                             {
@@ -20483,11 +21396,13 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "version": {
+                          "type": "string"
                         }
                       },
                       "required": [
                         "appId",
-                        "bundleVersion",
                         "createdAt",
                         "expiresAt",
                         "fingerprint",
@@ -20505,8 +21420,10 @@
                         "signatureKeyId",
                         "sizeBytes",
                         "state",
+                        "type",
                         "unusedSince",
-                        "updatedAt"
+                        "updatedAt",
+                        "version"
                       ]
                     },
                     "bundleId": {
@@ -21433,9 +22350,6 @@
                           "format": "uuid",
                           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                         },
-                        "bundleVersion": {
-                          "type": "string"
-                        },
                         "createdAt": {
                           "type": "string",
                           "format": "date-time",
@@ -21555,6 +22469,13 @@
                             "uploading"
                           ]
                         },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "embedded",
+                            "uploaded"
+                          ]
+                        },
                         "unusedSince": {
                           "anyOf": [
                             {
@@ -21571,11 +22492,13 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "version": {
+                          "type": "string"
                         }
                       },
                       "required": [
                         "appId",
-                        "bundleVersion",
                         "createdAt",
                         "expiresAt",
                         "fingerprint",
@@ -21593,8 +22516,10 @@
                         "signatureKeyId",
                         "sizeBytes",
                         "state",
+                        "type",
                         "unusedSince",
-                        "updatedAt"
+                        "updatedAt",
+                        "version"
                       ]
                     },
                     "bundleId": {
@@ -22228,9 +23153,6 @@
                           "format": "uuid",
                           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                         },
-                        "bundleVersion": {
-                          "type": "string"
-                        },
                         "createdAt": {
                           "type": "string",
                           "format": "date-time",
@@ -22350,6 +23272,13 @@
                             "uploading"
                           ]
                         },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "embedded",
+                            "uploaded"
+                          ]
+                        },
                         "unusedSince": {
                           "anyOf": [
                             {
@@ -22366,11 +23295,13 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "version": {
+                          "type": "string"
                         }
                       },
                       "required": [
                         "appId",
-                        "bundleVersion",
                         "createdAt",
                         "expiresAt",
                         "fingerprint",
@@ -22388,8 +23319,10 @@
                         "signatureKeyId",
                         "sizeBytes",
                         "state",
+                        "type",
                         "unusedSince",
-                        "updatedAt"
+                        "updatedAt",
+                        "version"
                       ]
                     },
                     "bundleId": {
@@ -23023,9 +23956,6 @@
                           "format": "uuid",
                           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                         },
-                        "bundleVersion": {
-                          "type": "string"
-                        },
                         "createdAt": {
                           "type": "string",
                           "format": "date-time",
@@ -23145,6 +24075,13 @@
                             "uploading"
                           ]
                         },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "embedded",
+                            "uploaded"
+                          ]
+                        },
                         "unusedSince": {
                           "anyOf": [
                             {
@@ -23161,11 +24098,13 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "version": {
+                          "type": "string"
                         }
                       },
                       "required": [
                         "appId",
-                        "bundleVersion",
                         "createdAt",
                         "expiresAt",
                         "fingerprint",
@@ -23183,8 +24122,10 @@
                         "signatureKeyId",
                         "sizeBytes",
                         "state",
+                        "type",
                         "unusedSince",
-                        "updatedAt"
+                        "updatedAt",
+                        "version"
                       ]
                     },
                     "bundleId": {

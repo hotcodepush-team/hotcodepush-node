@@ -10,7 +10,7 @@ import type {
 } from '../types';
 
 /**
- * A store build the embed step registered, with the bundle it ships and the devices running it.
+ * A store build `binary create` registered, with the bundle it ships and the devices running it.
  */
 export type Binary = JsonResponseBody<
   '/v1/apps/{appId}/binaries/{binaryId}',

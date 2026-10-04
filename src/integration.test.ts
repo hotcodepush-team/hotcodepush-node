@@ -209,9 +209,9 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     const indexFile = resolveTestFile('index.html', '<h1>Node client</h1>');
     const createdBundle = await hotCodePush.apps.bundles.create({
       appId: app.id,
-      bundleVersion: '1.0.0',
       files: [indexFile.manifestEntry],
       platforms: ['android'],
+      version: '1.0.0',
     });
     const uploadedFile = await hotCodePush.apps.files.upload({
       appId: app.id,
@@ -286,9 +286,9 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     const mainFile = resolveTestFile('main.js', 'console.log("parts");');
     const createdBundle = await hotCodePush.apps.bundles.create({
       appId: app.id,
-      bundleVersion: '1.0.1',
       files: [mainFile.manifestEntry],
       platforms: ['android'],
+      version: '1.0.1',
     });
     await hotCodePush.apps.bundles.pack.upload({
       appId: app.id,
@@ -329,20 +329,20 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     const indexFile = resolveTestFile('index.html', '<h1>Node client</h1>');
     const createdBinary = await hotCodePush.apps.binaries.create({
       appId: app.id,
-      binaryBuild: '1',
-      binaryVersion: '1.0.0',
+      build: '1',
       files: [indexFile.manifestEntry],
       fingerprint: `fp1:${'a'.repeat(64)}`,
       platform: 'android',
+      version: '1.0.0',
     });
     const reregisteredBinary = await hotCodePush.apps.binaries.create({
       appId: app.id,
-      binaryBuild: '1',
-      binaryVersion: '1.0.0',
+      build: '1',
       files: [indexFile.manifestEntry],
       fingerprint: `fp1:${'b'.repeat(64)}`,
       force: true,
       platform: 'android',
+      version: '1.0.0',
     });
     const fetchedBinaries = await hotCodePush.apps.binaries.list({
       appId: app.id,

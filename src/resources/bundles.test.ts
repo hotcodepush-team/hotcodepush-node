@@ -66,18 +66,18 @@ describe('BundlesResource', () => {
 
     const createdBundle = await new HotCodePush().apps.bundles.create({
       appId: 'app',
-      bundleVersion: '1.0.0',
       files: [FILE],
       idempotencyKey: 'key',
       platforms: ['android', 'ios'],
+      version: '1.0.0',
     });
 
     expect(createdBundle).toEqual(BUNDLE);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       body: {
-        bundleVersion: '1.0.0',
         files: [FILE],
         platforms: ['android', 'ios'],
+        version: '1.0.0',
       },
       headers: { 'Idempotency-Key': 'key' },
       method: 'POST',
@@ -114,19 +114,20 @@ describe('BundlesResource', () => {
     });
   });
 
-  test('should list the bundles of the app filtered by use and platform', async () => {
+  test('should list the bundles of the app filtered by use, platform and type', async () => {
     const fetchMock = stubFetch(() => Response.json([BUNDLE]));
 
     const fetchedBundles = await new HotCodePush().apps.bundles.list({
       appId: 'app',
       isInUse: 'false',
       platform: 'ios',
+      type: 'uploaded',
     });
 
     expect(fetchedBundles).toEqual([BUNDLE]);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${BUNDLES_URL}?isInUse=false&platform=ios`,
+      url: `${BUNDLES_URL}?isInUse=false&platform=ios&type=uploaded`,
     });
   });
 });

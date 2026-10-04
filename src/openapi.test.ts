@@ -41,13 +41,13 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
   'apps.binaries.create': hotCodePush =>
     hotCodePush.apps.binaries.create({
       appId: APP_ID,
-      binaryBuild: '42',
-      binaryVersion: '1.0.0',
+      build: '42',
       files: [FILE],
       fingerprint: `fp1:${SHA256}`,
       force: true,
       idempotencyKey: 'key',
       platform: 'android',
+      version: '1.0.0',
     }),
   'apps.binaries.get': hotCodePush =>
     hotCodePush.apps.binaries.get({
@@ -67,19 +67,20 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
   'apps.bundles.count': hotCodePush =>
     hotCodePush.apps.bundles.count({
       appId: APP_ID,
-      bundleVersion: '1.0.0',
       isInUse: 'true',
       platform: 'ios',
       state: 'ready',
+      type: 'uploaded',
+      version: '1.0.0',
     }),
   'apps.bundles.create': hotCodePush =>
     hotCodePush.apps.bundles.create({
       appId: APP_ID,
-      bundleVersion: '1.0.0',
       files: [FILE],
       gitSha: 'b'.repeat(40),
       idempotencyKey: 'key',
       platforms: ['android'],
+      version: '1.0.0',
     }),
   'apps.bundles.delete': hotCodePush =>
     hotCodePush.apps.bundles.delete({ appId: APP_ID, bundleId: BUNDLE_ID }),
@@ -120,17 +121,26 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       partNumber: 1,
       uploadId: UPLOAD_ID,
     }),
+  'apps.bundles.expoManifest.upload': hotCodePush =>
+    hotCodePush.apps.bundles.expoManifest.upload({
+      appId: APP_ID,
+      bundleId: BUNDLE_ID,
+      manifest: '{}',
+      platform: 'ios',
+      signature: { keyId: 'key', value: 'rsa-v1_5-sha256:c2ln' },
+    }),
   'apps.bundles.get': hotCodePush =>
     hotCodePush.apps.bundles.get({ appId: APP_ID, bundleId: BUNDLE_ID }),
   'apps.bundles.list': hotCodePush =>
     hotCodePush.apps.bundles.list({
       appId: APP_ID,
-      bundleVersion: '1.0.0',
       isInUse: 'true',
       limit: 10,
       offset: 10,
       platform: 'ios',
       state: 'ready',
+      type: 'uploaded',
+      version: '1.0.0',
     }),
   'apps.bundles.pack.upload': hotCodePush =>
     hotCodePush.apps.bundles.pack.upload({
@@ -254,6 +264,23 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       name: 'beta',
     }),
   'apps.delete': hotCodePush => hotCodePush.apps.delete({ appId: APP_ID }),
+  'apps.deploymentKeys.count': hotCodePush =>
+    hotCodePush.apps.deploymentKeys.count({ appId: APP_ID }),
+  'apps.deploymentKeys.create': hotCodePush =>
+    hotCodePush.apps.deploymentKeys.create({
+      appId: APP_ID,
+      channelId: CHANNEL_ID,
+      idempotencyKey: 'key',
+      platform: 'ios',
+    }),
+  'apps.deploymentKeys.delete': hotCodePush =>
+    hotCodePush.apps.deploymentKeys.delete({ appId: APP_ID, key: 'key' }),
+  'apps.deploymentKeys.list': hotCodePush =>
+    hotCodePush.apps.deploymentKeys.list({
+      appId: APP_ID,
+      limit: 10,
+      offset: 10,
+    }),
   'apps.devices.count': hotCodePush =>
     hotCodePush.apps.devices.count({
       appId: APP_ID,

@@ -9,6 +9,7 @@ import type {
   QueryParameters,
 } from '../types';
 import { BundleDeltasResource } from './bundle-deltas';
+import { BundleExpoManifestResource } from './bundle-expo-manifest';
 import { BundlePackResource } from './bundle-pack';
 
 export type Bundle = JsonResponseBody<
@@ -62,10 +63,12 @@ export type ListBundlesOptions = PathParameters<
 
 export class BundlesResource {
   public readonly deltas: BundleDeltasResource;
+  public readonly expoManifest: BundleExpoManifestResource;
   public readonly pack: BundlePackResource;
 
   constructor(private readonly httpClient: HttpClient) {
     this.deltas = new BundleDeltasResource(httpClient);
+    this.expoManifest = new BundleExpoManifestResource(httpClient);
     this.pack = new BundlePackResource(httpClient);
   }
 

@@ -31,22 +31,22 @@ describe('BinariesResource', () => {
 
     const createdBinary = await new HotCodePush().apps.binaries.create({
       appId: 'app',
-      binaryBuild: '42',
-      binaryVersion: '1.0.0',
+      build: '42',
       files: [FILE],
       force: true,
       idempotencyKey: 'key',
       platform: 'android',
+      version: '1.0.0',
     });
 
     expect(createdBinary).toEqual(BINARY);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       body: {
-        binaryBuild: '42',
-        binaryVersion: '1.0.0',
+        build: '42',
         files: [FILE],
         force: true,
         platform: 'android',
+        version: '1.0.0',
       },
       headers: { 'Idempotency-Key': 'key' },
       method: 'POST',

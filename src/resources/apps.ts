@@ -8,6 +8,7 @@ import type {
 import { BinariesResource } from './binaries';
 import { BundlesResource } from './bundles';
 import { ChannelsResource } from './channels';
+import { DeploymentKeysResource } from './deployment-keys';
 import { DevicesResource } from './devices';
 import { FilesResource } from './files';
 import { PatchesResource } from './patches';
@@ -34,6 +35,7 @@ export class AppsResource {
   public readonly binaries: BinariesResource;
   public readonly bundles: BundlesResource;
   public readonly channels: ChannelsResource;
+  public readonly deploymentKeys: DeploymentKeysResource;
   public readonly devices: DevicesResource;
   public readonly files: FilesResource;
   public readonly patches: PatchesResource;
@@ -45,6 +47,7 @@ export class AppsResource {
     this.binaries = new BinariesResource(httpClient);
     this.bundles = new BundlesResource(httpClient);
     this.channels = new ChannelsResource(httpClient);
+    this.deploymentKeys = new DeploymentKeysResource(httpClient);
     this.devices = new DevicesResource(httpClient);
     this.files = new FilesResource(httpClient);
     this.patches = new PatchesResource(httpClient);

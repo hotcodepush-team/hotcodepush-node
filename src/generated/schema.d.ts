@@ -375,7 +375,7 @@ export interface paths {
         put?: never;
         /**
          * Register a binary
-         * @description Registers a store build with its identity — platform, binary version, build, fingerprint — and the bundle compiled into it, its files uploaded first through the file endpoints. Create-only on the identity: a re-registration with the same fingerprint and files answers the row, one with another fingerprint or other files is refused, and `force` updates it.
+         * @description Registers a store build with its identity — platform, version, build, fingerprint — and the bundle compiled into it, its files uploaded first through the file endpoints. Create-only on the identity: a re-registration with the same fingerprint and files answers the row, one with another fingerprint or other files is refused, and `force` updates it.
          */
         post: operations["postV1AppsByAppIdBinaries"];
         delete?: never;
@@ -433,7 +433,7 @@ export interface paths {
         };
         /**
          * List the bundles
-         * @description The app's uploaded bundles, newest first; a bundle a store build ships carries no number and is listed with its binary under binaries. `isInUse` selects the bundles an active or paused release serves.
+         * @description The app's bundles, newest first, every type unless `type` selects one: `embedded` for the bundle a store build ships, which carries no number, or `uploaded`. `isInUse` selects the bundles an active or paused release serves.
          */
         get: operations["getV1AppsByAppIdBundles"];
         put?: never;
@@ -457,7 +457,7 @@ export interface paths {
         };
         /**
          * Count the bundles
-         * @description The number of the app's uploaded bundles under the list's filters, which the list pages through.
+         * @description The number of the app's bundles under the list's filters, which the list pages through.
          */
         get: operations["getV1AppsByAppIdBundlesCount"];
         put?: never;
@@ -607,6 +607,26 @@ export interface paths {
          * @description Aborts a multipart delta pack upload, discarding its parts.
          */
         delete: operations["deleteV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadId"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundles/{bundleId}/expo/{platform}/manifest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Upload the Expo manifest
+         * @description Stores the bundle's Expo-format manifest for one of its platforms: `manifest` is the canonical JSON the CLI built with `@hotcodepush/protocol`, whose `id` and `hotcodepush-update` metadata are the bundle's update id on the platform; `signature` covers those bytes with the app's `rsa-v1_5-sha256` key, verified here, `E_SIGNATURE_INVALID` otherwise, and required once the app holds such a key, `E_SIGNATURE_REQUIRED`. The bundle is still `uploading`; a second PUT replaces the first.
+         */
+        put: operations["putV1AppsByAppIdBundlesByBundleIdExpoByPlatformManifest"];
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -963,6 +983,70 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/deployment-keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the deployment keys
+         * @description The app's CodePush bridge keys, newest first; `lastUsedAt` idle for thirty days says no legacy client is left and the key can go.
+         */
+        get: operations["getV1AppsByAppIdDeploymentKeys"];
+        put?: never;
+        /**
+         * Create a deployment key
+         * @description Issues a key for a channel and a platform, which a CodePush client is configured with beside the bridge's server URL; the bridge serves it within about a minute.
+         */
+        post: operations["postV1AppsByAppIdDeploymentKeys"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/deployment-keys/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Count the deployment keys
+         * @description The number of the app's deployment keys, which the list pages through.
+         */
+        get: operations["getV1AppsByAppIdDeploymentKeysCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/deployment-keys/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete a deployment key
+         * @description Retires a key once no legacy client checks under it; the bridge stops serving it within about a minute.
+         */
+        delete: operations["deleteV1AppsByAppIdDeploymentKeysByKey"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1499,7 +1583,7 @@ export interface components {
         /** @description The one error shape: a context-free code from the catalog, one sentence of what happened and what to do, and the field, rule and target of a failed validation in `details`. */
         Error: {
             /** @enum {string} */
-            code: "E_ACCOUNT_BANNED" | "E_APP_NAME_TAKEN" | "E_APPS_LIMIT_REACHED" | "E_AUTH_FLOW_FAILED" | "E_BUNDLE_IN_USE" | "E_BUNDLE_NOT_READY" | "E_BUNDLE_TOO_LARGE" | "E_CHANNEL_NAME_TAKEN" | "E_CHANNEL_PROTECTED" | "E_CHANNELS_PER_APP_LIMIT_REACHED" | "E_CLIENT_UPDATE_REQUIRED" | "E_DEFAULT_CHANNEL" | "E_EMBED_CONFLICT" | "E_FILES_PER_BUNDLE_LIMIT_REACHED" | "E_FORBIDDEN" | "E_HASH_MISMATCH" | "E_IDEMPOTENCY_KEY_REUSED" | "E_INTERNAL" | "E_INVITATION_INVALID" | "E_INVITATIONS_PER_DAY_LIMIT_REACHED" | "E_MAINTENANCE" | "E_MEMBERS_LIMIT_REACHED" | "E_NOT_FOUND" | "E_NOTIFICATION_MANDATORY" | "E_PLAN_REQUIRED" | "E_RATE_LIMITED" | "E_RELEASE_REVOKED" | "E_RELEASES_PER_DAY_LIMIT_REACHED" | "E_SIGNATURE_INVALID" | "E_SIGNATURE_REQUIRED" | "E_SOLE_OWNER" | "E_SOLE_SIGNING_KEY" | "E_SSO_REQUIRED" | "E_STORAGE_LIMIT_REACHED" | "E_TOKENS_LIMIT_REACHED" | "E_TURNSTILE_FAILED" | "E_UNAUTHENTICATED" | "E_UPLOAD_INCOMPLETE" | "E_VALIDATION" | "E_WEBHOOK_NAME_TAKEN";
+            code: "E_ACCOUNT_BANNED" | "E_APP_NAME_TAKEN" | "E_APPS_LIMIT_REACHED" | "E_AUTH_FLOW_FAILED" | "E_BINARY_CONFLICT" | "E_BUNDLE_IN_USE" | "E_BUNDLE_NOT_READY" | "E_BUNDLE_TOO_LARGE" | "E_CHANNEL_NAME_TAKEN" | "E_CHANNEL_PROTECTED" | "E_CHANNELS_PER_APP_LIMIT_REACHED" | "E_CLIENT_UPDATE_REQUIRED" | "E_DEFAULT_CHANNEL" | "E_FILES_PER_BUNDLE_LIMIT_REACHED" | "E_FORBIDDEN" | "E_HASH_MISMATCH" | "E_IDEMPOTENCY_KEY_REUSED" | "E_INTERNAL" | "E_INVITATION_INVALID" | "E_INVITATIONS_PER_DAY_LIMIT_REACHED" | "E_MAINTENANCE" | "E_MEMBERS_LIMIT_REACHED" | "E_NOT_FOUND" | "E_NOTIFICATION_MANDATORY" | "E_PLAN_REQUIRED" | "E_RATE_LIMITED" | "E_RELEASE_REVOKED" | "E_RELEASES_PER_DAY_LIMIT_REACHED" | "E_SIGNATURE_INVALID" | "E_SIGNATURE_REQUIRED" | "E_SOLE_OWNER" | "E_SOLE_SIGNING_KEY" | "E_SSO_REQUIRED" | "E_STORAGE_LIMIT_REACHED" | "E_TOKENS_LIMIT_REACHED" | "E_TURNSTILE_FAILED" | "E_UNAUTHENTICATED" | "E_UPLOAD_INCOMPLETE" | "E_VALIDATION" | "E_WEBHOOK_NAME_TAKEN";
             details: {
                 [key: string]: unknown;
             } | null;
@@ -4332,12 +4416,10 @@ export interface operations {
                     "application/json": {
                         /** Format: uuid */
                         appId: string;
-                        binaryBuild: string;
-                        binaryVersion: string;
+                        build: string;
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
-                            bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
@@ -4359,9 +4441,12 @@ export interface operations {
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
+                            /** @enum {string} */
+                            type: "embedded" | "uploaded";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            version: string;
                         };
                         /** Format: uuid */
                         bundleId: string;
@@ -4376,6 +4461,7 @@ export interface operations {
                         platform: "android" | "ios";
                         /** Format: date-time */
                         updatedAt: string;
+                        version: string;
                     }[];
                 };
             };
@@ -4461,8 +4547,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    binaryBuild: string;
-                    binaryVersion: string;
+                    build: string;
                     files: {
                         path: string;
                         sha256: string;
@@ -4474,6 +4559,7 @@ export interface operations {
                     force?: boolean;
                     /** @enum {string} */
                     platform: "android" | "ios";
+                    version: string;
                 };
             };
         };
@@ -4487,12 +4573,10 @@ export interface operations {
                     "application/json": {
                         /** Format: uuid */
                         appId: string;
-                        binaryBuild: string;
-                        binaryVersion: string;
+                        build: string;
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
-                            bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
@@ -4514,9 +4598,12 @@ export interface operations {
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
+                            /** @enum {string} */
+                            type: "embedded" | "uploaded";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            version: string;
                         };
                         /** Format: uuid */
                         bundleId: string;
@@ -4531,6 +4618,7 @@ export interface operations {
                         platform: "android" | "ios";
                         /** Format: date-time */
                         updatedAt: string;
+                        version: string;
                     };
                 };
             };
@@ -4543,12 +4631,10 @@ export interface operations {
                     "application/json": {
                         /** Format: uuid */
                         appId: string;
-                        binaryBuild: string;
-                        binaryVersion: string;
+                        build: string;
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
-                            bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
@@ -4570,9 +4656,12 @@ export interface operations {
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
+                            /** @enum {string} */
+                            type: "embedded" | "uploaded";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            version: string;
                         };
                         /** Format: uuid */
                         bundleId: string;
@@ -4587,6 +4676,7 @@ export interface operations {
                         platform: "android" | "ios";
                         /** Format: date-time */
                         updatedAt: string;
+                        version: string;
                     };
                 };
             };
@@ -4626,7 +4716,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_EMBED_CONFLICT, E_UPLOAD_INCOMPLETE or E_IDEMPOTENCY_KEY_REUSED */
+            /** @description E_BINARY_CONFLICT, E_UPLOAD_INCOMPLETE or E_IDEMPOTENCY_KEY_REUSED */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -4780,12 +4870,10 @@ export interface operations {
                     "application/json": {
                         /** Format: uuid */
                         appId: string;
-                        binaryBuild: string;
-                        binaryVersion: string;
+                        build: string;
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
-                            bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
@@ -4807,9 +4895,12 @@ export interface operations {
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
+                            /** @enum {string} */
+                            type: "embedded" | "uploaded";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            version: string;
                         };
                         /** Format: uuid */
                         bundleId: string;
@@ -4824,6 +4915,7 @@ export interface operations {
                         platform: "android" | "ios";
                         /** Format: date-time */
                         updatedAt: string;
+                        version: string;
                     };
                 };
             };
@@ -4897,10 +4989,11 @@ export interface operations {
             query?: {
                 limit?: number;
                 offset?: number;
-                bundleVersion?: string;
                 isInUse?: "false" | "true";
                 platform?: "android" | "ios";
                 state?: "ready" | "uploading";
+                type?: "embedded" | "uploaded";
+                version?: string;
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -4922,7 +5015,6 @@ export interface operations {
                     "application/json": {
                         /** Format: uuid */
                         appId: string;
-                        bundleVersion: string;
                         /** Format: date-time */
                         createdAt: string;
                         expiresAt: string | null;
@@ -4944,9 +5036,12 @@ export interface operations {
                         sizeBytes: number;
                         /** @enum {string} */
                         state: "ready" | "uploading";
+                        /** @enum {string} */
+                        type: "embedded" | "uploaded";
                         unusedSince: string | null;
                         /** Format: date-time */
                         updatedAt: string;
+                        version: string;
                     }[];
                 };
             };
@@ -5032,7 +5127,6 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    bundleVersion: string;
                     files: {
                         path: string;
                         sha256: string;
@@ -5066,6 +5160,7 @@ export interface operations {
                     } & {
                         [key: string]: unknown;
                     }) | null;
+                    version: string;
                 };
             };
         };
@@ -5079,7 +5174,6 @@ export interface operations {
                     "application/json": {
                         /** Format: uuid */
                         appId: string;
-                        bundleVersion: string;
                         /** Format: date-time */
                         createdAt: string;
                         expiresAt: string | null;
@@ -5101,9 +5195,12 @@ export interface operations {
                         sizeBytes: number;
                         /** @enum {string} */
                         state: "ready" | "uploading";
+                        /** @enum {string} */
+                        type: "embedded" | "uploaded";
                         unusedSince: string | null;
                         /** Format: date-time */
                         updatedAt: string;
+                        version: string;
                         uploads: {
                             files: {
                                 sha256: string;
@@ -5227,10 +5324,11 @@ export interface operations {
     getV1AppsByAppIdBundlesCount: {
         parameters: {
             query?: {
-                bundleVersion?: string;
                 isInUse?: "false" | "true";
                 platform?: "android" | "ios";
                 state?: "ready" | "uploading";
+                type?: "embedded" | "uploaded";
+                version?: string;
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -5343,7 +5441,6 @@ export interface operations {
                     "application/json": {
                         /** Format: uuid */
                         appId: string;
-                        bundleVersion: string;
                         /** Format: date-time */
                         createdAt: string;
                         expiresAt: string | null;
@@ -5365,9 +5462,12 @@ export interface operations {
                         sizeBytes: number;
                         /** @enum {string} */
                         state: "ready" | "uploading";
+                        /** @enum {string} */
+                        type: "embedded" | "uploaded";
                         unusedSince: string | null;
                         /** Format: date-time */
                         updatedAt: string;
+                        version: string;
                     };
                 };
             };
@@ -5556,7 +5656,6 @@ export interface operations {
                     "application/json": {
                         /** Format: uuid */
                         appId: string;
-                        bundleVersion: string;
                         /** Format: date-time */
                         createdAt: string;
                         expiresAt: string | null;
@@ -5578,9 +5677,12 @@ export interface operations {
                         sizeBytes: number;
                         /** @enum {string} */
                         state: "ready" | "uploading";
+                        /** @enum {string} */
+                        type: "embedded" | "uploaded";
                         unusedSince: string | null;
                         /** Format: date-time */
                         updatedAt: string;
+                        version: string;
                     };
                 };
             };
@@ -6165,6 +6267,117 @@ export interface operations {
             };
             /** @description E_NOT_FOUND */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    putV1AppsByAppIdBundlesByBundleIdExpoByPlatformManifest: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                platform: "android" | "ios";
+                appId: string;
+                bundleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    manifest: string;
+                    signature: ({
+                        keyId: string;
+                        value: string;
+                    } & {
+                        [key: string]: unknown;
+                    }) | null;
+                } & {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description The manifest, stored. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description E_SIGNATURE_INVALID or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_SIGNATURE_REQUIRED */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7903,7 +8116,6 @@ export interface operations {
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
-                            bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
@@ -7925,9 +8137,12 @@ export interface operations {
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
+                            /** @enum {string} */
+                            type: "embedded" | "uploaded";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            version: string;
                         };
                         /** Format: uuid */
                         bundleId: string;
@@ -8182,7 +8397,6 @@ export interface operations {
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
-                            bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
@@ -8204,9 +8418,12 @@ export interface operations {
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
+                            /** @enum {string} */
+                            type: "embedded" | "uploaded";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            version: string;
                         };
                         /** Format: uuid */
                         bundleId: string;
@@ -8527,7 +8744,6 @@ export interface operations {
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
-                            bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
@@ -8549,9 +8765,12 @@ export interface operations {
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
+                            /** @enum {string} */
+                            type: "embedded" | "uploaded";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            version: string;
                         };
                         /** Format: uuid */
                         bundleId: string;
@@ -8769,7 +8988,6 @@ export interface operations {
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
-                            bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
@@ -8791,9 +9009,12 @@ export interface operations {
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
+                            /** @enum {string} */
+                            type: "embedded" | "uploaded";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            version: string;
                         };
                         /** Format: uuid */
                         bundleId: string;
@@ -9010,6 +9231,404 @@ export interface operations {
                         }[];
                     };
                 };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1AppsByAppIdDeploymentKeys: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The deployment keys. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        /** Format: uuid */
+                        channelId: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        key: string;
+                        lastUsedAt: string | null;
+                        /** @enum {string} */
+                        platform: "android" | "ios";
+                    }[];
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1AppsByAppIdDeploymentKeys: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
+                "Idempotency-Key"?: string;
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    channelId: string;
+                    /** @enum {string} */
+                    platform: "android" | "ios";
+                };
+            };
+        };
+        responses: {
+            /** @description The deployment key. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        /** Format: uuid */
+                        channelId: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        key: string;
+                        lastUsedAt: string | null;
+                        /** @enum {string} */
+                        platform: "android" | "ios";
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_IDEMPOTENCY_KEY_REUSED */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1AppsByAppIdDeploymentKeysCount: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The number of rows the list's filters match. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        total: number;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    deleteV1AppsByAppIdDeploymentKeysByKey: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                key: string;
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The deployment key is gone. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
@@ -10311,7 +10930,6 @@ export interface operations {
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
-                            bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
@@ -10333,9 +10951,12 @@ export interface operations {
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
+                            /** @enum {string} */
+                            type: "embedded" | "uploaded";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            version: string;
                         };
                         /** Format: uuid */
                         bundleId: string;
@@ -10624,7 +11245,6 @@ export interface operations {
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
-                            bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
@@ -10646,9 +11266,12 @@ export interface operations {
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
+                            /** @enum {string} */
+                            type: "embedded" | "uploaded";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            version: string;
                         };
                         /** Format: uuid */
                         bundleId: string;
@@ -10852,7 +11475,6 @@ export interface operations {
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
-                            bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
@@ -10874,9 +11496,12 @@ export interface operations {
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
+                            /** @enum {string} */
+                            type: "embedded" | "uploaded";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            version: string;
                         };
                         /** Format: uuid */
                         bundleId: string;
@@ -11187,7 +11812,6 @@ export interface operations {
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
-                            bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
@@ -11209,9 +11833,12 @@ export interface operations {
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
+                            /** @enum {string} */
+                            type: "embedded" | "uploaded";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            version: string;
                         };
                         /** Format: uuid */
                         bundleId: string;
@@ -11413,7 +12040,6 @@ export interface operations {
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
-                            bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
@@ -11435,9 +12061,12 @@ export interface operations {
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
+                            /** @enum {string} */
+                            type: "embedded" | "uploaded";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            version: string;
                         };
                         /** Format: uuid */
                         bundleId: string;
@@ -11639,7 +12268,6 @@ export interface operations {
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
-                            bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
@@ -11661,9 +12289,12 @@ export interface operations {
                             sizeBytes: number;
                             /** @enum {string} */
                             state: "ready" | "uploading";
+                            /** @enum {string} */
+                            type: "embedded" | "uploaded";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            version: string;
                         };
                         /** Format: uuid */
                         bundleId: string;

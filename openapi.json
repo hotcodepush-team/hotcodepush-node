@@ -6993,7 +6993,7 @@
       },
       "post": {
         "operationId": "postV1AppsByAppIdBundles",
-        "description": "Creates the bundle from its manifest — platforms, version label, files with path, hash and size, the patches the CLI computed, fingerprint, git provenance — and answers the hashes and patch pairs the app lacks with their upload URLs; the bundle is `uploading` until completed. The signed content is the manifest the CLI builds from those fields with the signing key’s fingerprint as `keyId` — the files sorted by path, the patches by path then base, the platforms sorted, each by UTF-16 code units — as canonical JSON; `signature` covers those bytes and is verified here against the app’s keys, `E_SIGNATURE_INVALID` otherwise, and required once the app has a key, `E_SIGNATURE_REQUIRED`. `warnings` carries `FINGERPRINT_UNREGISTERED` when the fingerprint matches no binary of the app.",
+        "description": "Creates the bundle from its manifest — platforms, version label, files with path, hash and size, fingerprint, git provenance — and answers the hashes the app lacks with their upload URLs and the URL of the pack; the bundle is `uploading` until completed. The signed content is the manifest the CLI builds from those fields with the signing key’s fingerprint as `keyId` — the files sorted by path and the platforms sorted, each by UTF-16 code units — as canonical JSON; `signature` covers those bytes and is verified here against the app’s keys, `E_SIGNATURE_INVALID` otherwise, and required once the app has a key, `E_SIGNATURE_REQUIRED`. `warnings` carries `FINGERPRINT_UNREGISTERED` when the fingerprint matches no binary of the app.",
         "parameters": [
           {
             "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
@@ -7208,41 +7208,11 @@
                         "pack": {
                           "type": "string",
                           "format": "uri"
-                        },
-                        "patches": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "fromSha256": {
-                                "type": "string"
-                              },
-                              "sizeBytes": {
-                                "type": "integer",
-                                "minimum": -9007199254740991,
-                                "maximum": 9007199254740991
-                              },
-                              "toSha256": {
-                                "type": "string"
-                              },
-                              "url": {
-                                "type": "string",
-                                "format": "uri"
-                              }
-                            },
-                            "required": [
-                              "fromSha256",
-                              "sizeBytes",
-                              "toSha256",
-                              "url"
-                            ]
-                          }
                         }
                       },
                       "required": [
                         "files",
-                        "pack",
-                        "patches"
+                        "pack"
                       ]
                     },
                     "warnings": {
@@ -7520,44 +7490,6 @@
                       "boolean",
                       "null"
                     ]
-                  },
-                  "patches": {
-                    "default": [],
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "format": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 32
-                        },
-                        "fromSha256": {
-                          "type": "string",
-                          "pattern": "^[0-9a-f]{64}$"
-                        },
-                        "path": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "sizeBytes": {
-                          "type": "integer",
-                          "minimum": 0,
-                          "maximum": 9007199254740991
-                        },
-                        "toSha256": {
-                          "type": "string",
-                          "pattern": "^[0-9a-f]{64}$"
-                        }
-                      },
-                      "required": [
-                        "format",
-                        "fromSha256",
-                        "path",
-                        "sizeBytes",
-                        "toSha256"
-                      ]
-                    }
                   },
                   "platforms": {
                     "minItems": 1,
@@ -8199,7 +8131,7 @@
     "/v1/apps/{appId}/bundles/{bundleId}/complete": {
       "post": {
         "operationId": "postV1AppsByAppIdBundlesByBundleIdComplete",
-        "description": "Verifies every listed file, patch and the pack are present, rebuilds the signed manifest from the rows and checks its signature against the app's keys again, writes the envelope at the bundle's key — the manifest, the signature and, unsigned beside them, the bundle's id and creation time, the pack, the delta packs and the patches with their URLs and stored sizes — and sets `ready`; a completed bundle answers itself again.",
+        "description": "Verifies every listed file and the pack are present, rebuilds the signed manifest from the rows and checks its signature against the app's keys again, writes the envelope at the bundle's key — the manifest, the signature and, unsigned beside them, the bundle's id and creation time, the pack and the delta packs with their URLs and stored sizes — and sets `ready`; a completed bundle answers itself again.",
         "responses": {
           "200": {
             "content": {
@@ -9326,7 +9258,7 @@
     "/v1/apps/{appId}/bundles/{bundleId}/expo/{platform}/manifest": {
       "put": {
         "operationId": "putV1AppsByAppIdBundlesByBundleIdExpoByPlatformManifest",
-        "description": "Stores the bundle's Expo-format manifest for one of its platforms: `manifest` is the canonical JSON the CLI built with `@hotcodepush/protocol`, whose `id` and `hotcodepush-update` metadata are the bundle's update id on the platform; `signature` covers those bytes with the app's `rsa-v1_5-sha256` key, verified here, `E_SIGNATURE_INVALID` otherwise, and required once the app holds such a key, `E_SIGNATURE_REQUIRED`. The bundle is still `uploading`; a second PUT replaces the first.",
+        "description": "Stores the bundle's Expo-format manifest for one of its platforms: `manifest` is the canonical JSON the CLI built with `@hotcodepush/protocol`, whose `id` and `hotcodepush-update` metadata are the bundle's update id on the platform; `signature` covers those bytes with the app's signing key, the one its bundles are signed with, verified here against the app's keys, `E_SIGNATURE_INVALID` otherwise, and required once the app has a key, `E_SIGNATURE_REQUIRED`. The bundle is still `uploading`; a second PUT replaces the first.",
         "responses": {
           "204": {
             "description": "The manifest, stored."
@@ -19540,230 +19472,6 @@
         ]
       }
     },
-    "/v1/apps/{appId}/patches/{fromSha256}/{toSha256}": {
-      "put": {
-        "operationId": "putV1AppsByAppIdPatchesByFromSha256ByToSha256",
-        "description": "Uploads the patch from the content `fromSha256` to the content `toSha256`, as the CLI computed it; `Content-Length` declares the bytes, and a pair the app already holds answers the existing patch.",
-        "requestBody": {
-          "content": {
-            "application/octet-stream": {
-              "schema": {
-                "format": "binary"
-              }
-            }
-          },
-          "description": "The patch bytes."
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "appId": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                    },
-                    "fromSha256": {
-                      "type": "string"
-                    },
-                    "sizeBytes": {
-                      "type": "integer",
-                      "minimum": -9007199254740991,
-                      "maximum": 9007199254740991
-                    },
-                    "toSha256": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "appId",
-                    "createdAt",
-                    "fromSha256",
-                    "sizeBytes",
-                    "toSha256"
-                  ]
-                }
-              }
-            },
-            "description": "The patch, already present."
-          },
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "appId": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                    },
-                    "fromSha256": {
-                      "type": "string"
-                    },
-                    "sizeBytes": {
-                      "type": "integer",
-                      "minimum": -9007199254740991,
-                      "maximum": 9007199254740991
-                    },
-                    "toSha256": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "appId",
-                    "createdAt",
-                    "fromSha256",
-                    "sizeBytes",
-                    "toSha256"
-                  ]
-                }
-              }
-            },
-            "description": "The patch, stored."
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_UNAUTHENTICATED"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_FORBIDDEN or E_ACCOUNT_BANNED"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_NOT_FOUND"
-          },
-          "413": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_BUNDLE_TOO_LARGE"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_STORAGE_LIMIT_REACHED"
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_RATE_LIMITED"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_INTERNAL"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_MAINTENANCE"
-          }
-        },
-        "summary": "Upload a patch",
-        "tags": [
-          "Files"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "fromSha256",
-            "schema": {
-              "type": "string",
-              "pattern": "^[0-9a-f]{64}$"
-            },
-            "required": true
-          },
-          {
-            "in": "path",
-            "name": "toSha256",
-            "schema": {
-              "type": "string",
-              "pattern": "^[0-9a-f]{64}$"
-            },
-            "required": true
-          },
-          {
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "in": "path",
-            "name": "appId",
-            "required": true
-          },
-          {
-            "$ref": "#/components/parameters/ClientHeader"
-          }
-        ]
-      }
-    },
     "/v1/apps/{appId}/releases": {
       "get": {
         "operationId": "getV1AppsByAppIdReleases",
@@ -25233,7 +24941,7 @@
       },
       "post": {
         "operationId": "postV1AppsByAppIdSigningKeys",
-        "description": "Registers a public key, `ed25519:<base64>` or `rsa-v1_5-sha256:<base64>`; from then on the app releases only signed bundles and signed embedded rollbacks.",
+        "description": "Registers a public key, `rsa-v1_5-sha256:` and the base64 of an RSA key's SPKI DER, of at least 2048 bits, refused under `rsa_public_key` otherwise; from then on the app releases only signed bundles.",
         "responses": {
           "201": {
             "content": {
@@ -25283,7 +24991,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+            "description": "E_VALIDATION or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -25917,7 +25625,7 @@
     "/v1/apps/{appId}/statistics/updates": {
       "get": {
         "operationId": "getV1AppsByAppIdStatisticsUpdates",
-        "description": "What the devices did per day over the period — updates installed, failed and rolled back, from the nightly rollup — the adoption curve of the newest live releases since each went live with the moments it reached half and nine tenths of the channel's active devices, and the failure and skip reasons the devices reported in the period; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default, and `channelId` narrows it to one channel.",
+        "description": "What the devices did per day over the period — updates installed, failed and rolled back, counted as the devices report them — the adoption curve of the newest live releases since each went live with the moments it reached half and nine tenths of the channel's active devices, and the failure and skip reasons the devices reported in the period; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default, and `channelId` narrows it to one channel.",
         "responses": {
           "200": {
             "content": {

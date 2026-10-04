@@ -28,7 +28,6 @@ export type * from './resources/members';
 export type * from './resources/organization-apps';
 export type * from './resources/organization-invitations';
 export type * from './resources/organizations';
-export type * from './resources/patches';
 export type * from './resources/release-audience';
 export type * from './resources/releases';
 export type * from './resources/rollbacks';

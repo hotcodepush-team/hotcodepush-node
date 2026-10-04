@@ -439,7 +439,7 @@ export interface paths {
         put?: never;
         /**
          * Create a bundle
-         * @description Creates the bundle from its manifest — platforms, version label, files with path, hash and size, the patches the CLI computed, fingerprint, git provenance — and answers the hashes and patch pairs the app lacks with their upload URLs; the bundle is `uploading` until completed. The signed content is the manifest the CLI builds from those fields with the signing key’s fingerprint as `keyId` — the files sorted by path, the patches by path then base, the platforms sorted, each by UTF-16 code units — as canonical JSON; `signature` covers those bytes and is verified here against the app’s keys, `E_SIGNATURE_INVALID` otherwise, and required once the app has a key, `E_SIGNATURE_REQUIRED`. `warnings` carries `FINGERPRINT_UNREGISTERED` when the fingerprint matches no binary of the app.
+         * @description Creates the bundle from its manifest — platforms, version label, files with path, hash and size, fingerprint, git provenance — and answers the hashes the app lacks with their upload URLs and the URL of the pack; the bundle is `uploading` until completed. The signed content is the manifest the CLI builds from those fields with the signing key’s fingerprint as `keyId` — the files sorted by path and the platforms sorted, each by UTF-16 code units — as canonical JSON; `signature` covers those bytes and is verified here against the app’s keys, `E_SIGNATURE_INVALID` otherwise, and required once the app has a key, `E_SIGNATURE_REQUIRED`. `warnings` carries `FINGERPRINT_UNREGISTERED` when the fingerprint matches no binary of the app.
          */
         post: operations["postV1AppsByAppIdBundles"];
         delete?: never;
@@ -503,7 +503,7 @@ export interface paths {
         put?: never;
         /**
          * Complete a bundle
-         * @description Verifies every listed file, patch and the pack are present, rebuilds the signed manifest from the rows and checks its signature against the app's keys again, writes the envelope at the bundle's key — the manifest, the signature and, unsigned beside them, the bundle's id and creation time, the pack, the delta packs and the patches with their URLs and stored sizes — and sets `ready`; a completed bundle answers itself again.
+         * @description Verifies every listed file and the pack are present, rebuilds the signed manifest from the rows and checks its signature against the app's keys again, writes the envelope at the bundle's key — the manifest, the signature and, unsigned beside them, the bundle's id and creation time, the pack and the delta packs with their URLs and stored sizes — and sets `ready`; a completed bundle answers itself again.
          */
         post: operations["postV1AppsByAppIdBundlesByBundleIdComplete"];
         delete?: never;
@@ -622,7 +622,7 @@ export interface paths {
         get?: never;
         /**
          * Upload the Expo manifest
-         * @description Stores the bundle's Expo-format manifest for one of its platforms: `manifest` is the canonical JSON the CLI built with `@hotcodepush/protocol`, whose `id` and `hotcodepush-update` metadata are the bundle's update id on the platform; `signature` covers those bytes with the app's `rsa-v1_5-sha256` key, verified here, `E_SIGNATURE_INVALID` otherwise, and required once the app holds such a key, `E_SIGNATURE_REQUIRED`. The bundle is still `uploading`; a second PUT replaces the first.
+         * @description Stores the bundle's Expo-format manifest for one of its platforms: `manifest` is the canonical JSON the CLI built with `@hotcodepush/protocol`, whose `id` and `hotcodepush-update` metadata are the bundle's update id on the platform; `signature` covers those bytes with the app's signing key, the one its bundles are signed with, verified here against the app's keys, `E_SIGNATURE_INVALID` otherwise, and required once the app has a key, `E_SIGNATURE_REQUIRED`. The bundle is still `uploading`; a second PUT replaces the first.
          */
         put: operations["putV1AppsByAppIdBundlesByBundleIdExpoByPlatformManifest"];
         post?: never;
@@ -1256,26 +1256,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/apps/{appId}/patches/{fromSha256}/{toSha256}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Upload a patch
-         * @description Uploads the patch from the content `fromSha256` to the content `toSha256`, as the CLI computed it; `Content-Length` declares the bytes, and a pair the app already holds answers the existing patch.
-         */
-        put: operations["putV1AppsByAppIdPatchesByFromSha256ByToSha256"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/v1/apps/{appId}/releases": {
         parameters: {
             query?: never;
@@ -1435,7 +1415,7 @@ export interface paths {
         put?: never;
         /**
          * Register a signing key
-         * @description Registers a public key, `ed25519:<base64>` or `rsa-v1_5-sha256:<base64>`; from then on the app releases only signed bundles and signed embedded rollbacks.
+         * @description Registers a public key, `rsa-v1_5-sha256:` and the base64 of an RSA key's SPKI DER, of at least 2048 bits, refused under `rsa_public_key` otherwise; from then on the app releases only signed bundles.
          */
         post: operations["postV1AppsByAppIdSigningKeys"];
         delete?: never;
@@ -1513,7 +1493,7 @@ export interface paths {
         };
         /**
          * Get the update statistics
-         * @description What the devices did per day over the period — updates installed, failed and rolled back, from the nightly rollup — the adoption curve of the newest live releases since each went live with the moments it reached half and nine tenths of the channel's active devices, and the failure and skip reasons the devices reported in the period; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default, and `channelId` narrows it to one channel.
+         * @description What the devices did per day over the period — updates installed, failed and rolled back, counted as the devices report them — the adoption curve of the newest live releases since each went live with the moments it reached half and nine tenths of the channel's active devices, and the failure and skip reasons the devices reported in the period; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default, and `channelId` narrows it to one channel.
          */
         get: operations["getV1AppsByAppIdStatisticsUpdates"];
         put?: never;
@@ -5190,14 +5170,6 @@ export interface operations {
                     gitSha?: string | null;
                     /** @default null */
                     isGitDirty?: boolean | null;
-                    /** @default [] */
-                    patches?: {
-                        format: string;
-                        fromSha256: string;
-                        path: string;
-                        sizeBytes: number;
-                        toSha256: string;
-                    }[];
                     platforms: ("android" | "ios")[];
                     /** @default null */
                     signature?: ({
@@ -5256,13 +5228,6 @@ export interface operations {
                             }[];
                             /** Format: uri */
                             pack: string;
-                            patches: {
-                                fromSha256: string;
-                                sizeBytes: number;
-                                toSha256: string;
-                                /** Format: uri */
-                                url: string;
-                            }[];
                         };
                         warnings: {
                             /** @enum {string} */
@@ -10993,144 +10958,6 @@ export interface operations {
             };
         };
     };
-    putV1AppsByAppIdPatchesByFromSha256ByToSha256: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                fromSha256: string;
-                toSha256: string;
-                appId: string;
-            };
-            cookie?: never;
-        };
-        /** @description The patch bytes. */
-        requestBody?: {
-            content: {
-                "application/octet-stream": unknown;
-            };
-        };
-        responses: {
-            /** @description The patch, already present. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** Format: uuid */
-                        appId: string;
-                        /** Format: date-time */
-                        createdAt: string;
-                        fromSha256: string;
-                        sizeBytes: number;
-                        toSha256: string;
-                    };
-                };
-            };
-            /** @description The patch, stored. */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** Format: uuid */
-                        appId: string;
-                        /** Format: date-time */
-                        createdAt: string;
-                        fromSha256: string;
-                        sizeBytes: number;
-                        toSha256: string;
-                    };
-                };
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_BUNDLE_TOO_LARGE */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_STORAGE_LIMIT_REACHED */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
     getV1AppsByAppIdReleases: {
         parameters: {
             query?: {
@@ -12841,7 +12668,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description E_VALIDATION or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;

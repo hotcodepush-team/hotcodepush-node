@@ -371,13 +371,6 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       uploadId: UPLOAD_ID,
     }),
   'apps.get': hotCodePush => hotCodePush.apps.get({ appId: APP_ID }),
-  'apps.patches.upload': hotCodePush =>
-    hotCodePush.apps.patches.upload({
-      appId: APP_ID,
-      body: new Blob(['patch']),
-      fromSha256: SHA256,
-      toSha256: 'b'.repeat(64),
-    }),
   'apps.releases.audience.get': hotCodePush =>
     hotCodePush.apps.releases.audience.get({
       appId: APP_ID,

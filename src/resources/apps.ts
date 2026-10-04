@@ -11,7 +11,6 @@ import { ChannelsResource } from './channels';
 import { DeploymentKeysResource } from './deployment-keys';
 import { DevicesResource } from './devices';
 import { FilesResource } from './files';
-import { PatchesResource } from './patches';
 import { ReleasesResource } from './releases';
 import { SigningKeysResource } from './signing-keys';
 import { StatisticsResource } from './statistics';
@@ -38,7 +37,6 @@ export class AppsResource {
   public readonly deploymentKeys: DeploymentKeysResource;
   public readonly devices: DevicesResource;
   public readonly files: FilesResource;
-  public readonly patches: PatchesResource;
   public readonly releases: ReleasesResource;
   public readonly signingKeys: SigningKeysResource;
   public readonly statistics: StatisticsResource;
@@ -50,7 +48,6 @@ export class AppsResource {
     this.deploymentKeys = new DeploymentKeysResource(httpClient);
     this.devices = new DevicesResource(httpClient);
     this.files = new FilesResource(httpClient);
-    this.patches = new PatchesResource(httpClient);
     this.releases = new ReleasesResource(httpClient);
     this.signingKeys = new SigningKeysResource(httpClient);
     this.statistics = new StatisticsResource(httpClient);

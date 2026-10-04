@@ -53,7 +53,7 @@ export class SigningKeysResource {
   }
 
   /**
-   * Registers a public key; from then on the app releases only signed bundles.
+   * Registers a public key, `rsa-v1_5-sha256:` and the base64 of an RSA key's SPKI DER, of at least 2048 bits; from then on the app releases only signed bundles.
    * A repeat registers the key a second time, so the call is never retried.
    */
   public async create(options: CreateSigningKeyOptions): Promise<SigningKey> {

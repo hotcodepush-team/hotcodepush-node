@@ -416,7 +416,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
   'apps.signingKeys.create': hotCodePush =>
     hotCodePush.apps.signingKeys.create({
       appId: APP_ID,
-      publicKey: 'ed25519:key',
+      publicKey: 'rsa-v1_5-sha256:a2V5',
     }),
   'apps.signingKeys.delete': hotCodePush =>
     hotCodePush.apps.signingKeys.delete({

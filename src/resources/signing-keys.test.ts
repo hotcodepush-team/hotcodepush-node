@@ -7,7 +7,7 @@ import {
   stubFetch,
 } from '../test-helpers';
 
-const SIGNING_KEY = { id: 'signing-key', publicKey: 'ed25519:key' };
+const SIGNING_KEY = { id: 'signing-key', publicKey: 'rsa-v1_5-sha256:a2V5' };
 const SIGNING_KEYS_URL = 'https://api.hotcodepush.com/v1/apps/app/signing-keys';
 
 afterEach(() => {
@@ -36,12 +36,12 @@ describe('SigningKeysResource', () => {
 
     const createdSigningKey = await new HotCodePush().apps.signingKeys.create({
       appId: 'app',
-      publicKey: 'ed25519:key',
+      publicKey: 'rsa-v1_5-sha256:a2V5',
     });
 
     expect(createdSigningKey).toEqual(SIGNING_KEY);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
-      body: { publicKey: 'ed25519:key' },
+      body: { publicKey: 'rsa-v1_5-sha256:a2V5' },
       method: 'POST',
       url: SIGNING_KEYS_URL,
     });
@@ -51,7 +51,7 @@ describe('SigningKeysResource', () => {
     const attemptCount = await countAttemptsWhenUnavailable(() =>
       new HotCodePush().apps.signingKeys.create({
         appId: 'app',
-        publicKey: 'ed25519:key',
+        publicKey: 'rsa-v1_5-sha256:a2V5',
       }),
     );
 

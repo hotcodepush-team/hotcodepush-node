@@ -9341,7 +9341,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND or E_NOT_FOUND */
+            /** @description E_NOT_FOUND */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -12668,7 +12668,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -13101,7 +13101,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -13206,7 +13206,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
                 headers: {
                     [name: string]: unknown;

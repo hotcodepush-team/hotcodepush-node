@@ -16415,7 +16415,7 @@
                 }
               }
             },
-            "description": "E_NOT_FOUND or E_NOT_FOUND"
+            "description": "E_NOT_FOUND"
           },
           "429": {
             "content": {
@@ -24991,7 +24991,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -25818,7 +25818,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {
@@ -26019,7 +26019,7 @@
                 }
               }
             },
-            "description": "E_VALIDATION or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
+            "description": "E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED"
           },
           "401": {
             "content": {

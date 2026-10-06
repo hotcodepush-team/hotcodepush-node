@@ -160,6 +160,20 @@ describe('HttpClient', () => {
     );
   });
 
+  test('should send the ids in the query as a comma list', async () => {
+    const fetchMock = stubFetch(() => new Response(null, { status: 204 }));
+
+    await new HttpClient({}).fetchJson({
+      method: 'DELETE',
+      path: '/v1/apps/app/channels',
+      query: { ids: ['first', 'second'] },
+    });
+
+    expect(resolveSentRequest(fetchMock).url).toBe(
+      'https://api.hotcodepush.com/v1/apps/app/channels?ids=first%2Csecond',
+    );
+  });
+
   test('should repeat the parameter of any other list in the query', async () => {
     const fetchMock = stubFetch();
 

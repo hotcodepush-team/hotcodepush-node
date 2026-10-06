@@ -15,17 +15,18 @@ afterEach(() => {
 });
 
 describe('ChannelsResource', () => {
-  test('should count the channels of the app', async () => {
+  test('should count the channels of the app under the query', async () => {
     const fetchMock = stubFetch(() => Response.json({ total: 3 }));
 
     const fetchedCount = await new HotCodePush().apps.channels.count({
       appId: 'app',
+      query: 'stag',
     });
 
     expect(fetchedCount).toEqual({ total: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${CHANNELS_URL}/count`,
+      url: `${CHANNELS_URL}/count?query=stag`,
     });
   });
 
@@ -59,6 +60,20 @@ describe('ChannelsResource', () => {
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'DELETE',
       url: `${CHANNELS_URL}/channel`,
+    });
+  });
+
+  test('should delete the channels named by the ids', async () => {
+    const fetchMock = stubFetch(() => new Response(null, { status: 204 }));
+
+    await new HotCodePush().apps.channels.deleteMany({
+      appId: 'app',
+      ids: ['first', 'second'],
+    });
+
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'DELETE',
+      url: `${CHANNELS_URL}?ids=first%2Csecond`,
     });
   });
 

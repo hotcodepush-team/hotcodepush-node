@@ -12,17 +12,18 @@ afterEach(() => {
 });
 
 describe('MembersResource', () => {
-  test('should count the members of the organization', async () => {
+  test('should count the members of the organization under the filters', async () => {
     const fetchMock = stubFetch(() => Response.json({ total: 3 }));
 
     const fetchedCount = await new HotCodePush().organizations.members.count({
       organizationId: 'organization',
+      role: 'admin',
     });
 
     expect(fetchedCount).toEqual({ total: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${MEMBERS_URL}/count`,
+      url: `${MEMBERS_URL}/count?role=admin`,
     });
   });
 
@@ -37,6 +38,20 @@ describe('MembersResource', () => {
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'DELETE',
       url: `${MEMBERS_URL}/member`,
+    });
+  });
+
+  test('should delete the members named by the ids', async () => {
+    const fetchMock = stubFetch(() => new Response(null, { status: 204 }));
+
+    await new HotCodePush().organizations.members.deleteMany({
+      ids: ['first', 'second'],
+      organizationId: 'organization',
+    });
+
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'DELETE',
+      url: `${MEMBERS_URL}?ids=first%2Csecond`,
     });
   });
 

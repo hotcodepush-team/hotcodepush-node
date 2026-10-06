@@ -18,6 +18,12 @@ export type DeleteDeviceOptions = PathParameters<
   'delete'
 >;
 
+export type DeleteManyDevicesOptions = PathParameters<
+  '/v1/apps/{appId}/devices',
+  'delete'
+> &
+  QueryParameters<'/v1/apps/{appId}/devices', 'delete'>;
+
 /**
  * A device of the registry, the facts of its last report.
  */
@@ -70,6 +76,18 @@ export class DevicesResource {
     await this.httpClient.fetchJson({
       method: 'DELETE',
       path: resolvePath('/v1/apps/{appId}/devices/{deviceId}', options),
+    });
+  }
+
+  /**
+   * Deletes the app's devices named by `ids`, one to 100; an id of another app is skipped.
+   */
+  public async deleteMany(options: DeleteManyDevicesOptions): Promise<void> {
+    const { appId, ...query } = options;
+    await this.httpClient.fetchJson({
+      method: 'DELETE',
+      path: resolvePath('/v1/apps/{appId}/devices', { appId }),
+      query,
     });
   }
 

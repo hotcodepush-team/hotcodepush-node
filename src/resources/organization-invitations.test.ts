@@ -64,6 +64,20 @@ describe('OrganizationInvitationsResource', () => {
     });
   });
 
+  test('should delete the invitations named by the ids', async () => {
+    const fetchMock = stubFetch(() => new Response(null, { status: 204 }));
+
+    await new HotCodePush().organizations.invitations.deleteMany({
+      ids: ['first', 'second'],
+      organizationId: 'organization',
+    });
+
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'DELETE',
+      url: `${INVITATIONS_URL}?ids=first%2Csecond`,
+    });
+  });
+
   test('should list the invitations of the organization', async () => {
     const fetchMock = stubFetch(() => Response.json([INVITATION]));
 

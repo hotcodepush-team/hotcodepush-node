@@ -30,6 +30,12 @@ export type DeleteInvitationOptions = PathParameters<
   'delete'
 >;
 
+export type DeleteManyInvitationsOptions = PathParameters<
+  '/v1/organizations/{organizationId}/invitations',
+  'delete'
+> &
+  QueryParameters<'/v1/organizations/{organizationId}/invitations', 'delete'>;
+
 export type ListInvitationsOptions = PathParameters<
   '/v1/organizations/{organizationId}/invitations',
   'get'
@@ -78,6 +84,22 @@ export class OrganizationInvitationsResource {
         '/v1/organizations/{organizationId}/invitations/{invitationId}',
         options,
       ),
+    });
+  }
+
+  /**
+   * Withdraws the organization's invitations named by `ids`, one to 100; an id of another organization is skipped.
+   */
+  public async deleteMany(
+    options: DeleteManyInvitationsOptions,
+  ): Promise<void> {
+    const { organizationId, ...query } = options;
+    await this.httpClient.fetchJson({
+      method: 'DELETE',
+      path: resolvePath('/v1/organizations/{organizationId}/invitations', {
+        organizationId,
+      }),
+      query,
     });
   }
 

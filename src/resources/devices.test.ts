@@ -41,6 +41,20 @@ describe('DevicesResource', () => {
     });
   });
 
+  test('should delete the devices named by the ids', async () => {
+    const fetchMock = stubFetch(() => new Response(null, { status: 204 }));
+
+    await new HotCodePush().apps.devices.deleteMany({
+      appId: 'app',
+      ids: ['first', 'second'],
+    });
+
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'DELETE',
+      url: `${DEVICES_URL}?ids=first%2Csecond`,
+    });
+  });
+
   test('should get the device with its channel', async () => {
     const fetchMock = stubFetch(() => Response.json(DEVICE));
 

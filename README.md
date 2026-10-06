@@ -36,42 +36,42 @@ await hotCodePush.apps.channels.pause({ appId: app.id, channelId: channel.id });
 
 The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.channels`:
 
-| Resource                                                                         | Methods                                                                 |
-| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| `health`                                                                         | `get`                                                                   |
-| `organizations`                                                                  | `count`, `create`, `delete`, `get`, `list`, `update`                    |
-| `organizations.apps`                                                             | `count`, `create`, `list`                                               |
-| `organizations.invitations`                                                      | `count`, `create`, `delete`, `list`                                     |
-| `organizations.members`                                                          | `count`, `delete`, `get`, `list`, `update`                              |
-| `organizations.ssoProvider`, one per organization                                | `delete`, `get`, `put`                                                  |
-| `organizations.ssoProvider.verifications`                                        | `create`                                                                |
-| `invitations`, the caller's                                                      | `accept`, `count`, `list`                                               |
-| `apps`                                                                           | `delete`, `get`, `transfer`, `update`                                   |
-| `apps.bundles`                                                                   | `complete`, `count`, `create`, `delete`, `get`, `list`                  |
-| `apps.bundles.files`, a bundle's files ordered by path                           | `count`, `list`                                                         |
-| `apps.bundles.pack`, `apps.bundles.deltas`                                       | `upload`                                                                |
-| `apps.bundles.expoManifest`, the Expo-format manifest per platform               | `upload`                                                                |
-| `apps.bundles.pack.uploads`, `apps.bundles.deltas.uploads`, the multipart upload | `complete`, `create`, `delete`                                          |
-| `apps.bundles.pack.uploads.parts`, `apps.bundles.deltas.uploads.parts`           | `upload`                                                                |
-| `apps.channels`                                                                  | `count`, `create`, `delete`, `get`, `list`, `pause`, `resume`, `update` |
-| `apps.channels.indexes`                                                          | `get`                                                                   |
-| `apps.channels.qr`, the channel's deep link as an image                          | `get`                                                                   |
-| `apps.channels.releases`, the release log                                        | `count`, `create`, `list`, `revoke`                                     |
-| `apps.channels.rollbacks`                                                        | `create`                                                                |
-| `apps.binaries`, the store builds `binary create` creates                        | `count`, `create`, `get`, `list`                                        |
-| `apps.channels.audience`, the audience preview                                   | `get`                                                                   |
-| `apps.devices`                                                                   | `count`, `delete`, `get`, `list`                                        |
-| `apps.patches`                                                                   | `upload`                                                                |
-| `apps.signingKeys`                                                               | `count`, `create`, `delete`, `list`                                     |
-| `apps.deploymentKeys`, the CodePush bridge's keys                                | `count`, `create`, `delete`, `list`                                     |
-| `apps.statistics.fleet`, the registry counted by dimension                       | `get`                                                                   |
-| `apps.statistics.updates`, `apps.statistics.usage`, the time-series read models  | `get`                                                                   |
-| `apps.files`                                                                     | `upload`                                                                |
-| `apps.files.uploads`, the multipart upload                                       | `complete`, `create`, `delete`                                          |
-| `apps.files.uploads.parts`                                                       | `upload`                                                                |
-| `apps.releases`                                                                  | `count`, `get`, `list`, `pause`, `resume`, `revoke`, `update`           |
-| `apps.releases.audience`, a release's own audience                               | `get`                                                                   |
-| `users`                                                                          | `delete`, `get`                                                         |
+| Resource                                                                         | Methods                                                                               |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `health`                                                                         | `get`                                                                                 |
+| `organizations`                                                                  | `count`, `create`, `delete`, `get`, `list`, `update`                                  |
+| `organizations.apps`                                                             | `count`, `create`, `list`                                                             |
+| `organizations.auditLogs`                                                        | `count`, `downloadCsv`, `list`                                                        |
+| `organizations.invitations`                                                      | `count`, `create`, `delete`, `deleteMany`, `list`                                     |
+| `organizations.members`                                                          | `count`, `delete`, `deleteMany`, `get`, `list`, `update`                              |
+| `organizations.ssoProvider`, one per organization                                | `delete`, `get`, `put`                                                                |
+| `organizations.ssoProvider.verifications`                                        | `create`                                                                              |
+| `invitations`, the caller's                                                      | `accept`, `count`, `list`                                                             |
+| `apps`                                                                           | `delete`, `get`, `transfer`, `update`                                                 |
+| `apps.bundles`                                                                   | `complete`, `count`, `create`, `delete`, `get`, `list`                                |
+| `apps.bundles.files`, a bundle's files ordered by path                           | `count`, `list`                                                                       |
+| `apps.bundles.pack`, `apps.bundles.deltas`                                       | `upload`                                                                              |
+| `apps.bundles.pack.uploads`, `apps.bundles.deltas.uploads`, the multipart upload | `complete`, `create`, `delete`                                                        |
+| `apps.bundles.pack.uploads.parts`, `apps.bundles.deltas.uploads.parts`           | `upload`                                                                              |
+| `apps.channels`                                                                  | `count`, `create`, `delete`, `deleteMany`, `get`, `list`, `pause`, `resume`, `update` |
+| `apps.channels.indexes`                                                          | `get`                                                                                 |
+| `apps.channels.qr`, the channel's deep link as an image                          | `get`                                                                                 |
+| `apps.channels.releases`, the release log                                        | `count`, `create`, `list`, `revoke`                                                   |
+| `apps.channels.rollbacks`                                                        | `create`                                                                              |
+| `apps.binaries`, the store builds `binary create` creates                        | `count`, `create`, `get`, `list`                                                      |
+| `apps.channels.audience`, the audience preview                                   | `get`                                                                                 |
+| `apps.devices`                                                                   | `count`, `delete`, `deleteMany`, `get`, `list`                                        |
+| `apps.signingKeys`                                                               | `count`, `create`, `delete`, `list`                                                   |
+| `apps.statistics.fleet`, the registry counted by dimension                       | `get`                                                                                 |
+| `apps.statistics.updates`, `apps.statistics.usage`, the time-series read models  | `get`                                                                                 |
+| `apps.files`                                                                     | `upload`                                                                              |
+| `apps.files.uploads`, the multipart upload                                       | `complete`, `create`, `delete`                                                        |
+| `apps.files.uploads.parts`                                                       | `upload`                                                                              |
+| `apps.releases`                                                                  | `count`, `get`, `list`, `pause`, `resume`, `revoke`, `update`                         |
+| `apps.releases.audience`, a release's own audience                               | `get`                                                                                 |
+| `users`                                                                          | `delete`, `get`                                                                       |
+| `users.password`                                                                 | `create`                                                                              |
+| `users.sessions`, `users.tokens`                                                 | `deleteMany`                                                                          |
 
 Lists take `limit` and `offset`, and where the API embeds linked rows, `relations`: `organizations.members.list({ organizationId, relations: ['user'] })`; any other list parameter, an audience's `attribute` say, repeats itself in the query.
 Every list has a `count` beside it taking the same filters and answering `{ total }`, the number a paginated table reads.

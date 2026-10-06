@@ -11,7 +11,14 @@ import type {
 export type CountMembersOptions = PathParameters<
   '/v1/organizations/{organizationId}/members/count',
   'get'
->;
+> &
+  QueryParameters<'/v1/organizations/{organizationId}/members/count', 'get'>;
+
+export type DeleteManyMembersOptions = PathParameters<
+  '/v1/organizations/{organizationId}/members',
+  'delete'
+> &
+  QueryParameters<'/v1/organizations/{organizationId}/members', 'delete'>;
 
 export type DeleteMemberOptions = PathParameters<
   '/v1/organizations/{organizationId}/members/{memberId}',
@@ -52,15 +59,16 @@ export class MembersResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The number of the organization's members.
+   * The number of the organization's members under the list's filters.
    */
   public async count(options: CountMembersOptions): Promise<Count> {
+    const { organizationId, ...query } = options;
     return this.httpClient.fetchJson({
       method: 'GET',
-      path: resolvePath(
-        '/v1/organizations/{organizationId}/members/count',
-        options,
-      ),
+      path: resolvePath('/v1/organizations/{organizationId}/members/count', {
+        organizationId,
+      }),
+      query,
     });
   }
 
@@ -74,6 +82,21 @@ export class MembersResource {
         '/v1/organizations/{organizationId}/members/{memberId}',
         options,
       ),
+    });
+  }
+
+  /**
+   * Removes the organization's members named by `ids`, one to 100; an id of another organization is skipped,
+   * and the Owner refuses the whole set.
+   */
+  public async deleteMany(options: DeleteManyMembersOptions): Promise<void> {
+    const { organizationId, ...query } = options;
+    await this.httpClient.fetchJson({
+      method: 'DELETE',
+      path: resolvePath('/v1/organizations/{organizationId}/members', {
+        organizationId,
+      }),
+      query,
     });
   }
 

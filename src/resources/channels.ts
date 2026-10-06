@@ -29,7 +29,8 @@ export type ChannelWithDeviceCounts = JsonResponseBody<
 export type CountChannelsOptions = PathParameters<
   '/v1/apps/{appId}/channels/count',
   'get'
->;
+> &
+  QueryParameters<'/v1/apps/{appId}/channels/count', 'get'>;
 
 export type CreateChannelOptions = PathParameters<
   '/v1/apps/{appId}/channels',
@@ -42,6 +43,12 @@ export type DeleteChannelOptions = PathParameters<
   '/v1/apps/{appId}/channels/{channelId}',
   'delete'
 >;
+
+export type DeleteManyChannelsOptions = PathParameters<
+  '/v1/apps/{appId}/channels',
+  'delete'
+> &
+  QueryParameters<'/v1/apps/{appId}/channels', 'delete'>;
 
 export type GetChannelOptions = PathParameters<
   '/v1/apps/{appId}/channels/{channelId}',
@@ -86,12 +93,14 @@ export class ChannelsResource {
   }
 
   /**
-   * The number of the app's channels.
+   * The number of the app's channels under the list's filters.
    */
   public async count(options: CountChannelsOptions): Promise<Count> {
+    const { appId, ...query } = options;
     return this.httpClient.fetchJson({
       method: 'GET',
-      path: resolvePath('/v1/apps/{appId}/channels/count', options),
+      path: resolvePath('/v1/apps/{appId}/channels/count', { appId }),
+      query,
     });
   }
 
@@ -111,6 +120,19 @@ export class ChannelsResource {
     await this.httpClient.fetchJson({
       method: 'DELETE',
       path: resolvePath('/v1/apps/{appId}/channels/{channelId}', options),
+    });
+  }
+
+  /**
+   * Deletes the app's channels named by `ids`, one to 100; an id of another app is skipped.
+   * The app's default channel, or a protected channel when the caller is a Member, refuses the whole set.
+   */
+  public async deleteMany(options: DeleteManyChannelsOptions): Promise<void> {
+    const { appId, ...query } = options;
+    await this.httpClient.fetchJson({
+      method: 'DELETE',
+      path: resolvePath('/v1/apps/{appId}/channels', { appId }),
+      query,
     });
   }
 

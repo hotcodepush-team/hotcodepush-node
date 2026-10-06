@@ -12,7 +12,8 @@ import type { App } from './apps';
 export type CountAppsOptions = PathParameters<
   '/v1/organizations/{organizationId}/apps/count',
   'get'
->;
+> &
+  QueryParameters<'/v1/organizations/{organizationId}/apps/count', 'get'>;
 
 export type CreateAppOptions = PathParameters<
   '/v1/organizations/{organizationId}/apps',
@@ -31,15 +32,16 @@ export class OrganizationAppsResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The number of the organization's apps.
+   * The number of the organization's apps under the list's filters.
    */
   public async count(options: CountAppsOptions): Promise<Count> {
+    const { organizationId, ...query } = options;
     return this.httpClient.fetchJson({
       method: 'GET',
-      path: resolvePath(
-        '/v1/organizations/{organizationId}/apps/count',
-        options,
-      ),
+      path: resolvePath('/v1/organizations/{organizationId}/apps/count', {
+        organizationId,
+      }),
+      query,
     });
   }
 

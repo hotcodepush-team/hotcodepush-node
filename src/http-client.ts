@@ -3,6 +3,10 @@ import { resolveHotCodePushError } from './errors';
 import type { paths } from './generated/schema';
 import type { BlobUploadBody, IdempotencyOptions, UploadBody } from './types';
 
+const COMMA_LIST_QUERY_NAMES: ReadonlySet<string> = new Set([
+  'ids',
+  'relations',
+]);
 const DEFAULT_BASE_URL = 'https://api.hotcodepush.com';
 const DEFAULT_CLIENT = `node/${version}`;
 const IDEMPOTENT_METHODS: ReadonlySet<FetchJsonOptions['method']> = new Set([
@@ -36,7 +40,7 @@ export interface FetchJsonOptions {
   method: 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
   path: string;
   /**
-   * Undefined values and empty lists are left out; `relations` is sent as a comma list, any other list repeats its parameter.
+   * Undefined values and empty lists are left out; `ids` and `relations` are sent as comma lists, any other list repeats its parameter.
    */
   query?: Record<string, number | readonly string[] | string | undefined>;
 }
@@ -234,7 +238,7 @@ export function resolvePath(
 }
 
 /**
- * The values a query parameter is sent with: `relations` is the API's one comma list,
+ * The values a query parameter is sent with: `ids` and `relations` are the API's comma lists,
  * and every other list repeats, `?binary=…&binary=…`, since its values may hold a comma.
  */
 function resolveQueryValues(
@@ -247,7 +251,7 @@ function resolveQueryValues(
   if (typeof value !== 'object') {
     return [String(value)];
   }
-  if (name === 'relations') {
+  if (COMMA_LIST_QUERY_NAMES.has(name)) {
     return value.length === 0 ? [] : [value.join(',')];
   }
   return [...value];

@@ -8,6 +8,7 @@ import type {
   PathParameters,
   QueryParameters,
 } from '../types';
+import { AuditLogsResource } from './audit-logs';
 import { MembersResource } from './members';
 import { OrganizationAppsResource } from './organization-apps';
 import { OrganizationInvitationsResource } from './organization-invitations';
@@ -48,12 +49,14 @@ export type UpdateOrganizationOptions = PathParameters<
 
 export class OrganizationsResource {
   public readonly apps: OrganizationAppsResource;
+  public readonly auditLogs: AuditLogsResource;
   public readonly invitations: OrganizationInvitationsResource;
   public readonly members: MembersResource;
   public readonly ssoProvider: SsoProviderResource;
 
   constructor(private readonly httpClient: HttpClient) {
     this.apps = new OrganizationAppsResource(httpClient);
+    this.auditLogs = new AuditLogsResource(httpClient);
     this.invitations = new OrganizationInvitationsResource(httpClient);
     this.members = new MembersResource(httpClient);
     this.ssoProvider = new SsoProviderResource(httpClient);

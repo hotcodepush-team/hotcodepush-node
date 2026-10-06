@@ -73,7 +73,7 @@ export interface paths {
         };
         /**
          * List the apps
-         * @description The organization's apps, newest first.
+         * @description The organization's apps, newest first; `query` selects those whose id or name contains it, case-insensitively.
          */
         get: operations["getV1OrganizationsByOrganizationIdApps"];
         put?: never;
@@ -97,9 +97,49 @@ export interface paths {
         };
         /**
          * Count the apps
-         * @description The number of the organization's apps, which the list pages through.
+         * @description The number of the organization's apps under the list's filter, `query`, which the list pages through.
          */
         get: operations["getV1OrganizationsByOrganizationIdAppsCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/audit-logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the audit log
+         * @description The organization's audit log, newest first, filtered by `type` — `channel.created`, or `channel.*` for every action on the object — `userId`, `appId`, and `createdSince` and `createdUntil`, both inclusive; `?relations=user` embeds each row's user while the user is live. `?format=csv` answers every matching row as `text/csv`, unpaginated. Paying plans only.
+         */
+        get: operations["getV1OrganizationsByOrganizationIdAuditLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/audit-logs/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Count the audit log
+         * @description The number of the organization's audit rows under the list's filters, which the list pages through. Paying plans only.
+         */
+        get: operations["getV1OrganizationsByOrganizationIdAuditLogsCount"];
         put?: never;
         post?: never;
         delete?: never;
@@ -117,7 +157,7 @@ export interface paths {
         };
         /**
          * List the invitations
-         * @description The organization's invitations, newest first; `status=pending` selects those still pending and not yet expired.
+         * @description The organization's invitations, newest first, filtered by `role`, by `query`, the text their id or email contains, case-insensitively, and by `status`, whose `pending` selects those still pending and not yet expired.
          */
         get: operations["getV1OrganizationsByOrganizationIdInvitations"];
         put?: never;
@@ -126,7 +166,11 @@ export interface paths {
          * @description Invites an address with a role and sends the invitation mail; counts against the daily invitation limit.
          */
         post: operations["postV1OrganizationsByOrganizationIdInvitations"];
-        delete?: never;
+        /**
+         * Delete invitations in bulk
+         * @description Withdraws the invitations named by `ids`, as withdrawing each one does; an id that is not one of the organization's invitations is skipped, so a retried call answers the same.
+         */
+        delete: operations["deleteV1OrganizationsByOrganizationIdInvitations"];
         options?: never;
         head?: never;
         patch?: never;
@@ -141,7 +185,7 @@ export interface paths {
         };
         /**
          * Count the invitations
-         * @description The number of the organization's invitations under the list's filter, `status`, which the list pages through.
+         * @description The number of the organization's invitations under the list's filters, `role`, `query` and `status`, which the list pages through.
          */
         get: operations["getV1OrganizationsByOrganizationIdInvitationsCount"];
         put?: never;
@@ -181,12 +225,16 @@ export interface paths {
         };
         /**
          * List the members
-         * @description The organization's members, newest first; `?relations=user` embeds each member's user.
+         * @description The organization's members, newest first, filtered by `role` and by `query`, the text their user's id or email contains, case-insensitively; `?relations=user` embeds each member's user with `hasPassword` and `isTwoFactorEnabled`.
          */
         get: operations["getV1OrganizationsByOrganizationIdMembers"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Remove members in bulk
+         * @description Removes the members named by `ids`, each mailed as removing one does, the caller's own row leaving without a mail; an id that is not a member of the organization is skipped, so a retried call answers the same. Refused whole when the set holds the Owner, who leaves only after transferring ownership.
+         */
+        delete: operations["deleteV1OrganizationsByOrganizationIdMembers"];
         options?: never;
         head?: never;
         patch?: never;
@@ -201,7 +249,7 @@ export interface paths {
         };
         /**
          * Count the members
-         * @description The number of the organization's members, which the list pages through.
+         * @description The number of the organization's members under the list's filters, `role` and `query`, which the list pages through.
          */
         get: operations["getV1OrganizationsByOrganizationIdMembersCount"];
         put?: never;
@@ -221,7 +269,7 @@ export interface paths {
         };
         /**
          * Get a member
-         * @description One member of the organization; `?relations=user` embeds the member's user.
+         * @description One member of the organization; `?relations=user` embeds the member's user with `hasPassword` and `isTwoFactorEnabled`.
          */
         get: operations["getV1OrganizationsByOrganizationIdMembersByMemberId"];
         put?: never;
@@ -433,7 +481,7 @@ export interface paths {
         };
         /**
          * List the bundles
-         * @description The app's bundles, newest first, every type unless `type` selects one: `embedded` for the bundle a store build ships, which carries no number and no fingerprint, or `uploaded`. `isInUse` selects the bundles an active or paused release serves, `fingerprint` those built for that native layer.
+         * @description The app's bundles, newest first, every type unless `type` selects one: `embedded` for the bundle a store build ships, which carries no number and no fingerprint, or `uploaded`. `isInUse` selects the bundles an active or paused release serves, `fingerprint` those built for that native layer, `query` those whose number contains it.
          */
         get: operations["getV1AppsByAppIdBundles"];
         put?: never;
@@ -612,26 +660,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/apps/{appId}/bundles/{bundleId}/expo/{platform}/manifest": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Upload the Expo manifest
-         * @description Stores the bundle's Expo-format manifest for one of its platforms: `manifest` is the canonical JSON the CLI built with `@hotcodepush/protocol`, whose `id` and `hotcodepush-update` metadata are the bundle's update id on the platform; `signature` covers those bytes with the app's signing key, the one its bundles are signed with, verified here against the app's keys, `E_SIGNATURE_INVALID` otherwise, and required once the app has a key, `E_SIGNATURE_REQUIRED`. The bundle is still `uploading`; a second PUT replaces the first.
-         */
-        put: operations["putV1AppsByAppIdBundlesByBundleIdExpoByPlatformManifest"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/v1/apps/{appId}/bundles/{bundleId}/files": {
         parameters: {
             query?: never;
@@ -801,7 +829,7 @@ export interface paths {
         };
         /**
          * List the channels
-         * @description The app's channels, newest first.
+         * @description The app's channels, newest first; `query` selects those whose id or name contains it, case-insensitively.
          */
         get: operations["getV1AppsByAppIdChannels"];
         put?: never;
@@ -810,7 +838,11 @@ export interface paths {
          * @description Creates a channel: the name is one to 64 letters, digits, hyphens or underscores and unique per app; only Owners and Admins protect one; an expiry never sits on a protected channel; the count is bounded by `channels_per_app_limit`.
          */
         post: operations["postV1AppsByAppIdChannels"];
-        delete?: never;
+        /**
+         * Delete channels in bulk
+         * @description Deletes the channels named by `ids` with their releases, as deleting each one does; an id that is not one of the app's channels is skipped, so a retried call answers the same. Refused whole when the set holds the app's default channel, or a protected channel and the caller is a Member.
+         */
+        delete: operations["deleteV1AppsByAppIdChannels"];
         options?: never;
         head?: never;
         patch?: never;
@@ -825,7 +857,7 @@ export interface paths {
         };
         /**
          * Count the channels
-         * @description The number of the app's channels, which the list pages through.
+         * @description The number of the app's channels under the list's filter, `query`, which the list pages through.
          */
         get: operations["getV1AppsByAppIdChannelsCount"];
         put?: never;
@@ -1017,76 +1049,12 @@ export interface paths {
         };
         /**
          * Preview the audience of a release
-         * @description The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `runtime` versions, `fingerprint` hashes, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; the `rollout` percentage, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type asked for. A `runtime` condition matches the runtime version a bridge reports, which our SDKs leave empty.
+         * @description The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `fingerprint` hashes, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; the `rollout` percentage, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type asked for.
          */
         get: operations["getV1AppsByAppIdChannelsByChannelIdAudience"];
         put?: never;
         post?: never;
         delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/apps/{appId}/deployment-keys": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List the deployment keys
-         * @description The app's CodePush bridge keys, newest first; `lastUsedAt` idle for thirty days says no legacy client is left and the key can go.
-         */
-        get: operations["getV1AppsByAppIdDeploymentKeys"];
-        put?: never;
-        /**
-         * Create a deployment key
-         * @description Issues a key for a channel and a platform, which a CodePush client is configured with beside the bridge's server URL; the bridge serves it within about a minute.
-         */
-        post: operations["postV1AppsByAppIdDeploymentKeys"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/apps/{appId}/deployment-keys/count": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Count the deployment keys
-         * @description The number of the app's deployment keys, which the list pages through.
-         */
-        get: operations["getV1AppsByAppIdDeploymentKeysCount"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/apps/{appId}/deployment-keys/{key}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Delete a deployment key
-         * @description Retires a key once no legacy client checks under it; the bridge stops serving it within about a minute.
-         */
-        delete: operations["deleteV1AppsByAppIdDeploymentKeysByKey"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1101,12 +1069,16 @@ export interface paths {
         };
         /**
          * List the devices
-         * @description The app's devices, the newest `lastSeenAt` first, filtered by `channelId`, `platform`, `binaryVersion`, `binaryBuild`, `sdkVersion`, `runtimeVersion`, `fingerprint`, an `attribute` as `key=value`, and `lastSeenSince` and `lastSeenUntil`, both inclusive; `?relations=channel` embeds the channel.
+         * @description The app's devices, the newest `lastSeenAt` first, filtered by `channelId`, `platform`, `binaryVersion`, `binaryBuild`, `sdkVersion`, `fingerprint`, an `attribute` as `key=value`, and `lastSeenSince` and `lastSeenUntil`, both inclusive; `?relations=channel,release` embeds the channel and the current release.
          */
         get: operations["getV1AppsByAppIdDevices"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Delete devices in bulk
+         * @description Deletes the registry rows named by `ids`, as deleting each one does; an id that is not one of the app's devices is skipped, so a retried call answers the same.
+         */
+        delete: operations["deleteV1AppsByAppIdDevices"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1141,7 +1113,7 @@ export interface paths {
         };
         /**
          * Get a device
-         * @description The device's registry row with its per-release marks and their reasons, newest first, read from Postgres; `?relations=channel` embeds the channel.
+         * @description The device's registry row with its per-release marks and their reasons, newest first, read from Postgres; `?relations=channel,release` embeds the channel and the current release.
          */
         get: operations["getV1AppsByAppIdDevicesByDeviceId"];
         put?: never;
@@ -1265,7 +1237,7 @@ export interface paths {
         };
         /**
          * List the releases
-         * @description Every release of the app, newest first, filtered by `channelId`, `bundleId` or `state`; `?relations=channel,bundle,counters` embeds the linked rows.
+         * @description Every release of the app, newest first, filtered by `channelId`, `bundleId`, `state` and `gitCommit`, the text the hash, ref or message of the bundle's Git commit contains, case-insensitively; `?relations=channel,bundle,counters` embeds the linked rows.
          */
         get: operations["getV1AppsByAppIdReleases"];
         put?: never;
@@ -1285,7 +1257,7 @@ export interface paths {
         };
         /**
          * Count the releases
-         * @description The number of the app's releases under the list's filters, `channelId`, `bundleId` and `state`, which the list pages through.
+         * @description The number of the app's releases under the list's filters, `channelId`, `bundleId`, `state` and `gitCommit`, which the list pages through.
          */
         get: operations["getV1AppsByAppIdReleasesCount"];
         put?: never;
@@ -1473,7 +1445,7 @@ export interface paths {
         };
         /**
          * Get the device statistics
-         * @description The registry's snapshot of the devices seen in the last thirty days, counted per release with the embedded bundles as `null`, binary version, SDK version, runtime version, platform, OS version and country, each the most common first; `channelId` narrows it to one channel's devices.
+         * @description The registry's snapshot of the devices seen in the last thirty days, counted per release with its number and channel and the embedded bundles as `null`, binary version, SDK version, platform, OS version and country, each the most common first; `channelId` narrows it to one channel's devices.
          */
         get: operations["getV1AppsByAppIdStatisticsFleet"];
         put?: never;
@@ -1572,6 +1544,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/users/{userId}/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete sessions in bulk
+         * @description Ends the caller's sessions named by `ids`, the current one included, as revoking each one does; an id that is not one of the caller's sessions is skipped, so a retried call answers the same. `me` or the caller's own id, any other user answering `E_FORBIDDEN`.
+         */
+        delete: operations["deleteV1UsersByUserIdSessions"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/users/{userId}/tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete tokens in bulk
+         * @description Deletes the caller's API tokens named by `ids`, as deleting each one does; an id that is not one of the caller's tokens is skipped, so a retried call answers the same. `me` or the caller's own id, any other user answering `E_FORBIDDEN`.
+         */
+        delete: operations["deleteV1UsersByUserIdTokens"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/users/{userId}": {
         parameters: {
             query?: never;
@@ -1596,6 +1608,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/users/{userId}/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Set the password
+         * @description Sets the first password of an account that signed up through GitHub, Google or SSO, so it signs in with its email too; the account's other sessions end and the password-changed mail follows. An account with a password changes it through the auth slice, and a member behind a verified SSO domain answers `E_SSO_REQUIRED`. `me` or the caller's own id, any other user answering `E_FORBIDDEN`.
+         */
+        post: operations["postV1UsersByUserIdPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1603,7 +1635,7 @@ export interface components {
         /** @description The one error shape: a context-free code from the catalog, one sentence of what happened and what to do, and the field, rule and target of a failed validation in `details`. */
         Error: {
             /** @enum {string} */
-            code: "E_ACCOUNT_BANNED" | "E_APP_NAME_TAKEN" | "E_APPS_LIMIT_REACHED" | "E_AUTH_FLOW_FAILED" | "E_BINARY_CONFLICT" | "E_BUNDLE_IN_USE" | "E_BUNDLE_NOT_READY" | "E_BUNDLE_TOO_LARGE" | "E_CHANNEL_NAME_TAKEN" | "E_CHANNEL_PROTECTED" | "E_CHANNELS_PER_APP_LIMIT_REACHED" | "E_CLIENT_UPDATE_REQUIRED" | "E_DEFAULT_CHANNEL" | "E_FILES_PER_BUNDLE_LIMIT_REACHED" | "E_FORBIDDEN" | "E_HASH_MISMATCH" | "E_IDEMPOTENCY_KEY_REUSED" | "E_INTERNAL" | "E_INVITATION_INVALID" | "E_INVITATIONS_PER_DAY_LIMIT_REACHED" | "E_MAINTENANCE" | "E_MEMBERS_LIMIT_REACHED" | "E_NOT_FOUND" | "E_NOTIFICATION_MANDATORY" | "E_PLAN_REQUIRED" | "E_RATE_LIMITED" | "E_RELEASE_REVOKED" | "E_RELEASES_PER_DAY_LIMIT_REACHED" | "E_SIGNATURE_INVALID" | "E_SIGNATURE_REQUIRED" | "E_SOLE_OWNER" | "E_SOLE_SIGNING_KEY" | "E_SSO_REQUIRED" | "E_STORAGE_LIMIT_REACHED" | "E_TOKENS_LIMIT_REACHED" | "E_TURNSTILE_FAILED" | "E_UNAUTHENTICATED" | "E_UPLOAD_INCOMPLETE" | "E_VALIDATION" | "E_WEBHOOK_NAME_TAKEN";
+            code: "E_ACCOUNT_BANNED" | "E_APP_NAME_TAKEN" | "E_APPS_LIMIT_REACHED" | "E_AUTH_FLOW_FAILED" | "E_BINARY_CONFLICT" | "E_BUNDLE_IN_USE" | "E_BUNDLE_NOT_READY" | "E_BUNDLE_TOO_LARGE" | "E_CHANNEL_NAME_TAKEN" | "E_CHANNEL_PROTECTED" | "E_CHANNELS_PER_APP_LIMIT_REACHED" | "E_CLIENT_UPDATE_REQUIRED" | "E_DEFAULT_CHANNEL" | "E_FILES_PER_BUNDLE_LIMIT_REACHED" | "E_FORBIDDEN" | "E_HASH_MISMATCH" | "E_IDEMPOTENCY_KEY_REUSED" | "E_INTERNAL" | "E_INVITATION_INVALID" | "E_INVITATIONS_PER_DAY_LIMIT_REACHED" | "E_MAINTENANCE" | "E_MEMBERS_LIMIT_REACHED" | "E_NOT_FOUND" | "E_NOTIFICATION_MANDATORY" | "E_PASSWORD_ALREADY_SET" | "E_PLAN_REQUIRED" | "E_RATE_LIMITED" | "E_RELEASE_REVOKED" | "E_RELEASES_PER_DAY_LIMIT_REACHED" | "E_SIGNATURE_INVALID" | "E_SIGNATURE_REQUIRED" | "E_SOLE_OWNER" | "E_SOLE_SIGNING_KEY" | "E_SSO_REQUIRED" | "E_STORAGE_LIMIT_REACHED" | "E_TOKENS_LIMIT_REACHED" | "E_TURNSTILE_FAILED" | "E_UNAUTHENTICATED" | "E_UPLOAD_INCOMPLETE" | "E_VALIDATION" | "E_WEBHOOK_NAME_TAKEN";
             details: {
                 [key: string]: unknown;
             } | null;
@@ -1862,6 +1894,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            hasPassword: boolean;
+                            isTwoFactorEnabled: boolean;
                         };
                         /** Format: uuid */
                         userId: string;
@@ -1956,6 +1990,7 @@ export interface operations {
             query?: {
                 limit?: number;
                 offset?: number;
+                query?: string;
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -2190,7 +2225,9 @@ export interface operations {
     };
     getV1OrganizationsByOrganizationIdAppsCount: {
         parameters: {
-            query?: never;
+            query?: {
+                query?: string;
+            };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
@@ -2278,11 +2315,250 @@ export interface operations {
             };
         };
     };
+    getV1OrganizationsByOrganizationIdAuditLogs: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                appId?: string;
+                createdSince?: string;
+                createdUntil?: string;
+                type?: string;
+                userId?: string;
+                relations?: "user"[];
+                format?: "csv";
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The audit log. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        address: string | null;
+                        apiKeyId: string | null;
+                        appId: string | null;
+                        country: string | null;
+                        /** Format: date-time */
+                        createdAt: string;
+                        /** Format: uuid */
+                        id: string;
+                        objectId: string | null;
+                        sessionId: string | null;
+                        snapshot: {
+                            [key: string]: unknown;
+                        };
+                        type: string;
+                        user?: {
+                            /** Format: email */
+                            email: string;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        userAgent: string | null;
+                        userId: string | null;
+                    }[];
+                    "text/csv": string;
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_PLAN_REQUIRED */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1OrganizationsByOrganizationIdAuditLogsCount: {
+        parameters: {
+            query?: {
+                appId?: string;
+                createdSince?: string;
+                createdUntil?: string;
+                type?: string;
+                userId?: string;
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The number of rows the list's filters match. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        total: number;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_PLAN_REQUIRED */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     getV1OrganizationsByOrganizationIdInvitations: {
         parameters: {
             query?: {
                 limit?: number;
                 offset?: number;
+                query?: string;
+                role?: "admin" | "billing" | "member" | "owner";
                 status?: "pending";
             };
             header?: {
@@ -2527,9 +2803,99 @@ export interface operations {
             };
         };
     };
+    deleteV1OrganizationsByOrganizationIdInvitations: {
+        parameters: {
+            query: {
+                ids: string[];
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The invitations are withdrawn. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     getV1OrganizationsByOrganizationIdInvitationsCount: {
         parameters: {
             query?: {
+                query?: string;
+                role?: "admin" | "billing" | "member" | "owner";
                 status?: "pending";
             };
             header?: {
@@ -2711,6 +3077,8 @@ export interface operations {
             query?: {
                 limit?: number;
                 offset?: number;
+                query?: string;
+                role?: "admin" | "billing" | "member" | "owner";
                 relations?: "user"[];
             };
             header?: {
@@ -2748,6 +3116,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            hasPassword: boolean;
+                            isTwoFactorEnabled: boolean;
                         };
                         /** Format: uuid */
                         userId: string;
@@ -2819,9 +3189,100 @@ export interface operations {
             };
         };
     };
+    deleteV1OrganizationsByOrganizationIdMembers: {
+        parameters: {
+            query: {
+                ids: string[];
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The members are removed. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     getV1OrganizationsByOrganizationIdMembersCount: {
         parameters: {
-            query?: never;
+            query?: {
+                query?: string;
+                role?: "admin" | "billing" | "member" | "owner";
+            };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
@@ -2950,6 +3411,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            hasPassword: boolean;
+                            isTwoFactorEnabled: boolean;
                         };
                         /** Format: uuid */
                         userId: string;
@@ -3163,6 +3626,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            hasPassword: boolean;
+                            isTwoFactorEnabled: boolean;
                         };
                         /** Format: uuid */
                         userId: string;
@@ -5017,6 +5482,7 @@ export interface operations {
                 fingerprint?: string;
                 isInUse?: "false" | "true";
                 platform?: "android" | "ios";
+                query?: string;
                 state?: "ready" | "uploading";
                 type?: "embedded" | "uploaded";
                 version?: string;
@@ -5338,6 +5804,7 @@ export interface operations {
                 fingerprint?: string;
                 isInUse?: "false" | "true";
                 platform?: "android" | "ios";
+                query?: string;
                 state?: "ready" | "uploading";
                 type?: "embedded" | "uploaded";
                 version?: string;
@@ -6315,117 +6782,6 @@ export interface operations {
             };
         };
     };
-    putV1AppsByAppIdBundlesByBundleIdExpoByPlatformManifest: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                platform: "android" | "ios";
-                appId: string;
-                bundleId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    manifest: string;
-                    signature: ({
-                        keyId: string;
-                        value: string;
-                    } & {
-                        [key: string]: unknown;
-                    }) | null;
-                } & {
-                    [key: string]: unknown;
-                };
-            };
-        };
-        responses: {
-            /** @description The manifest, stored. */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description E_SIGNATURE_INVALID or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_SIGNATURE_REQUIRED */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
     getV1AppsByAppIdBundlesByBundleIdFiles: {
         parameters: {
             query?: {
@@ -7248,6 +7604,7 @@ export interface operations {
             query?: {
                 limit?: number;
                 offset?: number;
+                query?: string;
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -7488,9 +7845,108 @@ export interface operations {
             };
         };
     };
+    deleteV1AppsByAppIdChannels: {
+        parameters: {
+            query: {
+                ids: string[];
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The channels are gone. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_DEFAULT_CHANNEL */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     getV1AppsByAppIdChannelsCount: {
         parameters: {
-            query?: never;
+            query?: {
+                query?: string;
+            };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
@@ -8185,12 +8641,6 @@ export interface operations {
                                 type: "os";
                             } & {
                                 [key: string]: unknown;
-                            }) | ({
-                                /** @constant */
-                                type: "runtime";
-                                version: string;
-                            } & {
-                                [key: string]: unknown;
                             })) | ({
                                 type: string;
                             } & {
@@ -8396,12 +8846,6 @@ export interface operations {
                             type: "os";
                         } & {
                             [key: string]: unknown;
-                        }) | ({
-                            /** @constant */
-                            type: "runtime";
-                            version: string;
-                        } & {
-                            [key: string]: unknown;
                         }))[];
                         counters?: {
                             attempted: number;
@@ -8559,12 +9003,6 @@ export interface operations {
                         type: "os";
                     } & {
                         [key: string]: unknown;
-                    }) | ({
-                        /** @constant */
-                        type: "runtime";
-                        version: string;
-                    } & {
-                        [key: string]: unknown;
                     }))[];
                     /** @default null */
                     failureAction?: ("notify" | "pause" | "revoke") | null;
@@ -8675,12 +9113,6 @@ export interface operations {
                             range: string;
                             /** @constant */
                             type: "os";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
-                            /** @constant */
-                            type: "runtime";
-                            version: string;
                         } & {
                             [key: string]: unknown;
                         }))[];
@@ -9024,12 +9456,6 @@ export interface operations {
                             type: "os";
                         } & {
                             [key: string]: unknown;
-                        }) | ({
-                            /** @constant */
-                            type: "runtime";
-                            version: string;
-                        } & {
-                            [key: string]: unknown;
                         }))[];
                         counters?: {
                             attempted: number;
@@ -9268,12 +9694,6 @@ export interface operations {
                             type: "os";
                         } & {
                             [key: string]: unknown;
-                        }) | ({
-                            /** @constant */
-                            type: "runtime";
-                            version: string;
-                        } & {
-                            [key: string]: unknown;
                         }))[];
                         counters?: {
                             attempted: number;
@@ -9388,7 +9808,6 @@ export interface operations {
                 fingerprint?: string[];
                 os?: string[];
                 rollout?: number;
-                runtime?: string[];
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -9496,404 +9915,6 @@ export interface operations {
             };
         };
     };
-    getV1AppsByAppIdDeploymentKeys: {
-        parameters: {
-            query?: {
-                limit?: number;
-                offset?: number;
-            };
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                appId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The deployment keys. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** Format: uuid */
-                        appId: string;
-                        /** Format: uuid */
-                        channelId: string;
-                        /** Format: date-time */
-                        createdAt: string;
-                        key: string;
-                        lastUsedAt: string | null;
-                        /** @enum {string} */
-                        platform: "android" | "ios";
-                    }[];
-                };
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    postV1AppsByAppIdDeploymentKeys: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
-                "Idempotency-Key"?: string;
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                appId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** Format: uuid */
-                    channelId: string;
-                    /** @enum {string} */
-                    platform: "android" | "ios";
-                };
-            };
-        };
-        responses: {
-            /** @description The deployment key. */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** Format: uuid */
-                        appId: string;
-                        /** Format: uuid */
-                        channelId: string;
-                        /** Format: date-time */
-                        createdAt: string;
-                        key: string;
-                        lastUsedAt: string | null;
-                        /** @enum {string} */
-                        platform: "android" | "ios";
-                    };
-                };
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_IDEMPOTENCY_KEY_REUSED */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    getV1AppsByAppIdDeploymentKeysCount: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                appId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The number of rows the list's filters match. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        total: number;
-                    };
-                };
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    deleteV1AppsByAppIdDeploymentKeysByKey: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                key: string;
-                appId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The deployment key is gone. */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
     getV1AppsByAppIdDevices: {
         parameters: {
             query?: {
@@ -9907,9 +9928,8 @@ export interface operations {
                 lastSeenSince?: string;
                 lastSeenUntil?: string;
                 platform?: "android" | "ios";
-                runtimeVersion?: string;
                 sdkVersion?: string;
-                relations?: "channel"[];
+                relations?: ("channel" | "release")[];
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -9970,12 +9990,224 @@ export interface operations {
                         osVersion: string;
                         /** @enum {string} */
                         platform: "android" | "ios";
-                        runtimeVersion: string | null;
+                        release?: {
+                            /** Format: uuid */
+                            appId: string;
+                            bundle?: {
+                                /** Format: uuid */
+                                appId: string;
+                                /** Format: date-time */
+                                createdAt: string;
+                                expiresAt: string | null;
+                                fingerprint: string | null;
+                                /** @enum {string} */
+                                framework: "capacitor" | "cordova" | "expo" | "react-native";
+                                gitMessage: string | null;
+                                gitRef: string | null;
+                                gitRemote: string | null;
+                                gitSha: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                isGitDirty: boolean | null;
+                                manifestSha256: string | null;
+                                number: number | null;
+                                platforms: ("android" | "ios")[];
+                                signature: string | null;
+                                signatureKeyId: string | null;
+                                sizeBytes: number;
+                                /** @enum {string} */
+                                state: "ready" | "uploading";
+                                /** @enum {string} */
+                                type: "embedded" | "uploaded";
+                                unusedSince: string | null;
+                                /** Format: date-time */
+                                updatedAt: string;
+                                version: string;
+                            };
+                            /** Format: uuid */
+                            bundleId: string;
+                            channel?: {
+                                /** Format: uuid */
+                                appId: string;
+                                /** Format: date-time */
+                                createdAt: string;
+                                expiresAt: string | null;
+                                failureAction: ("notify" | "pause" | "revoke") | null;
+                                failureMinSample: number | null;
+                                failureThresholdPercent: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                isDiscoverable: boolean;
+                                isProtected: boolean;
+                                name: string;
+                                pausedAt: string | null;
+                                /** Format: date-time */
+                                updatedAt: string;
+                            };
+                            /** Format: uuid */
+                            channelId: string;
+                            conditions: (({
+                                key: string;
+                                /** @constant */
+                                type: "attribute";
+                                valueSha256: string;
+                            } & {
+                                [key: string]: unknown;
+                            }) | ({
+                                range: string;
+                                /** @constant */
+                                type: "binary";
+                            } & {
+                                [key: string]: unknown;
+                            }) | ({
+                                hashedIds: string[];
+                                /** @constant */
+                                type: "device";
+                            } & {
+                                [key: string]: unknown;
+                            }) | ({
+                                hash: string;
+                                /** @constant */
+                                type: "fingerprint";
+                            } & {
+                                [key: string]: unknown;
+                            }) | ({
+                                range: string;
+                                /** @constant */
+                                type: "os";
+                            } & {
+                                [key: string]: unknown;
+                            }))[];
+                            counters?: {
+                                attempted: number;
+                                failedCrashed: number;
+                                failedDownload: number;
+                                failedReadyTimeout: number;
+                                failedReported: number;
+                                failedVerification: number;
+                                installed: number;
+                            };
+                            /** Format: date-time */
+                            createdAt: string;
+                            createdFromReleaseId: string | null;
+                            deviceCount: number;
+                            failureAction: ("notify" | "pause" | "revoke") | null;
+                            failureMinSample: number | null;
+                            failureThresholdPercent: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            isMandatory: boolean;
+                            liveAt: string | null;
+                            notes: string | null;
+                            number: number;
+                            pausedAt: string | null;
+                            purgedAt: string | null;
+                            rolledBackFromReleaseId: string | null;
+                            rolloutPercentage: number;
+                            /** @enum {string} */
+                            state: "active" | "paused" | "revoked";
+                            /** Format: date-time */
+                            updatedAt: string;
+                            verifier: {
+                                /** @enum {string} */
+                                result: "drifted" | "matched";
+                                /** Format: date-time */
+                                verifiedAt: string;
+                            } | null;
+                        };
                         sdkVersion: string;
                         /** Format: date-time */
                         updatedAt: string;
                     }[];
                 };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    deleteV1AppsByAppIdDevices: {
+        parameters: {
+            query: {
+                ids: string[];
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The devices are gone. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
             400: {
@@ -10053,7 +10285,6 @@ export interface operations {
                 lastSeenSince?: string;
                 lastSeenUntil?: string;
                 platform?: "android" | "ios";
-                runtimeVersion?: string;
                 sdkVersion?: string;
             };
             header?: {
@@ -10146,7 +10377,7 @@ export interface operations {
     getV1AppsByAppIdDevicesByDeviceId: {
         parameters: {
             query?: {
-                relations?: "channel"[];
+                relations?: ("channel" | "release")[];
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -10208,7 +10439,131 @@ export interface operations {
                         osVersion: string;
                         /** @enum {string} */
                         platform: "android" | "ios";
-                        runtimeVersion: string | null;
+                        release?: {
+                            /** Format: uuid */
+                            appId: string;
+                            bundle?: {
+                                /** Format: uuid */
+                                appId: string;
+                                /** Format: date-time */
+                                createdAt: string;
+                                expiresAt: string | null;
+                                fingerprint: string | null;
+                                /** @enum {string} */
+                                framework: "capacitor" | "cordova" | "expo" | "react-native";
+                                gitMessage: string | null;
+                                gitRef: string | null;
+                                gitRemote: string | null;
+                                gitSha: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                isGitDirty: boolean | null;
+                                manifestSha256: string | null;
+                                number: number | null;
+                                platforms: ("android" | "ios")[];
+                                signature: string | null;
+                                signatureKeyId: string | null;
+                                sizeBytes: number;
+                                /** @enum {string} */
+                                state: "ready" | "uploading";
+                                /** @enum {string} */
+                                type: "embedded" | "uploaded";
+                                unusedSince: string | null;
+                                /** Format: date-time */
+                                updatedAt: string;
+                                version: string;
+                            };
+                            /** Format: uuid */
+                            bundleId: string;
+                            channel?: {
+                                /** Format: uuid */
+                                appId: string;
+                                /** Format: date-time */
+                                createdAt: string;
+                                expiresAt: string | null;
+                                failureAction: ("notify" | "pause" | "revoke") | null;
+                                failureMinSample: number | null;
+                                failureThresholdPercent: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                isDiscoverable: boolean;
+                                isProtected: boolean;
+                                name: string;
+                                pausedAt: string | null;
+                                /** Format: date-time */
+                                updatedAt: string;
+                            };
+                            /** Format: uuid */
+                            channelId: string;
+                            conditions: (({
+                                key: string;
+                                /** @constant */
+                                type: "attribute";
+                                valueSha256: string;
+                            } & {
+                                [key: string]: unknown;
+                            }) | ({
+                                range: string;
+                                /** @constant */
+                                type: "binary";
+                            } & {
+                                [key: string]: unknown;
+                            }) | ({
+                                hashedIds: string[];
+                                /** @constant */
+                                type: "device";
+                            } & {
+                                [key: string]: unknown;
+                            }) | ({
+                                hash: string;
+                                /** @constant */
+                                type: "fingerprint";
+                            } & {
+                                [key: string]: unknown;
+                            }) | ({
+                                range: string;
+                                /** @constant */
+                                type: "os";
+                            } & {
+                                [key: string]: unknown;
+                            }))[];
+                            counters?: {
+                                attempted: number;
+                                failedCrashed: number;
+                                failedDownload: number;
+                                failedReadyTimeout: number;
+                                failedReported: number;
+                                failedVerification: number;
+                                installed: number;
+                            };
+                            /** Format: date-time */
+                            createdAt: string;
+                            createdFromReleaseId: string | null;
+                            deviceCount: number;
+                            failureAction: ("notify" | "pause" | "revoke") | null;
+                            failureMinSample: number | null;
+                            failureThresholdPercent: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            isMandatory: boolean;
+                            liveAt: string | null;
+                            notes: string | null;
+                            number: number;
+                            pausedAt: string | null;
+                            purgedAt: string | null;
+                            rolledBackFromReleaseId: string | null;
+                            rolloutPercentage: number;
+                            /** @enum {string} */
+                            state: "active" | "paused" | "revoked";
+                            /** Format: date-time */
+                            updatedAt: string;
+                            verifier: {
+                                /** @enum {string} */
+                                result: "drifted" | "matched";
+                                /** Format: date-time */
+                                verifiedAt: string;
+                            } | null;
+                        };
                         sdkVersion: string;
                         /** Format: date-time */
                         updatedAt: string;
@@ -10965,6 +11320,7 @@ export interface operations {
                 offset?: number;
                 bundleId?: string;
                 channelId?: string;
+                gitCommit?: string;
                 state?: "active" | "paused" | "revoked";
                 relations?: ("bundle" | "channel" | "counters")[];
             };
@@ -11070,12 +11426,6 @@ export interface operations {
                             range: string;
                             /** @constant */
                             type: "os";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
-                            /** @constant */
-                            type: "runtime";
-                            version: string;
                         } & {
                             [key: string]: unknown;
                         }))[];
@@ -11188,6 +11538,7 @@ export interface operations {
             query?: {
                 bundleId?: string;
                 channelId?: string;
+                gitCommit?: string;
                 state?: "active" | "paused" | "revoked";
             };
             header?: {
@@ -11385,12 +11736,6 @@ export interface operations {
                             range: string;
                             /** @constant */
                             type: "os";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
-                            /** @constant */
-                            type: "runtime";
-                            version: string;
                         } & {
                             [key: string]: unknown;
                         }))[];
@@ -11615,12 +11960,6 @@ export interface operations {
                             range: string;
                             /** @constant */
                             type: "os";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
-                            /** @constant */
-                            type: "runtime";
-                            version: string;
                         } & {
                             [key: string]: unknown;
                         }))[];
@@ -11954,12 +12293,6 @@ export interface operations {
                             type: "os";
                         } & {
                             [key: string]: unknown;
-                        }) | ({
-                            /** @constant */
-                            type: "runtime";
-                            version: string;
-                        } & {
-                            [key: string]: unknown;
                         }))[];
                         counters?: {
                             attempted: number;
@@ -12182,12 +12515,6 @@ export interface operations {
                             type: "os";
                         } & {
                             [key: string]: unknown;
-                        }) | ({
-                            /** @constant */
-                            type: "runtime";
-                            version: string;
-                        } & {
-                            [key: string]: unknown;
                         }))[];
                         counters?: {
                             attempted: number;
@@ -12408,12 +12735,6 @@ export interface operations {
                             range: string;
                             /** @constant */
                             type: "os";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
-                            /** @constant */
-                            type: "runtime";
-                            version: string;
                         } & {
                             [key: string]: unknown;
                         }))[];
@@ -12963,10 +13284,8 @@ export interface operations {
                         release: {
                             count: number;
                             value: string | null;
-                        }[];
-                        runtimeVersion: {
-                            count: number;
-                            value: string | null;
+                            channelId: string | null;
+                            number: number | null;
                         }[];
                         sdkVersion: {
                             count: number;
@@ -13711,6 +14030,182 @@ export interface operations {
             };
         };
     };
+    deleteV1UsersByUserIdSessions: {
+        parameters: {
+            query: {
+                ids: string[];
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                userId: "me" | string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The sessions are ended. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    deleteV1UsersByUserIdTokens: {
+        parameters: {
+            query: {
+                ids: string[];
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                userId: "me" | string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The tokens are gone. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     getV1UsersByUserId: {
         parameters: {
             query?: never;
@@ -13867,6 +14362,107 @@ export interface operations {
                 };
             };
             /** @description E_SOLE_OWNER */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1UsersByUserIdPassword: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                userId: "me" | string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    password: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The password is set. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_SSO_REQUIRED or E_FORBIDDEN or E_ACCOUNT_BANNED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_PASSWORD_ALREADY_SET */
             409: {
                 headers: {
                     [name: string]: unknown;

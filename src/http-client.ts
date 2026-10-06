@@ -63,6 +63,12 @@ export interface HttpClientOptions {
    * The API token, sent as `Authorization: Bearer <token>`.
    */
   token?: string;
+  /**
+   * The `User-Agent` header, `<name>/<version>`, which a session keeps, so the sessions page and the new-sign-in mail name the client.
+   *
+   * @default the one the runtime's `fetch` sends
+   */
+  userAgent?: string;
 }
 
 export class HttpClient {
@@ -203,6 +209,9 @@ function resolveHeaders(options: HttpClientOptions): Record<string, string> {
   };
   if (options.token) {
     headers.Authorization = `Bearer ${options.token}`;
+  }
+  if (options.userAgent) {
+    headers['User-Agent'] = options.userAgent;
   }
   return headers;
 }

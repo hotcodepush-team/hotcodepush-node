@@ -93,6 +93,29 @@ describe('HttpClient', () => {
     });
   });
 
+  test('should send the given user agent when a user agent is set', async () => {
+    const fetchMock = stubFetch(() => new Response(null));
+
+    await new HttpClient({ userAgent: 'hotcodepush-cli/1.2.3' }).fetchJson({
+      method: 'GET',
+      path: '/health',
+    });
+
+    expect(fetchMock.mock.lastCall?.[1]?.headers).toMatchObject({
+      'User-Agent': 'hotcodepush-cli/1.2.3',
+    });
+  });
+
+  test('should leave the user agent to the runtime when no user agent is set', async () => {
+    const fetchMock = stubFetch(() => new Response(null));
+
+    await new HttpClient({}).fetchJson({ method: 'GET', path: '/health' });
+
+    expect(fetchMock.mock.lastCall?.[1]?.headers).not.toHaveProperty(
+      'User-Agent',
+    );
+  });
+
   test('should send the body as json when a body is set', async () => {
     const fetchMock = stubFetch(() => new Response(null));
 

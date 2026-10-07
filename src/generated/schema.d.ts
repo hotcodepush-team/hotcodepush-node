@@ -1635,7 +1635,7 @@ export interface components {
         /** @description The one error shape: a context-free code from the catalog, one sentence of what happened and what to do, and the field, rule and target of a failed validation in `details`. */
         Error: {
             /** @enum {string} */
-            code: "E_ACCOUNT_BANNED" | "E_APP_NAME_TAKEN" | "E_APPS_LIMIT_REACHED" | "E_AUTH_FLOW_FAILED" | "E_BINARY_CONFLICT" | "E_BUNDLE_IN_USE" | "E_BUNDLE_NOT_READY" | "E_BUNDLE_TOO_LARGE" | "E_CHANNEL_NAME_TAKEN" | "E_CHANNEL_PROTECTED" | "E_CHANNELS_PER_APP_LIMIT_REACHED" | "E_CLIENT_UPDATE_REQUIRED" | "E_DEFAULT_CHANNEL" | "E_FILES_PER_BUNDLE_LIMIT_REACHED" | "E_FORBIDDEN" | "E_HASH_MISMATCH" | "E_IDEMPOTENCY_KEY_REUSED" | "E_INTERNAL" | "E_INVITATION_INVALID" | "E_INVITATIONS_PER_DAY_LIMIT_REACHED" | "E_MAINTENANCE" | "E_MEMBERS_LIMIT_REACHED" | "E_NOT_FOUND" | "E_NOTIFICATION_MANDATORY" | "E_PASSWORD_ALREADY_SET" | "E_PLAN_REQUIRED" | "E_RATE_LIMITED" | "E_RELEASE_REVOKED" | "E_RELEASES_PER_DAY_LIMIT_REACHED" | "E_SIGNATURE_INVALID" | "E_SIGNATURE_REQUIRED" | "E_SOLE_OWNER" | "E_SOLE_SIGNING_KEY" | "E_SSO_REQUIRED" | "E_STORAGE_LIMIT_REACHED" | "E_TOKENS_LIMIT_REACHED" | "E_TURNSTILE_FAILED" | "E_UNAUTHENTICATED" | "E_UPLOAD_INCOMPLETE" | "E_VALIDATION" | "E_WEBHOOK_NAME_TAKEN";
+            code: "E_ACCOUNT_BANNED" | "E_APP_NAME_TAKEN" | "E_APPS_LIMIT_REACHED" | "E_AUTH_FLOW_FAILED" | "E_BINARY_CONFLICT" | "E_BUNDLE_IN_USE" | "E_BUNDLE_NOT_READY" | "E_BUNDLE_TOO_LARGE" | "E_CHANNEL_NAME_TAKEN" | "E_CHANNEL_PROTECTED" | "E_CHANNELS_PER_APP_LIMIT_REACHED" | "E_CLIENT_UPDATE_REQUIRED" | "E_DEFAULT_CHANNEL" | "E_FILES_PER_BUNDLE_LIMIT_REACHED" | "E_FORBIDDEN" | "E_HASH_MISMATCH" | "E_IDEMPOTENCY_KEY_REUSED" | "E_INTERNAL" | "E_INVITATION_INVALID" | "E_INVITATIONS_PER_DAY_LIMIT_REACHED" | "E_MAINTENANCE" | "E_MEMBERS_LIMIT_REACHED" | "E_NOT_FOUND" | "E_NOTIFICATION_MANDATORY" | "E_ORIGIN_UNTRUSTED" | "E_PASSWORD_ALREADY_SET" | "E_PLAN_REQUIRED" | "E_RATE_LIMITED" | "E_RELEASE_REVOKED" | "E_RELEASES_PER_DAY_LIMIT_REACHED" | "E_SIGNATURE_INVALID" | "E_SIGNATURE_REQUIRED" | "E_SOLE_OWNER" | "E_SOLE_SIGNING_KEY" | "E_SSO_REQUIRED" | "E_STORAGE_LIMIT_REACHED" | "E_TOKENS_LIMIT_REACHED" | "E_TURNSTILE_FAILED" | "E_UNAUTHENTICATED" | "E_UPLOAD_INCOMPLETE" | "E_VALIDATION" | "E_WEBHOOK_NAME_TAKEN";
             details: {
                 [key: string]: unknown;
             } | null;
@@ -1715,7 +1715,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1803,7 +1803,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1920,7 +1920,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2045,7 +2045,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2158,7 +2158,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2268,7 +2268,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2400,7 +2400,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2505,7 +2505,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2619,7 +2619,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2738,7 +2738,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2844,7 +2844,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2938,7 +2938,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3025,7 +3025,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3142,7 +3142,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3230,7 +3230,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3323,7 +3323,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3437,7 +3437,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3524,7 +3524,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3652,7 +3652,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3779,7 +3779,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3986,7 +3986,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4072,7 +4072,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4203,7 +4203,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4308,7 +4308,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4418,7 +4418,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4515,7 +4515,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4619,7 +4619,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4705,7 +4705,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4827,7 +4827,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4970,7 +4970,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5185,7 +5185,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5287,7 +5287,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5427,7 +5427,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5555,7 +5555,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5724,7 +5724,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5849,7 +5849,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5968,7 +5968,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6055,7 +6055,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6183,7 +6183,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6289,7 +6289,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6399,7 +6399,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6499,7 +6499,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6628,7 +6628,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6735,7 +6735,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6831,7 +6831,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6922,7 +6922,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7018,7 +7018,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7127,7 +7127,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7226,7 +7226,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7354,7 +7354,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7460,7 +7460,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7552,7 +7552,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7661,7 +7661,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7780,7 +7780,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7886,7 +7886,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7987,7 +7987,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8096,7 +8096,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8183,7 +8183,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8310,7 +8310,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8425,7 +8425,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8531,7 +8531,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8687,7 +8687,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8815,38 +8815,28 @@ export interface operations {
                         };
                         /** Format: uuid */
                         channelId: string;
-                        conditions: (({
+                        conditions: ({
                             key: string;
                             /** @constant */
                             type: "attribute";
                             valueSha256: string;
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "binary";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hashedIds: string[];
                             /** @constant */
                             type: "device";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hash: string;
                             /** @constant */
                             type: "fingerprint";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "os";
-                        } & {
-                            [key: string]: unknown;
-                        }))[];
+                        })[];
                         counters?: {
                             attempted: number;
                             failedCrashed: number;
@@ -8904,7 +8894,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8972,38 +8962,28 @@ export interface operations {
                     /** Format: uuid */
                     bundleId?: string;
                     /** @default [] */
-                    conditions?: (({
+                    conditions?: ({
                         key: string;
                         /** @constant */
                         type: "attribute";
                         valueSha256: string;
-                    } & {
-                        [key: string]: unknown;
-                    }) | ({
+                    } | {
                         range: string;
                         /** @constant */
                         type: "binary";
-                    } & {
-                        [key: string]: unknown;
-                    }) | ({
+                    } | {
                         hashedIds: string[];
                         /** @constant */
                         type: "device";
-                    } & {
-                        [key: string]: unknown;
-                    }) | ({
+                    } | {
                         hash: string;
                         /** @constant */
                         type: "fingerprint";
-                    } & {
-                        [key: string]: unknown;
-                    }) | ({
+                    } | {
                         range: string;
                         /** @constant */
                         type: "os";
-                    } & {
-                        [key: string]: unknown;
-                    }))[];
+                    })[];
                     /** @default null */
                     failureAction?: ("notify" | "pause" | "revoke") | null;
                     /** @default null */
@@ -9084,38 +9064,28 @@ export interface operations {
                         };
                         /** Format: uuid */
                         channelId: string;
-                        conditions: (({
+                        conditions: ({
                             key: string;
                             /** @constant */
                             type: "attribute";
                             valueSha256: string;
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "binary";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hashedIds: string[];
                             /** @constant */
                             type: "device";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hash: string;
                             /** @constant */
                             type: "fingerprint";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "os";
-                        } & {
-                            [key: string]: unknown;
-                        }))[];
+                        })[];
                         counters?: {
                             attempted: number;
                             failedCrashed: number;
@@ -9181,7 +9151,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9290,7 +9260,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9425,38 +9395,28 @@ export interface operations {
                         };
                         /** Format: uuid */
                         channelId: string;
-                        conditions: (({
+                        conditions: ({
                             key: string;
                             /** @constant */
                             type: "attribute";
                             valueSha256: string;
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "binary";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hashedIds: string[];
                             /** @constant */
                             type: "device";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hash: string;
                             /** @constant */
                             type: "fingerprint";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "os";
-                        } & {
-                            [key: string]: unknown;
-                        }))[];
+                        })[];
                         counters?: {
                             attempted: number;
                             failedCrashed: number;
@@ -9514,7 +9474,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9663,38 +9623,28 @@ export interface operations {
                         };
                         /** Format: uuid */
                         channelId: string;
-                        conditions: (({
+                        conditions: ({
                             key: string;
                             /** @constant */
                             type: "attribute";
                             valueSha256: string;
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "binary";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hashedIds: string[];
                             /** @constant */
                             type: "device";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hash: string;
                             /** @constant */
                             type: "fingerprint";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "os";
-                        } & {
-                            [key: string]: unknown;
-                        }))[];
+                        })[];
                         counters?: {
                             attempted: number;
                             failedCrashed: number;
@@ -9752,7 +9702,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9868,7 +9818,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10046,38 +9996,28 @@ export interface operations {
                             };
                             /** Format: uuid */
                             channelId: string;
-                            conditions: (({
+                            conditions: ({
                                 key: string;
                                 /** @constant */
                                 type: "attribute";
                                 valueSha256: string;
-                            } & {
-                                [key: string]: unknown;
-                            }) | ({
+                            } | {
                                 range: string;
                                 /** @constant */
                                 type: "binary";
-                            } & {
-                                [key: string]: unknown;
-                            }) | ({
+                            } | {
                                 hashedIds: string[];
                                 /** @constant */
                                 type: "device";
-                            } & {
-                                [key: string]: unknown;
-                            }) | ({
+                            } | {
                                 hash: string;
                                 /** @constant */
                                 type: "fingerprint";
-                            } & {
-                                [key: string]: unknown;
-                            }) | ({
+                            } | {
                                 range: string;
                                 /** @constant */
                                 type: "os";
-                            } & {
-                                [key: string]: unknown;
-                            }))[];
+                            })[];
                             counters?: {
                                 attempted: number;
                                 failedCrashed: number;
@@ -10139,7 +10079,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10227,7 +10167,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10327,7 +10267,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10495,38 +10435,28 @@ export interface operations {
                             };
                             /** Format: uuid */
                             channelId: string;
-                            conditions: (({
+                            conditions: ({
                                 key: string;
                                 /** @constant */
                                 type: "attribute";
                                 valueSha256: string;
-                            } & {
-                                [key: string]: unknown;
-                            }) | ({
+                            } | {
                                 range: string;
                                 /** @constant */
                                 type: "binary";
-                            } & {
-                                [key: string]: unknown;
-                            }) | ({
+                            } | {
                                 hashedIds: string[];
                                 /** @constant */
                                 type: "device";
-                            } & {
-                                [key: string]: unknown;
-                            }) | ({
+                            } | {
                                 hash: string;
                                 /** @constant */
                                 type: "fingerprint";
-                            } & {
-                                [key: string]: unknown;
-                            }) | ({
+                            } | {
                                 range: string;
                                 /** @constant */
                                 type: "os";
-                            } & {
-                                [key: string]: unknown;
-                            }))[];
+                            })[];
                             counters?: {
                                 attempted: number;
                                 failedCrashed: number;
@@ -10599,7 +10529,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10686,7 +10616,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10803,7 +10733,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10912,7 +10842,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11011,7 +10941,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11160,7 +11090,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11266,7 +11196,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11397,38 +11327,28 @@ export interface operations {
                         };
                         /** Format: uuid */
                         channelId: string;
-                        conditions: (({
+                        conditions: ({
                             key: string;
                             /** @constant */
                             type: "attribute";
                             valueSha256: string;
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "binary";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hashedIds: string[];
                             /** @constant */
                             type: "device";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hash: string;
                             /** @constant */
                             type: "fingerprint";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "os";
-                        } & {
-                            [key: string]: unknown;
-                        }))[];
+                        })[];
                         counters?: {
                             attempted: number;
                             failedCrashed: number;
@@ -11486,7 +11406,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11581,7 +11501,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11707,38 +11627,28 @@ export interface operations {
                         };
                         /** Format: uuid */
                         channelId: string;
-                        conditions: (({
+                        conditions: ({
                             key: string;
                             /** @constant */
                             type: "attribute";
                             valueSha256: string;
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "binary";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hashedIds: string[];
                             /** @constant */
                             type: "device";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hash: string;
                             /** @constant */
                             type: "fingerprint";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "os";
-                        } & {
-                            [key: string]: unknown;
-                        }))[];
+                        })[];
                         counters?: {
                             attempted: number;
                             failedCrashed: number;
@@ -11796,7 +11706,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11931,38 +11841,28 @@ export interface operations {
                         };
                         /** Format: uuid */
                         channelId: string;
-                        conditions: (({
+                        conditions: ({
                             key: string;
                             /** @constant */
                             type: "attribute";
                             valueSha256: string;
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "binary";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hashedIds: string[];
                             /** @constant */
                             type: "device";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hash: string;
                             /** @constant */
                             type: "fingerprint";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "os";
-                        } & {
-                            [key: string]: unknown;
-                        }))[];
+                        })[];
                         counters?: {
                             attempted: number;
                             failedCrashed: number;
@@ -12020,7 +11920,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12138,7 +12038,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12262,38 +12162,28 @@ export interface operations {
                         };
                         /** Format: uuid */
                         channelId: string;
-                        conditions: (({
+                        conditions: ({
                             key: string;
                             /** @constant */
                             type: "attribute";
                             valueSha256: string;
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "binary";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hashedIds: string[];
                             /** @constant */
                             type: "device";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hash: string;
                             /** @constant */
                             type: "fingerprint";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "os";
-                        } & {
-                            [key: string]: unknown;
-                        }))[];
+                        })[];
                         counters?: {
                             attempted: number;
                             failedCrashed: number;
@@ -12351,7 +12241,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12484,38 +12374,28 @@ export interface operations {
                         };
                         /** Format: uuid */
                         channelId: string;
-                        conditions: (({
+                        conditions: ({
                             key: string;
                             /** @constant */
                             type: "attribute";
                             valueSha256: string;
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "binary";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hashedIds: string[];
                             /** @constant */
                             type: "device";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hash: string;
                             /** @constant */
                             type: "fingerprint";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "os";
-                        } & {
-                            [key: string]: unknown;
-                        }))[];
+                        })[];
                         counters?: {
                             attempted: number;
                             failedCrashed: number;
@@ -12573,7 +12453,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12706,38 +12586,28 @@ export interface operations {
                         };
                         /** Format: uuid */
                         channelId: string;
-                        conditions: (({
+                        conditions: ({
                             key: string;
                             /** @constant */
                             type: "attribute";
                             valueSha256: string;
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "binary";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hashedIds: string[];
                             /** @constant */
                             type: "device";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             hash: string;
                             /** @constant */
                             type: "fingerprint";
-                        } & {
-                            [key: string]: unknown;
-                        }) | ({
+                        } | {
                             range: string;
                             /** @constant */
                             type: "os";
-                        } & {
-                            [key: string]: unknown;
-                        }))[];
+                        })[];
                         counters?: {
                             attempted: number;
                             failedCrashed: number;
@@ -12795,7 +12665,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12904,7 +12774,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13007,7 +12877,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13097,7 +12967,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13184,7 +13054,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13312,7 +13182,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13440,7 +13310,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13545,7 +13415,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13648,7 +13518,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13734,7 +13604,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13848,7 +13718,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13967,7 +13837,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14073,7 +13943,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14161,7 +14031,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14259,7 +14129,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14345,7 +14215,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14446,7 +14316,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_SSO_REQUIRED or E_FORBIDDEN or E_ACCOUNT_BANNED */
+            /** @description E_SSO_REQUIRED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
             403: {
                 headers: {
                     [name: string]: unknown;

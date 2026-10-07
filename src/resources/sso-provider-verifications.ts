@@ -22,6 +22,7 @@ export class SsoProviderVerificationsResource {
   /**
    * Looks up the domain's TXT record for the provider's token and marks the domain verified when it is there.
    * A verified provider answers unchanged without a lookup, so the call is retried.
+   * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
   public async create(
     options: CreateSsoProviderVerificationOptions,

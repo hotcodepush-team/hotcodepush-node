@@ -41,6 +41,7 @@ export class AuditLogsResource {
 
   /**
    * The number of the audit log's rows under the list's filters.
+   * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
   public async count(options: CountAuditLogsOptions): Promise<Count> {
     const { organizationId, ...query } = options;
@@ -55,6 +56,7 @@ export class AuditLogsResource {
 
   /**
    * The audit log under the list's filters as `text/csv`, read whole.
+   * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
   public async downloadCsv(
     options: DownloadAuditLogsCsvOptions,
@@ -72,6 +74,7 @@ export class AuditLogsResource {
   /**
    * The organization's audit log, newest first; `type` takes `channel.*` for every action on an object.
    * Paying plans only, `E_PLAN_REQUIRED` otherwise.
+   * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
   public async list(options: ListAuditLogsOptions): Promise<AuditLog[]> {
     const { organizationId, ...query } = options;

@@ -52,6 +52,7 @@ export class AppsResource {
 
   /**
    * Soft-deletes an app: gone at once, hard-deleted after seven days.
+   * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
   public async delete(options: DeleteAppOptions): Promise<void> {
     await this.httpClient.fetchJson({
@@ -70,6 +71,7 @@ export class AppsResource {
   /**
    * Moves an app to another organization the caller is an Admin of.
    * A repeat answers `E_VALIDATION`, the app being in the target already, so the call is never retried.
+   * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
   public async transfer(options: TransferAppOptions): Promise<App> {
     const { appId, ...body } = options;

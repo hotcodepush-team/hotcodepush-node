@@ -25,6 +25,7 @@ export class UsersResource {
   /**
    * Soft-deletes the caller's account: gone at once, hard-deleted after seven days.
    * `userId` takes `me` for the caller.
+   * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
   public async delete(options: DeleteUserOptions): Promise<void> {
     await this.httpClient.fetchJson({

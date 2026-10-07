@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
@@ -9,6 +9,7 @@ import { resolveSentRequest, stubFetch } from './test-helpers';
 interface OpenApiOperation {
   parameters?: { in: string; name: string }[];
   requestBody?: { content: Record<string, unknown> };
+  security?: Record<string, string[]>[];
 }
 
 interface OpenApiDocument {
@@ -620,6 +621,43 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
 };
 
 /**
+ * The methods whose operation the document marks with `sessionAuth`, each
+ * carrying `SESSION_ONLY_NOTE` in its JSDoc.
+ */
+const SESSION_ONLY_METHODS: readonly string[] = [
+  'apps.delete',
+  'apps.transfer',
+  'invitations.accept',
+  'invitations.count',
+  'invitations.list',
+  'organizations.auditLogs.count',
+  'organizations.auditLogs.downloadCsv',
+  'organizations.auditLogs.list',
+  'organizations.create',
+  'organizations.delete',
+  'organizations.invitations.count',
+  'organizations.invitations.create',
+  'organizations.invitations.delete',
+  'organizations.invitations.deleteMany',
+  'organizations.invitations.list',
+  'organizations.members.delete',
+  'organizations.members.deleteMany',
+  'organizations.members.update',
+  'organizations.ssoProvider.delete',
+  'organizations.ssoProvider.get',
+  'organizations.ssoProvider.put',
+  'organizations.ssoProvider.verifications.create',
+  'organizations.update',
+  'users.delete',
+  'users.password.create',
+  'users.sessions.deleteMany',
+  'users.tokens.deleteMany',
+];
+
+const SESSION_ONLY_NOTE =
+  'An API token answers `E_FORBIDDEN`; sign in with a session.';
+
+/**
  * `/health` is outside the document by the path rule.
  */
 const UNDOCUMENTED_RESOURCES = ['health'];
@@ -656,6 +694,43 @@ describe('the OpenAPI snapshot', () => {
     expect([...new Set(calledOperationNames)].sort()).toEqual(
       resolveDocumentedOperationNames().sort(),
     );
+  });
+
+  test('should list exactly the methods whose operation an API token is refused on', async () => {
+    const sessionOnlyMethodNames: string[] = [];
+
+    for (const [name, callResourceMethod] of Object.entries(CALLS)) {
+      const fetchMock = stubFetch();
+      await callResourceMethod(new HotCodePush());
+      const sentRequest = resolveSentRequest(fetchMock);
+      const operation = resolveOperation(
+        sentRequest.method,
+        new URL(sentRequest.url).pathname,
+      );
+      if (
+        operation?.security?.some(requirement => 'sessionAuth' in requirement)
+      ) {
+        sessionOnlyMethodNames.push(name);
+      }
+    }
+
+    expect(sessionOnlyMethodNames.sort()).toEqual(SESSION_ONLY_METHODS);
+  });
+
+  test('should note the refusal of an API token on as many methods as the list holds', () => {
+    const resourcesDirectory = new URL('resources/', import.meta.url);
+
+    const notedMethodCount = readdirSync(resourcesDirectory)
+      .filter(fileName => !fileName.endsWith('.test.ts'))
+      .map(fileName =>
+        readFileSync(new URL(fileName, resourcesDirectory), 'utf8'),
+      )
+      .reduce(
+        (count, source) => count + source.split(SESSION_ONLY_NOTE).length - 1,
+        0,
+      );
+
+    expect(notedMethodCount).toBe(SESSION_ONLY_METHODS.length);
   });
 
   test.each(Object.entries(CALLS))(

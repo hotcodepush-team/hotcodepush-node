@@ -13,6 +13,7 @@ export class UserSessionsResource {
 
   /**
    * Ends the caller's sessions named by `ids`, one to 100, the current one included; an id that is not the caller's is skipped.
+   * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
   public async deleteMany(options: DeleteManySessionsOptions): Promise<void> {
     const { userId, ...query } = options;

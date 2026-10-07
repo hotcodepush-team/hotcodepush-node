@@ -13,7 +13,8 @@ export type GetUpdateStatisticsOptions = PathParameters<
   QueryParameters<'/v1/apps/{appId}/statistics/updates', 'get'>;
 
 /**
- * The updates per day of the period, the adoption curves of the newest live releases and the reasons the devices reported.
+ * The updates per day of the period beside the channel's active devices, the adoption rate's denominator,
+ * the adoption curves of the newest live releases and the reasons the devices reported.
  */
 export type UpdateStatistics = JsonResponseBody<
   '/v1/apps/{appId}/statistics/updates',
@@ -25,7 +26,8 @@ export class StatisticsUpdatesResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The update statistics of the period, `periodSince` to `periodUntil` inclusive, of one channel when `channelId` names it.
+   * The update statistics of the period, `periodSince` to `periodUntil` inclusive, of one channel when `channelId` names it;
+   * `releaseId` narrows the adoption curves to that one release, whatever its age.
    */
   public async get(
     options: GetUpdateStatisticsOptions,

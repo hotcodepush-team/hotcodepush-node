@@ -4,7 +4,15 @@ import { HotCodePush } from '../client';
 import { resolveSentRequest, stubFetch } from '../test-helpers';
 
 const UPDATE_STATISTICS = {
-  days: [{ day: '2026-09-01', failed: 1, installed: 9, rolledBack: 0 }],
+  days: [
+    {
+      activeDevices: 40,
+      day: '2026-09-01',
+      failed: 1,
+      installed: 9,
+      rolledBack: 0,
+    },
+  ],
   failureReasons: [],
   releases: [],
   skippedReasons: [],
@@ -15,7 +23,7 @@ afterEach(() => {
 });
 
 describe('StatisticsUpdatesResource', () => {
-  test("should get the update statistics of one channel's period", async () => {
+  test("should get the update statistics of one channel's period with one release's curve", async () => {
     const fetchMock = stubFetch(() => Response.json(UPDATE_STATISTICS));
 
     const fetchedStatistics =
@@ -24,12 +32,13 @@ describe('StatisticsUpdatesResource', () => {
         channelId: 'channel',
         periodSince: '2026-09-01',
         periodUntil: '2026-09-30',
+        releaseId: 'release',
       });
 
     expect(fetchedStatistics).toEqual(UPDATE_STATISTICS);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: 'https://api.hotcodepush.com/v1/apps/app/statistics/updates?channelId=channel&periodSince=2026-09-01&periodUntil=2026-09-30',
+      url: 'https://api.hotcodepush.com/v1/apps/app/statistics/updates?channelId=channel&periodSince=2026-09-01&periodUntil=2026-09-30&releaseId=release',
     });
   });
 });

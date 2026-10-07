@@ -17243,7 +17243,7 @@
     "/v1/apps/{appId}/channels/{channelId}/audience": {
       "get": {
         "operationId": "getV1AppsByAppIdChannelsByChannelIdAudience",
-        "description": "The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `fingerprint` hashes, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; the `rollout` percentage, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type asked for.",
+        "description": "The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `fingerprint` hashes, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; the `rollout` percentage, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type asked for, and `FINGERPRINT_UNREGISTERED` for each `fingerprint` no binary of the app carries once the app has registered one.",
         "responses": {
           "200": {
             "content": {
@@ -23649,7 +23649,7 @@
     "/v1/apps/{appId}/releases/{releaseId}/audience": {
       "get": {
         "operationId": "getV1AppsByAppIdReleasesByReleaseIdAudience",
-        "description": "The channel's devices seen in the last thirty days that the release's own conditions reach, evaluated over the registry the way the device evaluates the index — the stored attribute hashes and device-id hashes against the devices' values hashed the same way — and the release's rollout percentage as its estimated share; the release detail's audience, where the channel's preview takes the raw values the create dialog has. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` for the condition types the channel's SDKs do not know.",
+        "description": "The channel's devices seen in the last thirty days that the release's own conditions reach, evaluated over the registry the way the device evaluates the index — the stored attribute hashes and device-id hashes against the devices' values hashed the same way — and the release's rollout percentage as its estimated share; the release detail's audience, where the channel's preview takes the raw values the create dialog has. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` for the condition types the channel's SDKs do not know, and `FINGERPRINT_UNREGISTERED` for each fingerprint condition no binary of the app carries once the app has registered one.",
         "responses": {
           "200": {
             "content": {
@@ -27070,7 +27070,7 @@
     "/v1/apps/{appId}/statistics/updates": {
       "get": {
         "operationId": "getV1AppsByAppIdStatisticsUpdates",
-        "description": "What the devices did per day over the period — updates installed, failed and rolled back, counted as the devices report them — the adoption curve of the newest live releases since each went live with the moments it reached half and nine tenths of the channel's active devices, and the failure and skip reasons the devices reported in the period; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default, and `channelId` narrows it to one channel.",
+        "description": "What the devices did per day over the period — updates installed, failed and rolled back, counted as the devices report them, beside the channel's active devices of the day, the adoption rate's denominator — the adoption curve of the newest live releases since each went live with the moments it reached half and nine tenths of the channel's active devices, and the failure and skip reasons the devices reported in the period; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default, `channelId` narrows it to one channel, and `releaseId`, a release of the app, narrows the curves to that one release whatever its age.",
         "responses": {
           "200": {
             "content": {
@@ -27083,6 +27083,18 @@
                       "items": {
                         "type": "object",
                         "properties": {
+                          "activeDevices": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
                           "day": {
                             "type": "string",
                             "format": "date",
@@ -27105,6 +27117,7 @@
                           }
                         },
                         "required": [
+                          "activeDevices",
                           "day",
                           "failed",
                           "installed",
@@ -27253,7 +27266,7 @@
                 }
               }
             },
-            "description": "The daily counts, the adoption curves and the reasons."
+            "description": "The daily counts with their active devices, the adoption curves and the reasons."
           },
           "400": {
             "content": {
@@ -27352,6 +27365,15 @@
           {
             "in": "query",
             "name": "channelId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "in": "query",
+            "name": "releaseId",
             "schema": {
               "type": "string",
               "format": "uuid",

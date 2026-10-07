@@ -426,6 +426,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       channelId: CHANNEL_ID,
       periodSince: '2026-09-01',
       periodUntil: '2026-09-30',
+      releaseId: RELEASE_ID,
     }),
   'apps.statistics.usage.get': hotCodePush =>
     hotCodePush.apps.statistics.usage.get({

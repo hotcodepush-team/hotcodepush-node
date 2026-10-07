@@ -1049,7 +1049,7 @@ export interface paths {
         };
         /**
          * Preview the audience of a release
-         * @description The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `fingerprint` hashes, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; the `rollout` percentage, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type asked for.
+         * @description The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `fingerprint` hashes, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; the `rollout` percentage, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type asked for, and `FINGERPRINT_UNREGISTERED` for each `fingerprint` no binary of the app carries once the app has registered one.
          */
         get: operations["getV1AppsByAppIdChannelsByChannelIdAudience"];
         put?: never;
@@ -1301,7 +1301,7 @@ export interface paths {
         };
         /**
          * Read the audience of a release
-         * @description The channel's devices seen in the last thirty days that the release's own conditions reach, evaluated over the registry the way the device evaluates the index — the stored attribute hashes and device-id hashes against the devices' values hashed the same way — and the release's rollout percentage as its estimated share; the release detail's audience, where the channel's preview takes the raw values the create dialog has. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` for the condition types the channel's SDKs do not know.
+         * @description The channel's devices seen in the last thirty days that the release's own conditions reach, evaluated over the registry the way the device evaluates the index — the stored attribute hashes and device-id hashes against the devices' values hashed the same way — and the release's rollout percentage as its estimated share; the release detail's audience, where the channel's preview takes the raw values the create dialog has. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` for the condition types the channel's SDKs do not know, and `FINGERPRINT_UNREGISTERED` for each fingerprint condition no binary of the app carries once the app has registered one.
          */
         get: operations["getV1AppsByAppIdReleasesByReleaseIdAudience"];
         put?: never;
@@ -1465,7 +1465,7 @@ export interface paths {
         };
         /**
          * Get the update statistics
-         * @description What the devices did per day over the period — updates installed, failed and rolled back, counted as the devices report them — the adoption curve of the newest live releases since each went live with the moments it reached half and nine tenths of the channel's active devices, and the failure and skip reasons the devices reported in the period; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default, and `channelId` narrows it to one channel.
+         * @description What the devices did per day over the period — updates installed, failed and rolled back, counted as the devices report them, beside the channel's active devices of the day, the adoption rate's denominator — the adoption curve of the newest live releases since each went live with the moments it reached half and nine tenths of the channel's active devices, and the failure and skip reasons the devices reported in the period; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default, `channelId` narrows it to one channel, and `releaseId`, a release of the app, narrows the curves to that one release whatever its age.
          */
         get: operations["getV1AppsByAppIdStatisticsUpdates"];
         put?: never;
@@ -13365,6 +13365,7 @@ export interface operations {
                 periodSince?: string;
                 periodUntil?: string;
                 channelId?: string;
+                releaseId?: string;
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -13377,7 +13378,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description The daily counts, the adoption curves and the reasons. */
+            /** @description The daily counts with their active devices, the adoption curves and the reasons. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -13385,6 +13386,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         days: {
+                            activeDevices: number | null;
                             /** Format: date */
                             day: string;
                             failed: number;

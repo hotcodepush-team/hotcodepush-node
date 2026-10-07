@@ -492,6 +492,85 @@ describe('withRetry', () => {
     await expect(responsePromise).resolves.toMatchObject({ status: 200 });
   });
 
+  test.each([429, 503])(
+    'should wait the seconds of retry-after when a %i carries them',
+    async status => {
+      const fetchMock = vi
+        .fn<typeof fetch>()
+        .mockResolvedValueOnce(
+          new Response(null, { headers: { 'Retry-After': '5' }, status }),
+        )
+        .mockResolvedValueOnce(new Response(null, { status: 200 }));
+
+      const responsePromise = withRetry(fetchMock)('https://example.com');
+      await vi.advanceTimersByTimeAsync(4999);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(1);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+
+      await expect(responsePromise).resolves.toMatchObject({ status: 200 });
+    },
+  );
+
+  test('should wait until the date of retry-after when a 429 carries one', async () => {
+    vi.setSystemTime(new Date('2026-10-07T12:00:00Z'));
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        new Response(null, {
+          headers: { 'Retry-After': 'Wed, 07 Oct 2026 12:00:03 GMT' },
+          status: 429,
+        }),
+      )
+      .mockResolvedValueOnce(new Response(null, { status: 200 }));
+
+    const responsePromise = withRetry(fetchMock)('https://example.com');
+    await vi.advanceTimersByTimeAsync(2999);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    await expect(responsePromise).resolves.toMatchObject({ status: 200 });
+  });
+
+  test('should wait at most sixty seconds when the retry-after of a 429 asks for longer', async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        new Response(null, { headers: { 'Retry-After': '3600' }, status: 429 }),
+      )
+      .mockResolvedValueOnce(new Response(null, { status: 200 }));
+
+    const responsePromise = withRetry(fetchMock)('https://example.com');
+    await vi.advanceTimersByTimeAsync(59_999);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    await expect(responsePromise).resolves.toMatchObject({ status: 200 });
+  });
+
+  test.each([
+    ['carries no retry-after', {}],
+    ['carries a retry-after that does not parse', { 'Retry-After': 'soon' }],
+  ])(
+    'should back off exponentially when a 429 %s',
+    async (_condition, headers) => {
+      const fetchMock = vi
+        .fn<typeof fetch>()
+        .mockResolvedValueOnce(new Response(null, { headers, status: 429 }))
+        .mockResolvedValueOnce(new Response(null, { status: 200 }));
+
+      const responsePromise = withRetry(fetchMock)('https://example.com');
+      await vi.advanceTimersByTimeAsync(499);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(1);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+
+      await expect(responsePromise).resolves.toMatchObject({ status: 200 });
+    },
+  );
+
   test('should throw the last error when every attempt throws', async () => {
     const fetchMock = vi.fn<typeof fetch>(async () => {
       throw new DOMException('The operation timed out.', 'TimeoutError');

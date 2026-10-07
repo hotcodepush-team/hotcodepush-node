@@ -18,6 +18,11 @@ const INITIAL_RETRY_DELAY_MS = 500;
 const JSON_TIMEOUT_MS = 60_000;
 const MAX_ATTEMPTS = 3;
 /**
+ * The longest wait a `Retry-After` is followed for: the API's rate limits count in sixty-second windows.
+ */
+const MAX_RETRY_AFTER_MS = 60_000;
+const RETRY_AFTER_STATUSES: ReadonlySet<number> = new Set([429, 503]);
+/**
  * Ten minutes per attempt: `SINGLE_UPLOAD_LIMIT_BYTES`, the largest `Blob` sent in one request, at about a hundred kilobytes a second.
  */
 const UPLOAD_TIMEOUT_MS = 10 * 60_000;
@@ -257,6 +262,24 @@ function resolveQueryValues(
   return [...value];
 }
 
+/**
+ * The wait a 429 or a 503 asks for in `Retry-After`, delay seconds or an HTTP date, capped at `MAX_RETRY_AFTER_MS`;
+ * undefined for any other status, a missing header or one that does not parse.
+ */
+function resolveRetryAfterMs(response: Response): number | undefined {
+  const retryAfter = response.headers.get('Retry-After')?.trim();
+  if (!RETRY_AFTER_STATUSES.has(response.status) || !retryAfter) {
+    return undefined;
+  }
+  const retryAfterMs = /^\d+$/.test(retryAfter)
+    ? Number(retryAfter) * 1000
+    : Date.parse(retryAfter) - Date.now();
+  if (Number.isNaN(retryAfterMs)) {
+    return undefined;
+  }
+  return Math.min(Math.max(retryAfterMs, 0), MAX_RETRY_AFTER_MS);
+}
+
 function sleep(milliseconds: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
@@ -265,18 +288,20 @@ export function withRetry(fetchFunction: typeof fetch): typeof fetch {
   return async (input, init) => {
     for (let attempt = 1; ; attempt++) {
       const isLastAttempt = attempt === MAX_ATTEMPTS;
+      let retryAfterMs: number | undefined;
       try {
         const response = await fetchFunction(input, init);
         if (isLastAttempt || !isRetryableStatus(response.status)) {
           return response;
         }
         await response.body?.cancel();
+        retryAfterMs = resolveRetryAfterMs(response);
       } catch (error) {
         if (isLastAttempt) {
           throw error;
         }
       }
-      await sleep(INITIAL_RETRY_DELAY_MS * 2 ** (attempt - 1));
+      await sleep(retryAfterMs ?? INITIAL_RETRY_DELAY_MS * 2 ** (attempt - 1));
     }
   };
 }

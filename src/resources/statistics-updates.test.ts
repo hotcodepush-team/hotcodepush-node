@@ -7,9 +7,9 @@ const UPDATE_STATISTICS = {
   days: [
     {
       activeDevices: 40,
+      applied: 9,
       day: '2026-09-01',
       failed: 1,
-      installed: 9,
       rolledBack: 0,
     },
   ],

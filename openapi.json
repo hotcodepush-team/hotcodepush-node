@@ -5943,7 +5943,7 @@
     "/v1/apps/{appId}/binaries": {
       "get": {
         "operationId": "getV1AppsByAppIdBinaries",
-        "description": "The app's registered store builds, newest first, each with the devices running it, filtered by `platform` and `fingerprint`; `?relations=bundle` embeds the bundle each ships.",
+        "description": "The app's store builds, newest first, each with the devices running it, filtered by `platform` and `fingerprint`; `?relations=bundle` embeds the bundle each ships.",
         "responses": {
           "200": {
             "content": {
@@ -6358,7 +6358,7 @@
       },
       "post": {
         "operationId": "postV1AppsByAppIdBinaries",
-        "description": "Registers a store build with its identity — platform, version, build, fingerprint — and the bundle compiled into it, its files uploaded first through the file endpoints. Create-only on the identity: a re-registration with the same fingerprint and files answers the row, one with another fingerprint or other files is refused, and `force` updates it.",
+        "description": "Creates the binary, a store build with its identity — platform, version, build, fingerprint — and the bundle compiled into it, its files uploaded first through the file endpoints. Create-only on the identity: a second create with the same fingerprint and files answers the row, one with another fingerprint or other files is refused, and `force` updates it.",
         "parameters": [
           {
             "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
@@ -6998,7 +6998,7 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "summary": "Register a binary",
+        "summary": "Create a binary",
         "tags": [
           "Binaries"
         ],
@@ -7012,7 +7012,8 @@
                   "build": {
                     "type": "string",
                     "minLength": 1,
-                    "maxLength": 64
+                    "maxLength": 64,
+                    "pattern": "^[^\\p{Cc}]*$"
                   },
                   "files": {
                     "minItems": 1,
@@ -7068,7 +7069,8 @@
                   "version": {
                     "type": "string",
                     "minLength": 1,
-                    "maxLength": 64
+                    "maxLength": 64,
+                    "pattern": "^[^\\p{Cc}]*$"
                   }
                 },
                 "required": [
@@ -7086,7 +7088,7 @@
     "/v1/apps/{appId}/binaries/count": {
       "get": {
         "operationId": "getV1AppsByAppIdBinariesCount",
-        "description": "The number of the app's registered store builds under the list's filters, which the list pages through.",
+        "description": "The number of the app's store builds under the list's filters, which the list pages through.",
         "responses": {
           "200": {
             "content": {
@@ -7221,7 +7223,7 @@
     "/v1/apps/{appId}/binaries/{binaryId}": {
       "get": {
         "operationId": "getV1AppsByAppIdBinariesByBinaryId",
-        "description": "One registered store build with the devices running it; `?relations=bundle` embeds the bundle it ships.",
+        "description": "One store build with the devices running it; `?relations=bundle` embeds the bundle it ships.",
         "responses": {
           "200": {
             "content": {
@@ -7976,7 +7978,7 @@
       },
       "post": {
         "operationId": "postV1AppsByAppIdBundles",
-        "description": "Creates the bundle from its manifest — platforms, version label, files with path, hash and size, fingerprint, git provenance — and answers the hashes the app lacks with their upload URLs and the URL of the pack; the bundle is `uploading` until completed. The signed content is the manifest the CLI builds from those fields with the signing key’s fingerprint as `keyId` — the files sorted by path and the platforms sorted, each by UTF-16 code units — as canonical JSON; `signature` covers those bytes and is verified here against the app’s keys, `E_SIGNATURE_INVALID` otherwise, and required once the app has a key, `E_SIGNATURE_REQUIRED`. `warnings` carries `FINGERPRINT_UNREGISTERED` when the fingerprint matches no binary of the app.",
+        "description": "Creates the bundle from its manifest — platforms, version label, files with path, hash and size, fingerprint, git provenance — and answers the hashes the app lacks with their upload URLs and the URL of the pack; the bundle is `uploading` until completed. The signed content is the manifest the CLI builds from those fields with the signing key’s fingerprint as `keyId` — the files sorted by path and the platforms sorted, each by UTF-16 code units — as canonical JSON; `signature` covers those bytes and is verified here against the app’s keys, `E_SIGNATURE_INVALID` otherwise, and required once the app has a key, `E_SIGNATURE_REQUIRED`. `warnings` carries `FINGERPRINT_UNKNOWN` when no binary of the app carries the fingerprint.",
         "parameters": [
           {
             "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
@@ -8206,7 +8208,7 @@
                           "code": {
                             "type": "string",
                             "enum": [
-                              "FINGERPRINT_UNREGISTERED",
+                              "FINGERPRINT_UNKNOWN",
                               "UNSUPPORTED_CONDITION_SHARE"
                             ]
                           },
@@ -9003,7 +9005,7 @@
       },
       "delete": {
         "operationId": "deleteV1AppsByAppIdBundlesByBundleId",
-        "description": "Deletes the bundle now, not by retention: refused while a release serves it or a registered binary ships it; its manifest, pack and delta packs go with it, and the files no other bundle of the app lists.",
+        "description": "Deletes the bundle now, not by retention: refused while a release serves it or a binary ships it; its manifest, pack and delta packs go with it, and the files no other bundle of the app lists.",
         "responses": {
           "204": {
             "description": "The bundle is gone."
@@ -10248,7 +10250,7 @@
     "/v1/apps/{appId}/bundles/{bundleId}/files": {
       "get": {
         "operationId": "getV1AppsByAppIdBundlesByBundleIdFiles",
-        "description": "The bundle's files, ordered by path, each with its content hash and uncompressed size; an embedded bundle answers the files its binary registered. `limit` goes up to 1000, beyond every other list's 100, since a tool reads the whole list of each base bundle it builds a delta pack against.",
+        "description": "The bundle's files, ordered by path, each with its content hash and uncompressed size; an embedded bundle answers the files its binary was created with. `limit` goes up to 1000, beyond every other list's 100, since a tool reads the whole list of each base bundle it builds a delta pack against.",
         "responses": {
           "200": {
             "content": {
@@ -13358,7 +13360,7 @@
     "/v1/apps/{appId}/channels/{channelId}/indexes/{platform}": {
       "get": {
         "operationId": "getV1AppsByAppIdChannelsByChannelIdIndexesByPlatform",
-        "description": "The channel's index for a platform as the database sees it, for the probe and the verifier to compare with the copy the CDN serves.",
+        "description": "The channel's index for a platform as the database sees it, for the probe and the verifier to compare with the copy the CDN serves; its `sequence` is the last materialization's time in milliseconds, each materialization strictly above the one before, so an index rebuilt after a database restore still supersedes every copy a device holds.",
         "responses": {
           "200": {
             "content": {
@@ -14161,6 +14163,11 @@
                       "counters": {
                         "type": "object",
                         "properties": {
+                          "applied": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
                           "attempted": {
                             "type": "integer",
                             "minimum": -9007199254740991,
@@ -14190,21 +14197,16 @@
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
-                          },
-                          "installed": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
                           }
                         },
                         "required": [
+                          "applied",
                           "attempted",
                           "failedCrashed",
                           "failedDownload",
                           "failedReadyTimeout",
                           "failedReported",
-                          "failedVerification",
-                          "installed"
+                          "failedVerification"
                         ]
                       },
                       "createdAt": {
@@ -15004,6 +15006,11 @@
                     "counters": {
                       "type": "object",
                       "properties": {
+                        "applied": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
                         "attempted": {
                           "type": "integer",
                           "minimum": -9007199254740991,
@@ -15033,21 +15040,16 @@
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
-                        },
-                        "installed": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
                         }
                       },
                       "required": [
+                        "applied",
                         "attempted",
                         "failedCrashed",
                         "failedDownload",
                         "failedReadyTimeout",
                         "failedReported",
-                        "failedVerification",
-                        "installed"
+                        "failedVerification"
                       ]
                     },
                     "createdAt": {
@@ -15232,7 +15234,7 @@
                           "code": {
                             "type": "string",
                             "enum": [
-                              "FINGERPRINT_UNREGISTERED",
+                              "FINGERPRINT_UNKNOWN",
                               "UNSUPPORTED_CONDITION_SHARE"
                             ]
                           },
@@ -16166,6 +16168,11 @@
                     "counters": {
                       "type": "object",
                       "properties": {
+                        "applied": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
                         "attempted": {
                           "type": "integer",
                           "minimum": -9007199254740991,
@@ -16195,21 +16202,16 @@
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
-                        },
-                        "installed": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
                         }
                       },
                       "required": [
+                        "applied",
                         "attempted",
                         "failedCrashed",
                         "failedDownload",
                         "failedReadyTimeout",
                         "failedReported",
-                        "failedVerification",
-                        "installed"
+                        "failedVerification"
                       ]
                     },
                     "createdAt": {
@@ -16969,6 +16971,11 @@
                       "counters": {
                         "type": "object",
                         "properties": {
+                          "applied": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
                           "attempted": {
                             "type": "integer",
                             "minimum": -9007199254740991,
@@ -16998,21 +17005,16 @@
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
-                          },
-                          "installed": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
                           }
                         },
                         "required": [
+                          "applied",
                           "attempted",
                           "failedCrashed",
                           "failedDownload",
                           "failedReadyTimeout",
                           "failedReported",
-                          "failedVerification",
-                          "installed"
+                          "failedVerification"
                         ]
                       },
                       "createdAt": {
@@ -17350,7 +17352,7 @@
     "/v1/apps/{appId}/channels/{channelId}/audience": {
       "get": {
         "operationId": "getV1AppsByAppIdChannelsByChannelIdAudience",
-        "description": "The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `fingerprint` hashes, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; the `rollout` percentage, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type asked for, and `FINGERPRINT_UNREGISTERED` for each `fingerprint` no binary of the app carries once the app has registered one.",
+        "description": "The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `fingerprint` hashes, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; the `rollout` percentage, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type asked for, and `FINGERPRINT_UNKNOWN` for each `fingerprint` no binary of the app carries once the app has a binary.",
         "responses": {
           "200": {
             "content": {
@@ -17427,7 +17429,7 @@
                           "code": {
                             "type": "string",
                             "enum": [
-                              "FINGERPRINT_UNREGISTERED",
+                              "FINGERPRINT_UNKNOWN",
                               "UNSUPPORTED_CONDITION_SHARE"
                             ]
                           },
@@ -18274,6 +18276,11 @@
                           "counters": {
                             "type": "object",
                             "properties": {
+                              "applied": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
                               "attempted": {
                                 "type": "integer",
                                 "minimum": -9007199254740991,
@@ -18303,21 +18310,16 @@
                                 "type": "integer",
                                 "minimum": -9007199254740991,
                                 "maximum": 9007199254740991
-                              },
-                              "installed": {
-                                "type": "integer",
-                                "minimum": -9007199254740991,
-                                "maximum": 9007199254740991
                               }
                             },
                             "required": [
+                              "applied",
                               "attempted",
                               "failedCrashed",
                               "failedDownload",
                               "failedReadyTimeout",
                               "failedReported",
-                              "failedVerification",
-                              "installed"
+                              "failedVerification"
                             ]
                           },
                           "createdAt": {
@@ -19692,6 +19694,11 @@
                         "counters": {
                           "type": "object",
                           "properties": {
+                            "applied": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
                             "attempted": {
                               "type": "integer",
                               "minimum": -9007199254740991,
@@ -19721,21 +19728,16 @@
                               "type": "integer",
                               "minimum": -9007199254740991,
                               "maximum": 9007199254740991
-                            },
-                            "installed": {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
                             }
                           },
                           "required": [
+                            "applied",
                             "attempted",
                             "failedCrashed",
                             "failedDownload",
                             "failedReadyTimeout",
                             "failedReported",
-                            "failedVerification",
-                            "installed"
+                            "failedVerification"
                           ]
                         },
                         "createdAt": {
@@ -19959,10 +19961,10 @@
                           "kind": {
                             "type": "string",
                             "enum": [
+                              "applied",
                               "attempted",
                               "checked",
-                              "failed",
-                              "installed"
+                              "failed"
                             ]
                           },
                           "reason": {
@@ -21543,6 +21545,11 @@
                       "counters": {
                         "type": "object",
                         "properties": {
+                          "applied": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
                           "attempted": {
                             "type": "integer",
                             "minimum": -9007199254740991,
@@ -21572,21 +21579,16 @@
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
-                          },
-                          "installed": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
                           }
                         },
                         "required": [
+                          "applied",
                           "attempted",
                           "failedCrashed",
                           "failedDownload",
                           "failedReadyTimeout",
                           "failedReported",
-                          "failedVerification",
-                          "installed"
+                          "failedVerification"
                         ]
                       },
                       "createdAt": {
@@ -22535,6 +22537,11 @@
                     "counters": {
                       "type": "object",
                       "properties": {
+                        "applied": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
                         "attempted": {
                           "type": "integer",
                           "minimum": -9007199254740991,
@@ -22564,21 +22571,16 @@
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
-                        },
-                        "installed": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
                         }
                       },
                       "required": [
+                        "applied",
                         "attempted",
                         "failedCrashed",
                         "failedDownload",
                         "failedReadyTimeout",
                         "failedReported",
-                        "failedVerification",
-                        "installed"
+                        "failedVerification"
                       ]
                     },
                     "createdAt": {
@@ -23323,6 +23325,11 @@
                     "counters": {
                       "type": "object",
                       "properties": {
+                        "applied": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
                         "attempted": {
                           "type": "integer",
                           "minimum": -9007199254740991,
@@ -23352,21 +23359,16 @@
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
-                        },
-                        "installed": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
                         }
                       },
                       "required": [
+                        "applied",
                         "attempted",
                         "failedCrashed",
                         "failedDownload",
                         "failedReadyTimeout",
                         "failedReported",
-                        "failedVerification",
-                        "installed"
+                        "failedVerification"
                       ]
                     },
                     "createdAt": {
@@ -23756,7 +23758,7 @@
     "/v1/apps/{appId}/releases/{releaseId}/audience": {
       "get": {
         "operationId": "getV1AppsByAppIdReleasesByReleaseIdAudience",
-        "description": "The channel's devices seen in the last thirty days that the release's own conditions reach, evaluated over the registry the way the device evaluates the index — the stored attribute hashes and device-id hashes against the devices' values hashed the same way — and the release's rollout percentage as its estimated share; the release detail's audience, where the channel's preview takes the raw values the create dialog has. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` for the condition types the channel's SDKs do not know, and `FINGERPRINT_UNREGISTERED` for each fingerprint condition no binary of the app carries once the app has registered one.",
+        "description": "The channel's devices seen in the last thirty days that the release's own conditions reach, evaluated over the registry the way the device evaluates the index — the stored attribute hashes and device-id hashes against the devices' values hashed the same way — and the release's rollout percentage as its estimated share; the release detail's audience, where the channel's preview takes the raw values the create dialog has. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` for the condition types the channel's SDKs do not know, and `FINGERPRINT_UNKNOWN` for each fingerprint condition no binary of the app carries once the app has a binary.",
         "responses": {
           "200": {
             "content": {
@@ -23833,7 +23835,7 @@
                           "code": {
                             "type": "string",
                             "enum": [
-                              "FINGERPRINT_UNREGISTERED",
+                              "FINGERPRINT_UNKNOWN",
                               "UNSUPPORTED_CONDITION_SHARE"
                             ]
                           },
@@ -24401,6 +24403,11 @@
                     "counters": {
                       "type": "object",
                       "properties": {
+                        "applied": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
                         "attempted": {
                           "type": "integer",
                           "minimum": -9007199254740991,
@@ -24430,21 +24437,16 @@
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
-                        },
-                        "installed": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
                         }
                       },
                       "required": [
+                        "applied",
                         "attempted",
                         "failedCrashed",
                         "failedDownload",
                         "failedReadyTimeout",
                         "failedReported",
-                        "failedVerification",
-                        "installed"
+                        "failedVerification"
                       ]
                     },
                     "createdAt": {
@@ -25186,6 +25188,11 @@
                     "counters": {
                       "type": "object",
                       "properties": {
+                        "applied": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
                         "attempted": {
                           "type": "integer",
                           "minimum": -9007199254740991,
@@ -25215,21 +25222,16 @@
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
-                        },
-                        "installed": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
                         }
                       },
                       "required": [
+                        "applied",
                         "attempted",
                         "failedCrashed",
                         "failedDownload",
                         "failedReadyTimeout",
                         "failedReported",
-                        "failedVerification",
-                        "installed"
+                        "failedVerification"
                       ]
                     },
                     "createdAt": {
@@ -25971,6 +25973,11 @@
                     "counters": {
                       "type": "object",
                       "properties": {
+                        "applied": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
                         "attempted": {
                           "type": "integer",
                           "minimum": -9007199254740991,
@@ -26000,21 +26007,16 @@
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
-                        },
-                        "installed": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
                         }
                       },
                       "required": [
+                        "applied",
                         "attempted",
                         "failedCrashed",
                         "failedDownload",
                         "failedReadyTimeout",
                         "failedReported",
-                        "failedVerification",
-                        "installed"
+                        "failedVerification"
                       ]
                     },
                     "createdAt": {
@@ -27177,7 +27179,7 @@
     "/v1/apps/{appId}/statistics/updates": {
       "get": {
         "operationId": "getV1AppsByAppIdStatisticsUpdates",
-        "description": "What the devices did per day over the period — updates installed, failed and rolled back, counted as the devices report them, beside the channel's active devices of the day, the adoption rate's denominator — the adoption curve of the newest live releases since each went live with the moments it reached half and nine tenths of the channel's active devices, and the failure and skip reasons the devices reported in the period; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default, `channelId` narrows it to one channel, and `releaseId`, a release of the app, narrows the curves to that one release whatever its age.",
+        "description": "What the devices did per day over the period — updates applied, failed and rolled back, counted as the devices report them, beside the channel's active devices of the day, the adoption rate's denominator — the adoption curve of the newest live releases since each went live with the moments it reached half and nine tenths of the channel's active devices, and the failure and skip reasons the devices reported in the period; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default and at most 366, `channelId` narrows it to one channel, and `releaseId`, a release of the app, narrows the curves to that one release whatever its age.",
         "responses": {
           "200": {
             "content": {
@@ -27202,17 +27204,17 @@
                               }
                             ]
                           },
+                          "applied": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
                           "day": {
                             "type": "string",
                             "format": "date",
                             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
                           },
                           "failed": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "installed": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
@@ -27225,9 +27227,9 @@
                         },
                         "required": [
                           "activeDevices",
+                          "applied",
                           "day",
                           "failed",
-                          "installed",
                           "rolledBack"
                         ]
                       }
@@ -27262,20 +27264,20 @@
                             "items": {
                               "type": "object",
                               "properties": {
+                                "applied": {
+                                  "type": "integer",
+                                  "minimum": -9007199254740991,
+                                  "maximum": 9007199254740991
+                                },
                                 "at": {
                                   "type": "string",
                                   "format": "date-time",
                                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                                },
-                                "installed": {
-                                  "type": "integer",
-                                  "minimum": -9007199254740991,
-                                  "maximum": 9007199254740991
                                 }
                               },
                               "required": [
-                                "at",
-                                "installed"
+                                "applied",
+                                "at"
                               ]
                             }
                           },
@@ -27505,7 +27507,7 @@
     "/v1/apps/{appId}/statistics/usage": {
       "get": {
         "operationId": "getV1AppsByAppIdStatisticsUsage",
-        "description": "The monthly active devices per month the period touches — the closed months as the rollup wrote them, the number the invoice shows, the open month counted live — and the checks and bytes per day from the HTTP analytics beside the bytes the devices reported, approximate by design; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default.",
+        "description": "The monthly active devices per month the period touches — the closed months as the rollup wrote them, the number the invoice shows, the open month counted live — and the checks and bytes per day from the HTTP analytics beside the bytes the devices reported, approximate by design; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default and at most 366.",
         "responses": {
           "200": {
             "content": {
@@ -28815,7 +28817,7 @@
       },
       "delete": {
         "operationId": "deleteV1UsersByUserId",
-        "description": "Soft-deletes the account: gone at once, hard-deleted after seven days by a job, restorable only by support within the window. Refused while the user is the only Owner of an organization with other members.",
+        "description": "Soft-deletes the account: gone at once, hard-deleted after seven days by a job, restorable only by support within the window. Refused while the user is the only Owner of an organization with other members; an organization with no other member is soft-deleted with the account.",
         "responses": {
           "204": {
             "description": "The account is scheduled for deletion."

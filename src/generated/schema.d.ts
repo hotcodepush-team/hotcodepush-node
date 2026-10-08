@@ -417,13 +417,13 @@ export interface paths {
         };
         /**
          * List the binaries
-         * @description The app's registered store builds, newest first, each with the devices running it, filtered by `platform` and `fingerprint`; `?relations=bundle` embeds the bundle each ships.
+         * @description The app's store builds, newest first, each with the devices running it, filtered by `platform` and `fingerprint`; `?relations=bundle` embeds the bundle each ships.
          */
         get: operations["getV1AppsByAppIdBinaries"];
         put?: never;
         /**
-         * Register a binary
-         * @description Registers a store build with its identity — platform, version, build, fingerprint — and the bundle compiled into it, its files uploaded first through the file endpoints. Create-only on the identity: a re-registration with the same fingerprint and files answers the row, one with another fingerprint or other files is refused, and `force` updates it.
+         * Create a binary
+         * @description Creates the binary, a store build with its identity — platform, version, build, fingerprint — and the bundle compiled into it, its files uploaded first through the file endpoints. Create-only on the identity: a second create with the same fingerprint and files answers the row, one with another fingerprint or other files is refused, and `force` updates it.
          */
         post: operations["postV1AppsByAppIdBinaries"];
         delete?: never;
@@ -441,7 +441,7 @@ export interface paths {
         };
         /**
          * Count the binaries
-         * @description The number of the app's registered store builds under the list's filters, which the list pages through.
+         * @description The number of the app's store builds under the list's filters, which the list pages through.
          */
         get: operations["getV1AppsByAppIdBinariesCount"];
         put?: never;
@@ -461,7 +461,7 @@ export interface paths {
         };
         /**
          * Get a binary
-         * @description One registered store build with the devices running it; `?relations=bundle` embeds the bundle it ships.
+         * @description One store build with the devices running it; `?relations=bundle` embeds the bundle it ships.
          */
         get: operations["getV1AppsByAppIdBinariesByBinaryId"];
         put?: never;
@@ -487,7 +487,7 @@ export interface paths {
         put?: never;
         /**
          * Create a bundle
-         * @description Creates the bundle from its manifest — platforms, version label, files with path, hash and size, fingerprint, git provenance — and answers the hashes the app lacks with their upload URLs and the URL of the pack; the bundle is `uploading` until completed. The signed content is the manifest the CLI builds from those fields with the signing key’s fingerprint as `keyId` — the files sorted by path and the platforms sorted, each by UTF-16 code units — as canonical JSON; `signature` covers those bytes and is verified here against the app’s keys, `E_SIGNATURE_INVALID` otherwise, and required once the app has a key, `E_SIGNATURE_REQUIRED`. `warnings` carries `FINGERPRINT_UNREGISTERED` when the fingerprint matches no binary of the app.
+         * @description Creates the bundle from its manifest — platforms, version label, files with path, hash and size, fingerprint, git provenance — and answers the hashes the app lacks with their upload URLs and the URL of the pack; the bundle is `uploading` until completed. The signed content is the manifest the CLI builds from those fields with the signing key’s fingerprint as `keyId` — the files sorted by path and the platforms sorted, each by UTF-16 code units — as canonical JSON; `signature` covers those bytes and is verified here against the app’s keys, `E_SIGNATURE_INVALID` otherwise, and required once the app has a key, `E_SIGNATURE_REQUIRED`. `warnings` carries `FINGERPRINT_UNKNOWN` when no binary of the app carries the fingerprint.
          */
         post: operations["postV1AppsByAppIdBundles"];
         delete?: never;
@@ -532,7 +532,7 @@ export interface paths {
         post?: never;
         /**
          * Delete a bundle
-         * @description Deletes the bundle now, not by retention: refused while a release serves it or a registered binary ships it; its manifest, pack and delta packs go with it, and the files no other bundle of the app lists.
+         * @description Deletes the bundle now, not by retention: refused while a release serves it or a binary ships it; its manifest, pack and delta packs go with it, and the files no other bundle of the app lists.
          */
         delete: operations["deleteV1AppsByAppIdBundlesByBundleId"];
         options?: never;
@@ -669,7 +669,7 @@ export interface paths {
         };
         /**
          * List the files of a bundle
-         * @description The bundle's files, ordered by path, each with its content hash and uncompressed size; an embedded bundle answers the files its binary registered. `limit` goes up to 1000, beyond every other list's 100, since a tool reads the whole list of each base bundle it builds a delta pack against.
+         * @description The bundle's files, ordered by path, each with its content hash and uncompressed size; an embedded bundle answers the files its binary was created with. `limit` goes up to 1000, beyond every other list's 100, since a tool reads the whole list of each base bundle it builds a delta pack against.
          */
         get: operations["getV1AppsByAppIdBundlesByBundleIdFiles"];
         put?: never;
@@ -945,7 +945,7 @@ export interface paths {
         };
         /**
          * Get a channel index
-         * @description The channel's index for a platform as the database sees it, for the probe and the verifier to compare with the copy the CDN serves.
+         * @description The channel's index for a platform as the database sees it, for the probe and the verifier to compare with the copy the CDN serves; its `sequence` is the last materialization's time in milliseconds, each materialization strictly above the one before, so an index rebuilt after a database restore still supersedes every copy a device holds.
          */
         get: operations["getV1AppsByAppIdChannelsByChannelIdIndexesByPlatform"];
         put?: never;
@@ -1049,7 +1049,7 @@ export interface paths {
         };
         /**
          * Preview the audience of a release
-         * @description The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `fingerprint` hashes, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; the `rollout` percentage, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type asked for, and `FINGERPRINT_UNREGISTERED` for each `fingerprint` no binary of the app carries once the app has registered one.
+         * @description The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `fingerprint` hashes, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; the `rollout` percentage, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type asked for, and `FINGERPRINT_UNKNOWN` for each `fingerprint` no binary of the app carries once the app has a binary.
          */
         get: operations["getV1AppsByAppIdChannelsByChannelIdAudience"];
         put?: never;
@@ -1301,7 +1301,7 @@ export interface paths {
         };
         /**
          * Read the audience of a release
-         * @description The channel's devices seen in the last thirty days that the release's own conditions reach, evaluated over the registry the way the device evaluates the index — the stored attribute hashes and device-id hashes against the devices' values hashed the same way — and the release's rollout percentage as its estimated share; the release detail's audience, where the channel's preview takes the raw values the create dialog has. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` for the condition types the channel's SDKs do not know, and `FINGERPRINT_UNREGISTERED` for each fingerprint condition no binary of the app carries once the app has registered one.
+         * @description The channel's devices seen in the last thirty days that the release's own conditions reach, evaluated over the registry the way the device evaluates the index — the stored attribute hashes and device-id hashes against the devices' values hashed the same way — and the release's rollout percentage as its estimated share; the release detail's audience, where the channel's preview takes the raw values the create dialog has. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` for the condition types the channel's SDKs do not know, and `FINGERPRINT_UNKNOWN` for each fingerprint condition no binary of the app carries once the app has a binary.
          */
         get: operations["getV1AppsByAppIdReleasesByReleaseIdAudience"];
         put?: never;
@@ -1465,7 +1465,7 @@ export interface paths {
         };
         /**
          * Get the update statistics
-         * @description What the devices did per day over the period — updates installed, failed and rolled back, counted as the devices report them, beside the channel's active devices of the day, the adoption rate's denominator — the adoption curve of the newest live releases since each went live with the moments it reached half and nine tenths of the channel's active devices, and the failure and skip reasons the devices reported in the period; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default, `channelId` narrows it to one channel, and `releaseId`, a release of the app, narrows the curves to that one release whatever its age.
+         * @description What the devices did per day over the period — updates applied, failed and rolled back, counted as the devices report them, beside the channel's active devices of the day, the adoption rate's denominator — the adoption curve of the newest live releases since each went live with the moments it reached half and nine tenths of the channel's active devices, and the failure and skip reasons the devices reported in the period; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default and at most 366, `channelId` narrows it to one channel, and `releaseId`, a release of the app, narrows the curves to that one release whatever its age.
          */
         get: operations["getV1AppsByAppIdStatisticsUpdates"];
         put?: never;
@@ -1485,7 +1485,7 @@ export interface paths {
         };
         /**
          * Get the usage statistics
-         * @description The monthly active devices per month the period touches — the closed months as the rollup wrote them, the number the invoice shows, the open month counted live — and the checks and bytes per day from the HTTP analytics beside the bytes the devices reported, approximate by design; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default.
+         * @description The monthly active devices per month the period touches — the closed months as the rollup wrote them, the number the invoice shows, the open month counted live — and the checks and bytes per day from the HTTP analytics beside the bytes the devices reported, approximate by design; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default and at most 366.
          */
         get: operations["getV1AppsByAppIdStatisticsUsage"];
         put?: never;
@@ -1600,7 +1600,7 @@ export interface paths {
         post?: never;
         /**
          * Delete the account
-         * @description Soft-deletes the account: gone at once, hard-deleted after seven days by a job, restorable only by support within the window. Refused while the user is the only Owner of an organization with other members.
+         * @description Soft-deletes the account: gone at once, hard-deleted after seven days by a job, restorable only by support within the window. Refused while the user is the only Owner of an organization with other members; an organization with no other member is soft-deleted with the account.
          */
         delete: operations["deleteV1UsersByUserId"];
         options?: never;
@@ -5697,7 +5697,7 @@ export interface operations {
                         };
                         warnings: {
                             /** @enum {string} */
-                            code: "FINGERPRINT_UNREGISTERED" | "UNSUPPORTED_CONDITION_SHARE";
+                            code: "FINGERPRINT_UNKNOWN" | "UNSUPPORTED_CONDITION_SHARE";
                             details: {
                                 [key: string]: unknown;
                             } | null;
@@ -8838,13 +8838,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
+                            applied: number;
                             attempted: number;
                             failedCrashed: number;
                             failedDownload: number;
                             failedReadyTimeout: number;
                             failedReported: number;
                             failedVerification: number;
-                            installed: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -9087,13 +9087,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
+                            applied: number;
                             attempted: number;
                             failedCrashed: number;
                             failedDownload: number;
                             failedReadyTimeout: number;
                             failedReported: number;
                             failedVerification: number;
-                            installed: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -9124,7 +9124,7 @@ export interface operations {
                         } | null;
                         warnings: {
                             /** @enum {string} */
-                            code: "FINGERPRINT_UNREGISTERED" | "UNSUPPORTED_CONDITION_SHARE";
+                            code: "FINGERPRINT_UNKNOWN" | "UNSUPPORTED_CONDITION_SHARE";
                             details: {
                                 [key: string]: unknown;
                             } | null;
@@ -9418,13 +9418,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
+                            applied: number;
                             attempted: number;
                             failedCrashed: number;
                             failedDownload: number;
                             failedReadyTimeout: number;
                             failedReported: number;
                             failedVerification: number;
-                            installed: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -9646,13 +9646,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
+                            applied: number;
                             attempted: number;
                             failedCrashed: number;
                             failedDownload: number;
                             failedReadyTimeout: number;
                             failedReported: number;
                             failedVerification: number;
-                            installed: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -9791,7 +9791,7 @@ export interface operations {
                         total: number;
                         warnings: {
                             /** @enum {string} */
-                            code: "FINGERPRINT_UNREGISTERED" | "UNSUPPORTED_CONDITION_SHARE";
+                            code: "FINGERPRINT_UNKNOWN" | "UNSUPPORTED_CONDITION_SHARE";
                             details: {
                                 [key: string]: unknown;
                             } | null;
@@ -10019,13 +10019,13 @@ export interface operations {
                                 type: "os";
                             })[];
                             counters?: {
+                                applied: number;
                                 attempted: number;
                                 failedCrashed: number;
                                 failedDownload: number;
                                 failedReadyTimeout: number;
                                 failedReported: number;
                                 failedVerification: number;
-                                installed: number;
                             };
                             /** Format: date-time */
                             createdAt: string;
@@ -10458,13 +10458,13 @@ export interface operations {
                                 type: "os";
                             })[];
                             counters?: {
+                                applied: number;
                                 attempted: number;
                                 failedCrashed: number;
                                 failedDownload: number;
                                 failedReadyTimeout: number;
                                 failedReported: number;
                                 failedVerification: number;
-                                installed: number;
                             };
                             /** Format: date-time */
                             createdAt: string;
@@ -10501,7 +10501,7 @@ export interface operations {
                             /** Format: date-time */
                             createdAt: string;
                             /** @enum {string} */
-                            kind: "attempted" | "checked" | "failed" | "installed";
+                            kind: "applied" | "attempted" | "checked" | "failed";
                             reason: string | null;
                             /** Format: uuid */
                             releaseId: string;
@@ -11350,13 +11350,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
+                            applied: number;
                             attempted: number;
                             failedCrashed: number;
                             failedDownload: number;
                             failedReadyTimeout: number;
                             failedReported: number;
                             failedVerification: number;
-                            installed: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -11650,13 +11650,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
+                            applied: number;
                             attempted: number;
                             failedCrashed: number;
                             failedDownload: number;
                             failedReadyTimeout: number;
                             failedReported: number;
                             failedVerification: number;
-                            installed: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -11864,13 +11864,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
+                            applied: number;
                             attempted: number;
                             failedCrashed: number;
                             failedDownload: number;
                             failedReadyTimeout: number;
                             failedReported: number;
                             failedVerification: number;
-                            installed: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -12011,7 +12011,7 @@ export interface operations {
                         total: number;
                         warnings: {
                             /** @enum {string} */
-                            code: "FINGERPRINT_UNREGISTERED" | "UNSUPPORTED_CONDITION_SHARE";
+                            code: "FINGERPRINT_UNKNOWN" | "UNSUPPORTED_CONDITION_SHARE";
                             details: {
                                 [key: string]: unknown;
                             } | null;
@@ -12185,13 +12185,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
+                            applied: number;
                             attempted: number;
                             failedCrashed: number;
                             failedDownload: number;
                             failedReadyTimeout: number;
                             failedReported: number;
                             failedVerification: number;
-                            installed: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -12397,13 +12397,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
+                            applied: number;
                             attempted: number;
                             failedCrashed: number;
                             failedDownload: number;
                             failedReadyTimeout: number;
                             failedReported: number;
                             failedVerification: number;
-                            installed: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -12609,13 +12609,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
+                            applied: number;
                             attempted: number;
                             failedCrashed: number;
                             failedDownload: number;
                             failedReadyTimeout: number;
                             failedReported: number;
                             failedVerification: number;
-                            installed: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -13257,10 +13257,10 @@ export interface operations {
                     "application/json": {
                         days: {
                             activeDevices: number | null;
+                            applied: number;
                             /** Format: date */
                             day: string;
                             failed: number;
-                            installed: number;
                             rolledBack: number;
                         }[];
                         failureReasons: {
@@ -13269,9 +13269,9 @@ export interface operations {
                         }[];
                         releases: {
                             adoption: {
+                                applied: number;
                                 /** Format: date-time */
                                 at: string;
-                                installed: number;
                             }[];
                             /** Format: uuid */
                             channelId: string;

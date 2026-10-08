@@ -10,7 +10,7 @@ import type {
 } from '../types';
 
 /**
- * A store build `binary create` registered, with the bundle it ships and the devices running it.
+ * A store build, created by `binary create`, with the bundle it ships and the devices running it.
  */
 export type Binary = JsonResponseBody<
   '/v1/apps/{appId}/binaries/{binaryId}',
@@ -47,7 +47,7 @@ export class BinariesResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The number of the app's registered store builds under the list's filters.
+   * The number of the app's store builds under the list's filters.
    */
   public async count(options: CountBinariesOptions): Promise<Count> {
     const { appId, ...query } = options;
@@ -59,8 +59,8 @@ export class BinariesResource {
   }
 
   /**
-   * Registers a store build on its identity with the bundle compiled into it, its files uploaded first.
-   * An identical registration answers the existing one; a conflicting fingerprint or file set is refused unless `force` is set.
+   * Creates the binary, a store build on its identity with the bundle compiled into it, its files uploaded first.
+   * An identical create answers the existing one; a conflicting fingerprint or file set is refused unless `force` is set.
    */
   public async create(options: CreateBinaryOptions): Promise<Binary> {
     const { appId, idempotencyKey, ...body } = options;
@@ -84,7 +84,7 @@ export class BinariesResource {
   }
 
   /**
-   * The app's registered store builds, newest first.
+   * The app's store builds, newest first.
    */
   public async list(options: ListBinariesOptions): Promise<Binary[]> {
     const { appId, ...query } = options;

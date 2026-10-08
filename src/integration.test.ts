@@ -325,7 +325,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     ).rejects.toMatchObject({ code: 'E_NOT_FOUND', status: 404 });
   });
 
-  test('should register a binary and read it with its bundle', async () => {
+  test('should create a binary and read it with its bundle', async () => {
     const indexFile = resolveTestFile('index.html', '<h1>Node client</h1>');
     const createdBinary = await hotCodePush.apps.binaries.create({
       appId: app.id,
@@ -335,7 +335,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
       platform: 'android',
       version: '1.0.0',
     });
-    const reregisteredBinary = await hotCodePush.apps.binaries.create({
+    const forceCreatedBinary = await hotCodePush.apps.binaries.create({
       appId: app.id,
       build: '1',
       files: [indexFile.manifestEntry],
@@ -354,12 +354,12 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
       relations: ['bundle'],
     });
 
-    expect(reregisteredBinary).toMatchObject({
+    expect(forceCreatedBinary).toMatchObject({
       fingerprint: `fp1:${'b'.repeat(64)}`,
       id: createdBinary.id,
     });
     expect(fetchedBinaries.map(({ id }) => id)).toEqual([createdBinary.id]);
-    expect(fetchedBinary.bundle?.id).toBe(reregisteredBinary.bundleId);
+    expect(fetchedBinary.bundle?.id).toBe(forceCreatedBinary.bundleId);
     expect(fetchedBinary.bundle?.number).toBeNull();
   });
 

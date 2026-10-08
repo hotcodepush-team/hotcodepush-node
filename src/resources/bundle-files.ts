@@ -44,7 +44,7 @@ export class BundleFilesResource {
   }
 
   /**
-   * The bundle's files, ordered by path; an embedded bundle answers the files its binary registered.
+   * The bundle's files, ordered by path; an embedded bundle answers the files its binary was created with.
    */
   public async list(options: ListBundleFilesOptions): Promise<BundleFile[]> {
     const { appId, bundleId, ...query } = options;

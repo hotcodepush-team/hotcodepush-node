@@ -51,6 +51,7 @@ Run `npm run fmt` before every commit; lint, typecheck, test and build must pass
 - Every error is one JSON shape, `code`, `message`, `details`; `HotCodePushError` carries them and the status verbatim, and a body without the shape becomes `E_INTERNAL`.
 - Every call goes through `withTimeout` and `withRetry`, never a bare `fetch`: sixty seconds per attempt, `JSON_TIMEOUT_MS`, and ten minutes for a binary upload, `UPLOAD_TIMEOUT_MS`, three attempts, exponential backoff from 500 ms, retrying a thrown fetch, 408, 429 and 5xx; a 429 or a 503 waits its `Retry-After` instead, at most sixty seconds, the rate-limit window.
 - Every creating `POST` — a `POST` on a collection, never a transition such as `pause` — goes through `fetchCreatingPost`, which sends the caller's `idempotencyKey` or a UUID generated per call and kept across its retries.
+- Any other `POST` is retried only where a repeat is safe: `pause`, `resume`, a bundle's `complete`, the SSO verification, the three multipart starts and a file upload's completion; a pack's or a delta's completion is never retried, since a repeat answers `E_NOT_FOUND` for an upload R2 already closed.
 - Lists take `limit` and `offset`; `relations` and `ids` are typed lists sent as comma lists, `?relations=user`, `?ids=a,b`, and any other list repeats its parameter, `?attribute=a&attribute=b`.
 - `me` is accepted wherever a `{userId}` appears; the client passes it through.
 - The `/v1/auth/*` slice is Better Auth's and outside the document; its client lives in the CLI and the console, never here.

@@ -45,12 +45,13 @@ export class FileUploadsResource {
 
   /**
    * Assembles the parts into the file and checks its hash.
-   * R2 refuses a second completion, so the call is never retried.
+   * A hash the app already holds answers the stored file before any assembly, so the call is retried.
    */
   public async complete(options: CompleteFileUploadOptions): Promise<AppFile> {
     const { appId, sha256, uploadId, ...body } = options;
     return this.httpClient.fetchJson({
       body,
+      isRetryable: true,
       method: 'POST',
       path: resolvePath(
         '/v1/apps/{appId}/files/{sha256}/uploads/{uploadId}/complete',
@@ -61,10 +62,11 @@ export class FileUploadsResource {
 
   /**
    * Starts a multipart upload; every part but the last is at least five mebibytes, all of one size.
-   * The API keeps no idempotency key for it, so the call is never retried: a repeat would start a second upload.
+   * The start holds no state, and an upload a repeat leaves unused expires by the bucket's default, so the call is retried.
    */
   public async create(options: CreateFileUploadOptions): Promise<FileUpload> {
     return this.httpClient.fetchJson({
+      isRetryable: true,
       method: 'POST',
       path: resolvePath('/v1/apps/{appId}/files/{sha256}/uploads', options),
     });

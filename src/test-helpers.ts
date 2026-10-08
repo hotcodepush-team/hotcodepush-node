@@ -54,6 +54,27 @@ export function resolveSentMethodsAndUrls(
 }
 
 /**
+ * Runs a call against an API answering 502 on the first attempt and `createResponse` on every later one,
+ * and answers the call's result with the attempts it made.
+ */
+export async function runCallAfterBadGateway<T>(
+  call: () => Promise<T>,
+  createResponse: () => Response,
+): Promise<{ attemptCount: number; result: T }> {
+  vi.useFakeTimers();
+  try {
+    const fetchMock = stubFetch(createResponse);
+    fetchMock.mockResolvedValueOnce(new Response(null, { status: 502 }));
+    const resultPromise = call();
+    await vi.runAllTimersAsync();
+    const result = await resultPromise;
+    return { attemptCount: fetchMock.mock.calls.length, result };
+  } finally {
+    vi.useRealTimers();
+  }
+}
+
+/**
  * Replaces the global `fetch`; undo with `vi.unstubAllGlobals()`.
  */
 export function stubFetch(

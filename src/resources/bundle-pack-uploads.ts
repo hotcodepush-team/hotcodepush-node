@@ -63,12 +63,13 @@ export class BundlePackUploadsResource {
 
   /**
    * Starts a multipart upload of the pack; every part but the last is at least five mebibytes, all of one size.
-   * The API keeps no idempotency key for it, so the call is never retried: a repeat would start a second upload.
+   * The start holds no state, and an upload a repeat leaves unused expires by the bucket's default, so the call is retried.
    */
   public async create(
     options: CreateBundlePackUploadOptions,
   ): Promise<BundlePackUpload> {
     return this.httpClient.fetchJson({
+      isRetryable: true,
       method: 'POST',
       path: resolvePath(
         '/v1/apps/{appId}/bundles/{bundleId}/pack/uploads',

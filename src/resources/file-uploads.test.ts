@@ -2,8 +2,8 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { HotCodePush } from '../client';
 import {
-  countAttemptsWhenUnavailable,
   resolveSentRequest,
+  runCallAfterBadGateway,
   stubFetch,
 } from '../test-helpers';
 
@@ -34,17 +34,22 @@ describe('FileUploadsResource', () => {
     });
   });
 
-  test('should not retry the completion when the api is unavailable', async () => {
-    const attemptCount = await countAttemptsWhenUnavailable(() =>
-      new HotCodePush().apps.files.uploads.complete({
-        appId: 'app',
-        sha256: SHA256,
-        parts: [{ etag: 'etag', partNumber: 1 }],
-        uploadId: 'upload',
-      }),
+  test('should retry the completion when the api answers 502', async () => {
+    const file = { sha256: SHA256, sizeBytes: 10 };
+
+    const { attemptCount, result } = await runCallAfterBadGateway(
+      () =>
+        new HotCodePush().apps.files.uploads.complete({
+          appId: 'app',
+          parts: [{ etag: 'etag', partNumber: 1 }],
+          sha256: SHA256,
+          uploadId: 'upload',
+        }),
+      () => Response.json(file),
     );
 
-    expect(attemptCount).toBe(1);
+    expect(result).toEqual(file);
+    expect(attemptCount).toBe(2);
   });
 
   test('should post to start the upload without an idempotency key', async () => {
@@ -68,15 +73,18 @@ describe('FileUploadsResource', () => {
     );
   });
 
-  test('should not retry the start when the api is unavailable', async () => {
-    const attemptCount = await countAttemptsWhenUnavailable(() =>
-      new HotCodePush().apps.files.uploads.create({
-        appId: 'app',
-        sha256: SHA256,
-      }),
+  test('should retry the start when the api answers 502', async () => {
+    const { attemptCount, result } = await runCallAfterBadGateway(
+      () =>
+        new HotCodePush().apps.files.uploads.create({
+          appId: 'app',
+          sha256: SHA256,
+        }),
+      () => Response.json({ uploadId: 'upload' }, { status: 201 }),
     );
 
-    expect(attemptCount).toBe(1);
+    expect(result).toEqual({ uploadId: 'upload' });
+    expect(attemptCount).toBe(2);
   });
 
   test('should delete the upload to abort it', async () => {

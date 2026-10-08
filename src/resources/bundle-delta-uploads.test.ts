@@ -4,6 +4,7 @@ import { HotCodePush } from '../client';
 import {
   countAttemptsWhenUnavailable,
   resolveSentRequest,
+  runCallAfterBadGateway,
   stubFetch,
 } from '../test-helpers';
 
@@ -72,16 +73,19 @@ describe('BundleDeltaUploadsResource', () => {
     );
   });
 
-  test('should not retry the start when the api is unavailable', async () => {
-    const attemptCount = await countAttemptsWhenUnavailable(() =>
-      new HotCodePush().apps.bundles.deltas.uploads.create({
-        appId: 'app',
-        baseBundleId: 'base',
-        bundleId: 'bundle',
-      }),
+  test('should retry the start when the api answers 502', async () => {
+    const { attemptCount, result } = await runCallAfterBadGateway(
+      () =>
+        new HotCodePush().apps.bundles.deltas.uploads.create({
+          appId: 'app',
+          baseBundleId: 'base',
+          bundleId: 'bundle',
+        }),
+      () => Response.json({ uploadId: 'upload' }, { status: 201 }),
     );
 
-    expect(attemptCount).toBe(1);
+    expect(result).toEqual({ uploadId: 'upload' });
+    expect(attemptCount).toBe(2);
   });
 
   test('should delete the upload to abort it', async () => {

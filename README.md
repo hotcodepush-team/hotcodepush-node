@@ -75,7 +75,7 @@ The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.ch
 
 Lists take `limit` and `offset`, and where the API embeds linked rows, `relations`: `organizations.members.list({ organizationId, relations: ['user'] })`; any other list parameter, an audience's `attribute` say, repeats itself in the query.
 Every list has a `count` beside it taking the same filters and answering `{ total }`, the number a paginated table reads.
-`users.get({ userId: 'me' })` answers the caller behind the token, and `users.delete({ userId: 'me' })` deletes the caller's account, as `me` addresses the caller wherever the API takes a `{userId}`.
+`users.get({ userId: 'me' })` answers the caller behind the token, and `users.delete({ password, userId: 'me' })` deletes the caller's account once its password checks out, as `me` addresses the caller wherever the API takes a `{userId}`.
 
 An upload streams its body, a `Blob` or a `ReadableStream` with its `contentLength`, never buffering it:
 

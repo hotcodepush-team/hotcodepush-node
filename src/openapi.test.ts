@@ -607,7 +607,11 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.organizations.ssoProvider.verifications.create({
       organizationId: ORGANIZATION_ID,
     }),
-  'users.delete': hotCodePush => hotCodePush.users.delete({ userId: 'me' }),
+  'users.delete': hotCodePush =>
+    hotCodePush.users.delete({
+      password: 'correct horse battery staple',
+      userId: 'me',
+    }),
   'users.get': hotCodePush => hotCodePush.users.get({ userId: 'me' }),
   'users.password.create': hotCodePush =>
     hotCodePush.users.password.create({

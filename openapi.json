@@ -52,7 +52,6 @@
               "E_SIGNATURE_INVALID",
               "E_SIGNATURE_REQUIRED",
               "E_SOLE_OWNER",
-              "E_SOLE_SIGNING_KEY",
               "E_SSO_REQUIRED",
               "E_STORAGE_LIMIT_REACHED",
               "E_TOKENS_LIMIT_REACHED",
@@ -666,7 +665,7 @@
     "/v1/organizations/{organizationId}/apps": {
       "get": {
         "operationId": "getV1OrganizationsByOrganizationIdApps",
-        "description": "The organization's apps, newest first; `query` selects those whose id or name contains it, case-insensitively.",
+        "description": "The organization's apps, newest first; `query` selects those whose name contains it, case-insensitively.",
         "responses": {
           "200": {
             "content": {
@@ -1908,7 +1907,7 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The organization's invitations, newest first, filtered by `role`, by `query`, the text their id or email contains, case-insensitively, and by `status`, whose `pending` selects those still pending and not yet expired.",
+        "description": "The organization's invitations, newest first, filtered by `role`, by `query`, the text their email contains, case-insensitively, and by `status`, whose `pending` selects those still pending and not yet expired.",
         "summary": "List the invitations",
         "tags": [
           "Invitations"
@@ -2601,7 +2600,7 @@
     "/v1/organizations/{organizationId}/members": {
       "get": {
         "operationId": "getV1OrganizationsByOrganizationIdMembers",
-        "description": "The organization's members, newest first, filtered by `role` and by `query`, the text their user's id or email contains, case-insensitively; `?relations=user` embeds each member's user with `hasPassword` and `isTwoFactorEnabled`.",
+        "description": "The organization's members, newest first, filtered by `role` and by `query`, the text their user's email contains, case-insensitively; `?relations=user` embeds each member's user with `hasPassword` and `isTwoFactorEnabled`.",
         "responses": {
           "200": {
             "content": {
@@ -11445,7 +11444,7 @@
     "/v1/apps/{appId}/channels": {
       "get": {
         "operationId": "getV1AppsByAppIdChannels",
-        "description": "The app's channels, newest first; `query` selects those whose id or name contains it, case-insensitively.",
+        "description": "The app's channels, newest first; `query` selects those whose name contains it, case-insensitively.",
         "responses": {
           "200": {
             "content": {
@@ -26763,7 +26762,7 @@
     "/v1/apps/{appId}/signing-keys/{signingKeyId}": {
       "delete": {
         "operationId": "deleteV1AppsByAppIdSigningKeysBySigningKeyId",
-        "description": "Unregisters a key, after the store release that stopped trusting it; the app's only key cannot be deleted, so an app that signs never silently stops.",
+        "description": "Unregisters a key, after the store release that stopped trusting it; the app's last key goes like any other, and binaries built with it refuse unsigned releases until they are replaced.",
         "responses": {
           "204": {
             "description": "The signing key is gone."
@@ -26807,16 +26806,6 @@
               }
             },
             "description": "E_NOT_FOUND"
-          },
-          "409": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "E_SOLE_SIGNING_KEY"
           },
           "429": {
             "content": {
@@ -28817,7 +28806,7 @@
       },
       "delete": {
         "operationId": "deleteV1UsersByUserId",
-        "description": "Soft-deletes the account: gone at once, hard-deleted after seven days by a job, restorable only by support within the window. Refused while the user is the only Owner of an organization with other members; an organization with no other member is soft-deleted with the account.",
+        "description": "Soft-deletes the account: gone at once, hard-deleted after seven days by a job, restorable only by support within the window. The body carries the account's password, the one re-authentication of the API: a wrong one answers `E_FORBIDDEN`, and so does an account without a password, which sets one first. Refused while the user is the only Owner of an organization with other members; an organization with no other member is soft-deleted with the account.",
         "responses": {
           "204": {
             "description": "The account is scheduled for deletion."
@@ -28934,7 +28923,27 @@
           {
             "$ref": "#/components/parameters/ClientHeader"
           }
-        ]
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  }
+                },
+                "required": [
+                  "password"
+                ]
+              }
+            }
+          }
+        }
       }
     },
     "/v1/users/{userId}/password": {

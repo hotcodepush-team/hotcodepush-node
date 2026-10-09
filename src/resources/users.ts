@@ -1,11 +1,16 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
-import type { JsonResponseBody, PathParameters } from '../types';
+import type {
+  JsonRequestBody,
+  JsonResponseBody,
+  PathParameters,
+} from '../types';
 import { UserPasswordResource } from './user-password';
 import { UserSessionsResource } from './user-sessions';
 import { UserTokensResource } from './user-tokens';
 
-export type DeleteUserOptions = PathParameters<'/v1/users/{userId}', 'delete'>;
+export type DeleteUserOptions = PathParameters<'/v1/users/{userId}', 'delete'> &
+  JsonRequestBody<'/v1/users/{userId}', 'delete'>;
 
 export type GetUserOptions = PathParameters<'/v1/users/{userId}', 'get'>;
 
@@ -24,13 +29,16 @@ export class UsersResource {
 
   /**
    * Soft-deletes the caller's account: gone at once, hard-deleted after seven days.
-   * `userId` takes `me` for the caller.
+   * `userId` takes `me` for the caller; `password` is the account's own, and a wrong one answers `E_FORBIDDEN`,
+   * as does an account without a password, which sets one first through `users.password.create`.
    * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
   public async delete(options: DeleteUserOptions): Promise<void> {
+    const { userId, ...body } = options;
     await this.httpClient.fetchJson({
+      body,
       method: 'DELETE',
-      path: resolvePath('/v1/users/{userId}', options),
+      path: resolvePath('/v1/users/{userId}', { userId }),
     });
   }
 

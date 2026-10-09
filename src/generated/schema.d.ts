@@ -73,7 +73,7 @@ export interface paths {
         };
         /**
          * List the apps
-         * @description The organization's apps, newest first; `query` selects those whose id or name contains it, case-insensitively.
+         * @description The organization's apps, newest first; `query` selects those whose name contains it, case-insensitively.
          */
         get: operations["getV1OrganizationsByOrganizationIdApps"];
         put?: never;
@@ -157,7 +157,7 @@ export interface paths {
         };
         /**
          * List the invitations
-         * @description The organization's invitations, newest first, filtered by `role`, by `query`, the text their id or email contains, case-insensitively, and by `status`, whose `pending` selects those still pending and not yet expired.
+         * @description The organization's invitations, newest first, filtered by `role`, by `query`, the text their email contains, case-insensitively, and by `status`, whose `pending` selects those still pending and not yet expired.
          */
         get: operations["getV1OrganizationsByOrganizationIdInvitations"];
         put?: never;
@@ -225,7 +225,7 @@ export interface paths {
         };
         /**
          * List the members
-         * @description The organization's members, newest first, filtered by `role` and by `query`, the text their user's id or email contains, case-insensitively; `?relations=user` embeds each member's user with `hasPassword` and `isTwoFactorEnabled`.
+         * @description The organization's members, newest first, filtered by `role` and by `query`, the text their user's email contains, case-insensitively; `?relations=user` embeds each member's user with `hasPassword` and `isTwoFactorEnabled`.
          */
         get: operations["getV1OrganizationsByOrganizationIdMembers"];
         put?: never;
@@ -829,7 +829,7 @@ export interface paths {
         };
         /**
          * List the channels
-         * @description The app's channels, newest first; `query` selects those whose id or name contains it, case-insensitively.
+         * @description The app's channels, newest first; `query` selects those whose name contains it, case-insensitively.
          */
         get: operations["getV1AppsByAppIdChannels"];
         put?: never;
@@ -1428,7 +1428,7 @@ export interface paths {
         post?: never;
         /**
          * Delete a signing key
-         * @description Unregisters a key, after the store release that stopped trusting it; the app's only key cannot be deleted, so an app that signs never silently stops.
+         * @description Unregisters a key, after the store release that stopped trusting it; the app's last key goes like any other, and binaries built with it refuse unsigned releases until they are replaced.
          */
         delete: operations["deleteV1AppsByAppIdSigningKeysBySigningKeyId"];
         options?: never;
@@ -1600,7 +1600,7 @@ export interface paths {
         post?: never;
         /**
          * Delete the account
-         * @description Soft-deletes the account: gone at once, hard-deleted after seven days by a job, restorable only by support within the window. Refused while the user is the only Owner of an organization with other members; an organization with no other member is soft-deleted with the account.
+         * @description Soft-deletes the account: gone at once, hard-deleted after seven days by a job, restorable only by support within the window. The body carries the account's password, the one re-authentication of the API: a wrong one answers `E_FORBIDDEN`, and so does an account without a password, which sets one first. Refused while the user is the only Owner of an organization with other members; an organization with no other member is soft-deleted with the account.
          */
         delete: operations["deleteV1UsersByUserId"];
         options?: never;
@@ -1635,7 +1635,7 @@ export interface components {
         /** @description The one error shape: a context-free code from the catalog, one sentence of what happened and what to do, and the field, rule and target of a failed validation in `details`. */
         Error: {
             /** @enum {string} */
-            code: "E_ACCOUNT_BANNED" | "E_APP_NAME_TAKEN" | "E_APPS_LIMIT_REACHED" | "E_AUTH_FLOW_FAILED" | "E_BINARY_CONFLICT" | "E_BUNDLE_IN_USE" | "E_BUNDLE_NOT_READY" | "E_BUNDLE_TOO_LARGE" | "E_CHANNEL_NAME_TAKEN" | "E_CHANNEL_PROTECTED" | "E_CHANNELS_PER_APP_LIMIT_REACHED" | "E_CLIENT_UPDATE_REQUIRED" | "E_DEFAULT_CHANNEL" | "E_FILES_PER_BUNDLE_LIMIT_REACHED" | "E_FORBIDDEN" | "E_HASH_MISMATCH" | "E_IDEMPOTENCY_KEY_REUSED" | "E_INTERNAL" | "E_INVITATION_INVALID" | "E_INVITATIONS_PER_DAY_LIMIT_REACHED" | "E_MAINTENANCE" | "E_MEMBERS_LIMIT_REACHED" | "E_NOT_FOUND" | "E_NOTIFICATION_MANDATORY" | "E_ORIGIN_UNTRUSTED" | "E_PASSWORD_ALREADY_SET" | "E_PLAN_REQUIRED" | "E_RATE_LIMITED" | "E_RELEASE_REVOKED" | "E_RELEASES_PER_DAY_LIMIT_REACHED" | "E_SIGNATURE_INVALID" | "E_SIGNATURE_REQUIRED" | "E_SOLE_OWNER" | "E_SOLE_SIGNING_KEY" | "E_SSO_REQUIRED" | "E_STORAGE_LIMIT_REACHED" | "E_TOKENS_LIMIT_REACHED" | "E_TURNSTILE_FAILED" | "E_UNAUTHENTICATED" | "E_UPLOAD_INCOMPLETE" | "E_VALIDATION" | "E_WEBHOOK_NAME_TAKEN";
+            code: "E_ACCOUNT_BANNED" | "E_APP_NAME_TAKEN" | "E_APPS_LIMIT_REACHED" | "E_AUTH_FLOW_FAILED" | "E_BINARY_CONFLICT" | "E_BUNDLE_IN_USE" | "E_BUNDLE_NOT_READY" | "E_BUNDLE_TOO_LARGE" | "E_CHANNEL_NAME_TAKEN" | "E_CHANNEL_PROTECTED" | "E_CHANNELS_PER_APP_LIMIT_REACHED" | "E_CLIENT_UPDATE_REQUIRED" | "E_DEFAULT_CHANNEL" | "E_FILES_PER_BUNDLE_LIMIT_REACHED" | "E_FORBIDDEN" | "E_HASH_MISMATCH" | "E_IDEMPOTENCY_KEY_REUSED" | "E_INTERNAL" | "E_INVITATION_INVALID" | "E_INVITATIONS_PER_DAY_LIMIT_REACHED" | "E_MAINTENANCE" | "E_MEMBERS_LIMIT_REACHED" | "E_NOT_FOUND" | "E_NOTIFICATION_MANDATORY" | "E_ORIGIN_UNTRUSTED" | "E_PASSWORD_ALREADY_SET" | "E_PLAN_REQUIRED" | "E_RATE_LIMITED" | "E_RELEASE_REVOKED" | "E_RELEASES_PER_DAY_LIMIT_REACHED" | "E_SIGNATURE_INVALID" | "E_SIGNATURE_REQUIRED" | "E_SOLE_OWNER" | "E_SSO_REQUIRED" | "E_STORAGE_LIMIT_REACHED" | "E_TOKENS_LIMIT_REACHED" | "E_TURNSTILE_FAILED" | "E_UNAUTHENTICATED" | "E_UPLOAD_INCOMPLETE" | "E_VALIDATION" | "E_WEBHOOK_NAME_TAKEN";
             details: {
                 [key: string]: unknown;
             } | null;
@@ -13072,15 +13072,6 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_SOLE_SIGNING_KEY */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
@@ -14188,7 +14179,13 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    password: string;
+                };
+            };
+        };
         responses: {
             /** @description The account is scheduled for deletion. */
             204: {

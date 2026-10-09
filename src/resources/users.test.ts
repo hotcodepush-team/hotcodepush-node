@@ -18,14 +18,18 @@ afterEach(() => {
 });
 
 describe('UsersResource', () => {
-  test('should delete the caller when the user id is me', async () => {
+  test('should delete the caller with the password when the user id is me', async () => {
     const fetchMock = stubFetch(() => new Response(null, { status: 204 }));
 
     await expect(
-      new HotCodePush().users.delete({ userId: 'me' }),
+      new HotCodePush().users.delete({
+        password: 'correct horse battery staple',
+        userId: 'me',
+      }),
     ).resolves.toBeUndefined();
 
     expect(resolveSentRequest(fetchMock)).toMatchObject({
+      body: { password: 'correct horse battery staple' },
       method: 'DELETE',
       url: 'https://api.hotcodepush.com/v1/users/me',
     });

@@ -9,10 +9,16 @@ import type {
   QueryParameters,
 } from '../types';
 import { AuditLogsResource } from './audit-logs';
+import { BillingResource } from './billing';
+import { CheckoutsResource } from './checkouts';
+import { CustomerPortalSessionsResource } from './customer-portal-sessions';
+import { LimitsResource } from './limits';
 import { MembersResource } from './members';
 import { OrganizationAppsResource } from './organization-apps';
 import { OrganizationInvitationsResource } from './organization-invitations';
 import { SsoProviderResource } from './sso-provider';
+import { SubscriptionResource } from './subscription';
+import { UsageResource } from './usage';
 
 export type CreateOrganizationOptions = JsonRequestBody<
   '/v1/organizations',
@@ -50,16 +56,30 @@ export type UpdateOrganizationOptions = PathParameters<
 export class OrganizationsResource {
   public readonly apps: OrganizationAppsResource;
   public readonly auditLogs: AuditLogsResource;
+  public readonly billing: BillingResource;
+  public readonly checkouts: CheckoutsResource;
+  public readonly customerPortalSessions: CustomerPortalSessionsResource;
   public readonly invitations: OrganizationInvitationsResource;
+  public readonly limits: LimitsResource;
   public readonly members: MembersResource;
   public readonly ssoProvider: SsoProviderResource;
+  public readonly subscription: SubscriptionResource;
+  public readonly usage: UsageResource;
 
   constructor(private readonly httpClient: HttpClient) {
     this.apps = new OrganizationAppsResource(httpClient);
     this.auditLogs = new AuditLogsResource(httpClient);
+    this.billing = new BillingResource(httpClient);
+    this.checkouts = new CheckoutsResource(httpClient);
+    this.customerPortalSessions = new CustomerPortalSessionsResource(
+      httpClient,
+    );
     this.invitations = new OrganizationInvitationsResource(httpClient);
+    this.limits = new LimitsResource(httpClient);
     this.members = new MembersResource(httpClient);
     this.ssoProvider = new SsoProviderResource(httpClient);
+    this.subscription = new SubscriptionResource(httpClient);
+    this.usage = new UsageResource(httpClient);
   }
 
   /**

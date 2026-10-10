@@ -64,6 +64,94 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/notification-preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List notification preferences
+         * @description Every notification type with what the caller receives per medium and whether that is the default or an override, grouped by category in the catalog's order: the account-scoped categories, or with `organizationId` that organization's product alerts.
+         */
+        get: operations["getV1NotificationPreferences"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update a notification preference
+         * @description Sets one cell of the caller's matrix, the type and the medium, for the account or with `organizationId` for that membership; a mandatory category's email is always on.
+         */
+        patch: operations["patchV1NotificationPreferences"];
+        trace?: never;
+    };
+    "/v1/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List notifications
+         * @description The caller's in-app notifications across every organization, newest first, filtered by `isRead`.
+         */
+        get: operations["getV1Notifications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update notifications in bulk
+         * @description Marks every unread notification of the caller read: `isRead: true`, the body one notification's update takes.
+         */
+        patch: operations["patchV1Notifications"];
+        trace?: never;
+    };
+    "/v1/notifications/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Count notifications
+         * @description The number of the caller's notifications under the list's filters; `?isRead=false` is the bell's badge.
+         */
+        get: operations["getV1NotificationsCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/notifications/{notificationId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update a notification
+         * @description Marks one of the caller's notifications read: `isRead: true` sets the moment it was read.
+         */
+        patch: operations["patchV1NotificationsByNotificationId"];
+        trace?: never;
+    };
     "/v1/organizations/{organizationId}/apps": {
         parameters: {
             query?: never;
@@ -148,6 +236,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/organizations/{organizationId}/billing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the billing
+         * @description The organization's billing this month: the plan, the spending cap and a lowered one waiting for the next month, the MAU counted so far against the ceiling the plan sets, and when the cap was reached if it was. Owner, Admin and Billing.
+         */
+        get: operations["getV1OrganizationsByOrganizationIdBilling"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update the spending cap
+         * @description Sets the spending cap, in whole dollars from $5 to $10,000: a raise applies now and counts the devices waiting beyond the previous cap in the order they reported, a lower cap applies from the next billing month. Mails Owner and Billing and the caller. Owner, Admin and Billing, on a paying plan.
+         */
+        patch: operations["patchV1OrganizationsByOrganizationIdBilling"];
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/checkouts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a checkout
+         * @description Enables billing: creates the Polar checkout for pay-as-you-go with the chosen spending cap, the organization as Polar's customer, and answers its URL. The subscription and the cap arrive with Polar's webhook once the checkout is paid. Free organizations only.
+         */
+        post: operations["postV1OrganizationsByOrganizationIdCheckouts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/customer-portal-sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a customer portal session
+         * @description Creates a session of Polar's customer portal for the organization — its invoices and its payment method — and answers its URL. An organization that never subscribed has no portal.
+         */
+        post: operations["postV1OrganizationsByOrganizationIdCustomerPortalSessions"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/organizations/{organizationId}/invitations": {
         parameters: {
             query?: never;
@@ -211,6 +363,26 @@ export interface paths {
          * @description Withdraws an invitation; its link stops working at once.
          */
         delete: operations["deleteV1OrganizationsByOrganizationIdInvitationsByInvitationId"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the limits
+         * @description Every limit of the registry in effect for the organization, keyed by name: its value, the plan's default, and whether a row of ours overrides the default; read-only, since raising one is a row of ours. `tokensLimit` counts one user's tokens and is every user's ceiling, never overridden. Admin or Owner.
+         */
+        get: operations["getV1OrganizationsByOrganizationIdLimits"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -336,6 +508,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/organizations/{organizationId}/subscription/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel the subscription
+         * @description Schedules the end of the subscription at the end of its period, with the reason and the comment of the retention dialog; until then the organization stays on pay-as-you-go. A cancel already scheduled stays as it is.
+         */
+        post: operations["postV1OrganizationsByOrganizationIdSubscriptionCancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/subscription/uncancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Uncancel the subscription
+         * @description Clears the scheduled end of the subscription, so it renews as before. A subscription with no end scheduled stays as it is.
+         */
+        post: operations["postV1OrganizationsByOrganizationIdSubscriptionUncancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the usage
+         * @description The monthly active devices and bytes of each of the organization's live apps in `month`, `YYYY-MM`, the current one by default, beside the organization's total. Each month is the rollup's, the number the invoice shows, its bytes approximate by design; the current month's devices are counted live, since the rollup's row is a night behind. `?format=csv` answers the apps as `text/csv`. Any role of the organization, Billing included.
+         */
+        get: operations["getV1OrganizationsByOrganizationIdUsage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/organizations": {
         parameters: {
             query?: never;
@@ -403,7 +635,7 @@ export interface paths {
         head?: never;
         /**
          * Update an organization
-         * @description Changes the name and the security settings; the security settings need a paying plan, and the region is read-only after creation.
+         * @description Changes the name and the security settings; the security settings need a paying plan, an allowlist leaving out the caller's own address or country answers `E_VALIDATION` with the rule `excludes_caller`, and the region is read-only after creation.
          */
         patch: operations["patchV1OrganizationsByOrganizationId"];
         trace?: never;
@@ -971,7 +1203,7 @@ export interface paths {
         put?: never;
         /**
          * Create a release
-         * @description Creates a release in the channel of a ready bundle, `bundleId`, or of what another channel's newest active release serves, `fromChannelId`, recorded as the provenance, with its conditions, rollout, mandatory flag, notes and the nullable auto-pause overrides, numbered next in the channel; refused on a protected channel below Admin, past `releases_per_app_per_day_limit` and, once the app has a signing key, for an unsigned bundle; an `Idempotency-Key` answers the same release again for 24 hours. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type the release uses.
+         * @description Creates a release in the channel of a ready bundle, `bundleId`, or of what another channel's newest active release serves, `fromChannelId`, recorded as the provenance, with its conditions, rollout, mandatory flag, notes, the nullable auto-pause overrides and the nullable progression schedule, whose last percentage lies above the rollout, numbered next in the channel; refused on a protected channel below Admin, past `releases_per_app_per_day_limit` and, once the app has a signing key, for an unsigned bundle; an `Idempotency-Key` answers the same release again for 24 hours. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type the release uses.
          */
         post: operations["postV1AppsByAppIdChannelsByChannelIdReleases"];
         delete?: never;
@@ -1287,7 +1519,7 @@ export interface paths {
         head?: never;
         /**
          * Update a release
-         * @description Edits the rollout percentage in both directions — a device that has the release keeps it — the mandatory flag, the notes and the nullable auto-pause overrides, null inheriting the channel; the index re-materializes and devices see the change on their next check; revoked is terminal.
+         * @description Edits the rollout percentage in both directions — a device that has the release keeps it — the progression schedule, null stopping it, the mandatory flag, the notes and the nullable auto-pause overrides, null inheriting the channel; a rollout set without a schedule ends the one the release had, and a schedule named starts its step anew, its last percentage above the rollout; the index re-materializes and devices see the change on their next check; revoked is terminal.
          */
         patch: operations["patchV1AppsByAppIdReleasesByReleaseId"];
         trace?: never;
@@ -1535,7 +1767,7 @@ export interface paths {
         put?: never;
         /**
          * Transfer an app
-         * @description Moves the app to another organization the caller is an Admin of, in one transaction, with the target's `apps_limit` and storage limit checked; audited in both organizations.
+         * @description Moves the app to another organization the caller is an Admin of, in one transaction, with the target's security settings, `apps_limit` and storage limit checked; audited in both organizations.
          */
         post: operations["postV1AppsByAppIdTransfer"];
         delete?: never;
@@ -1635,7 +1867,7 @@ export interface components {
         /** @description The one error shape: a context-free code from the catalog, one sentence of what happened and what to do, and the field, rule and target of a failed validation in `details`. */
         Error: {
             /** @enum {string} */
-            code: "E_ACCOUNT_BANNED" | "E_APP_NAME_TAKEN" | "E_APPS_LIMIT_REACHED" | "E_AUTH_FLOW_FAILED" | "E_BINARY_CONFLICT" | "E_BUNDLE_IN_USE" | "E_BUNDLE_NOT_READY" | "E_BUNDLE_TOO_LARGE" | "E_CHANNEL_NAME_TAKEN" | "E_CHANNEL_PROTECTED" | "E_CHANNELS_PER_APP_LIMIT_REACHED" | "E_CLIENT_UPDATE_REQUIRED" | "E_DEFAULT_CHANNEL" | "E_FILES_PER_BUNDLE_LIMIT_REACHED" | "E_FORBIDDEN" | "E_HASH_MISMATCH" | "E_IDEMPOTENCY_KEY_REUSED" | "E_INTERNAL" | "E_INVITATION_INVALID" | "E_INVITATIONS_PER_DAY_LIMIT_REACHED" | "E_MAINTENANCE" | "E_MEMBERS_LIMIT_REACHED" | "E_NOT_FOUND" | "E_NOTIFICATION_MANDATORY" | "E_ORIGIN_UNTRUSTED" | "E_PASSWORD_ALREADY_SET" | "E_PLAN_REQUIRED" | "E_RATE_LIMITED" | "E_RELEASE_REVOKED" | "E_RELEASES_PER_DAY_LIMIT_REACHED" | "E_SIGNATURE_INVALID" | "E_SIGNATURE_REQUIRED" | "E_SOLE_OWNER" | "E_SSO_REQUIRED" | "E_STORAGE_LIMIT_REACHED" | "E_TOKENS_LIMIT_REACHED" | "E_TURNSTILE_FAILED" | "E_UNAUTHENTICATED" | "E_UPLOAD_INCOMPLETE" | "E_VALIDATION" | "E_WEBHOOK_NAME_TAKEN";
+            code: "E_ACCOUNT_BANNED" | "E_APP_NAME_TAKEN" | "E_APPS_LIMIT_REACHED" | "E_AUTH_FLOW_FAILED" | "E_BINARY_CONFLICT" | "E_BUNDLE_IN_USE" | "E_BUNDLE_NOT_READY" | "E_BUNDLE_TOO_LARGE" | "E_CHANNEL_NAME_TAKEN" | "E_CHANNEL_PROTECTED" | "E_CHANNELS_PER_APP_LIMIT_REACHED" | "E_CLIENT_UPDATE_REQUIRED" | "E_COUNTRY_NOT_ALLOWED" | "E_DEFAULT_CHANNEL" | "E_FILES_PER_BUNDLE_LIMIT_REACHED" | "E_FORBIDDEN" | "E_HASH_MISMATCH" | "E_IDEMPOTENCY_KEY_REUSED" | "E_INTERNAL" | "E_INVITATION_INVALID" | "E_INVITATIONS_PER_DAY_LIMIT_REACHED" | "E_IP_NOT_ALLOWED" | "E_MAINTENANCE" | "E_MEMBERS_LIMIT_REACHED" | "E_NOT_FOUND" | "E_NOTIFICATION_MANDATORY" | "E_ORIGIN_UNTRUSTED" | "E_PASSWORD_ALREADY_SET" | "E_PLAN_REQUIRED" | "E_RATE_LIMITED" | "E_RELEASE_REVOKED" | "E_RELEASES_PER_DAY_LIMIT_REACHED" | "E_SIGNATURE_INVALID" | "E_SIGNATURE_REQUIRED" | "E_SOLE_OWNER" | "E_SSO_REQUIRED" | "E_STORAGE_LIMIT_REACHED" | "E_TOKENS_LIMIT_REACHED" | "E_TURNSTILE_FAILED" | "E_TWO_FACTOR_REQUIRED" | "E_UNAUTHENTICATED" | "E_UPLOAD_INCOMPLETE" | "E_VALIDATION" | "E_WEBHOOK_NAME_TAKEN";
             details: {
                 [key: string]: unknown;
             } | null;
@@ -1715,7 +1947,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1803,7 +2035,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1920,7 +2152,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1949,6 +2181,612 @@ export interface operations {
             };
             /** @description E_MEMBERS_LIMIT_REACHED */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1NotificationPreferences: {
+        parameters: {
+            query?: {
+                organizationId?: string;
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The preferences. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        category: "account" | "billing" | "lifecycle" | "newsletter" | "product_alerts" | "service_notices";
+                        isMandatory: boolean;
+                        types: {
+                            media: {
+                                isDefault: boolean;
+                                isEnabled: boolean;
+                                /** @enum {string} */
+                                medium: "email" | "in_app";
+                            }[];
+                            /** @enum {string} */
+                            type: "account-banned" | "account-deleted" | "api-token-created" | "code-signing-not-enabled" | "deprecation" | "dormancy-final-warning" | "dormancy-notice" | "dunning-paused" | "email-address-changed" | "email-verification" | "fair-use-warning" | "feedback-after-thirty-days" | "first-release-nudge" | "incident" | "invitation" | "invitation-accepted" | "maintenance-window" | "member-removed" | "member-role-changed" | "new-sign-in" | "newsletter-issue" | "no-device-after-first-release" | "organization-deleted" | "ownership-transferred" | "password-changed" | "password-reset" | "payment-failed" | "payment-failed-reminder-1" | "payment-failed-reminder-2" | "recovery-code-used" | "recovery-codes-regenerated" | "release-failure-rate" | "release-from-ci" | "release-paused" | "release-revoked" | "spending-cap-changed" | "spending-cap-reached" | "spending-cap-warning" | "sso-member-joined" | "sso-member-joined-admins" | "staged-rollouts-available" | "storage-limit-reached" | "storage-warning" | "terms-change" | "two-factor-disabled" | "two-factor-enabled" | "webhook-disabled" | "welcome";
+                        }[];
+                    }[];
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    patchV1NotificationPreferences: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    isEnabled: boolean;
+                    /** @enum {string} */
+                    medium: "email" | "in_app";
+                    /** Format: uuid */
+                    organizationId?: string;
+                    /** @enum {string} */
+                    type: "account-banned" | "account-deleted" | "api-token-created" | "code-signing-not-enabled" | "deprecation" | "dormancy-final-warning" | "dormancy-notice" | "dunning-paused" | "email-address-changed" | "email-verification" | "fair-use-warning" | "feedback-after-thirty-days" | "first-release-nudge" | "incident" | "invitation" | "invitation-accepted" | "maintenance-window" | "member-removed" | "member-role-changed" | "new-sign-in" | "newsletter-issue" | "no-device-after-first-release" | "organization-deleted" | "ownership-transferred" | "password-changed" | "password-reset" | "payment-failed" | "payment-failed-reminder-1" | "payment-failed-reminder-2" | "recovery-code-used" | "recovery-codes-regenerated" | "release-failure-rate" | "release-from-ci" | "release-paused" | "release-revoked" | "spending-cap-changed" | "spending-cap-reached" | "spending-cap-warning" | "sso-member-joined" | "sso-member-joined-admins" | "staged-rollouts-available" | "storage-limit-reached" | "storage-warning" | "terms-change" | "two-factor-disabled" | "two-factor-enabled" | "webhook-disabled" | "welcome";
+                };
+            };
+        };
+        responses: {
+            /** @description The type's preferences. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        media: {
+                            isDefault: boolean;
+                            isEnabled: boolean;
+                            /** @enum {string} */
+                            medium: "email" | "in_app";
+                        }[];
+                        /** @enum {string} */
+                        type: "account-banned" | "account-deleted" | "api-token-created" | "code-signing-not-enabled" | "deprecation" | "dormancy-final-warning" | "dormancy-notice" | "dunning-paused" | "email-address-changed" | "email-verification" | "fair-use-warning" | "feedback-after-thirty-days" | "first-release-nudge" | "incident" | "invitation" | "invitation-accepted" | "maintenance-window" | "member-removed" | "member-role-changed" | "new-sign-in" | "newsletter-issue" | "no-device-after-first-release" | "organization-deleted" | "ownership-transferred" | "password-changed" | "password-reset" | "payment-failed" | "payment-failed-reminder-1" | "payment-failed-reminder-2" | "recovery-code-used" | "recovery-codes-regenerated" | "release-failure-rate" | "release-from-ci" | "release-paused" | "release-revoked" | "spending-cap-changed" | "spending-cap-reached" | "spending-cap-warning" | "sso-member-joined" | "sso-member-joined-admins" | "staged-rollouts-available" | "storage-limit-reached" | "storage-warning" | "terms-change" | "two-factor-disabled" | "two-factor-enabled" | "webhook-disabled" | "welcome";
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOTIFICATION_MANDATORY */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1Notifications: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                isRead?: "false" | "true";
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The notifications. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        createdAt: string;
+                        /** Format: uuid */
+                        id: string;
+                        isRead: boolean;
+                        organizationId: string | null;
+                        payload: {
+                            [key: string]: unknown;
+                        };
+                        type: string;
+                    }[];
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    patchV1Notifications: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @constant */
+                    isRead: true;
+                };
+            };
+        };
+        responses: {
+            /** @description Every notification is read. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1NotificationsCount: {
+        parameters: {
+            query?: {
+                isRead?: "false" | "true";
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The number of rows the list's filters match. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        total: number;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    patchV1NotificationsByNotificationId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                notificationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @constant */
+                    isRead: true;
+                };
+            };
+        };
+        responses: {
+            /** @description The notification. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        createdAt: string;
+                        /** Format: uuid */
+                        id: string;
+                        isRead: boolean;
+                        organizationId: string | null;
+                        payload: {
+                            [key: string]: unknown;
+                        };
+                        type: string;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2045,7 +2883,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2158,7 +2996,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2268,7 +3106,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2400,7 +3238,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2505,7 +3343,404 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1OrganizationsByOrganizationIdBilling: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The billing. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        cappedAt: string | null;
+                        countedMau: number;
+                        mauCap: number | null;
+                        nextSpendingCapCents: number | null;
+                        nextSpendingCapStartsAt: string | null;
+                        /** @enum {string} */
+                        plan: "enterprise" | "free" | "pay_as_you_go";
+                        spendingCapCents: number;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    patchV1OrganizationsByOrganizationIdBilling: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    spendingCapCents: number;
+                };
+            };
+        };
+        responses: {
+            /** @description The billing. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        cappedAt: string | null;
+                        countedMau: number;
+                        mauCap: number | null;
+                        nextSpendingCapCents: number | null;
+                        nextSpendingCapStartsAt: string | null;
+                        /** @enum {string} */
+                        plan: "enterprise" | "free" | "pay_as_you_go";
+                        spendingCapCents: number;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_PLAN_REQUIRED */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1OrganizationsByOrganizationIdCheckouts: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    spendingCapCents: number;
+                };
+            };
+        };
+        responses: {
+            /** @description The checkout to open. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uri */
+                        url: string;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1OrganizationsByOrganizationIdCustomerPortalSessions: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The portal to open. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uri */
+                        url: string;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2619,7 +3854,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2738,7 +3973,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2844,7 +4079,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2938,7 +4173,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3025,7 +4260,101 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1OrganizationsByOrganizationIdLimits: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The effective limits. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: {
+                            default: number;
+                            isOverridden: boolean;
+                            value: number;
+                        };
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3142,7 +4471,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3230,7 +4559,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3323,7 +4652,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3437,7 +4766,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3524,7 +4853,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3652,7 +4981,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3779,7 +5108,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3986,7 +5315,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4072,7 +5401,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4203,7 +5532,292 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1OrganizationsByOrganizationIdSubscriptionCancel: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    comment?: string;
+                    /** @enum {string} */
+                    reason: "missing_features" | "not_enough_value" | "other" | "technical_issues" | "too_expensive";
+                };
+            };
+        };
+        responses: {
+            /** @description The end is scheduled. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1OrganizationsByOrganizationIdSubscriptionUncancel: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The subscription renews. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1OrganizationsByOrganizationIdUsage: {
+        parameters: {
+            query?: {
+                format?: "csv";
+                month?: string;
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The apps' usage and the organization's total. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        apps: {
+                            /** Format: uuid */
+                            appId: string;
+                            appName: string;
+                            bytes: number;
+                            mau: number;
+                        }[];
+                        month: string;
+                        total: {
+                            bytes: number;
+                            mau: number;
+                        };
+                    };
+                    "text/csv": string;
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4308,7 +5922,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4418,7 +6032,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4515,7 +6129,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4619,7 +6233,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4705,7 +6319,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4827,7 +6441,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4970,7 +6584,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5185,7 +6799,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5287,7 +6901,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5427,7 +7041,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5555,7 +7169,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5724,7 +7338,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5849,7 +7463,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5968,7 +7582,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6055,7 +7669,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6183,7 +7797,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6289,7 +7903,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6399,7 +8013,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6499,7 +8113,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6628,7 +8242,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6735,7 +8349,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6831,7 +8445,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6922,7 +8536,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7018,7 +8632,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7127,7 +8741,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7226,7 +8840,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7354,7 +8968,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7460,7 +9074,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7552,7 +9166,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7661,7 +9275,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7780,7 +9394,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7886,7 +9500,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7987,7 +9601,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8096,7 +9710,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8183,7 +9797,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8310,7 +9924,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8425,7 +10039,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8531,7 +10145,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8687,7 +10301,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8860,6 +10474,25 @@ export interface operations {
                         notes: string | null;
                         number: number;
                         pausedAt: string | null;
+                        progression: {
+                            minimumSample: number;
+                            minimumSeconds: number;
+                            percentages: number[];
+                        } | null;
+                        progressionStep: {
+                            gate: {
+                                attempted: number;
+                                /** @constant */
+                                kind: "sample";
+                                required: number;
+                            } | {
+                                /** @constant */
+                                kind: "time";
+                                /** Format: date-time */
+                                readyAt: string;
+                            };
+                            number: number;
+                        } | null;
                         purgedAt: string | null;
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
@@ -8894,7 +10527,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8996,6 +10629,12 @@ export interface operations {
                     isMandatory?: boolean;
                     /** @default null */
                     notes?: string | null;
+                    /** @default null */
+                    progression?: {
+                        minimumSample: number;
+                        minimumSeconds: number;
+                        percentages: number[];
+                    } | null;
                     /** @default 100 */
                     rolloutPercentage?: number;
                 };
@@ -9109,6 +10748,25 @@ export interface operations {
                         notes: string | null;
                         number: number;
                         pausedAt: string | null;
+                        progression: {
+                            minimumSample: number;
+                            minimumSeconds: number;
+                            percentages: number[];
+                        } | null;
+                        progressionStep: {
+                            gate: {
+                                attempted: number;
+                                /** @constant */
+                                kind: "sample";
+                                required: number;
+                            } | {
+                                /** @constant */
+                                kind: "time";
+                                /** Format: date-time */
+                                readyAt: string;
+                            };
+                            number: number;
+                        } | null;
                         purgedAt: string | null;
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
@@ -9151,7 +10809,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9260,7 +10918,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9440,6 +11098,25 @@ export interface operations {
                         notes: string | null;
                         number: number;
                         pausedAt: string | null;
+                        progression: {
+                            minimumSample: number;
+                            minimumSeconds: number;
+                            percentages: number[];
+                        } | null;
+                        progressionStep: {
+                            gate: {
+                                attempted: number;
+                                /** @constant */
+                                kind: "sample";
+                                required: number;
+                            } | {
+                                /** @constant */
+                                kind: "time";
+                                /** Format: date-time */
+                                readyAt: string;
+                            };
+                            number: number;
+                        } | null;
                         purgedAt: string | null;
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
@@ -9474,7 +11151,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9668,6 +11345,25 @@ export interface operations {
                         notes: string | null;
                         number: number;
                         pausedAt: string | null;
+                        progression: {
+                            minimumSample: number;
+                            minimumSeconds: number;
+                            percentages: number[];
+                        } | null;
+                        progressionStep: {
+                            gate: {
+                                attempted: number;
+                                /** @constant */
+                                kind: "sample";
+                                required: number;
+                            } | {
+                                /** @constant */
+                                kind: "time";
+                                /** Format: date-time */
+                                readyAt: string;
+                            };
+                            number: number;
+                        } | null;
                         purgedAt: string | null;
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
@@ -9702,7 +11398,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9818,7 +11514,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10041,6 +11737,25 @@ export interface operations {
                             notes: string | null;
                             number: number;
                             pausedAt: string | null;
+                            progression: {
+                                minimumSample: number;
+                                minimumSeconds: number;
+                                percentages: number[];
+                            } | null;
+                            progressionStep: {
+                                gate: {
+                                    attempted: number;
+                                    /** @constant */
+                                    kind: "sample";
+                                    required: number;
+                                } | {
+                                    /** @constant */
+                                    kind: "time";
+                                    /** Format: date-time */
+                                    readyAt: string;
+                                };
+                                number: number;
+                            } | null;
                             purgedAt: string | null;
                             rolledBackFromReleaseId: string | null;
                             rolloutPercentage: number;
@@ -10079,7 +11794,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10167,7 +11882,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10267,7 +11982,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10480,6 +12195,25 @@ export interface operations {
                             notes: string | null;
                             number: number;
                             pausedAt: string | null;
+                            progression: {
+                                minimumSample: number;
+                                minimumSeconds: number;
+                                percentages: number[];
+                            } | null;
+                            progressionStep: {
+                                gate: {
+                                    attempted: number;
+                                    /** @constant */
+                                    kind: "sample";
+                                    required: number;
+                                } | {
+                                    /** @constant */
+                                    kind: "time";
+                                    /** Format: date-time */
+                                    readyAt: string;
+                                };
+                                number: number;
+                            } | null;
                             purgedAt: string | null;
                             rolledBackFromReleaseId: string | null;
                             rolloutPercentage: number;
@@ -10529,7 +12263,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10616,7 +12350,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10733,7 +12467,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10842,7 +12576,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10941,7 +12675,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11090,7 +12824,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11196,7 +12930,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11372,6 +13106,25 @@ export interface operations {
                         notes: string | null;
                         number: number;
                         pausedAt: string | null;
+                        progression: {
+                            minimumSample: number;
+                            minimumSeconds: number;
+                            percentages: number[];
+                        } | null;
+                        progressionStep: {
+                            gate: {
+                                attempted: number;
+                                /** @constant */
+                                kind: "sample";
+                                required: number;
+                            } | {
+                                /** @constant */
+                                kind: "time";
+                                /** Format: date-time */
+                                readyAt: string;
+                            };
+                            number: number;
+                        } | null;
                         purgedAt: string | null;
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
@@ -11406,7 +13159,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11501,7 +13254,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11672,6 +13425,25 @@ export interface operations {
                         notes: string | null;
                         number: number;
                         pausedAt: string | null;
+                        progression: {
+                            minimumSample: number;
+                            minimumSeconds: number;
+                            percentages: number[];
+                        } | null;
+                        progressionStep: {
+                            gate: {
+                                attempted: number;
+                                /** @constant */
+                                kind: "sample";
+                                required: number;
+                            } | {
+                                /** @constant */
+                                kind: "time";
+                                /** Format: date-time */
+                                readyAt: string;
+                            };
+                            number: number;
+                        } | null;
                         purgedAt: string | null;
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
@@ -11706,7 +13478,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11774,6 +13546,11 @@ export interface operations {
                     failureThresholdPercent?: number | null;
                     isMandatory?: boolean;
                     notes?: string | null;
+                    progression?: {
+                        minimumSample: number;
+                        minimumSeconds: number;
+                        percentages: number[];
+                    } | null;
                     rolloutPercentage?: number;
                 };
             };
@@ -11886,6 +13663,25 @@ export interface operations {
                         notes: string | null;
                         number: number;
                         pausedAt: string | null;
+                        progression: {
+                            minimumSample: number;
+                            minimumSeconds: number;
+                            percentages: number[];
+                        } | null;
+                        progressionStep: {
+                            gate: {
+                                attempted: number;
+                                /** @constant */
+                                kind: "sample";
+                                required: number;
+                            } | {
+                                /** @constant */
+                                kind: "time";
+                                /** Format: date-time */
+                                readyAt: string;
+                            };
+                            number: number;
+                        } | null;
                         purgedAt: string | null;
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
@@ -11920,7 +13716,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12038,7 +13834,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12207,6 +14003,25 @@ export interface operations {
                         notes: string | null;
                         number: number;
                         pausedAt: string | null;
+                        progression: {
+                            minimumSample: number;
+                            minimumSeconds: number;
+                            percentages: number[];
+                        } | null;
+                        progressionStep: {
+                            gate: {
+                                attempted: number;
+                                /** @constant */
+                                kind: "sample";
+                                required: number;
+                            } | {
+                                /** @constant */
+                                kind: "time";
+                                /** Format: date-time */
+                                readyAt: string;
+                            };
+                            number: number;
+                        } | null;
                         purgedAt: string | null;
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
@@ -12241,7 +14056,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12419,6 +14234,25 @@ export interface operations {
                         notes: string | null;
                         number: number;
                         pausedAt: string | null;
+                        progression: {
+                            minimumSample: number;
+                            minimumSeconds: number;
+                            percentages: number[];
+                        } | null;
+                        progressionStep: {
+                            gate: {
+                                attempted: number;
+                                /** @constant */
+                                kind: "sample";
+                                required: number;
+                            } | {
+                                /** @constant */
+                                kind: "time";
+                                /** Format: date-time */
+                                readyAt: string;
+                            };
+                            number: number;
+                        } | null;
                         purgedAt: string | null;
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
@@ -12453,7 +14287,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12631,6 +14465,25 @@ export interface operations {
                         notes: string | null;
                         number: number;
                         pausedAt: string | null;
+                        progression: {
+                            minimumSample: number;
+                            minimumSeconds: number;
+                            percentages: number[];
+                        } | null;
+                        progressionStep: {
+                            gate: {
+                                attempted: number;
+                                /** @constant */
+                                kind: "sample";
+                                required: number;
+                            } | {
+                                /** @constant */
+                                kind: "time";
+                                /** Format: date-time */
+                                readyAt: string;
+                            };
+                            number: number;
+                        } | null;
                         purgedAt: string | null;
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
@@ -12665,7 +14518,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12774,7 +14627,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12877,7 +14730,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12967,7 +14820,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13054,7 +14907,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13173,7 +15026,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13301,7 +15154,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13406,7 +15259,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13509,7 +15362,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13595,7 +15448,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13709,7 +15562,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13828,7 +15681,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13934,7 +15787,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14022,7 +15875,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14120,7 +15973,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14212,7 +16065,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14313,7 +16166,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_SSO_REQUIRED or E_FORBIDDEN, E_ACCOUNT_BANNED, or E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin */
+            /** @description E_SSO_REQUIRED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;

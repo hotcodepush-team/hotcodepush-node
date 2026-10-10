@@ -26,6 +26,7 @@ const FILE = { path: 'index.html', sha256: 'a'.repeat(64), sizeBytes: 5 };
 const HTTP_METHODS = ['delete', 'get', 'patch', 'post', 'put'];
 const INVITATION_ID = '9d3c5e81-6f2a-4b07-8c14-3e7a1f9b0d26';
 const MEMBER_ID = '5b8a2f47-0e9c-4d31-a6b8-2c4f7e1d9a03';
+const NOTIFICATION_ID = '7e2a5c19-4b8d-4f36-a0c7-1d9e3b6f8a52';
 const ORGANIZATION_ID = 'c6e0b3a8-4d1f-4a92-b7e5-8f3d2c0a6b19';
 const RELEASE_ID = '0f7d4c2b-9a6e-4e18-83b5-d1c9a7f2e604';
 const SESSION_ID = '4e7b2d90-8c3a-4f61-b5d2-9a1c6e8f3b47';
@@ -256,6 +257,12 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       failureThresholdPercent: 10,
       idempotencyKey: 'key',
       isMandatory: true,
+      progression: {
+        minimumSample: 100,
+        minimumSeconds: 3600,
+        percentages: [25, 50],
+      },
+      rolloutPercentage: 10,
     }),
   'apps.channels.releases.list': hotCodePush =>
     hotCodePush.apps.channels.releases.list({
@@ -399,6 +406,11 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
   'apps.releases.update': hotCodePush =>
     hotCodePush.apps.releases.update({
       appId: APP_ID,
+      progression: {
+        minimumSample: 100,
+        minimumSeconds: 3600,
+        percentages: [75, 100],
+      },
       releaseId: RELEASE_ID,
       rolloutPercentage: 50,
     }),
@@ -449,6 +461,28 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     }),
   'invitations.count': hotCodePush => hotCodePush.invitations.count(),
   'invitations.list': hotCodePush => hotCodePush.invitations.list(),
+  'notificationPreferences.list': hotCodePush =>
+    hotCodePush.notificationPreferences.list({
+      organizationId: ORGANIZATION_ID,
+    }),
+  'notificationPreferences.update': hotCodePush =>
+    hotCodePush.notificationPreferences.update({
+      isEnabled: false,
+      medium: 'email',
+      organizationId: ORGANIZATION_ID,
+      type: 'release-paused',
+    }),
+  'notifications.count': hotCodePush =>
+    hotCodePush.notifications.count({ isRead: 'false' }),
+  'notifications.list': hotCodePush =>
+    hotCodePush.notifications.list({ isRead: 'false', limit: 10, offset: 10 }),
+  'notifications.update': hotCodePush =>
+    hotCodePush.notifications.update({
+      isRead: true,
+      notificationId: NOTIFICATION_ID,
+    }),
+  'notifications.updateMany': hotCodePush =>
+    hotCodePush.notifications.updateMany({ isRead: true }),
   'organizations.apps.count': hotCodePush =>
     hotCodePush.organizations.apps.count({
       organizationId: ORGANIZATION_ID,
@@ -498,9 +532,25 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       type: 'channel.*',
       userId: USER_ID,
     }),
+  'organizations.billing.get': hotCodePush =>
+    hotCodePush.organizations.billing.get({ organizationId: ORGANIZATION_ID }),
+  'organizations.billing.update': hotCodePush =>
+    hotCodePush.organizations.billing.update({
+      organizationId: ORGANIZATION_ID,
+      spendingCapCents: 5000,
+    }),
+  'organizations.checkouts.create': hotCodePush =>
+    hotCodePush.organizations.checkouts.create({
+      organizationId: ORGANIZATION_ID,
+      spendingCapCents: 5000,
+    }),
   'organizations.count': hotCodePush => hotCodePush.organizations.count(),
   'organizations.create': hotCodePush =>
     hotCodePush.organizations.create({ idempotencyKey: 'key', name: 'Acme' }),
+  'organizations.customerPortalSessions.create': hotCodePush =>
+    hotCodePush.organizations.customerPortalSessions.create({
+      organizationId: ORGANIZATION_ID,
+    }),
   'organizations.delete': hotCodePush =>
     hotCodePush.organizations.delete({ organizationId: ORGANIZATION_ID }),
   'organizations.get': hotCodePush =>
@@ -538,6 +588,8 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       role: 'member',
       status: 'pending',
     }),
+  'organizations.limits.get': hotCodePush =>
+    hotCodePush.organizations.limits.get({ organizationId: ORGANIZATION_ID }),
   'organizations.list': hotCodePush =>
     hotCodePush.organizations.list({ limit: 10, offset: 10 }),
   'organizations.members.count': hotCodePush =>
@@ -607,6 +659,26 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.organizations.ssoProvider.verifications.create({
       organizationId: ORGANIZATION_ID,
     }),
+  'organizations.subscription.cancel': hotCodePush =>
+    hotCodePush.organizations.subscription.cancel({
+      comment: 'We moved to a monthly release train.',
+      organizationId: ORGANIZATION_ID,
+      reason: 'not_enough_value',
+    }),
+  'organizations.subscription.uncancel': hotCodePush =>
+    hotCodePush.organizations.subscription.uncancel({
+      organizationId: ORGANIZATION_ID,
+    }),
+  'organizations.usage.downloadCsv': hotCodePush =>
+    hotCodePush.organizations.usage.downloadCsv({
+      month: '2026-09',
+      organizationId: ORGANIZATION_ID,
+    }),
+  'organizations.usage.get': hotCodePush =>
+    hotCodePush.organizations.usage.get({
+      month: '2026-09',
+      organizationId: ORGANIZATION_ID,
+    }),
   'users.delete': hotCodePush =>
     hotCodePush.users.delete({
       password: 'correct horse battery staple',
@@ -634,16 +706,27 @@ const SESSION_ONLY_METHODS: readonly string[] = [
   'invitations.accept',
   'invitations.count',
   'invitations.list',
+  'notificationPreferences.list',
+  'notificationPreferences.update',
+  'notifications.count',
+  'notifications.list',
+  'notifications.update',
+  'notifications.updateMany',
   'organizations.auditLogs.count',
   'organizations.auditLogs.downloadCsv',
   'organizations.auditLogs.list',
+  'organizations.billing.get',
+  'organizations.billing.update',
+  'organizations.checkouts.create',
   'organizations.create',
+  'organizations.customerPortalSessions.create',
   'organizations.delete',
   'organizations.invitations.count',
   'organizations.invitations.create',
   'organizations.invitations.delete',
   'organizations.invitations.deleteMany',
   'organizations.invitations.list',
+  'organizations.limits.get',
   'organizations.members.delete',
   'organizations.members.deleteMany',
   'organizations.members.update',
@@ -651,6 +734,8 @@ const SESSION_ONLY_METHODS: readonly string[] = [
   'organizations.ssoProvider.get',
   'organizations.ssoProvider.put',
   'organizations.ssoProvider.verifications.create',
+  'organizations.subscription.cancel',
+  'organizations.subscription.uncancel',
   'organizations.update',
   'users.delete',
   'users.password.create',
@@ -738,7 +823,7 @@ describe('the OpenAPI snapshot', () => {
   });
 
   test.each(Object.entries(CALLS))(
-    'should document the path, method, query, body and content type %s sends',
+    'should document the path, method, query, idempotency key, body and content type %s sends',
     async (_name, callResourceMethod) => {
       const fetchMock = stubFetch();
 
@@ -750,6 +835,10 @@ describe('the OpenAPI snapshot', () => {
       const documentedQueryNames = (operation?.parameters ?? [])
         .filter(parameter => parameter.in === 'query')
         .map(parameter => parameter.name);
+      const hasDocumentedIdempotencyKey = (operation?.parameters ?? []).some(
+        parameter =>
+          parameter.in === 'header' && parameter.name === 'Idempotency-Key',
+      );
       const documentedContentTypes = Object.keys(
         operation?.requestBody?.content ?? {},
       );
@@ -760,6 +849,9 @@ describe('the OpenAPI snapshot', () => {
       ).toBeDefined();
       expect(documentedQueryNames).toEqual(
         expect.arrayContaining([...url.searchParams.keys()]),
+      );
+      expect('Idempotency-Key' in sentRequest.headers).toBe(
+        hasDocumentedIdempotencyKey,
       );
       expect(sentRequest.body !== undefined).toBe(
         documentedContentTypes.length > 0,

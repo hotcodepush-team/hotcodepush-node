@@ -142,7 +142,7 @@ export class ReleasesResource {
   }
 
   /**
-   * Changes the rollout percentage in both directions, the mandatory flag or the notes.
+   * Changes the rollout percentage in both directions, the progression schedule, null stopping it, the mandatory flag or the notes.
    */
   public async update(options: UpdateReleaseOptions): Promise<Release> {
     const { appId, releaseId, ...body } = options;

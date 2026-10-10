@@ -44,6 +44,12 @@ The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.ch
 | `organizations.auditLogs`                                                        | `count`, `downloadCsv`, `list`                                                        |
 | `organizations.invitations`                                                      | `count`, `create`, `delete`, `deleteMany`, `list`                                     |
 | `organizations.members`                                                          | `count`, `delete`, `deleteMany`, `get`, `list`, `update`                              |
+| `organizations.billing`, the plan, the spending cap and this month's MAU         | `get`, `update`                                                                       |
+| `organizations.checkouts`, enabling billing through Polar                        | `create`                                                                              |
+| `organizations.customerPortalSessions`, Polar's portal for invoices and the card | `create`                                                                              |
+| `organizations.limits`, the limits in effect                                     | `get`                                                                                 |
+| `organizations.subscription`                                                     | `cancel`, `uncancel`                                                                  |
+| `organizations.usage`, each app's MAU and bytes for a month                      | `downloadCsv`, `get`                                                                  |
 | `organizations.ssoProvider`, one per organization                                | `delete`, `get`, `put`                                                                |
 | `organizations.ssoProvider.verifications`                                        | `create`                                                                              |
 | `invitations`, the caller's                                                      | `accept`, `count`, `list`                                                             |
@@ -72,9 +78,11 @@ The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.ch
 | `users`                                                                          | `delete`, `get`                                                                       |
 | `users.password`                                                                 | `create`                                                                              |
 | `users.sessions`, `users.tokens`                                                 | `deleteMany`                                                                          |
+| `notifications`, the caller's in-app notifications                               | `count`, `list`, `update`, `updateMany`                                               |
+| `notificationPreferences`, the caller's matrix of types and media                | `list`, `update`                                                                      |
 
 Lists take `limit` and `offset`, and where the API embeds linked rows, `relations`: `organizations.members.list({ organizationId, relations: ['user'] })`; any other list parameter, an audience's `attribute` say, repeats itself in the query.
-Every list has a `count` beside it taking the same filters and answering `{ total }`, the number a paginated table reads.
+Every paginated list has a `count` beside it taking the same filters and answering `{ total }`, the number a paginated table reads; `notificationPreferences.list` answers the whole matrix at once and has none.
 `users.get({ userId: 'me' })` answers the caller behind the token, and `users.delete({ password, userId: 'me' })` deletes the caller's account once its password checks out, as `me` addresses the caller wherever the API takes a `{userId}`.
 
 An upload streams its body, a `Blob` or a `ReadableStream` with its `contentLength`, never buffering it:
@@ -92,7 +100,7 @@ await hotCodePush.apps.files.upload({
 An upload attempt may take ten minutes, `UPLOAD_TIMEOUT_MS`, enough for a 512 MB body at one megabyte a second; every other call gets sixty seconds.
 A `Blob` is read again when a retry needs it; a stream is read once, so a failed stream upload is not retried.
 
-Every creating call sends an `Idempotency-Key`, a UUID per call kept across the client's own retries; pass `idempotencyKey` to reuse one when you retry the call yourself, and the API answers the first result again for 24 hours.
+Every creating call but a checkout and a customer portal session sends an `Idempotency-Key`, a UUID per call kept across the client's own retries; pass `idempotencyKey` to reuse one when you retry the call yourself, and the API answers the first result again for 24 hours. A checkout and a portal session carry no key and are never retried, since each call opens another Polar object; a click repeats them.
 
 A failed request throws a `HotCodePushError` carrying the API's `code`, `message` and `details` and the HTTP `status`.
 

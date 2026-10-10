@@ -50,8 +50,8 @@ Run `npm run fmt` before every commit; lint, typecheck, test and build must pass
 - Every request sends `X-HotCodePush-Client: <name>/<version>`, `node/<this package's version>` unless the caller passes its own, as the CLI and the MCP server do; `User-Agent` goes out only when the caller sets `userAgent`, since a session keeps it and the sessions page names the client by it.
 - Every error is one JSON shape, `code`, `message`, `details`; `HotCodePushError` carries them and the status verbatim, and a body without the shape becomes `E_INTERNAL`.
 - Every call goes through `withTimeout` and `withRetry`, never a bare `fetch`: sixty seconds per attempt, `JSON_TIMEOUT_MS`, and ten minutes for a binary upload, `UPLOAD_TIMEOUT_MS`, three attempts, exponential backoff from 500 ms, retrying a thrown fetch, 408, 429 and 5xx; a 429 or a 503 waits its `Retry-After` instead, at most sixty seconds, the rate-limit window.
-- Every creating `POST` — a `POST` on a collection, never a transition such as `pause` — goes through `fetchCreatingPost`, which sends the caller's `idempotencyKey` or a UUID generated per call and kept across its retries.
-- Any other `POST` is retried only where a repeat is safe: `pause`, `resume`, a bundle's `complete`, the SSO verification, the three multipart starts and a file upload's completion; a pack's or a delta's completion is never retried, since a repeat answers `E_NOT_FOUND` for an upload R2 already closed.
+- Every creating `POST` — the eight operations whose OpenAPI document lists the `Idempotency-Key` header: organizations, invitations, apps, channels, releases, rollbacks, bundles and binaries — goes through `fetchCreatingPost`, which sends the caller's `idempotencyKey` or a UUID generated per call and kept across its retries. A checkout and a customer portal session carry no key and are never retried, since each call creates another Polar object.
+- Any other `POST` is retried only where a repeat is safe: `pause`, `resume`, the subscription's `cancel` and `uncancel`, a bundle's `complete`, the SSO verification, the three multipart starts and a file upload's completion; a pack's or a delta's completion is never retried, since a repeat answers `E_NOT_FOUND` for an upload R2 already closed.
 - Lists take `limit` and `offset`; `relations` and `ids` are typed lists sent as comma lists, `?relations=user`, `?ids=a,b`, and any other list repeats its parameter, `?attribute=a&attribute=b`.
 - `me` is accepted wherever a `{userId}` appears; the client passes it through.
 - The `/v1/auth/*` slice is Better Auth's and outside the document; its client lives in the CLI and the console, never here.
@@ -60,7 +60,7 @@ Run `npm run fmt` before every commit; lint, typecheck, test and build must pass
 ## The OpenAPI snapshot
 
 The API's `/openapi` document is the contract, and `openapi.json` is its committed snapshot, so the package builds and CI checks without the API.
-A schema change breaks the build three ways: the types in `src/generated/schema.d.ts` stop compiling where a resource uses them, `npm run typecheck` fails while the generated file is stale, and `src/openapi.test.ts` fails when a method sends a path, method, query parameter or body the snapshot lacks, or when a resource method has no call there.
+A schema change breaks the build three ways: the types in `src/generated/schema.d.ts` stop compiling where a resource uses them, `npm run typecheck` fails while the generated file is stale, and `src/openapi.test.ts` fails when a method sends a path, method, query parameter or body the snapshot lacks, when it sends an `Idempotency-Key` where the operation documents none or none where it does, or when a resource method has no call there.
 
 When the API changes:
 

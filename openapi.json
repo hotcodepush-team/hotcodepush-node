@@ -740,6 +740,8 @@
                                 "dunning-paused",
                                 "email-address-changed",
                                 "email-verification",
+                                "enterprise-ending-soon",
+                                "enterprise-expired",
                                 "fair-use-warning",
                                 "feedback-after-thirty-days",
                                 "first-release-nudge",
@@ -943,6 +945,8 @@
                         "dunning-paused",
                         "email-address-changed",
                         "email-verification",
+                        "enterprise-ending-soon",
+                        "enterprise-expired",
                         "fair-use-warning",
                         "feedback-after-thirty-days",
                         "first-release-nudge",
@@ -1114,6 +1118,8 @@
                       "dunning-paused",
                       "email-address-changed",
                       "email-verification",
+                      "enterprise-ending-soon",
+                      "enterprise-expired",
                       "fair-use-warning",
                       "feedback-after-thirty-days",
                       "first-release-nudge",
@@ -2862,6 +2868,9 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "cancelAtPeriodEnd": {
+                      "type": "boolean"
+                    },
                     "cappedAt": {
                       "anyOf": [
                         {
@@ -2878,6 +2887,18 @@
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
+                    },
+                    "currentPeriodEndsAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     },
                     "mauCap": {
                       "anyOf": [
@@ -2927,16 +2948,52 @@
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
+                    },
+                    "subscriptionProvider": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "polar"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "subscriptionStatus": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "suggestedSpendingCapCents": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   },
                   "required": [
+                    "cancelAtPeriodEnd",
                     "cappedAt",
                     "countedMau",
+                    "currentPeriodEndsAt",
                     "mauCap",
                     "nextSpendingCapCents",
                     "nextSpendingCapStartsAt",
                     "plan",
-                    "spendingCapCents"
+                    "spendingCapCents",
+                    "subscriptionProvider",
+                    "subscriptionStatus",
+                    "suggestedSpendingCapCents"
                   ]
                 }
               }
@@ -3014,7 +3071,7 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The organization's billing this month: the plan, the spending cap and a lowered one waiting for the next month, the MAU counted so far against the ceiling the plan sets, and when the cap was reached if it was. Owner, Admin and Billing.",
+        "description": "The organization's billing this month: the plan and its subscription mirror, the spending cap and a lowered one waiting for the next month, the MAU counted so far against the ceiling the plan sets, when the cap was reached if it was, and on Free the cap the last thirty days' active devices suggest. Owner, Admin and Billing.",
         "summary": "Get the billing",
         "tags": [
           "Billing"
@@ -3048,6 +3105,9 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "cancelAtPeriodEnd": {
+                      "type": "boolean"
+                    },
                     "cappedAt": {
                       "anyOf": [
                         {
@@ -3064,6 +3124,18 @@
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
+                    },
+                    "currentPeriodEndsAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     },
                     "mauCap": {
                       "anyOf": [
@@ -3113,16 +3185,52 @@
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
+                    },
+                    "subscriptionProvider": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "polar"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "subscriptionStatus": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "suggestedSpendingCapCents": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   },
                   "required": [
+                    "cancelAtPeriodEnd",
                     "cappedAt",
                     "countedMau",
+                    "currentPeriodEndsAt",
                     "mauCap",
                     "nextSpendingCapCents",
                     "nextSpendingCapStartsAt",
                     "plan",
-                    "spendingCapCents"
+                    "spendingCapCents",
+                    "subscriptionProvider",
+                    "subscriptionStatus",
+                    "suggestedSpendingCapCents"
                   ]
                 }
               }
@@ -3367,7 +3475,8 @@
                   "spendingCapCents": {
                     "type": "integer",
                     "minimum": 500,
-                    "maximum": 1000000
+                    "maximum": 1000000,
+                    "multipleOf": 100
                   }
                 },
                 "required": [
@@ -11071,7 +11180,7 @@
     "/v1/apps/{appId}/bundles/{bundleId}": {
       "get": {
         "operationId": "getV1AppsByAppIdBundlesByBundleId",
-        "description": "One bundle, with the derived expiry — `unusedSince` plus the retention — while it is in use nowhere.",
+        "description": "One bundle, with the derived expiry — `unusedSince` plus the retention — while it is in use nowhere, and `deltaPacks`, the delta packs the platform builds against the bases its devices run, oldest first, each with its state — `requested`, `built` or `failed` — and, once built, its size and its patch count.",
         "responses": {
           "200": {
             "content": {
@@ -11229,6 +11338,57 @@
                     },
                     "version": {
                       "type": "string"
+                    },
+                    "deltaPacks": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "baseBundleId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "patchCount": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "sizeBytes": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "state": {
+                            "type": "string",
+                            "enum": [
+                              "built",
+                              "failed",
+                              "requested"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "baseBundleId",
+                          "patchCount",
+                          "sizeBytes",
+                          "state"
+                        ]
+                      }
                     }
                   },
                   "required": [
@@ -11253,7 +11413,8 @@
                     "type",
                     "unusedSince",
                     "updatedAt",
-                    "version"
+                    "version",
+                    "deltaPacks"
                   ]
                 }
               }
@@ -11479,7 +11640,7 @@
     "/v1/apps/{appId}/bundles/{bundleId}/complete": {
       "post": {
         "operationId": "postV1AppsByAppIdBundlesByBundleIdComplete",
-        "description": "Verifies every listed file and the pack are present, rebuilds the signed manifest from the rows and checks its signature against the app's keys again, writes the envelope at the bundle's key — the manifest, the signature and, unsigned beside them, the bundle's id and creation time, the pack and the delta packs with their URLs and stored sizes — and sets `ready`; a completed bundle answers itself again.",
+        "description": "Verifies every listed file and the pack are present, rebuilds the signed manifest from the rows and checks its signature against the app's keys again, writes the envelope at the bundle's key — the manifest, the signature and, unsigned beside them, the bundle's id and creation time and the pack with its URL and stored size, the delta list empty since the platform builds the delta packs and devices reach them through the delta route — and sets `ready`; a completed bundle answers itself again.",
         "responses": {
           "200": {
             "content": {

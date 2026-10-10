@@ -12,6 +12,7 @@ const BUNDLES_URL = 'https://api.hotcodepush.com/v1/apps/app/bundles';
 const BUNDLE = { id: 'bundle', state: 'uploading' };
 const DELTA_PACK: BundleWithDeltaPacks['deltaPacks'][number] = {
   baseBundleId: 'base',
+  baseBundleNumber: 1,
   patchCount: 2,
   sizeBytes: 512,
   state: 'built',

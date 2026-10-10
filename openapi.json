@@ -11180,7 +11180,7 @@
     "/v1/apps/{appId}/bundles/{bundleId}": {
       "get": {
         "operationId": "getV1AppsByAppIdBundlesByBundleId",
-        "description": "One bundle, with the derived expiry — `unusedSince` plus the retention — while it is in use nowhere, and `deltaPacks`, the delta packs the platform builds against the bases its devices run, oldest first, each with its state — `requested`, `built` or `failed` — and, once built, its size and its patch count.",
+        "description": "One bundle, with the derived expiry — `unusedSince` plus the retention — while it is in use nowhere, and `deltaPacks`, the delta packs the platform builds against the bases its devices run, oldest first, each with its base's id and number, the number null for an embedded base, its state — `requested`, `built` or `failed` — and, once built, its size and its patch count.",
         "responses": {
           "200": {
             "content": {
@@ -11349,6 +11349,18 @@
                             "format": "uuid",
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                           },
+                          "baseBundleNumber": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
                           "patchCount": {
                             "anyOf": [
                               {
@@ -11384,6 +11396,7 @@
                         },
                         "required": [
                           "baseBundleId",
+                          "baseBundleNumber",
                           "patchCount",
                           "sizeBytes",
                           "state"

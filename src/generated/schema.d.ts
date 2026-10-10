@@ -757,7 +757,7 @@ export interface paths {
         };
         /**
          * Get a bundle
-         * @description One bundle, with the derived expiry — `unusedSince` plus the retention — while it is in use nowhere, and `deltaPacks`, the delta packs the platform builds against the bases its devices run, oldest first, each with its state — `requested`, `built` or `failed` — and, once built, its size and its patch count.
+         * @description One bundle, with the derived expiry — `unusedSince` plus the retention — while it is in use nowhere, and `deltaPacks`, the delta packs the platform builds against the bases its devices run, oldest first, each with its base's id and number, the number null for an embedded base, its state — `requested`, `built` or `failed` — and, once built, its size and its patch count.
          */
         get: operations["getV1AppsByAppIdBundlesByBundleId"];
         put?: never;
@@ -7574,6 +7574,7 @@ export interface operations {
                         deltaPacks: {
                             /** Format: uuid */
                             baseBundleId: string;
+                            baseBundleNumber: number | null;
                             patchCount: number | null;
                             sizeBytes: number | null;
                             /** @enum {string} */

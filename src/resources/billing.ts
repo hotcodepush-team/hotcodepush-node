@@ -8,7 +8,8 @@ import type {
 
 /**
  * The organization's billing this month: the plan, the spending cap and a lowered one waiting for the next month,
- * the MAU counted so far against the ceiling the plan sets, and `cappedAt` once the cap was reached.
+ * the subscription's status and period end, the MAU counted so far against the ceiling the plan sets, `cappedAt` once
+ * the cap was reached and, on Free, the cap the month's usage suggests.
  */
 export type Billing = JsonResponseBody<
   '/v1/organizations/{organizationId}/billing',

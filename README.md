@@ -36,50 +36,50 @@ await hotCodePush.apps.channels.pause({ appId: app.id, channelId: channel.id });
 
 The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.channels`:
 
-| Resource                                                                         | Methods                                                                               |
-| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `health`                                                                         | `get`                                                                                 |
-| `organizations`                                                                  | `count`, `create`, `delete`, `get`, `list`, `update`                                  |
-| `organizations.apps`                                                             | `count`, `create`, `list`                                                             |
-| `organizations.auditLogs`                                                        | `count`, `downloadCsv`, `list`                                                        |
-| `organizations.invitations`                                                      | `count`, `create`, `delete`, `deleteMany`, `list`                                     |
-| `organizations.members`                                                          | `count`, `delete`, `deleteMany`, `get`, `list`, `update`                              |
-| `organizations.billing`, the plan, the spending cap and this month's MAU         | `get`, `update`                                                                       |
-| `organizations.checkouts`, enabling billing through Polar                        | `create`                                                                              |
-| `organizations.customerPortalSessions`, Polar's portal for invoices and the card | `create`                                                                              |
-| `organizations.limits`, the limits in effect                                     | `get`                                                                                 |
-| `organizations.subscription`                                                     | `cancel`, `uncancel`                                                                  |
-| `organizations.usage`, each app's MAU and bytes for a month                      | `downloadCsv`, `get`                                                                  |
-| `organizations.ssoProvider`, one per organization                                | `delete`, `get`, `put`                                                                |
-| `organizations.ssoProvider.verifications`                                        | `create`                                                                              |
-| `invitations`, the caller's                                                      | `accept`, `count`, `list`                                                             |
-| `apps`                                                                           | `delete`, `get`, `transfer`, `update`                                                 |
-| `apps.bundles`                                                                   | `complete`, `count`, `create`, `delete`, `get`, `list`                                |
-| `apps.bundles.files`, a bundle's files ordered by path                           | `count`, `list`                                                                       |
-| `apps.bundles.pack`, `apps.bundles.deltas`                                       | `upload`                                                                              |
-| `apps.bundles.pack.uploads`, `apps.bundles.deltas.uploads`, the multipart upload | `complete`, `create`, `delete`                                                        |
-| `apps.bundles.pack.uploads.parts`, `apps.bundles.deltas.uploads.parts`           | `upload`                                                                              |
-| `apps.channels`                                                                  | `count`, `create`, `delete`, `deleteMany`, `get`, `list`, `pause`, `resume`, `update` |
-| `apps.channels.indexes`                                                          | `get`                                                                                 |
-| `apps.channels.qr`, the channel's deep link as an image                          | `get`                                                                                 |
-| `apps.channels.releases`, the release log                                        | `count`, `create`, `list`, `revoke`                                                   |
-| `apps.channels.rollbacks`                                                        | `create`                                                                              |
-| `apps.binaries`, the store builds `binary create` creates                        | `count`, `create`, `get`, `list`                                                      |
-| `apps.channels.audience`, the audience preview                                   | `get`                                                                                 |
-| `apps.devices`                                                                   | `count`, `delete`, `deleteMany`, `get`, `list`                                        |
-| `apps.signingKeys`                                                               | `count`, `create`, `delete`, `list`                                                   |
-| `apps.statistics.fleet`, the registry counted by dimension                       | `get`                                                                                 |
-| `apps.statistics.updates`, `apps.statistics.usage`, the time-series read models  | `get`                                                                                 |
-| `apps.files`                                                                     | `upload`                                                                              |
-| `apps.files.uploads`, the multipart upload                                       | `complete`, `create`, `delete`                                                        |
-| `apps.files.uploads.parts`                                                       | `upload`                                                                              |
-| `apps.releases`                                                                  | `count`, `get`, `list`, `pause`, `resume`, `revoke`, `update`                         |
-| `apps.releases.audience`, a release's own audience                               | `get`                                                                                 |
-| `users`                                                                          | `delete`, `get`                                                                       |
-| `users.password`                                                                 | `create`                                                                              |
-| `users.sessions`, `users.tokens`                                                 | `deleteMany`                                                                          |
-| `notifications`, the caller's in-app notifications                               | `count`, `list`, `update`, `updateMany`                                               |
-| `notificationPreferences`, the caller's matrix of types and media                | `list`, `update`                                                                      |
+| Resource                                                                                   | Methods                                                                               |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| `health`                                                                                   | `get`                                                                                 |
+| `organizations`                                                                            | `count`, `create`, `delete`, `get`, `list`, `update`                                  |
+| `organizations.apps`                                                                       | `count`, `create`, `list`                                                             |
+| `organizations.auditLogs`                                                                  | `count`, `downloadCsv`, `list`                                                        |
+| `organizations.invitations`                                                                | `count`, `create`, `delete`, `deleteMany`, `list`                                     |
+| `organizations.members`                                                                    | `count`, `delete`, `deleteMany`, `get`, `list`, `update`                              |
+| `organizations.billing`, the plan, the subscription, the spending cap and this month's MAU | `get`, `update`                                                                       |
+| `organizations.checkouts`, enabling billing through Polar                                  | `create`                                                                              |
+| `organizations.customerPortalSessions`, Polar's portal for invoices and the card           | `create`                                                                              |
+| `organizations.limits`, the limits in effect                                               | `get`                                                                                 |
+| `organizations.subscription`                                                               | `cancel`, `uncancel`                                                                  |
+| `organizations.usage`, each app's MAU and bytes for a month                                | `downloadCsv`, `get`                                                                  |
+| `organizations.ssoProvider`, one per organization                                          | `delete`, `get`, `put`                                                                |
+| `organizations.ssoProvider.verifications`                                                  | `create`                                                                              |
+| `invitations`, the caller's                                                                | `accept`, `count`, `list`                                                             |
+| `apps`                                                                                     | `delete`, `get`, `transfer`, `update`                                                 |
+| `apps.bundles`                                                                             | `complete`, `count`, `create`, `delete`, `get`, `list`                                |
+| `apps.bundles.files`, a bundle's files ordered by path                                     | `count`, `list`                                                                       |
+| `apps.bundles.pack`, `apps.bundles.deltas`                                                 | `upload`                                                                              |
+| `apps.bundles.pack.uploads`, `apps.bundles.deltas.uploads`, the multipart upload           | `complete`, `create`, `delete`                                                        |
+| `apps.bundles.pack.uploads.parts`, `apps.bundles.deltas.uploads.parts`                     | `upload`                                                                              |
+| `apps.channels`                                                                            | `count`, `create`, `delete`, `deleteMany`, `get`, `list`, `pause`, `resume`, `update` |
+| `apps.channels.indexes`                                                                    | `get`                                                                                 |
+| `apps.channels.qr`, the channel's deep link as an image                                    | `get`                                                                                 |
+| `apps.channels.releases`, the release log                                                  | `count`, `create`, `list`, `revoke`                                                   |
+| `apps.channels.rollbacks`                                                                  | `create`                                                                              |
+| `apps.binaries`, the store builds `binary create` creates                                  | `count`, `create`, `get`, `list`                                                      |
+| `apps.channels.audience`, the audience preview                                             | `get`                                                                                 |
+| `apps.devices`                                                                             | `count`, `delete`, `deleteMany`, `get`, `list`                                        |
+| `apps.signingKeys`                                                                         | `count`, `create`, `delete`, `list`                                                   |
+| `apps.statistics.fleet`, the registry counted by dimension                                 | `get`                                                                                 |
+| `apps.statistics.updates`, `apps.statistics.usage`, the time-series read models            | `get`                                                                                 |
+| `apps.files`                                                                               | `upload`                                                                              |
+| `apps.files.uploads`, the multipart upload                                                 | `complete`, `create`, `delete`                                                        |
+| `apps.files.uploads.parts`                                                                 | `upload`                                                                              |
+| `apps.releases`                                                                            | `count`, `get`, `list`, `pause`, `resume`, `revoke`, `update`                         |
+| `apps.releases.audience`, a release's own audience                                         | `get`                                                                                 |
+| `users`                                                                                    | `delete`, `get`                                                                       |
+| `users.password`                                                                           | `create`                                                                              |
+| `users.sessions`, `users.tokens`                                                           | `deleteMany`                                                                          |
+| `notifications`, the caller's in-app notifications                                         | `count`, `list`, `update`, `updateMany`                                               |
+| `notificationPreferences`, the caller's matrix of types and media                          | `list`, `update`                                                                      |
 
 Lists take `limit` and `offset`, and where the API embeds linked rows, `relations`: `organizations.members.list({ organizationId, relations: ['user'] })`; any other list parameter, an audience's `attribute` say, repeats itself in the query.
 Every paginated list has a `count` beside it taking the same filters and answering `{ total }`, the number a paginated table reads; `notificationPreferences.list` answers the whole matrix at once and has none.

@@ -13,6 +13,15 @@ import { BundleFilesResource } from './bundle-files';
 import { BundlePackResource } from './bundle-pack';
 
 export type Bundle = JsonResponseBody<
+  '/v1/apps/{appId}/bundles',
+  'get',
+  200
+>[number];
+
+/**
+ * A bundle with the delta packs the platform builds against the bases its devices run, oldest first.
+ */
+export type BundleWithDeltaPacks = JsonResponseBody<
   '/v1/apps/{appId}/bundles/{bundleId}',
   'get',
   200
@@ -123,7 +132,7 @@ export class BundlesResource {
     });
   }
 
-  public async get(options: GetBundleOptions): Promise<Bundle> {
+  public async get(options: GetBundleOptions): Promise<BundleWithDeltaPacks> {
     return this.httpClient.fetchJson({
       method: 'GET',
       path: resolvePath('/v1/apps/{appId}/bundles/{bundleId}', options),

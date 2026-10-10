@@ -245,7 +245,7 @@ export interface paths {
         };
         /**
          * Get the billing
-         * @description The organization's billing this month: the plan, the spending cap and a lowered one waiting for the next month, the MAU counted so far against the ceiling the plan sets, and when the cap was reached if it was. Owner, Admin and Billing.
+         * @description The organization's billing this month: the plan and its subscription mirror, the spending cap and a lowered one waiting for the next month, the MAU counted so far against the ceiling the plan sets, when the cap was reached if it was, and on Free the cap the last thirty days' active devices suggest. Owner, Admin and Billing.
          */
         get: operations["getV1OrganizationsByOrganizationIdBilling"];
         put?: never;
@@ -757,7 +757,7 @@ export interface paths {
         };
         /**
          * Get a bundle
-         * @description One bundle, with the derived expiry — `unusedSince` plus the retention — while it is in use nowhere.
+         * @description One bundle, with the derived expiry — `unusedSince` plus the retention — while it is in use nowhere, and `deltaPacks`, the delta packs the platform builds against the bases its devices run, oldest first, each with its state — `requested`, `built` or `failed` — and, once built, its size and its patch count.
          */
         get: operations["getV1AppsByAppIdBundlesByBundleId"];
         put?: never;
@@ -783,7 +783,7 @@ export interface paths {
         put?: never;
         /**
          * Complete a bundle
-         * @description Verifies every listed file and the pack are present, rebuilds the signed manifest from the rows and checks its signature against the app's keys again, writes the envelope at the bundle's key — the manifest, the signature and, unsigned beside them, the bundle's id and creation time, the pack and the delta packs with their URLs and stored sizes — and sets `ready`; a completed bundle answers itself again.
+         * @description Verifies every listed file and the pack are present, rebuilds the signed manifest from the rows and checks its signature against the app's keys again, writes the envelope at the bundle's key — the manifest, the signature and, unsigned beside them, the bundle's id and creation time and the pack with its URL and stored size, the delta list empty since the platform builds the delta packs and devices reach them through the delta route — and sets `ready`; a completed bundle answers itself again.
          */
         post: operations["postV1AppsByAppIdBundlesByBundleIdComplete"];
         delete?: never;
@@ -2249,7 +2249,7 @@ export interface operations {
                                 medium: "email" | "in_app";
                             }[];
                             /** @enum {string} */
-                            type: "account-banned" | "account-deleted" | "api-token-created" | "code-signing-not-enabled" | "deprecation" | "dormancy-final-warning" | "dormancy-notice" | "dunning-paused" | "email-address-changed" | "email-verification" | "fair-use-warning" | "feedback-after-thirty-days" | "first-release-nudge" | "incident" | "invitation" | "invitation-accepted" | "maintenance-window" | "member-removed" | "member-role-changed" | "new-sign-in" | "newsletter-issue" | "no-device-after-first-release" | "organization-deleted" | "ownership-transferred" | "password-changed" | "password-reset" | "payment-failed" | "payment-failed-reminder-1" | "payment-failed-reminder-2" | "recovery-code-used" | "recovery-codes-regenerated" | "release-failure-rate" | "release-from-ci" | "release-paused" | "release-revoked" | "spending-cap-changed" | "spending-cap-reached" | "spending-cap-warning" | "sso-member-joined" | "sso-member-joined-admins" | "staged-rollouts-available" | "storage-limit-reached" | "storage-warning" | "terms-change" | "two-factor-disabled" | "two-factor-enabled" | "webhook-disabled" | "welcome";
+                            type: "account-banned" | "account-deleted" | "api-token-created" | "code-signing-not-enabled" | "deprecation" | "dormancy-final-warning" | "dormancy-notice" | "dunning-paused" | "email-address-changed" | "email-verification" | "enterprise-ending-soon" | "enterprise-expired" | "fair-use-warning" | "feedback-after-thirty-days" | "first-release-nudge" | "incident" | "invitation" | "invitation-accepted" | "maintenance-window" | "member-removed" | "member-role-changed" | "new-sign-in" | "newsletter-issue" | "no-device-after-first-release" | "organization-deleted" | "ownership-transferred" | "password-changed" | "password-reset" | "payment-failed" | "payment-failed-reminder-1" | "payment-failed-reminder-2" | "recovery-code-used" | "recovery-codes-regenerated" | "release-failure-rate" | "release-from-ci" | "release-paused" | "release-revoked" | "spending-cap-changed" | "spending-cap-reached" | "spending-cap-warning" | "sso-member-joined" | "sso-member-joined-admins" | "staged-rollouts-available" | "storage-limit-reached" | "storage-warning" | "terms-change" | "two-factor-disabled" | "two-factor-enabled" | "webhook-disabled" | "welcome";
                         }[];
                     }[];
                 };
@@ -2338,7 +2338,7 @@ export interface operations {
                     /** Format: uuid */
                     organizationId?: string;
                     /** @enum {string} */
-                    type: "account-banned" | "account-deleted" | "api-token-created" | "code-signing-not-enabled" | "deprecation" | "dormancy-final-warning" | "dormancy-notice" | "dunning-paused" | "email-address-changed" | "email-verification" | "fair-use-warning" | "feedback-after-thirty-days" | "first-release-nudge" | "incident" | "invitation" | "invitation-accepted" | "maintenance-window" | "member-removed" | "member-role-changed" | "new-sign-in" | "newsletter-issue" | "no-device-after-first-release" | "organization-deleted" | "ownership-transferred" | "password-changed" | "password-reset" | "payment-failed" | "payment-failed-reminder-1" | "payment-failed-reminder-2" | "recovery-code-used" | "recovery-codes-regenerated" | "release-failure-rate" | "release-from-ci" | "release-paused" | "release-revoked" | "spending-cap-changed" | "spending-cap-reached" | "spending-cap-warning" | "sso-member-joined" | "sso-member-joined-admins" | "staged-rollouts-available" | "storage-limit-reached" | "storage-warning" | "terms-change" | "two-factor-disabled" | "two-factor-enabled" | "webhook-disabled" | "welcome";
+                    type: "account-banned" | "account-deleted" | "api-token-created" | "code-signing-not-enabled" | "deprecation" | "dormancy-final-warning" | "dormancy-notice" | "dunning-paused" | "email-address-changed" | "email-verification" | "enterprise-ending-soon" | "enterprise-expired" | "fair-use-warning" | "feedback-after-thirty-days" | "first-release-nudge" | "incident" | "invitation" | "invitation-accepted" | "maintenance-window" | "member-removed" | "member-role-changed" | "new-sign-in" | "newsletter-issue" | "no-device-after-first-release" | "organization-deleted" | "ownership-transferred" | "password-changed" | "password-reset" | "payment-failed" | "payment-failed-reminder-1" | "payment-failed-reminder-2" | "recovery-code-used" | "recovery-codes-regenerated" | "release-failure-rate" | "release-from-ci" | "release-paused" | "release-revoked" | "spending-cap-changed" | "spending-cap-reached" | "spending-cap-warning" | "sso-member-joined" | "sso-member-joined-admins" | "staged-rollouts-available" | "storage-limit-reached" | "storage-warning" | "terms-change" | "two-factor-disabled" | "two-factor-enabled" | "webhook-disabled" | "welcome";
                 };
             };
         };
@@ -2357,7 +2357,7 @@ export interface operations {
                             medium: "email" | "in_app";
                         }[];
                         /** @enum {string} */
-                        type: "account-banned" | "account-deleted" | "api-token-created" | "code-signing-not-enabled" | "deprecation" | "dormancy-final-warning" | "dormancy-notice" | "dunning-paused" | "email-address-changed" | "email-verification" | "fair-use-warning" | "feedback-after-thirty-days" | "first-release-nudge" | "incident" | "invitation" | "invitation-accepted" | "maintenance-window" | "member-removed" | "member-role-changed" | "new-sign-in" | "newsletter-issue" | "no-device-after-first-release" | "organization-deleted" | "ownership-transferred" | "password-changed" | "password-reset" | "payment-failed" | "payment-failed-reminder-1" | "payment-failed-reminder-2" | "recovery-code-used" | "recovery-codes-regenerated" | "release-failure-rate" | "release-from-ci" | "release-paused" | "release-revoked" | "spending-cap-changed" | "spending-cap-reached" | "spending-cap-warning" | "sso-member-joined" | "sso-member-joined-admins" | "staged-rollouts-available" | "storage-limit-reached" | "storage-warning" | "terms-change" | "two-factor-disabled" | "two-factor-enabled" | "webhook-disabled" | "welcome";
+                        type: "account-banned" | "account-deleted" | "api-token-created" | "code-signing-not-enabled" | "deprecation" | "dormancy-final-warning" | "dormancy-notice" | "dunning-paused" | "email-address-changed" | "email-verification" | "enterprise-ending-soon" | "enterprise-expired" | "fair-use-warning" | "feedback-after-thirty-days" | "first-release-nudge" | "incident" | "invitation" | "invitation-accepted" | "maintenance-window" | "member-removed" | "member-role-changed" | "new-sign-in" | "newsletter-issue" | "no-device-after-first-release" | "organization-deleted" | "ownership-transferred" | "password-changed" | "password-reset" | "payment-failed" | "payment-failed-reminder-1" | "payment-failed-reminder-2" | "recovery-code-used" | "recovery-codes-regenerated" | "release-failure-rate" | "release-from-ci" | "release-paused" | "release-revoked" | "spending-cap-changed" | "spending-cap-reached" | "spending-cap-warning" | "sso-member-joined" | "sso-member-joined-admins" | "staged-rollouts-available" | "storage-limit-reached" | "storage-warning" | "terms-change" | "two-factor-disabled" | "two-factor-enabled" | "webhook-disabled" | "welcome";
                     };
                 };
             };
@@ -3411,14 +3411,19 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        cancelAtPeriodEnd: boolean;
                         cappedAt: string | null;
                         countedMau: number;
+                        currentPeriodEndsAt: string | null;
                         mauCap: number | null;
                         nextSpendingCapCents: number | null;
                         nextSpendingCapStartsAt: string | null;
                         /** @enum {string} */
                         plan: "enterprise" | "free" | "pay_as_you_go";
                         spendingCapCents: number;
+                        subscriptionProvider: "polar" | null;
+                        subscriptionStatus: string | null;
+                        suggestedSpendingCapCents: number | null;
                     };
                 };
             };
@@ -3514,14 +3519,19 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        cancelAtPeriodEnd: boolean;
                         cappedAt: string | null;
                         countedMau: number;
+                        currentPeriodEndsAt: string | null;
                         mauCap: number | null;
                         nextSpendingCapCents: number | null;
                         nextSpendingCapStartsAt: string | null;
                         /** @enum {string} */
                         plan: "enterprise" | "free" | "pay_as_you_go";
                         spendingCapCents: number;
+                        subscriptionProvider: "polar" | null;
+                        subscriptionStatus: string | null;
+                        suggestedSpendingCapCents: number | null;
                     };
                 };
             };
@@ -7561,6 +7571,14 @@ export interface operations {
                         /** Format: date-time */
                         updatedAt: string;
                         version: string;
+                        deltaPacks: {
+                            /** Format: uuid */
+                            baseBundleId: string;
+                            patchCount: number | null;
+                            sizeBytes: number | null;
+                            /** @enum {string} */
+                            state: "built" | "failed" | "requested";
+                        }[];
                     };
                 };
             };

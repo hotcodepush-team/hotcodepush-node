@@ -7,9 +7,9 @@ import type {
 } from '../types';
 
 /**
- * The organization's billing this month: the plan, the spending cap and a lowered one waiting for the next month,
- * the subscription's status and period end, the MAU counted so far against the ceiling the plan sets, `cappedAt` once
- * the cap was reached and, on Free, the cap the month's usage suggests.
+ * The organization's billing this month: the plan, the spending cap, the subscription's status and period end, the MAU
+ * counted so far against the ceiling the plan sets, `cappedAt` once the cap was reached and, on Free, the cap the
+ * month's usage suggests.
  */
 export type Billing = JsonResponseBody<
   '/v1/organizations/{organizationId}/billing',
@@ -42,7 +42,7 @@ export class BillingResource {
   }
 
   /**
-   * Sets the spending cap in whole dollars: a raise applies now, a lower cap from the next billing month.
+   * Sets the spending cap in whole dollars, applying now.
    * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
   public async update(options: UpdateBillingOptions): Promise<Billing> {

@@ -245,7 +245,7 @@ export interface paths {
         };
         /**
          * Get the billing
-         * @description The organization's billing this month: the plan and its subscription mirror, the spending cap and a lowered one waiting for the next month, the MAU counted so far against the ceiling the plan sets, when the cap was reached if it was, and on Free the cap the last thirty days' active devices suggest. Owner, Admin and Billing.
+         * @description The organization's billing this month: the plan and its subscription mirror, the spending cap, the MAU counted so far against the ceiling the plan sets, when the cap was reached if it was, and on Free the cap the last thirty days' active devices suggest. Owner, Admin and Billing.
          */
         get: operations["getV1OrganizationsByOrganizationIdBilling"];
         put?: never;
@@ -255,7 +255,7 @@ export interface paths {
         head?: never;
         /**
          * Update the spending cap
-         * @description Sets the spending cap, in whole dollars from $5 to $10,000: a raise applies now and counts the devices waiting beyond the previous cap in the order they reported, a lower cap applies from the next billing month. Mails Owner and Billing and the caller. Owner, Admin and Billing, on a paying plan.
+         * @description Sets the spending cap, in whole dollars from $5 to $10,000, applying now: a raise counts the devices waiting beyond the previous cap in the order they reported, a cap below the MAU the month counted stops counting further devices while the counted ones stay billed. Mails Owner and Billing and the caller. Owner, Admin and Billing, on a paying plan.
          */
         patch: operations["patchV1OrganizationsByOrganizationIdBilling"];
         trace?: never;
@@ -3416,8 +3416,6 @@ export interface operations {
                         countedMau: number;
                         currentPeriodEndsAt: string | null;
                         mauCap: number | null;
-                        nextSpendingCapCents: number | null;
-                        nextSpendingCapStartsAt: string | null;
                         /** @enum {string} */
                         plan: "enterprise" | "free" | "pay_as_you_go";
                         spendingCapCents: number;
@@ -3524,8 +3522,6 @@ export interface operations {
                         countedMau: number;
                         currentPeriodEndsAt: string | null;
                         mauCap: number | null;
-                        nextSpendingCapCents: number | null;
-                        nextSpendingCapStartsAt: string | null;
                         /** @enum {string} */
                         plan: "enterprise" | "free" | "pay_as_you_go";
                         spendingCapCents: number;

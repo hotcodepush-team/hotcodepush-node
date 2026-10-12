@@ -6,11 +6,19 @@ import type { User } from './users';
 
 const USER: User = {
   createdAt: '2026-09-29T00:00:00.000Z',
-  credential: 'token',
+  discoverySource: null,
   email: 'user@example.test',
   id: 'user',
+  image: null,
+  intendedFramework: null,
   isEmailVerified: true,
+  jobRole: null,
+  lastSeenAt: '2026-10-12T00:00:00.000Z',
+  locale: null,
   name: 'User',
+  timeFormat: null,
+  timeZone: null,
+  updatedAt: '2026-09-29T00:00:00.000Z',
 };
 
 afterEach(() => {

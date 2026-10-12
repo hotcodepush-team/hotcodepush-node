@@ -97,6 +97,19 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     }),
   'apps.bundles.delete': hotCodePush =>
     hotCodePush.apps.bundles.delete({ appId: APP_ID, bundleId: BUNDLE_ID }),
+  'apps.bundles.deltas.count': hotCodePush =>
+    hotCodePush.apps.bundles.deltas.count({
+      appId: APP_ID,
+      bundleId: BUNDLE_ID,
+    }),
+  'apps.bundles.deltas.list': hotCodePush =>
+    hotCodePush.apps.bundles.deltas.list({
+      appId: APP_ID,
+      bundleId: BUNDLE_ID,
+      limit: 10,
+      offset: 10,
+      relations: ['baseBundle'],
+    }),
   'apps.bundles.deltas.upload': hotCodePush =>
     hotCodePush.apps.bundles.deltas.upload({
       appId: APP_ID,
@@ -316,7 +329,21 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.apps.devices.get({
       appId: APP_ID,
       deviceId: DEVICE_ID,
-      relations: ['channel'],
+      relations: ['channel', 'currentRelease'],
+    }),
+  'apps.devices.marks.count': hotCodePush =>
+    hotCodePush.apps.devices.marks.count({
+      appId: APP_ID,
+      deviceId: DEVICE_ID,
+      releaseId: RELEASE_ID,
+    }),
+  'apps.devices.marks.list': hotCodePush =>
+    hotCodePush.apps.devices.marks.list({
+      appId: APP_ID,
+      deviceId: DEVICE_ID,
+      limit: 10,
+      offset: 10,
+      releaseId: RELEASE_ID,
     }),
   'apps.devices.list': hotCodePush =>
     hotCodePush.apps.devices.list({
@@ -331,7 +358,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       limit: 10,
       offset: 10,
       platform: 'ios',
-      relations: ['channel'],
+      relations: ['channel', 'currentRelease'],
       sdkVersion: '1.0.0',
     }),
   'apps.files.upload': hotCodePush =>
@@ -460,7 +487,12 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       token: 'token',
     }),
   'invitations.count': hotCodePush => hotCodePush.invitations.count(),
-  'invitations.list': hotCodePush => hotCodePush.invitations.list(),
+  'invitations.list': hotCodePush =>
+    hotCodePush.invitations.list({
+      limit: 10,
+      offset: 10,
+      relations: ['organization'],
+    }),
   'notificationPreferences.list': hotCodePush =>
     hotCodePush.notificationPreferences.list({
       organizationId: ORGANIZATION_ID,

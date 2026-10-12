@@ -5,6 +5,7 @@ import type {
   JsonRequestBody,
   JsonResponseBody,
   PathParameters,
+  QueryParameters,
 } from '../types';
 import type { Member } from './members';
 
@@ -19,6 +20,11 @@ export type Invitation = JsonResponseBody<
   'get',
   200
 >[number];
+
+export type ListCallerInvitationsOptions = QueryParameters<
+  '/v1/invitations',
+  'get'
+>;
 
 export class InvitationsResource {
   constructor(private readonly httpClient: HttpClient) {}
@@ -51,13 +57,16 @@ export class InvitationsResource {
   }
 
   /**
-   * The caller's pending invitations across organizations, newest first.
+   * The caller's pending invitations across organizations, newest first; `relations: ['organization']` embeds each one's organization as its id and name.
    * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
-  public async list(): Promise<Invitation[]> {
+  public async list(
+    options: ListCallerInvitationsOptions = {},
+  ): Promise<Invitation[]> {
     return this.httpClient.fetchJson({
       method: 'GET',
       path: resolvePath('/v1/invitations'),
+      query: options,
     });
   }
 }

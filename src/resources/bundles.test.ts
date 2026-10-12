@@ -6,20 +6,9 @@ import {
   resolveSentRequest,
   stubFetch,
 } from '../test-helpers';
-import type { BundleWithDeltaPacks } from './bundles';
 
 const BUNDLES_URL = 'https://api.hotcodepush.com/v1/apps/app/bundles';
 const BUNDLE = { id: 'bundle', state: 'uploading' };
-const DELTA_PACK: BundleWithDeltaPacks['deltaPacks'][number] = {
-  baseBundleId: 'base',
-  baseBundleNumber: 1,
-  createdAt: '2026-10-12T08:00:00.000Z',
-  patchCount: 2,
-  requestedAt: '2026-10-12T08:00:00.000Z',
-  sizeBytes: 512,
-  state: 'built',
-  updatedAt: '2026-10-12T08:01:00.000Z',
-};
 const FILE = { path: 'index.html', sha256: 'a'.repeat(64), sizeBytes: 5 };
 const FINGERPRINT = `fp1:${'a'.repeat(64)}`;
 
@@ -111,16 +100,15 @@ describe('BundlesResource', () => {
     });
   });
 
-  test('should get the bundle with its delta packs', async () => {
-    const bundle = { ...BUNDLE, deltaPacks: [DELTA_PACK] };
-    const fetchMock = stubFetch(() => Response.json(bundle));
+  test('should get the bundle', async () => {
+    const fetchMock = stubFetch(() => Response.json(BUNDLE));
 
     const fetchedBundle = await new HotCodePush().apps.bundles.get({
       appId: 'app',
       bundleId: 'bundle',
     });
 
-    expect(fetchedBundle).toEqual(bundle);
+    expect(fetchedBundle).toEqual(BUNDLE);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${BUNDLES_URL}/bundle`,

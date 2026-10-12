@@ -6,6 +6,7 @@ import type {
   PathParameters,
   QueryParameters,
 } from '../types';
+import { DeviceMarksResource } from './device-marks';
 
 export type CountDevicesOptions = PathParameters<
   '/v1/apps/{appId}/devices/count',
@@ -33,15 +34,6 @@ export type Device = JsonResponseBody<
   200
 >[number];
 
-/**
- * A device with its per-release marks, newest first.
- */
-export type DeviceWithMarks = JsonResponseBody<
-  '/v1/apps/{appId}/devices/{deviceId}',
-  'get',
-  200
->;
-
 export type GetDeviceOptions = PathParameters<
   '/v1/apps/{appId}/devices/{deviceId}',
   'get'
@@ -55,7 +47,11 @@ export type ListDevicesOptions = PathParameters<
   QueryParameters<'/v1/apps/{appId}/devices', 'get'>;
 
 export class DevicesResource {
-  constructor(private readonly httpClient: HttpClient) {}
+  public readonly marks: DeviceMarksResource;
+
+  constructor(private readonly httpClient: HttpClient) {
+    this.marks = new DeviceMarksResource(httpClient);
+  }
 
   /**
    * The number of the app's devices under the list's filters.
@@ -91,7 +87,7 @@ export class DevicesResource {
     });
   }
 
-  public async get(options: GetDeviceOptions): Promise<DeviceWithMarks> {
+  public async get(options: GetDeviceOptions): Promise<Device> {
     const { appId, deviceId, ...query } = options;
     return this.httpClient.fetchJson({
       method: 'GET',

@@ -66,4 +66,22 @@ describe('InvitationsResource', () => {
       url: INVITATIONS_URL,
     });
   });
+
+  test("should list the caller's invitations with their organizations when asked", async () => {
+    const invitation = {
+      id: 'invitation',
+      organization: { id: 'organization', name: 'Acme' },
+    };
+    const fetchMock = stubFetch(() => Response.json([invitation]));
+
+    const fetchedInvitations = await new HotCodePush().invitations.list({
+      relations: ['organization'],
+    });
+
+    expect(fetchedInvitations).toEqual([invitation]);
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: `${INVITATIONS_URL}?relations=organization`,
+    });
+  });
 });

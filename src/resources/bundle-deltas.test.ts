@@ -12,8 +12,9 @@ import { PART_SIZE_BYTES, SINGLE_UPLOAD_LIMIT_BYTES } from '../upload-in-parts';
 const BLOB_ABOVE_SINGLE_UPLOAD_LIMIT = new Blob([
   new Uint8Array(SINGLE_UPLOAD_LIMIT_BYTES + 1),
 ]);
-const DELTA_URL =
-  'https://api.hotcodepush.com/v1/apps/app/bundles/bundle/deltas/base';
+const DELTAS_URL =
+  'https://api.hotcodepush.com/v1/apps/app/bundles/bundle/deltas';
+const DELTA_URL = `${DELTAS_URL}/base`;
 const PART_NUMBERS = [1, 2, 3, 4, 5, 6, 7];
 
 afterEach(() => {
@@ -21,6 +22,42 @@ afterEach(() => {
 });
 
 describe('BundleDeltasResource', () => {
+  test("should count the bundle's delta packs", async () => {
+    const fetchMock = stubFetch(() => Response.json({ total: 2 }));
+
+    const fetchedCount = await new HotCodePush().apps.bundles.deltas.count({
+      appId: 'app',
+      bundleId: 'bundle',
+    });
+
+    expect(fetchedCount).toEqual({ total: 2 });
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: `${DELTAS_URL}/count`,
+    });
+  });
+
+  test("should list the bundle's delta packs with their base bundles", async () => {
+    const deltaPack = {
+      baseBundle: { id: 'base', number: 16 },
+      baseBundleId: 'base',
+      state: 'built',
+    };
+    const fetchMock = stubFetch(() => Response.json([deltaPack]));
+
+    const fetchedDeltaPacks = await new HotCodePush().apps.bundles.deltas.list({
+      appId: 'app',
+      bundleId: 'bundle',
+      relations: ['baseBundle'],
+    });
+
+    expect(fetchedDeltaPacks).toEqual([deltaPack]);
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: `${DELTAS_URL}?relations=baseBundle`,
+    });
+  });
+
   test('should put the delta pack from the base bundle as a tar', async () => {
     const fetchMock = stubFetch(() => Response.json({ sizeBytes: 5 }));
     const delta = new Blob(['delta']);

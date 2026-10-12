@@ -19,15 +19,6 @@ export type Bundle = JsonResponseBody<
 >[number];
 
 /**
- * A bundle with the delta packs the platform builds against the bases its devices run, oldest first.
- */
-export type BundleWithDeltaPacks = JsonResponseBody<
-  '/v1/apps/{appId}/bundles/{bundleId}',
-  'get',
-  200
->;
-
-/**
  * A created bundle with the upload URLs of the files the app lacks and of its pack.
  */
 export type BundleWithUploads = JsonResponseBody<
@@ -132,7 +123,7 @@ export class BundlesResource {
     });
   }
 
-  public async get(options: GetBundleOptions): Promise<BundleWithDeltaPacks> {
+  public async get(options: GetBundleOptions): Promise<Bundle> {
     return this.httpClient.fetchJson({
       method: 'GET',
       path: resolvePath('/v1/apps/{appId}/bundles/{bundleId}', options),

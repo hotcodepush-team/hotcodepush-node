@@ -557,9 +557,49 @@ export interface paths {
         };
         /**
          * Get the usage
-         * @description The monthly active devices and bytes of each of the organization's live apps in `month`, `YYYY-MM`, the current one by default, beside the organization's total. Each month is the rollup's, the number the invoice shows, its bytes approximate by design; the current month's devices are counted live, since the rollup's row is a night behind. `?format=csv` answers the apps as `text/csv`. Any role of the organization, Billing included.
+         * @description The organization's usage in `month`, `YYYY-MM`, the current one by default: `mau` and `bytes` summed over the rows `GET …/usage/apps` lists, read from the stored months and never counted in the request. Any role of the organization, Billing included.
          */
         get: operations["getV1OrganizationsByOrganizationIdUsage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/usage/apps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the usage per app
+         * @description The usage per app in `month`, `YYYY-MM`, the current one by default: the stored month of each of the organization's live apps that has one — `mau`, the counted devices, kept live, and `bytes`, the files host's, approximate by design, the open month's a day behind. Ordered by `mau`, the most first, then `appId`: the list's one exception to newest first. `?relations=app` embeds each row's app, `{ id, name }`. `?format=csv` answers every row of the month as `text/csv` with the app's name, unpaginated, in `appId` order. Any role of the organization, Billing included.
+         */
+        get: operations["getV1OrganizationsByOrganizationIdUsageApps"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/usage/apps/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Count the usage per app
+         * @description The number of rows the usage per app lists for `month`, which the list pages through.
+         */
+        get: operations["getV1OrganizationsByOrganizationIdUsageAppsCount"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1797,7 +1837,7 @@ export interface paths {
         };
         /**
          * Get the usage statistics
-         * @description The monthly active devices per month the period touches — the closed months as the rollup wrote them, the number the invoice shows, the open month counted live — and the checks and bytes per day from the HTTP analytics beside the bytes the devices reported, approximate by design; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default and at most 366.
+         * @description The monthly active devices and bytes per month the period touches — the app's stored months, the number the invoice shows, the open month's devices kept live and its bytes a day behind — and the checks and bytes per day from the HTTP analytics beside the bytes the devices reported, approximate by design; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default and at most 366.
          */
         get: operations["getV1AppsByAppIdStatisticsUsage"];
         put?: never;
@@ -5843,7 +5883,6 @@ export interface operations {
     getV1OrganizationsByOrganizationIdUsage: {
         parameters: {
             query?: {
-                format?: "csv";
                 month?: string;
             };
             header?: {
@@ -5857,27 +5896,215 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description The apps' usage and the organization's total. */
+            /** @description The organization's usage. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        apps: {
-                            /** Format: uuid */
-                            appId: string;
-                            appName: string;
-                            bytes: number;
-                            mau: number;
-                        }[];
+                        bytes: number;
+                        mau: number;
                         month: string;
-                        total: {
-                            bytes: number;
-                            mau: number;
-                        };
                     };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1OrganizationsByOrganizationIdUsageApps: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                month?: string;
+                relations?: "app"[];
+                format?: "csv";
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The usage per app. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        app?: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        /** Format: uuid */
+                        appId: string;
+                        bytes: number;
+                        mau: number;
+                        month: string;
+                    }[];
                     "text/csv": string;
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1OrganizationsByOrganizationIdUsageAppsCount: {
+        parameters: {
+            query?: {
+                month?: string;
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The number of rows the list's filters match. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        total: number;
+                    };
                 };
             };
             /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */

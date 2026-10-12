@@ -12,7 +12,7 @@ export type ListNotificationPreferencesOptions = QueryParameters<
 >;
 
 /**
- * One notification type with what the caller receives per medium and whether that is the default or an override.
+ * Whether the caller receives one category's notifications through one medium, for the account or one membership.
  */
 export type NotificationPreference = JsonResponseBody<
   '/v1/notification-preferences',
@@ -20,34 +20,25 @@ export type NotificationPreference = JsonResponseBody<
   200
 >;
 
-/**
- * A category of the catalog with its types; a mandatory category's email is always on.
- */
-export type NotificationPreferenceCategory = JsonResponseBody<
-  '/v1/notification-preferences',
-  'get',
-  200
->[number];
-
 export type UpdateNotificationPreferenceOptions = JsonRequestBody<
   '/v1/notification-preferences',
   'patch'
 >;
 
 /**
- * The caller's matrix of notification types and media, for the account or, with `organizationId`, for that membership.
+ * The caller's notification preferences, one per category and medium, for the account or, with `organizationId`, for that membership.
  */
 export class NotificationPreferencesResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * Every notification type grouped by category in the catalog's order: the account-scoped categories,
-   * or with `organizationId` that organization's product alerts.
+   * One preference per category and each medium its notifications reach, the defaults included, in the catalog's order
+   * and email first: the categories set for the account, or with `organizationId` those set per membership.
    * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
   public async list(
     options: ListNotificationPreferencesOptions = {},
-  ): Promise<NotificationPreferenceCategory[]> {
+  ): Promise<NotificationPreference[]> {
     return this.httpClient.fetchJson({
       method: 'GET',
       path: resolvePath('/v1/notification-preferences'),
@@ -56,7 +47,7 @@ export class NotificationPreferencesResource {
   }
 
   /**
-   * Sets one cell of the matrix, the type and the medium.
+   * Sets one preference, the category and the medium, and answers it; a mandatory category's email is always on.
    * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
   public async update(

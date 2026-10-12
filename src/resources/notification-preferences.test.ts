@@ -6,8 +6,10 @@ import { resolveSentRequest, stubFetch } from '../test-helpers';
 const NOTIFICATION_PREFERENCES_URL =
   'https://api.hotcodepush.com/v1/notification-preferences';
 const NOTIFICATION_PREFERENCE = {
-  media: [{ isDefault: false, isEnabled: false, medium: 'email' }],
-  type: 'release-paused',
+  category: 'product_alerts',
+  isEnabled: false,
+  medium: 'email',
+  organizationId: 'organization',
 };
 
 afterEach(() => {
@@ -15,44 +17,39 @@ afterEach(() => {
 });
 
 describe('NotificationPreferencesResource', () => {
-  test("should list the organization's product alert preferences", async () => {
-    const category = {
-      category: 'product_alerts',
-      isMandatory: false,
-      types: [NOTIFICATION_PREFERENCE],
-    };
-    const fetchMock = stubFetch(() => Response.json([category]));
+  test("should list the caller's preferences of the organization", async () => {
+    const fetchMock = stubFetch(() => Response.json([NOTIFICATION_PREFERENCE]));
 
-    const fetchedCategories =
+    const fetchedNotificationPreferences =
       await new HotCodePush().notificationPreferences.list({
         organizationId: 'organization',
       });
 
-    expect(fetchedCategories).toEqual([category]);
+    expect(fetchedNotificationPreferences).toEqual([NOTIFICATION_PREFERENCE]);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${NOTIFICATION_PREFERENCES_URL}?organizationId=organization`,
     });
   });
 
-  test('should patch one cell of the matrix', async () => {
+  test('should patch one category and medium', async () => {
     const fetchMock = stubFetch(() => Response.json(NOTIFICATION_PREFERENCE));
 
     const updatedNotificationPreference =
       await new HotCodePush().notificationPreferences.update({
+        category: 'product_alerts',
         isEnabled: false,
         medium: 'email',
         organizationId: 'organization',
-        type: 'release-paused',
       });
 
     expect(updatedNotificationPreference).toEqual(NOTIFICATION_PREFERENCE);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       body: {
+        category: 'product_alerts',
         isEnabled: false,
         medium: 'email',
         organizationId: 'organization',
-        type: 'release-paused',
       },
       method: 'PATCH',
       url: NOTIFICATION_PREFERENCES_URL,

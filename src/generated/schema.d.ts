@@ -73,7 +73,7 @@ export interface paths {
         };
         /**
          * List notification preferences
-         * @description Every notification type with what the caller receives per medium and whether that is the default or an override, grouped by category in the catalog's order: the account-scoped categories, or with `organizationId` that organization's product alerts.
+         * @description The caller's preferences, one row per category and each medium its notifications reach, the defaults included, in the catalog's order and email first: the categories set for the account, or with `organizationId` those set per membership for that organization.
          */
         get: operations["getV1NotificationPreferences"];
         put?: never;
@@ -83,7 +83,7 @@ export interface paths {
         head?: never;
         /**
          * Update a notification preference
-         * @description Sets one cell of the caller's matrix, the type and the medium, for the account or with `organizationId` for that membership; a mandatory category's email is always on.
+         * @description Sets one row of the caller's preferences, the category and the medium, for the account or with `organizationId` for that membership, and answers it; a mandatory category's email is always on.
          */
         patch: operations["patchV1NotificationPreferences"];
         trace?: never;
@@ -2239,18 +2239,11 @@ export interface operations {
                 content: {
                     "application/json": {
                         /** @enum {string} */
-                        category: "account" | "billing" | "lifecycle" | "newsletter" | "product_alerts" | "service_notices";
-                        isMandatory: boolean;
-                        types: {
-                            media: {
-                                isDefault: boolean;
-                                isEnabled: boolean;
-                                /** @enum {string} */
-                                medium: "email" | "in_app";
-                            }[];
-                            /** @enum {string} */
-                            type: "account-banned" | "account-deleted" | "api-token-created" | "code-signing-not-enabled" | "deprecation" | "dormancy-final-warning" | "dormancy-notice" | "dunning-paused" | "email-address-changed" | "email-verification" | "enterprise-ending-soon" | "enterprise-expired" | "fair-use-warning" | "feedback-after-thirty-days" | "first-release-nudge" | "incident" | "invitation" | "invitation-accepted" | "maintenance-window" | "member-removed" | "member-role-changed" | "new-sign-in" | "newsletter-issue" | "no-device-after-first-release" | "organization-deleted" | "ownership-transferred" | "password-changed" | "password-reset" | "payment-failed" | "payment-failed-reminder-1" | "payment-failed-reminder-2" | "recovery-code-used" | "recovery-codes-regenerated" | "release-failure-rate" | "release-from-ci" | "release-paused" | "release-revoked" | "spending-cap-changed" | "spending-cap-reached" | "spending-cap-warning" | "sso-member-joined" | "sso-member-joined-admins" | "staged-rollouts-available" | "storage-limit-reached" | "storage-warning" | "terms-change" | "two-factor-disabled" | "two-factor-enabled" | "webhook-disabled" | "welcome";
-                        }[];
+                        category: "account" | "billing" | "lifecycle" | "newsletter" | "product_alerts" | "service_notices" | "spending_alerts" | "team_activity";
+                        isEnabled: boolean;
+                        /** @enum {string} */
+                        medium: "email" | "in_app";
+                        organizationId: string | null;
                     }[];
                 };
             };
@@ -2332,32 +2325,30 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @enum {string} */
+                    category: "account" | "billing" | "lifecycle" | "newsletter" | "product_alerts" | "service_notices" | "spending_alerts" | "team_activity";
                     isEnabled: boolean;
                     /** @enum {string} */
                     medium: "email" | "in_app";
                     /** Format: uuid */
                     organizationId?: string;
-                    /** @enum {string} */
-                    type: "account-banned" | "account-deleted" | "api-token-created" | "code-signing-not-enabled" | "deprecation" | "dormancy-final-warning" | "dormancy-notice" | "dunning-paused" | "email-address-changed" | "email-verification" | "enterprise-ending-soon" | "enterprise-expired" | "fair-use-warning" | "feedback-after-thirty-days" | "first-release-nudge" | "incident" | "invitation" | "invitation-accepted" | "maintenance-window" | "member-removed" | "member-role-changed" | "new-sign-in" | "newsletter-issue" | "no-device-after-first-release" | "organization-deleted" | "ownership-transferred" | "password-changed" | "password-reset" | "payment-failed" | "payment-failed-reminder-1" | "payment-failed-reminder-2" | "recovery-code-used" | "recovery-codes-regenerated" | "release-failure-rate" | "release-from-ci" | "release-paused" | "release-revoked" | "spending-cap-changed" | "spending-cap-reached" | "spending-cap-warning" | "sso-member-joined" | "sso-member-joined-admins" | "staged-rollouts-available" | "storage-limit-reached" | "storage-warning" | "terms-change" | "two-factor-disabled" | "two-factor-enabled" | "webhook-disabled" | "welcome";
                 };
             };
         };
         responses: {
-            /** @description The type's preferences. */
+            /** @description The preference. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        media: {
-                            isDefault: boolean;
-                            isEnabled: boolean;
-                            /** @enum {string} */
-                            medium: "email" | "in_app";
-                        }[];
                         /** @enum {string} */
-                        type: "account-banned" | "account-deleted" | "api-token-created" | "code-signing-not-enabled" | "deprecation" | "dormancy-final-warning" | "dormancy-notice" | "dunning-paused" | "email-address-changed" | "email-verification" | "enterprise-ending-soon" | "enterprise-expired" | "fair-use-warning" | "feedback-after-thirty-days" | "first-release-nudge" | "incident" | "invitation" | "invitation-accepted" | "maintenance-window" | "member-removed" | "member-role-changed" | "new-sign-in" | "newsletter-issue" | "no-device-after-first-release" | "organization-deleted" | "ownership-transferred" | "password-changed" | "password-reset" | "payment-failed" | "payment-failed-reminder-1" | "payment-failed-reminder-2" | "recovery-code-used" | "recovery-codes-regenerated" | "release-failure-rate" | "release-from-ci" | "release-paused" | "release-revoked" | "spending-cap-changed" | "spending-cap-reached" | "spending-cap-warning" | "sso-member-joined" | "sso-member-joined-admins" | "staged-rollouts-available" | "storage-limit-reached" | "storage-warning" | "terms-change" | "two-factor-disabled" | "two-factor-enabled" | "webhook-disabled" | "welcome";
+                        category: "account" | "billing" | "lifecycle" | "newsletter" | "product_alerts" | "service_notices" | "spending_alerts" | "team_activity";
+                        isEnabled: boolean;
+                        /** @enum {string} */
+                        medium: "email" | "in_app";
+                        organizationId: string | null;
                     };
                 };
             };
@@ -3193,6 +3184,7 @@ export interface operations {
                         /** Format: uuid */
                         id: string;
                         objectId: string | null;
+                        organizationId: string | null;
                         sessionId: string | null;
                         snapshot: {
                             [key: string]: unknown;
@@ -7571,10 +7563,16 @@ export interface operations {
                             /** Format: uuid */
                             baseBundleId: string;
                             baseBundleNumber: number | null;
+                            /** Format: date-time */
+                            createdAt: string;
                             patchCount: number | null;
+                            /** Format: date-time */
+                            requestedAt: string;
                             sizeBytes: number | null;
                             /** @enum {string} */
                             state: "built" | "failed" | "requested";
+                            /** Format: date-time */
+                            updatedAt: string;
                         }[];
                     };
                 };
@@ -9269,6 +9267,8 @@ export interface operations {
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
+                        verificationResult: ("drifted" | "matched") | null;
+                        verifiedAt: string | null;
                     }[];
                 };
             };
@@ -9388,6 +9388,8 @@ export interface operations {
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
+                        verificationResult: ("drifted" | "matched") | null;
+                        verifiedAt: string | null;
                     };
                 };
             };
@@ -9701,6 +9703,8 @@ export interface operations {
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
+                        verificationResult: ("drifted" | "matched") | null;
+                        verifiedAt: string | null;
                         activeDeviceCount: number;
                         currentDeviceCount: number;
                         embeddedDeviceCount: number;
@@ -9918,6 +9922,8 @@ export interface operations {
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
+                        verificationResult: ("drifted" | "matched") | null;
+                        verifiedAt: string | null;
                     };
                 };
             };
@@ -10033,6 +10039,8 @@ export interface operations {
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
+                        verificationResult: ("drifted" | "matched") | null;
+                        verifiedAt: string | null;
                     };
                 };
             };
@@ -10139,6 +10147,8 @@ export interface operations {
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
+                        verificationResult: ("drifted" | "matched") | null;
+                        verifiedAt: string | null;
                     };
                 };
             };
@@ -10389,8 +10399,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** Format: uuid */
-                        appId: string;
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
@@ -10441,6 +10449,8 @@ export interface operations {
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            verificationResult: ("drifted" | "matched") | null;
+                            verifiedAt: string | null;
                         };
                         /** Format: uuid */
                         channelId: string;
@@ -10663,8 +10673,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** Format: uuid */
-                        appId: string;
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
@@ -10715,6 +10723,8 @@ export interface operations {
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            verificationResult: ("drifted" | "matched") | null;
+                            verifiedAt: string | null;
                         };
                         /** Format: uuid */
                         channelId: string;
@@ -11013,8 +11023,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** Format: uuid */
-                        appId: string;
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
@@ -11065,6 +11073,8 @@ export interface operations {
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            verificationResult: ("drifted" | "matched") | null;
+                            verifiedAt: string | null;
                         };
                         /** Format: uuid */
                         channelId: string;
@@ -11260,8 +11270,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** Format: uuid */
-                        appId: string;
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
@@ -11312,6 +11320,8 @@ export interface operations {
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            verificationResult: ("drifted" | "matched") | null;
+                            verifiedAt: string | null;
                         };
                         /** Format: uuid */
                         channelId: string;
@@ -11634,6 +11644,8 @@ export interface operations {
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            verificationResult: ("drifted" | "matched") | null;
+                            verifiedAt: string | null;
                         };
                         channelId: string | null;
                         /** @enum {string} */
@@ -11642,18 +11654,16 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         currentReleaseId: string | null;
+                        /** Format: uuid */
+                        deviceId: string;
                         embeddedBundleId: string | null;
                         fingerprint: string | null;
-                        /** Format: uuid */
-                        id: string;
                         /** Format: date-time */
                         lastSeenAt: string;
                         osVersion: string;
                         /** @enum {string} */
                         platform: "android" | "ios";
                         release?: {
-                            /** Format: uuid */
-                            appId: string;
                             bundle?: {
                                 /** Format: uuid */
                                 appId: string;
@@ -11704,6 +11714,8 @@ export interface operations {
                                 pausedAt: string | null;
                                 /** Format: date-time */
                                 updatedAt: string;
+                                verificationResult: ("drifted" | "matched") | null;
+                                verifiedAt: string | null;
                             };
                             /** Format: uuid */
                             channelId: string;
@@ -12092,6 +12104,8 @@ export interface operations {
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            verificationResult: ("drifted" | "matched") | null;
+                            verifiedAt: string | null;
                         };
                         channelId: string | null;
                         /** @enum {string} */
@@ -12100,18 +12114,16 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         currentReleaseId: string | null;
+                        /** Format: uuid */
+                        deviceId: string;
                         embeddedBundleId: string | null;
                         fingerprint: string | null;
-                        /** Format: uuid */
-                        id: string;
                         /** Format: date-time */
                         lastSeenAt: string;
                         osVersion: string;
                         /** @enum {string} */
                         platform: "android" | "ios";
                         release?: {
-                            /** Format: uuid */
-                            appId: string;
                             bundle?: {
                                 /** Format: uuid */
                                 appId: string;
@@ -12162,6 +12174,8 @@ export interface operations {
                                 pausedAt: string | null;
                                 /** Format: date-time */
                                 updatedAt: string;
+                                verificationResult: ("drifted" | "matched") | null;
+                                verifiedAt: string | null;
                             };
                             /** Format: uuid */
                             channelId: string;
@@ -12445,6 +12459,8 @@ export interface operations {
                         createdAt: string;
                         sha256: string;
                         sizeBytes: number;
+                        /** Format: date-time */
+                        updatedAt: string;
                     };
                 };
             };
@@ -12461,6 +12477,8 @@ export interface operations {
                         createdAt: string;
                         sha256: string;
                         sizeBytes: number;
+                        /** Format: date-time */
+                        updatedAt: string;
                     };
                 };
             };
@@ -12802,6 +12820,8 @@ export interface operations {
                         createdAt: string;
                         sha256: string;
                         sizeBytes: number;
+                        /** Format: date-time */
+                        updatedAt: string;
                     };
                 };
             };
@@ -12818,6 +12838,8 @@ export interface operations {
                         createdAt: string;
                         sha256: string;
                         sizeBytes: number;
+                        /** Format: date-time */
+                        updatedAt: string;
                     };
                 };
             };
@@ -13021,8 +13043,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** Format: uuid */
-                        appId: string;
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
@@ -13073,6 +13093,8 @@ export interface operations {
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            verificationResult: ("drifted" | "matched") | null;
+                            verifiedAt: string | null;
                         };
                         /** Format: uuid */
                         channelId: string;
@@ -13340,8 +13362,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** Format: uuid */
-                        appId: string;
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
@@ -13392,6 +13412,8 @@ export interface operations {
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            verificationResult: ("drifted" | "matched") | null;
+                            verifiedAt: string | null;
                         };
                         /** Format: uuid */
                         channelId: string;
@@ -13578,8 +13600,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** Format: uuid */
-                        appId: string;
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
@@ -13630,6 +13650,8 @@ export interface operations {
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            verificationResult: ("drifted" | "matched") | null;
+                            verifiedAt: string | null;
                         };
                         /** Format: uuid */
                         channelId: string;
@@ -13918,8 +13940,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** Format: uuid */
-                        appId: string;
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
@@ -13970,6 +13990,8 @@ export interface operations {
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            verificationResult: ("drifted" | "matched") | null;
+                            verifiedAt: string | null;
                         };
                         /** Format: uuid */
                         channelId: string;
@@ -14149,8 +14171,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** Format: uuid */
-                        appId: string;
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
@@ -14201,6 +14221,8 @@ export interface operations {
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            verificationResult: ("drifted" | "matched") | null;
+                            verifiedAt: string | null;
                         };
                         /** Format: uuid */
                         channelId: string;
@@ -14380,8 +14402,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** Format: uuid */
-                        appId: string;
                         bundle?: {
                             /** Format: uuid */
                             appId: string;
@@ -14432,6 +14452,8 @@ export interface operations {
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
+                            verificationResult: ("drifted" | "matched") | null;
+                            verifiedAt: string | null;
                         };
                         /** Format: uuid */
                         channelId: string;
@@ -14621,6 +14643,8 @@ export interface operations {
                         /** Format: uuid */
                         id: string;
                         publicKey: string;
+                        /** Format: date-time */
+                        updatedAt: string;
                     }[];
                 };
             };
@@ -14724,6 +14748,8 @@ export interface operations {
                         /** Format: uuid */
                         id: string;
                         publicKey: string;
+                        /** Format: date-time */
+                        updatedAt: string;
                     };
                 };
             };

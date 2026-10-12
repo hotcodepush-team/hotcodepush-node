@@ -690,110 +690,39 @@
                           "lifecycle",
                           "newsletter",
                           "product_alerts",
-                          "service_notices"
+                          "service_notices",
+                          "spending_alerts",
+                          "team_activity"
                         ]
                       },
-                      "isMandatory": {
+                      "isEnabled": {
                         "type": "boolean"
                       },
-                      "types": {
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "media": {
-                              "type": "array",
-                              "items": {
-                                "type": "object",
-                                "properties": {
-                                  "isDefault": {
-                                    "type": "boolean"
-                                  },
-                                  "isEnabled": {
-                                    "type": "boolean"
-                                  },
-                                  "medium": {
-                                    "type": "string",
-                                    "enum": [
-                                      "email",
-                                      "in_app"
-                                    ]
-                                  }
-                                },
-                                "required": [
-                                  "isDefault",
-                                  "isEnabled",
-                                  "medium"
-                                ]
-                              }
-                            },
-                            "type": {
-                              "type": "string",
-                              "enum": [
-                                "account-banned",
-                                "account-deleted",
-                                "api-token-created",
-                                "code-signing-not-enabled",
-                                "deprecation",
-                                "dormancy-final-warning",
-                                "dormancy-notice",
-                                "dunning-paused",
-                                "email-address-changed",
-                                "email-verification",
-                                "enterprise-ending-soon",
-                                "enterprise-expired",
-                                "fair-use-warning",
-                                "feedback-after-thirty-days",
-                                "first-release-nudge",
-                                "incident",
-                                "invitation",
-                                "invitation-accepted",
-                                "maintenance-window",
-                                "member-removed",
-                                "member-role-changed",
-                                "new-sign-in",
-                                "newsletter-issue",
-                                "no-device-after-first-release",
-                                "organization-deleted",
-                                "ownership-transferred",
-                                "password-changed",
-                                "password-reset",
-                                "payment-failed",
-                                "payment-failed-reminder-1",
-                                "payment-failed-reminder-2",
-                                "recovery-code-used",
-                                "recovery-codes-regenerated",
-                                "release-failure-rate",
-                                "release-from-ci",
-                                "release-paused",
-                                "release-revoked",
-                                "spending-cap-changed",
-                                "spending-cap-reached",
-                                "spending-cap-warning",
-                                "sso-member-joined",
-                                "sso-member-joined-admins",
-                                "staged-rollouts-available",
-                                "storage-limit-reached",
-                                "storage-warning",
-                                "terms-change",
-                                "two-factor-disabled",
-                                "two-factor-enabled",
-                                "webhook-disabled",
-                                "welcome"
-                              ]
-                            }
+                      "medium": {
+                        "type": "string",
+                        "enum": [
+                          "email",
+                          "in_app"
+                        ]
+                      },
+                      "organizationId": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                           },
-                          "required": [
-                            "media",
-                            "type"
-                          ]
-                        }
+                          {
+                            "type": "null"
+                          }
+                        ]
                       }
                     },
                     "required": [
                       "category",
-                      "isMandatory",
-                      "types"
+                      "isEnabled",
+                      "medium",
+                      "organizationId"
                     ]
                   }
                 }
@@ -872,7 +801,7 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Every notification type with what the caller receives per medium and whether that is the default or an override, grouped by category in the catalog's order: the account-scoped categories, or with `organizationId` that organization's product alerts.",
+        "description": "The caller's preferences, one row per category and each medium its notifications reach, the defaults included, in the catalog's order and email first: the categories set for the account, or with `organizationId` those set per membership for that organization.",
         "summary": "List notification preferences",
         "tags": [
           "Notifications"
@@ -906,96 +835,52 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "media": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "isDefault": {
-                            "type": "boolean"
-                          },
-                          "isEnabled": {
-                            "type": "boolean"
-                          },
-                          "medium": {
-                            "type": "string",
-                            "enum": [
-                              "email",
-                              "in_app"
-                            ]
-                          }
-                        },
-                        "required": [
-                          "isDefault",
-                          "isEnabled",
-                          "medium"
-                        ]
-                      }
-                    },
-                    "type": {
+                    "category": {
                       "type": "string",
                       "enum": [
-                        "account-banned",
-                        "account-deleted",
-                        "api-token-created",
-                        "code-signing-not-enabled",
-                        "deprecation",
-                        "dormancy-final-warning",
-                        "dormancy-notice",
-                        "dunning-paused",
-                        "email-address-changed",
-                        "email-verification",
-                        "enterprise-ending-soon",
-                        "enterprise-expired",
-                        "fair-use-warning",
-                        "feedback-after-thirty-days",
-                        "first-release-nudge",
-                        "incident",
-                        "invitation",
-                        "invitation-accepted",
-                        "maintenance-window",
-                        "member-removed",
-                        "member-role-changed",
-                        "new-sign-in",
-                        "newsletter-issue",
-                        "no-device-after-first-release",
-                        "organization-deleted",
-                        "ownership-transferred",
-                        "password-changed",
-                        "password-reset",
-                        "payment-failed",
-                        "payment-failed-reminder-1",
-                        "payment-failed-reminder-2",
-                        "recovery-code-used",
-                        "recovery-codes-regenerated",
-                        "release-failure-rate",
-                        "release-from-ci",
-                        "release-paused",
-                        "release-revoked",
-                        "spending-cap-changed",
-                        "spending-cap-reached",
-                        "spending-cap-warning",
-                        "sso-member-joined",
-                        "sso-member-joined-admins",
-                        "staged-rollouts-available",
-                        "storage-limit-reached",
-                        "storage-warning",
-                        "terms-change",
-                        "two-factor-disabled",
-                        "two-factor-enabled",
-                        "webhook-disabled",
-                        "welcome"
+                        "account",
+                        "billing",
+                        "lifecycle",
+                        "newsletter",
+                        "product_alerts",
+                        "service_notices",
+                        "spending_alerts",
+                        "team_activity"
+                      ]
+                    },
+                    "isEnabled": {
+                      "type": "boolean"
+                    },
+                    "medium": {
+                      "type": "string",
+                      "enum": [
+                        "email",
+                        "in_app"
+                      ]
+                    },
+                    "organizationId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        {
+                          "type": "null"
+                        }
                       ]
                     }
                   },
                   "required": [
-                    "media",
-                    "type"
+                    "category",
+                    "isEnabled",
+                    "medium",
+                    "organizationId"
                   ]
                 }
               }
             },
-            "description": "The type's preferences."
+            "description": "The preference."
           },
           "400": {
             "content": {
@@ -1078,7 +963,7 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Sets one cell of the caller's matrix, the type and the medium, for the account or with `organizationId` for that membership; a mandatory category's email is always on.",
+        "description": "Sets one row of the caller's preferences, the category and the medium, for the account or with `organizationId` for that membership, and answers it; a mandatory category's email is always on.",
         "summary": "Update a notification preference",
         "tags": [
           "Notifications"
@@ -1090,6 +975,19 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "account",
+                      "billing",
+                      "lifecycle",
+                      "newsletter",
+                      "product_alerts",
+                      "service_notices",
+                      "spending_alerts",
+                      "team_activity"
+                    ]
+                  },
                   "isEnabled": {
                     "type": "boolean"
                   },
@@ -1104,67 +1002,12 @@
                     "type": "string",
                     "format": "uuid",
                     "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                  },
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "account-banned",
-                      "account-deleted",
-                      "api-token-created",
-                      "code-signing-not-enabled",
-                      "deprecation",
-                      "dormancy-final-warning",
-                      "dormancy-notice",
-                      "dunning-paused",
-                      "email-address-changed",
-                      "email-verification",
-                      "enterprise-ending-soon",
-                      "enterprise-expired",
-                      "fair-use-warning",
-                      "feedback-after-thirty-days",
-                      "first-release-nudge",
-                      "incident",
-                      "invitation",
-                      "invitation-accepted",
-                      "maintenance-window",
-                      "member-removed",
-                      "member-role-changed",
-                      "new-sign-in",
-                      "newsletter-issue",
-                      "no-device-after-first-release",
-                      "organization-deleted",
-                      "ownership-transferred",
-                      "password-changed",
-                      "password-reset",
-                      "payment-failed",
-                      "payment-failed-reminder-1",
-                      "payment-failed-reminder-2",
-                      "recovery-code-used",
-                      "recovery-codes-regenerated",
-                      "release-failure-rate",
-                      "release-from-ci",
-                      "release-paused",
-                      "release-revoked",
-                      "spending-cap-changed",
-                      "spending-cap-reached",
-                      "spending-cap-warning",
-                      "sso-member-joined",
-                      "sso-member-joined-admins",
-                      "staged-rollouts-available",
-                      "storage-limit-reached",
-                      "storage-warning",
-                      "terms-change",
-                      "two-factor-disabled",
-                      "two-factor-enabled",
-                      "webhook-disabled",
-                      "welcome"
-                    ]
                   }
                 },
                 "required": [
+                  "category",
                   "isEnabled",
-                  "medium",
-                  "type"
+                  "medium"
                 ]
               }
             }
@@ -2400,6 +2243,18 @@
                           }
                         ]
                       },
+                      "organizationId": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
                       "sessionId": {
                         "anyOf": [
                           {
@@ -2472,6 +2327,7 @@
                       "createdAt",
                       "id",
                       "objectId",
+                      "organizationId",
                       "sessionId",
                       "snapshot",
                       "type",
@@ -11309,6 +11165,11 @@
                               }
                             ]
                           },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
                           "patchCount": {
                             "anyOf": [
                               {
@@ -11320,6 +11181,11 @@
                                 "type": "null"
                               }
                             ]
+                          },
+                          "requestedAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                           },
                           "sizeBytes": {
                             "anyOf": [
@@ -11340,14 +11206,22 @@
                               "failed",
                               "requested"
                             ]
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                           }
                         },
                         "required": [
                           "baseBundleId",
                           "baseBundleNumber",
+                          "createdAt",
                           "patchCount",
+                          "requestedAt",
                           "sizeBytes",
-                          "state"
+                          "state",
+                          "updatedAt"
                         ]
                       }
                     }
@@ -14024,6 +13898,32 @@
                         "type": "string",
                         "format": "date-time",
                         "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      },
+                      "verificationResult": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "drifted",
+                              "matched"
+                            ]
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "verifiedAt": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       }
                     },
                     "required": [
@@ -14038,7 +13938,9 @@
                       "isProtected",
                       "name",
                       "pausedAt",
-                      "updatedAt"
+                      "updatedAt",
+                      "verificationResult",
+                      "verifiedAt"
                     ]
                   }
                 }
@@ -14411,6 +14313,32 @@
                       "type": "string",
                       "format": "date-time",
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "verificationResult": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "drifted",
+                            "matched"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "verifiedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   },
                   "required": [
@@ -14425,7 +14353,9 @@
                     "isProtected",
                     "name",
                     "pausedAt",
-                    "updatedAt"
+                    "updatedAt",
+                    "verificationResult",
+                    "verifiedAt"
                   ]
                 }
               }
@@ -14831,6 +14761,32 @@
                       "format": "date-time",
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                     },
+                    "verificationResult": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "drifted",
+                            "matched"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "verifiedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
                     "activeDeviceCount": {
                       "type": "integer",
                       "minimum": -9007199254740991,
@@ -14860,6 +14816,8 @@
                     "name",
                     "pausedAt",
                     "updatedAt",
+                    "verificationResult",
+                    "verifiedAt",
                     "activeDeviceCount",
                     "currentDeviceCount",
                     "embeddedDeviceCount"
@@ -15069,6 +15027,32 @@
                       "type": "string",
                       "format": "date-time",
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "verificationResult": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "drifted",
+                            "matched"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "verifiedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   },
                   "required": [
@@ -15083,7 +15067,9 @@
                     "isProtected",
                     "name",
                     "pausedAt",
-                    "updatedAt"
+                    "updatedAt",
+                    "verificationResult",
+                    "verifiedAt"
                   ]
                 }
               }
@@ -15491,6 +15477,32 @@
                       "type": "string",
                       "format": "date-time",
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "verificationResult": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "drifted",
+                            "matched"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "verifiedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   },
                   "required": [
@@ -15505,7 +15517,9 @@
                     "isProtected",
                     "name",
                     "pausedAt",
-                    "updatedAt"
+                    "updatedAt",
+                    "verificationResult",
+                    "verifiedAt"
                   ]
                 }
               }
@@ -15714,6 +15728,32 @@
                       "type": "string",
                       "format": "date-time",
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "verificationResult": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "drifted",
+                            "matched"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "verifiedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   },
                   "required": [
@@ -15728,7 +15768,9 @@
                     "isProtected",
                     "name",
                     "pausedAt",
-                    "updatedAt"
+                    "updatedAt",
+                    "verificationResult",
+                    "verifiedAt"
                   ]
                 }
               }
@@ -16227,11 +16269,6 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "appId": {
-                        "type": "string",
-                        "format": "uuid",
-                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                      },
                       "bundle": {
                         "type": "object",
                         "properties": {
@@ -16511,6 +16548,32 @@
                             "type": "string",
                             "format": "date-time",
                             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          "verificationResult": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "drifted",
+                                  "matched"
+                                ]
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "verifiedAt": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           }
                         },
                         "required": [
@@ -16525,7 +16588,9 @@
                           "isProtected",
                           "name",
                           "pausedAt",
-                          "updatedAt"
+                          "updatedAt",
+                          "verificationResult",
+                          "verifiedAt"
                         ]
                       },
                       "channelId": {
@@ -16967,7 +17032,6 @@
                       }
                     },
                     "required": [
-                      "appId",
                       "bundleId",
                       "channelId",
                       "conditions",
@@ -17176,11 +17240,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "appId": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
                     "bundle": {
                       "type": "object",
                       "properties": {
@@ -17460,6 +17519,32 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "verificationResult": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "drifted",
+                                "matched"
+                              ]
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "verifiedAt": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         }
                       },
                       "required": [
@@ -17474,7 +17559,9 @@
                         "isProtected",
                         "name",
                         "pausedAt",
-                        "updatedAt"
+                        "updatedAt",
+                        "verificationResult",
+                        "verifiedAt"
                       ]
                     },
                     "channelId": {
@@ -17953,7 +18040,6 @@
                     }
                   },
                   "required": [
-                    "appId",
                     "bundleId",
                     "channelId",
                     "conditions",
@@ -18482,11 +18568,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "appId": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
                     "bundle": {
                       "type": "object",
                       "properties": {
@@ -18766,6 +18847,32 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "verificationResult": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "drifted",
+                                "matched"
+                              ]
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "verifiedAt": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         }
                       },
                       "required": [
@@ -18780,7 +18887,9 @@
                         "isProtected",
                         "name",
                         "pausedAt",
-                        "updatedAt"
+                        "updatedAt",
+                        "verificationResult",
+                        "verifiedAt"
                       ]
                     },
                     "channelId": {
@@ -19222,7 +19331,6 @@
                     }
                   },
                   "required": [
-                    "appId",
                     "bundleId",
                     "channelId",
                     "conditions",
@@ -19391,11 +19499,6 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "appId": {
-                        "type": "string",
-                        "format": "uuid",
-                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                      },
                       "bundle": {
                         "type": "object",
                         "properties": {
@@ -19675,6 +19778,32 @@
                             "type": "string",
                             "format": "date-time",
                             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          "verificationResult": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "drifted",
+                                  "matched"
+                                ]
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "verifiedAt": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           }
                         },
                         "required": [
@@ -19689,7 +19818,9 @@
                           "isProtected",
                           "name",
                           "pausedAt",
-                          "updatedAt"
+                          "updatedAt",
+                          "verificationResult",
+                          "verifiedAt"
                         ]
                       },
                       "channelId": {
@@ -20131,7 +20262,6 @@
                       }
                     },
                     "required": [
-                      "appId",
                       "bundleId",
                       "channelId",
                       "conditions",
@@ -20702,6 +20832,32 @@
                             "type": "string",
                             "format": "date-time",
                             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          "verificationResult": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "drifted",
+                                  "matched"
+                                ]
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "verifiedAt": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           }
                         },
                         "required": [
@@ -20716,7 +20872,9 @@
                           "isProtected",
                           "name",
                           "pausedAt",
-                          "updatedAt"
+                          "updatedAt",
+                          "verificationResult",
+                          "verifiedAt"
                         ]
                       },
                       "channelId": {
@@ -20761,6 +20919,11 @@
                           }
                         ]
                       },
+                      "deviceId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
                       "embeddedBundleId": {
                         "anyOf": [
                           {
@@ -20778,11 +20941,6 @@
                           "string",
                           "null"
                         ]
-                      },
-                      "id": {
-                        "type": "string",
-                        "format": "uuid",
-                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                       },
                       "lastSeenAt": {
                         "type": "string",
@@ -20802,11 +20960,6 @@
                       "release": {
                         "type": "object",
                         "properties": {
-                          "appId": {
-                            "type": "string",
-                            "format": "uuid",
-                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                          },
                           "bundle": {
                             "type": "object",
                             "properties": {
@@ -21086,6 +21239,32 @@
                                 "type": "string",
                                 "format": "date-time",
                                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                              },
+                              "verificationResult": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "drifted",
+                                      "matched"
+                                    ]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "verifiedAt": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
                               }
                             },
                             "required": [
@@ -21100,7 +21279,9 @@
                               "isProtected",
                               "name",
                               "pausedAt",
-                              "updatedAt"
+                              "updatedAt",
+                              "verificationResult",
+                              "verifiedAt"
                             ]
                           },
                           "channelId": {
@@ -21542,7 +21723,6 @@
                           }
                         },
                         "required": [
-                          "appId",
                           "bundleId",
                           "channelId",
                           "conditions",
@@ -21587,9 +21767,9 @@
                       "country",
                       "createdAt",
                       "currentReleaseId",
+                      "deviceId",
                       "embeddedBundleId",
                       "fingerprint",
-                      "id",
                       "lastSeenAt",
                       "osVersion",
                       "platform",
@@ -22226,6 +22406,32 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "verificationResult": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "drifted",
+                                "matched"
+                              ]
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "verifiedAt": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         }
                       },
                       "required": [
@@ -22240,7 +22446,9 @@
                         "isProtected",
                         "name",
                         "pausedAt",
-                        "updatedAt"
+                        "updatedAt",
+                        "verificationResult",
+                        "verifiedAt"
                       ]
                     },
                     "channelId": {
@@ -22285,6 +22493,11 @@
                         }
                       ]
                     },
+                    "deviceId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
                     "embeddedBundleId": {
                       "anyOf": [
                         {
@@ -22302,11 +22515,6 @@
                         "string",
                         "null"
                       ]
-                    },
-                    "id": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
                     "lastSeenAt": {
                       "type": "string",
@@ -22326,11 +22534,6 @@
                     "release": {
                       "type": "object",
                       "properties": {
-                        "appId": {
-                          "type": "string",
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                        },
                         "bundle": {
                           "type": "object",
                           "properties": {
@@ -22610,6 +22813,32 @@
                               "type": "string",
                               "format": "date-time",
                               "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                            },
+                            "verificationResult": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "drifted",
+                                    "matched"
+                                  ]
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "verifiedAt": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
                             }
                           },
                           "required": [
@@ -22624,7 +22853,9 @@
                             "isProtected",
                             "name",
                             "pausedAt",
-                            "updatedAt"
+                            "updatedAt",
+                            "verificationResult",
+                            "verifiedAt"
                           ]
                         },
                         "channelId": {
@@ -23066,7 +23297,6 @@
                         }
                       },
                       "required": [
-                        "appId",
                         "bundleId",
                         "channelId",
                         "conditions",
@@ -23156,9 +23386,9 @@
                     "country",
                     "createdAt",
                     "currentReleaseId",
+                    "deviceId",
                     "embeddedBundleId",
                     "fingerprint",
-                    "id",
                     "lastSeenAt",
                     "osVersion",
                     "platform",
@@ -23429,13 +23659,19 @@
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                     }
                   },
                   "required": [
                     "appId",
                     "createdAt",
                     "sha256",
-                    "sizeBytes"
+                    "sizeBytes",
+                    "updatedAt"
                   ]
                 }
               }
@@ -23465,13 +23701,19 @@
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                     }
                   },
                   "required": [
                     "appId",
                     "createdAt",
                     "sha256",
-                    "sizeBytes"
+                    "sizeBytes",
+                    "updatedAt"
                   ]
                 }
               }
@@ -23938,13 +24180,19 @@
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                     }
                   },
                   "required": [
                     "appId",
                     "createdAt",
                     "sha256",
-                    "sizeBytes"
+                    "sizeBytes",
+                    "updatedAt"
                   ]
                 }
               }
@@ -23974,13 +24222,19 @@
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                     }
                   },
                   "required": [
                     "appId",
                     "createdAt",
                     "sha256",
-                    "sizeBytes"
+                    "sizeBytes",
+                    "updatedAt"
                   ]
                 }
               }
@@ -24283,11 +24537,6 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "appId": {
-                        "type": "string",
-                        "format": "uuid",
-                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                      },
                       "bundle": {
                         "type": "object",
                         "properties": {
@@ -24567,6 +24816,32 @@
                             "type": "string",
                             "format": "date-time",
                             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          "verificationResult": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "drifted",
+                                  "matched"
+                                ]
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "verifiedAt": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           }
                         },
                         "required": [
@@ -24581,7 +24856,9 @@
                           "isProtected",
                           "name",
                           "pausedAt",
-                          "updatedAt"
+                          "updatedAt",
+                          "verificationResult",
+                          "verifiedAt"
                         ]
                       },
                       "channelId": {
@@ -25023,7 +25300,6 @@
                       }
                     },
                     "required": [
-                      "appId",
                       "bundleId",
                       "channelId",
                       "conditions",
@@ -25381,11 +25657,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "appId": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
                     "bundle": {
                       "type": "object",
                       "properties": {
@@ -25665,6 +25936,32 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "verificationResult": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "drifted",
+                                "matched"
+                              ]
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "verifiedAt": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         }
                       },
                       "required": [
@@ -25679,7 +25976,9 @@
                         "isProtected",
                         "name",
                         "pausedAt",
-                        "updatedAt"
+                        "updatedAt",
+                        "verificationResult",
+                        "verifiedAt"
                       ]
                     },
                     "channelId": {
@@ -26121,7 +26420,6 @@
                     }
                   },
                   "required": [
-                    "appId",
                     "bundleId",
                     "channelId",
                     "conditions",
@@ -26275,11 +26573,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "appId": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
                     "bundle": {
                       "type": "object",
                       "properties": {
@@ -26559,6 +26852,32 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "verificationResult": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "drifted",
+                                "matched"
+                              ]
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "verifiedAt": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         }
                       },
                       "required": [
@@ -26573,7 +26892,9 @@
                         "isProtected",
                         "name",
                         "pausedAt",
-                        "updatedAt"
+                        "updatedAt",
+                        "verificationResult",
+                        "verifiedAt"
                       ]
                     },
                     "channelId": {
@@ -27015,7 +27336,6 @@
                     }
                   },
                   "required": [
-                    "appId",
                     "bundleId",
                     "channelId",
                     "conditions",
@@ -27496,11 +27816,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "appId": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
                     "bundle": {
                       "type": "object",
                       "properties": {
@@ -27780,6 +28095,32 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "verificationResult": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "drifted",
+                                "matched"
+                              ]
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "verifiedAt": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         }
                       },
                       "required": [
@@ -27794,7 +28135,9 @@
                         "isProtected",
                         "name",
                         "pausedAt",
-                        "updatedAt"
+                        "updatedAt",
+                        "verificationResult",
+                        "verifiedAt"
                       ]
                     },
                     "channelId": {
@@ -28236,7 +28579,6 @@
                     }
                   },
                   "required": [
-                    "appId",
                     "bundleId",
                     "channelId",
                     "conditions",
@@ -28387,11 +28729,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "appId": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
                     "bundle": {
                       "type": "object",
                       "properties": {
@@ -28671,6 +29008,32 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "verificationResult": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "drifted",
+                                "matched"
+                              ]
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "verifiedAt": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         }
                       },
                       "required": [
@@ -28685,7 +29048,9 @@
                         "isProtected",
                         "name",
                         "pausedAt",
-                        "updatedAt"
+                        "updatedAt",
+                        "verificationResult",
+                        "verifiedAt"
                       ]
                     },
                     "channelId": {
@@ -29127,7 +29492,6 @@
                     }
                   },
                   "required": [
-                    "appId",
                     "bundleId",
                     "channelId",
                     "conditions",
@@ -29278,11 +29642,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "appId": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
                     "bundle": {
                       "type": "object",
                       "properties": {
@@ -29562,6 +29921,32 @@
                           "type": "string",
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "verificationResult": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "drifted",
+                                "matched"
+                              ]
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "verifiedAt": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         }
                       },
                       "required": [
@@ -29576,7 +29961,9 @@
                         "isProtected",
                         "name",
                         "pausedAt",
-                        "updatedAt"
+                        "updatedAt",
+                        "verificationResult",
+                        "verifiedAt"
                       ]
                     },
                     "channelId": {
@@ -30018,7 +30405,6 @@
                     }
                   },
                   "required": [
-                    "appId",
                     "bundleId",
                     "channelId",
                     "conditions",
@@ -30191,6 +30577,11 @@
                       },
                       "publicKey": {
                         "type": "string"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                       }
                     },
                     "required": [
@@ -30198,7 +30589,8 @@
                       "createdAt",
                       "fingerprint",
                       "id",
-                      "publicKey"
+                      "publicKey",
+                      "updatedAt"
                     ]
                   }
                 }
@@ -30346,6 +30738,11 @@
                     },
                     "publicKey": {
                       "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                     }
                   },
                   "required": [
@@ -30353,7 +30750,8 @@
                     "createdAt",
                     "fingerprint",
                     "id",
-                    "publicKey"
+                    "publicKey",
+                    "updatedAt"
                   ]
                 }
               }

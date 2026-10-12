@@ -467,10 +467,10 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     }),
   'notificationPreferences.update': hotCodePush =>
     hotCodePush.notificationPreferences.update({
+      category: 'product_alerts',
       isEnabled: false,
       medium: 'email',
       organizationId: ORGANIZATION_ID,
-      type: 'release-paused',
     }),
   'notifications.count': hotCodePush =>
     hotCodePush.notifications.count({ isRead: 'false' }),

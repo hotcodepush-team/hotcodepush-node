@@ -16,7 +16,7 @@ describe('SsoProviderVerificationsResource', () => {
     const verification = {
       details: { reason: 'lookup_failed' },
       domain: 'example.com',
-      isVerified: false,
+      isDomainVerified: false,
     };
     const fetchMock = stubFetch(() => Response.json(verification));
 

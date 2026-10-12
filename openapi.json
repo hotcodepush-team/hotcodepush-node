@@ -5588,7 +5588,7 @@
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
-                    "isVerified": {
+                    "isDomainVerified": {
                       "type": "boolean"
                     },
                     "oidc": {
@@ -5642,13 +5642,6 @@
                       "type": "string",
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "provider": {
-                      "type": "string",
-                      "enum": [
-                        "oidc",
-                        "saml"
-                      ]
                     },
                     "saml": {
                       "anyOf": [
@@ -5726,10 +5719,9 @@
                     "createdAt",
                     "domain",
                     "id",
-                    "isVerified",
+                    "isDomainVerified",
                     "oidc",
                     "organizationId",
-                    "provider",
                     "saml",
                     "signInUrl",
                     "updatedAt",
@@ -5811,7 +5803,7 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The organization's SSO provider: its kind, domain, whether the domain is verified, the sign-in link, and the TXT record to set until it is.",
+        "description": "The organization's SSO provider: its domain, whether the domain is verified, the sign-in link, the `oidc` or `saml` block, the one present saying the kind, and the TXT record to set until the domain is verified.",
         "summary": "Get the SSO provider",
         "tags": [
           "SSO provider"
@@ -5858,7 +5850,7 @@
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
-                    "isVerified": {
+                    "isDomainVerified": {
                       "type": "boolean"
                     },
                     "oidc": {
@@ -5912,13 +5904,6 @@
                       "type": "string",
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "provider": {
-                      "type": "string",
-                      "enum": [
-                        "oidc",
-                        "saml"
-                      ]
                     },
                     "saml": {
                       "anyOf": [
@@ -5996,10 +5981,9 @@
                     "createdAt",
                     "domain",
                     "id",
-                    "isVerified",
+                    "isDomainVerified",
                     "oidc",
                     "organizationId",
-                    "provider",
                     "saml",
                     "signInUrl",
                     "updatedAt",
@@ -6029,7 +6013,7 @@
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
-                    "isVerified": {
+                    "isDomainVerified": {
                       "type": "boolean"
                     },
                     "oidc": {
@@ -6083,13 +6067,6 @@
                       "type": "string",
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "provider": {
-                      "type": "string",
-                      "enum": [
-                        "oidc",
-                        "saml"
-                      ]
                     },
                     "saml": {
                       "anyOf": [
@@ -6167,10 +6144,9 @@
                     "createdAt",
                     "domain",
                     "id",
-                    "isVerified",
+                    "isDomainVerified",
                     "oidc",
                     "organizationId",
-                    "provider",
                     "saml",
                     "signInUrl",
                     "updatedAt",
@@ -6498,7 +6474,7 @@
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
-                    "isVerified": {
+                    "isDomainVerified": {
                       "type": "boolean"
                     },
                     "oidc": {
@@ -6552,13 +6528,6 @@
                       "type": "string",
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "provider": {
-                      "type": "string",
-                      "enum": [
-                        "oidc",
-                        "saml"
-                      ]
                     },
                     "saml": {
                       "anyOf": [
@@ -6657,10 +6626,9 @@
                     "createdAt",
                     "domain",
                     "id",
-                    "isVerified",
+                    "isDomainVerified",
                     "oidc",
                     "organizationId",
-                    "provider",
                     "saml",
                     "signInUrl",
                     "updatedAt",
@@ -6743,7 +6711,7 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Checks the domain's TXT record for the token the provider waits for and marks the domain verified when it is there; the answer is the provider, its `isVerified` the result. A resolver that cannot be asked leaves the domain unverified, `details.reason` then `lookup_failed`.",
+        "description": "Checks the domain's TXT record for the token the provider waits for and marks the domain verified when it is there; the answer is the provider, its `isDomainVerified` the result. A resolver that cannot be asked leaves the domain unverified, `details.reason` then `lookup_failed`.",
         "summary": "Verify the SSO domain",
         "tags": [
           "SSO provider"
@@ -7280,6 +7248,11 @@
                         "owner"
                       ]
                     },
+                    "storageBytes": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
                     "updatedAt": {
                       "type": "string",
                       "format": "date-time",
@@ -7295,6 +7268,7 @@
                     "name",
                     "plan",
                     "region",
+                    "storageBytes",
                     "updatedAt"
                   ]
                 }
@@ -7487,6 +7461,11 @@
                           "owner"
                         ]
                       },
+                      "storageBytes": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
                       "updatedAt": {
                         "type": "string",
                         "format": "date-time",
@@ -7502,6 +7481,7 @@
                       "name",
                       "plan",
                       "region",
+                      "storageBytes",
                       "updatedAt"
                     ]
                   }
@@ -7722,7 +7702,7 @@
     "/v1/organizations/{organizationId}": {
       "get": {
         "operationId": "getV1OrganizationsByOrganizationId",
-        "description": "The organization with its plan; any role of it.",
+        "description": "The organization with its plan and `storageBytes`, the counter behind its storage limit; any role of it.",
         "responses": {
           "200": {
             "content": {
@@ -7792,6 +7772,11 @@
                         "owner"
                       ]
                     },
+                    "storageBytes": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
                     "updatedAt": {
                       "type": "string",
                       "format": "date-time",
@@ -7807,6 +7792,7 @@
                     "name",
                     "plan",
                     "region",
+                    "storageBytes",
                     "updatedAt"
                   ]
                 }
@@ -7976,6 +7962,11 @@
                         "owner"
                       ]
                     },
+                    "storageBytes": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
                     "updatedAt": {
                       "type": "string",
                       "format": "date-time",
@@ -7991,6 +7982,7 @@
                     "name",
                     "plan",
                     "region",
+                    "storageBytes",
                     "updatedAt"
                   ]
                 }

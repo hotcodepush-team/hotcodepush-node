@@ -469,7 +469,7 @@ export interface paths {
         };
         /**
          * Get the SSO provider
-         * @description The organization's SSO provider: its kind, domain, whether the domain is verified, the sign-in link, and the TXT record to set until it is.
+         * @description The organization's SSO provider: its domain, whether the domain is verified, the sign-in link, the `oidc` or `saml` block, the one present saying the kind, and the TXT record to set until the domain is verified.
          */
         get: operations["getV1OrganizationsByOrganizationIdSsoProvider"];
         /**
@@ -499,7 +499,7 @@ export interface paths {
         put?: never;
         /**
          * Verify the SSO domain
-         * @description Checks the domain's TXT record for the token the provider waits for and marks the domain verified when it is there; the answer is the provider, its `isVerified` the result. A resolver that cannot be asked leaves the domain unverified, `details.reason` then `lookup_failed`.
+         * @description Checks the domain's TXT record for the token the provider waits for and marks the domain verified when it is there; the answer is the provider, its `isDomainVerified` the result. A resolver that cannot be asked leaves the domain unverified, `details.reason` then `lookup_failed`.
          */
         post: operations["postV1OrganizationsByOrganizationIdSsoProviderVerifications"];
         delete?: never;
@@ -621,7 +621,7 @@ export interface paths {
         };
         /**
          * Get an organization
-         * @description The organization with its plan; any role of it.
+         * @description The organization with its plan and `storageBytes`, the counter behind its storage limit; any role of it.
          */
         get: operations["getV1OrganizationsByOrganizationId"];
         put?: never;
@@ -5143,7 +5143,7 @@ export interface operations {
                         domain: string;
                         /** Format: uuid */
                         id: string;
-                        isVerified: boolean;
+                        isDomainVerified: boolean;
                         oidc: {
                             clientId: string;
                             /** Format: uri */
@@ -5156,8 +5156,6 @@ export interface operations {
                         } | null;
                         /** Format: uuid */
                         organizationId: string;
-                        /** @enum {string} */
-                        provider: "oidc" | "saml";
                         saml: {
                             /** Format: uri */
                             acsUrl: string;
@@ -5293,7 +5291,7 @@ export interface operations {
                         domain: string;
                         /** Format: uuid */
                         id: string;
-                        isVerified: boolean;
+                        isDomainVerified: boolean;
                         oidc: {
                             clientId: string;
                             /** Format: uri */
@@ -5306,8 +5304,6 @@ export interface operations {
                         } | null;
                         /** Format: uuid */
                         organizationId: string;
-                        /** @enum {string} */
-                        provider: "oidc" | "saml";
                         saml: {
                             /** Format: uri */
                             acsUrl: string;
@@ -5341,7 +5337,7 @@ export interface operations {
                         domain: string;
                         /** Format: uuid */
                         id: string;
-                        isVerified: boolean;
+                        isDomainVerified: boolean;
                         oidc: {
                             clientId: string;
                             /** Format: uri */
@@ -5354,8 +5350,6 @@ export interface operations {
                         } | null;
                         /** Format: uuid */
                         organizationId: string;
-                        /** @enum {string} */
-                        provider: "oidc" | "saml";
                         saml: {
                             /** Format: uri */
                             acsUrl: string;
@@ -5563,7 +5557,7 @@ export interface operations {
                         domain: string;
                         /** Format: uuid */
                         id: string;
-                        isVerified: boolean;
+                        isDomainVerified: boolean;
                         oidc: {
                             clientId: string;
                             /** Format: uri */
@@ -5576,8 +5570,6 @@ export interface operations {
                         } | null;
                         /** Format: uuid */
                         organizationId: string;
-                        /** @enum {string} */
-                        provider: "oidc" | "saml";
                         saml: {
                             /** Format: uri */
                             acsUrl: string;
@@ -5988,6 +5980,7 @@ export interface operations {
                         region: string;
                         /** @enum {string} */
                         role?: "admin" | "billing" | "member" | "owner";
+                        storageBytes: number;
                         /** Format: date-time */
                         updatedAt: string;
                     }[];
@@ -6098,6 +6091,7 @@ export interface operations {
                         region: string;
                         /** @enum {string} */
                         role?: "admin" | "billing" | "member" | "owner";
+                        storageBytes: number;
                         /** Format: date-time */
                         updatedAt: string;
                     };
@@ -6299,6 +6293,7 @@ export interface operations {
                         region: string;
                         /** @enum {string} */
                         role?: "admin" | "billing" | "member" | "owner";
+                        storageBytes: number;
                         /** Format: date-time */
                         updatedAt: string;
                     };
@@ -6498,6 +6493,7 @@ export interface operations {
                         region: string;
                         /** @enum {string} */
                         role?: "admin" | "billing" | "member" | "owner";
+                        storageBytes: number;
                         /** Format: date-time */
                         updatedAt: string;
                     };

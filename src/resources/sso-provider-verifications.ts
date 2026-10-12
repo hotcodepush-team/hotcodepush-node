@@ -8,7 +8,7 @@ export type CreateSsoProviderVerificationOptions = PathParameters<
 >;
 
 /**
- * The provider after the lookup, `isVerified` its result, and `details.reason` `lookup_failed` when the resolver could not be asked.
+ * The provider after the lookup, `isDomainVerified` its result, and `details.reason` `lookup_failed` when the resolver could not be asked.
  */
 export type SsoProviderVerification = JsonResponseBody<
   '/v1/organizations/{organizationId}/sso-provider/verifications',

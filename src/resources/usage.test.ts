@@ -11,7 +11,22 @@ afterEach(() => {
 });
 
 describe('UsageResource', () => {
-  test("should download the month's usage as csv", async () => {
+  test('should count the apps with usage in the month', async () => {
+    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+
+    const fetchedCount = await new HotCodePush().organizations.usage.countApps({
+      month: '2026-09',
+      organizationId: 'organization',
+    });
+
+    expect(fetchedCount).toEqual({ total: 3 });
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: `${USAGE_URL}/apps/count?month=2026-09`,
+    });
+  });
+
+  test("should download the apps' usage in the month as csv", async () => {
     const fetchMock = stubFetch(
       () =>
         new Response('"appId","appName","mau","bytes"\n', {
@@ -20,7 +35,7 @@ describe('UsageResource', () => {
     );
 
     const downloadedCsv =
-      await new HotCodePush().organizations.usage.downloadCsv({
+      await new HotCodePush().organizations.usage.downloadAppsCsv({
         month: '2026-09',
         organizationId: 'organization',
       });
@@ -30,12 +45,12 @@ describe('UsageResource', () => {
     );
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${USAGE_URL}?month=2026-09&format=csv`,
+      url: `${USAGE_URL}/apps?month=2026-09&format=csv`,
     });
   });
 
-  test("should get the month's usage", async () => {
-    const usage = { apps: [], month: '2026-09', total: { bytes: 0, mau: 0 } };
+  test("should get the organization's usage in the month", async () => {
+    const usage = { bytes: 2048, mau: 12, month: '2026-09' };
     const fetchMock = stubFetch(() => Response.json(usage));
 
     const fetchedUsage = await new HotCodePush().organizations.usage.get({
@@ -47,6 +62,31 @@ describe('UsageResource', () => {
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${USAGE_URL}?month=2026-09`,
+    });
+  });
+
+  test("should list a page of the apps' usage with their apps", async () => {
+    const appUsageMonth = {
+      app: { id: 'app', name: 'Demo' },
+      appId: 'app',
+      bytes: 2048,
+      mau: 12,
+      month: '2026-09',
+    };
+    const fetchMock = stubFetch(() => Response.json([appUsageMonth]));
+
+    const fetchedRows = await new HotCodePush().organizations.usage.listApps({
+      limit: 10,
+      month: '2026-09',
+      offset: 10,
+      organizationId: 'organization',
+      relations: ['app'],
+    });
+
+    expect(fetchedRows).toEqual([appUsageMonth]);
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: `${USAGE_URL}/apps?limit=10&month=2026-09&offset=10&relations=app`,
     });
   });
 });

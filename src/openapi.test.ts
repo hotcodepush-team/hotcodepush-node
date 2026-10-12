@@ -701,8 +701,13 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.organizations.subscription.uncancel({
       organizationId: ORGANIZATION_ID,
     }),
-  'organizations.usage.downloadCsv': hotCodePush =>
-    hotCodePush.organizations.usage.downloadCsv({
+  'organizations.usage.countApps': hotCodePush =>
+    hotCodePush.organizations.usage.countApps({
+      month: '2026-09',
+      organizationId: ORGANIZATION_ID,
+    }),
+  'organizations.usage.downloadAppsCsv': hotCodePush =>
+    hotCodePush.organizations.usage.downloadAppsCsv({
       month: '2026-09',
       organizationId: ORGANIZATION_ID,
     }),
@@ -710,6 +715,14 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.organizations.usage.get({
       month: '2026-09',
       organizationId: ORGANIZATION_ID,
+    }),
+  'organizations.usage.listApps': hotCodePush =>
+    hotCodePush.organizations.usage.listApps({
+      limit: 10,
+      month: '2026-09',
+      offset: 10,
+      organizationId: ORGANIZATION_ID,
+      relations: ['app'],
     }),
   'users.delete': hotCodePush =>
     hotCodePush.users.delete({

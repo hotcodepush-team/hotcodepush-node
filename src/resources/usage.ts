@@ -1,27 +1,49 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
 import type {
+  Count,
   JsonResponseBody,
   PathParameters,
   QueryParameters,
 } from '../types';
 
 /**
- * The month `get` takes; the CSV holds the apps' rows.
+ * One live app's usage in a month: its monthly active devices and the bytes its files served, with the app as `relations: ['app']` embeds it.
  */
-export type DownloadUsageCsvOptions = GetUsageOptions;
+export type AppUsageMonth = JsonResponseBody<
+  '/v1/organizations/{organizationId}/usage/apps',
+  'get',
+  200
+>[number];
+
+export type CountUsageAppsOptions = PathParameters<
+  '/v1/organizations/{organizationId}/usage/apps/count',
+  'get'
+> &
+  QueryParameters<'/v1/organizations/{organizationId}/usage/apps/count', 'get'>;
+
+/**
+ * The month the CSV holds every app's row of.
+ */
+export type DownloadUsageAppsCsvOptions = CountUsageAppsOptions;
 
 export type GetUsageOptions = PathParameters<
   '/v1/organizations/{organizationId}/usage',
   'get'
 > &
+  QueryParameters<'/v1/organizations/{organizationId}/usage', 'get'>;
+
+export type ListUsageAppsOptions = PathParameters<
+  '/v1/organizations/{organizationId}/usage/apps',
+  'get'
+> &
   Omit<
-    QueryParameters<'/v1/organizations/{organizationId}/usage', 'get'>,
+    QueryParameters<'/v1/organizations/{organizationId}/usage/apps', 'get'>,
     'format'
   >;
 
 /**
- * The monthly active devices and bytes of each live app in `month`, `YYYY-MM`, beside the organization's total.
+ * The organization's monthly active devices and bytes in `month`, `YYYY-MM`, summed over its apps' rows.
  */
 export type Usage = JsonResponseBody<
   '/v1/organizations/{organizationId}/usage',
@@ -33,13 +55,29 @@ export class UsageResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The apps' usage in `month` as `text/csv`, read whole.
+   * The number of apps with usage in `month`, which `listApps` pages through.
    */
-  public async downloadCsv(options: DownloadUsageCsvOptions): Promise<Blob> {
+  public async countApps(options: CountUsageAppsOptions): Promise<Count> {
+    const { organizationId, ...query } = options;
+    return this.httpClient.fetchJson({
+      method: 'GET',
+      path: resolvePath('/v1/organizations/{organizationId}/usage/apps/count', {
+        organizationId,
+      }),
+      query,
+    });
+  }
+
+  /**
+   * Every app's usage in `month` as `text/csv` with the app's name, read whole.
+   */
+  public async downloadAppsCsv(
+    options: DownloadUsageAppsCsvOptions,
+  ): Promise<Blob> {
     const { organizationId, ...query } = options;
     return this.httpClient.fetchBlob({
       method: 'GET',
-      path: resolvePath('/v1/organizations/{organizationId}/usage', {
+      path: resolvePath('/v1/organizations/{organizationId}/usage/apps', {
         organizationId,
       }),
       query: { ...query, format: 'csv' },
@@ -47,13 +85,29 @@ export class UsageResource {
   }
 
   /**
-   * The usage of `month`, the current one by default: a past month the invoice's number, the current month's devices counted live.
+   * The organization's usage in `month`, the current one by default, read from the stored months.
    */
   public async get(options: GetUsageOptions): Promise<Usage> {
     const { organizationId, ...query } = options;
     return this.httpClient.fetchJson({
       method: 'GET',
       path: resolvePath('/v1/organizations/{organizationId}/usage', {
+        organizationId,
+      }),
+      query,
+    });
+  }
+
+  /**
+   * The usage of each live app in `month`, the most monthly active devices first; `relations: ['app']` embeds the app's id and name.
+   */
+  public async listApps(
+    options: ListUsageAppsOptions,
+  ): Promise<AppUsageMonth[]> {
+    const { organizationId, ...query } = options;
+    return this.httpClient.fetchJson({
+      method: 'GET',
+      path: resolvePath('/v1/organizations/{organizationId}/usage/apps', {
         organizationId,
       }),
       query,

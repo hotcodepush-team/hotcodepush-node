@@ -12,6 +12,7 @@ const USER: User = {
   image: null,
   intendedFramework: null,
   isEmailVerified: true,
+  isTwoFactorEnabled: false,
   jobRole: null,
   lastSeenAt: '2026-10-12T00:00:00.000Z',
   locale: null,

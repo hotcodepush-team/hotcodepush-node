@@ -16654,6 +16654,7 @@ export interface operations {
                         image: string | null;
                         intendedFramework: ("capacitor" | "cordova" | "expo" | "react_native" | "unsure") | null;
                         isEmailVerified: boolean;
+                        isTwoFactorEnabled: boolean;
                         jobRole: ("cto_or_founder" | "developer" | "freelancer_or_agency" | "manager_or_lead" | "other" | "student_or_hobbyist") | null;
                         /** Format: date-time */
                         lastSeenAt: string;

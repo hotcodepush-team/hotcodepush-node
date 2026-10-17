@@ -33673,6 +33673,9 @@
                     "isEmailVerified": {
                       "type": "boolean"
                     },
+                    "isTwoFactorEnabled": {
+                      "type": "boolean"
+                    },
                     "jobRole": {
                       "anyOf": [
                         {
@@ -33739,6 +33742,7 @@
                     "image",
                     "intendedFramework",
                     "isEmailVerified",
+                    "isTwoFactorEnabled",
                     "jobRole",
                     "lastSeenAt",
                     "locale",

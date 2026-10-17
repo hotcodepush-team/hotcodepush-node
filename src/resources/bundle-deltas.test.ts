@@ -23,14 +23,14 @@ afterEach(() => {
 
 describe('BundleDeltasResource', () => {
   test("should count the bundle's delta packs", async () => {
-    const fetchMock = stubFetch(() => Response.json({ total: 2 }));
+    const fetchMock = stubFetch(() => Response.json({ count: 2 }));
 
     const fetchedCount = await new HotCodePush().apps.bundles.deltas.count({
       appId: 'app',
       bundleId: 'bundle',
     });
 
-    expect(fetchedCount).toEqual({ total: 2 });
+    expect(fetchedCount).toEqual({ count: 2 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${DELTAS_URL}/count`,

@@ -13,14 +13,14 @@ afterEach(() => {
 
 describe('MembersResource', () => {
   test('should count the members of the organization under the filters', async () => {
-    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+    const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount = await new HotCodePush().organizations.members.count({
       organizationId: 'organization',
       role: 'admin',
     });
 
-    expect(fetchedCount).toEqual({ total: 3 });
+    expect(fetchedCount).toEqual({ count: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${MEMBERS_URL}/count?role=admin`,

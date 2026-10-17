@@ -47,7 +47,7 @@ describe('BundlesResource', () => {
   });
 
   test('should count the bundles of the app filtered by use and platform', async () => {
-    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+    const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount = await new HotCodePush().apps.bundles.count({
       appId: 'app',
@@ -55,7 +55,7 @@ describe('BundlesResource', () => {
       platform: 'ios',
     });
 
-    expect(fetchedCount).toEqual({ total: 3 });
+    expect(fetchedCount).toEqual({ count: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${BUNDLES_URL}/count?isInUse=true&platform=ios`,

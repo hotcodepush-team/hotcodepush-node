@@ -356,14 +356,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -1355,14 +1355,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -2075,14 +2075,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -2568,14 +2568,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -3916,14 +3916,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -4185,8 +4185,8 @@
                     "enum": [
                       "appCountLimit",
                       "bundleBytesLimit",
-                      "dataTransferBytesPerMonthlyActiveDeviceLimit",
                       "channelCountPerAppLimit",
+                      "dataTransferBytesPerMonthlyActiveDeviceLimit",
                       "fileCountPerBundleLimit",
                       "invitationCountPerDayLimit",
                       "memberCountLimit",
@@ -4222,8 +4222,8 @@
                   "required": [
                     "appCountLimit",
                     "bundleBytesLimit",
-                    "dataTransferBytesPerMonthlyActiveDeviceLimit",
                     "channelCountPerAppLimit",
+                    "dataTransferBytesPerMonthlyActiveDeviceLimit",
                     "fileCountPerBundleLimit",
                     "invitationCountPerDayLimit",
                     "memberCountLimit",
@@ -4707,14 +4707,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -7164,14 +7164,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -7887,14 +7887,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -9854,14 +9854,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -11299,14 +11299,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -12591,14 +12591,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -13700,14 +13700,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -14775,7 +14775,7 @@
                           }
                         ]
                       },
-                      "failureMinSample": {
+                      "failureMinimumUpdateCount": {
                         "anyOf": [
                           {
                             "type": "integer",
@@ -14862,7 +14862,7 @@
                       "createdAt",
                       "expiresAt",
                       "failureAction",
-                      "failureMinSample",
+                      "failureMinimumUpdateCount",
                       "failureThresholdPercent",
                       "id",
                       "isDiscoverable",
@@ -15190,7 +15190,7 @@
                         }
                       ]
                     },
-                    "failureMinSample": {
+                    "failureMinimumUpdateCount": {
                       "anyOf": [
                         {
                           "type": "integer",
@@ -15277,7 +15277,7 @@
                     "createdAt",
                     "expiresAt",
                     "failureAction",
-                    "failureMinSample",
+                    "failureMinimumUpdateCount",
                     "failureThresholdPercent",
                     "id",
                     "isDiscoverable",
@@ -15432,7 +15432,7 @@
                       }
                     ]
                   },
-                  "failureMinSample": {
+                  "failureMinimumUpdateCount": {
                     "anyOf": [
                       {
                         "type": "integer",
@@ -15477,14 +15477,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -15637,7 +15637,7 @@
                         }
                       ]
                     },
-                    "failureMinSample": {
+                    "failureMinimumUpdateCount": {
                       "anyOf": [
                         {
                           "type": "integer",
@@ -15739,7 +15739,7 @@
                     "createdAt",
                     "expiresAt",
                     "failureAction",
-                    "failureMinSample",
+                    "failureMinimumUpdateCount",
                     "failureThresholdPercent",
                     "id",
                     "isDiscoverable",
@@ -15904,7 +15904,7 @@
                         }
                       ]
                     },
-                    "failureMinSample": {
+                    "failureMinimumUpdateCount": {
                       "anyOf": [
                         {
                           "type": "integer",
@@ -15991,7 +15991,7 @@
                     "createdAt",
                     "expiresAt",
                     "failureAction",
-                    "failureMinSample",
+                    "failureMinimumUpdateCount",
                     "failureThresholdPercent",
                     "id",
                     "isDiscoverable",
@@ -16136,7 +16136,7 @@
                       }
                     ]
                   },
-                  "failureMinSample": {
+                  "failureMinimumUpdateCount": {
                     "anyOf": [
                       {
                         "type": "integer",
@@ -16354,7 +16354,7 @@
                         }
                       ]
                     },
-                    "failureMinSample": {
+                    "failureMinimumUpdateCount": {
                       "anyOf": [
                         {
                           "type": "integer",
@@ -16441,7 +16441,7 @@
                     "createdAt",
                     "expiresAt",
                     "failureAction",
-                    "failureMinSample",
+                    "failureMinimumUpdateCount",
                     "failureThresholdPercent",
                     "id",
                     "isDiscoverable",
@@ -16605,7 +16605,7 @@
                         }
                       ]
                     },
-                    "failureMinSample": {
+                    "failureMinimumUpdateCount": {
                       "anyOf": [
                         {
                           "type": "integer",
@@ -16692,7 +16692,7 @@
                     "createdAt",
                     "expiresAt",
                     "failureAction",
-                    "failureMinSample",
+                    "failureMinimumUpdateCount",
                     "failureThresholdPercent",
                     "id",
                     "isDiscoverable",
@@ -16932,7 +16932,7 @@
                                     {
                                       "type": "object",
                                       "properties": {
-                                        "hash": {
+                                        "fingerprint": {
                                           "type": "string",
                                           "minLength": 1
                                         },
@@ -16942,7 +16942,7 @@
                                         }
                                       },
                                       "required": [
-                                        "hash",
+                                        "fingerprint",
                                         "type"
                                       ],
                                       "additionalProperties": {}
@@ -17013,7 +17013,7 @@
                             "exclusiveMinimum": 0,
                             "maximum": 9007199254740991
                           },
-                          "rollout": {
+                          "rolloutPercentage": {
                             "type": "integer",
                             "minimum": 0,
                             "maximum": 100
@@ -17035,7 +17035,7 @@
                           "manifestUrl",
                           "notes",
                           "number",
-                          "rollout",
+                          "rolloutPercentage",
                           "sizeBytes"
                         ],
                         "additionalProperties": {}
@@ -17425,7 +17425,7 @@
                               }
                             ]
                           },
-                          "failureMinSample": {
+                          "failureMinimumUpdateCount": {
                             "anyOf": [
                               {
                                 "type": "integer",
@@ -17512,7 +17512,7 @@
                           "createdAt",
                           "expiresAt",
                           "failureAction",
-                          "failureMinSample",
+                          "failureMinimumUpdateCount",
                           "failureThresholdPercent",
                           "id",
                           "isDiscoverable",
@@ -17598,7 +17598,7 @@
                             {
                               "type": "object",
                               "properties": {
-                                "hash": {
+                                "fingerprint": {
                                   "type": "string",
                                   "minLength": 1
                                 },
@@ -17608,7 +17608,7 @@
                                 }
                               },
                               "required": [
-                                "hash",
+                                "fingerprint",
                                 "type"
                               ],
                               "additionalProperties": false
@@ -17720,7 +17720,7 @@
                           }
                         ]
                       },
-                      "failureMinSample": {
+                      "failureMinimumUpdateCount": {
                         "anyOf": [
                           {
                             "type": "integer",
@@ -17792,16 +17792,6 @@
                           {
                             "type": "object",
                             "properties": {
-                              "minimumSample": {
-                                "type": "integer",
-                                "minimum": 1,
-                                "maximum": 9007199254740991
-                              },
-                              "minimumSeconds": {
-                                "type": "integer",
-                                "minimum": 0,
-                                "maximum": 2592000
-                              },
                               "percentages": {
                                 "minItems": 2,
                                 "maxItems": 10,
@@ -17811,12 +17801,22 @@
                                   "minimum": 1,
                                   "maximum": 100
                                 }
+                              },
+                              "stepMinimumSeconds": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2592000
+                              },
+                              "stepMinimumUpdateCount": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 9007199254740991
                               }
                             },
                             "required": [
-                              "minimumSample",
-                              "minimumSeconds",
-                              "percentages"
+                              "percentages",
+                              "stepMinimumSeconds",
+                              "stepMinimumUpdateCount"
                             ]
                           },
                           {
@@ -17839,38 +17839,38 @@
                                         "minimum": -9007199254740991,
                                         "maximum": 9007199254740991
                                       },
-                                      "kind": {
-                                        "type": "string",
-                                        "const": "sample"
-                                      },
-                                      "required": {
+                                      "requiredUpdateCount": {
                                         "type": "integer",
                                         "minimum": -9007199254740991,
                                         "maximum": 9007199254740991
+                                      },
+                                      "type": {
+                                        "type": "string",
+                                        "const": "sample"
                                       }
                                     },
                                     "required": [
                                       "attemptedUpdateCount",
-                                      "kind",
-                                      "required"
+                                      "requiredUpdateCount",
+                                      "type"
                                     ]
                                   },
                                   {
                                     "type": "object",
                                     "properties": {
-                                      "kind": {
-                                        "type": "string",
-                                        "const": "time"
-                                      },
                                       "readyAt": {
                                         "type": "string",
                                         "format": "date-time",
                                         "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                                      },
+                                      "type": {
+                                        "type": "string",
+                                        "const": "time"
                                       }
                                     },
                                     "required": [
-                                      "kind",
-                                      "readyAt"
+                                      "readyAt",
+                                      "type"
                                     ]
                                   }
                                 ]
@@ -17942,7 +17942,7 @@
                       "createdFromReleaseId",
                       "deviceCount",
                       "failureAction",
-                      "failureMinSample",
+                      "failureMinimumUpdateCount",
                       "failureThresholdPercent",
                       "id",
                       "isMandatory",
@@ -18367,7 +18367,7 @@
                             }
                           ]
                         },
-                        "failureMinSample": {
+                        "failureMinimumUpdateCount": {
                           "anyOf": [
                             {
                               "type": "integer",
@@ -18454,7 +18454,7 @@
                         "createdAt",
                         "expiresAt",
                         "failureAction",
-                        "failureMinSample",
+                        "failureMinimumUpdateCount",
                         "failureThresholdPercent",
                         "id",
                         "isDiscoverable",
@@ -18540,7 +18540,7 @@
                           {
                             "type": "object",
                             "properties": {
-                              "hash": {
+                              "fingerprint": {
                                 "type": "string",
                                 "minLength": 1
                               },
@@ -18550,7 +18550,7 @@
                               }
                             },
                             "required": [
-                              "hash",
+                              "fingerprint",
                               "type"
                             ],
                             "additionalProperties": false
@@ -18662,7 +18662,7 @@
                         }
                       ]
                     },
-                    "failureMinSample": {
+                    "failureMinimumUpdateCount": {
                       "anyOf": [
                         {
                           "type": "integer",
@@ -18734,16 +18734,6 @@
                         {
                           "type": "object",
                           "properties": {
-                            "minimumSample": {
-                              "type": "integer",
-                              "minimum": 1,
-                              "maximum": 9007199254740991
-                            },
-                            "minimumSeconds": {
-                              "type": "integer",
-                              "minimum": 0,
-                              "maximum": 2592000
-                            },
                             "percentages": {
                               "minItems": 2,
                               "maxItems": 10,
@@ -18753,12 +18743,22 @@
                                 "minimum": 1,
                                 "maximum": 100
                               }
+                            },
+                            "stepMinimumSeconds": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2592000
+                            },
+                            "stepMinimumUpdateCount": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 9007199254740991
                             }
                           },
                           "required": [
-                            "minimumSample",
-                            "minimumSeconds",
-                            "percentages"
+                            "percentages",
+                            "stepMinimumSeconds",
+                            "stepMinimumUpdateCount"
                           ]
                         },
                         {
@@ -18781,38 +18781,38 @@
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
                                     },
-                                    "kind": {
-                                      "type": "string",
-                                      "const": "sample"
-                                    },
-                                    "required": {
+                                    "requiredUpdateCount": {
                                       "type": "integer",
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "const": "sample"
                                     }
                                   },
                                   "required": [
                                     "attemptedUpdateCount",
-                                    "kind",
-                                    "required"
+                                    "requiredUpdateCount",
+                                    "type"
                                   ]
                                 },
                                 {
                                   "type": "object",
                                   "properties": {
-                                    "kind": {
-                                      "type": "string",
-                                      "const": "time"
-                                    },
                                     "readyAt": {
                                       "type": "string",
                                       "format": "date-time",
                                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "const": "time"
                                     }
                                   },
                                   "required": [
-                                    "kind",
-                                    "readyAt"
+                                    "readyAt",
+                                    "type"
                                   ]
                                 }
                               ]
@@ -18921,7 +18921,7 @@
                     "createdFromReleaseId",
                     "deviceCount",
                     "failureAction",
-                    "failureMinSample",
+                    "failureMinimumUpdateCount",
                     "failureThresholdPercent",
                     "id",
                     "isMandatory",
@@ -19121,7 +19121,7 @@
                         {
                           "type": "object",
                           "properties": {
-                            "hash": {
+                            "fingerprint": {
                               "type": "string",
                               "minLength": 1
                             },
@@ -19131,7 +19131,7 @@
                             }
                           },
                           "required": [
-                            "hash",
+                            "fingerprint",
                             "type"
                           ],
                           "additionalProperties": false
@@ -19173,7 +19173,7 @@
                       }
                     ]
                   },
-                  "failureMinSample": {
+                  "failureMinimumUpdateCount": {
                     "default": null,
                     "anyOf": [
                       {
@@ -19226,16 +19226,6 @@
                       {
                         "type": "object",
                         "properties": {
-                          "minimumSample": {
-                            "type": "integer",
-                            "minimum": 1,
-                            "maximum": 9007199254740991
-                          },
-                          "minimumSeconds": {
-                            "type": "integer",
-                            "minimum": 0,
-                            "maximum": 2592000
-                          },
                           "percentages": {
                             "minItems": 2,
                             "maxItems": 10,
@@ -19245,12 +19235,22 @@
                               "minimum": 1,
                               "maximum": 100
                             }
+                          },
+                          "stepMinimumSeconds": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2592000
+                          },
+                          "stepMinimumUpdateCount": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 9007199254740991
                           }
                         },
                         "required": [
-                          "minimumSample",
-                          "minimumSeconds",
-                          "percentages"
+                          "percentages",
+                          "stepMinimumSeconds",
+                          "stepMinimumUpdateCount"
                         ]
                       },
                       {
@@ -19282,14 +19282,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -19666,7 +19666,7 @@
                             }
                           ]
                         },
-                        "failureMinSample": {
+                        "failureMinimumUpdateCount": {
                           "anyOf": [
                             {
                               "type": "integer",
@@ -19753,7 +19753,7 @@
                         "createdAt",
                         "expiresAt",
                         "failureAction",
-                        "failureMinSample",
+                        "failureMinimumUpdateCount",
                         "failureThresholdPercent",
                         "id",
                         "isDiscoverable",
@@ -19839,7 +19839,7 @@
                           {
                             "type": "object",
                             "properties": {
-                              "hash": {
+                              "fingerprint": {
                                 "type": "string",
                                 "minLength": 1
                               },
@@ -19849,7 +19849,7 @@
                               }
                             },
                             "required": [
-                              "hash",
+                              "fingerprint",
                               "type"
                             ],
                             "additionalProperties": false
@@ -19961,7 +19961,7 @@
                         }
                       ]
                     },
-                    "failureMinSample": {
+                    "failureMinimumUpdateCount": {
                       "anyOf": [
                         {
                           "type": "integer",
@@ -20033,16 +20033,6 @@
                         {
                           "type": "object",
                           "properties": {
-                            "minimumSample": {
-                              "type": "integer",
-                              "minimum": 1,
-                              "maximum": 9007199254740991
-                            },
-                            "minimumSeconds": {
-                              "type": "integer",
-                              "minimum": 0,
-                              "maximum": 2592000
-                            },
                             "percentages": {
                               "minItems": 2,
                               "maxItems": 10,
@@ -20052,12 +20042,22 @@
                                 "minimum": 1,
                                 "maximum": 100
                               }
+                            },
+                            "stepMinimumSeconds": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2592000
+                            },
+                            "stepMinimumUpdateCount": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 9007199254740991
                             }
                           },
                           "required": [
-                            "minimumSample",
-                            "minimumSeconds",
-                            "percentages"
+                            "percentages",
+                            "stepMinimumSeconds",
+                            "stepMinimumUpdateCount"
                           ]
                         },
                         {
@@ -20080,38 +20080,38 @@
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
                                     },
-                                    "kind": {
-                                      "type": "string",
-                                      "const": "sample"
-                                    },
-                                    "required": {
+                                    "requiredUpdateCount": {
                                       "type": "integer",
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "const": "sample"
                                     }
                                   },
                                   "required": [
                                     "attemptedUpdateCount",
-                                    "kind",
-                                    "required"
+                                    "requiredUpdateCount",
+                                    "type"
                                   ]
                                 },
                                 {
                                   "type": "object",
                                   "properties": {
-                                    "kind": {
-                                      "type": "string",
-                                      "const": "time"
-                                    },
                                     "readyAt": {
                                       "type": "string",
                                       "format": "date-time",
                                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "const": "time"
                                     }
                                   },
                                   "required": [
-                                    "kind",
-                                    "readyAt"
+                                    "readyAt",
+                                    "type"
                                   ]
                                 }
                               ]
@@ -20183,7 +20183,7 @@
                     "createdFromReleaseId",
                     "deviceCount",
                     "failureAction",
-                    "failureMinSample",
+                    "failureMinimumUpdateCount",
                     "failureThresholdPercent",
                     "id",
                     "isMandatory",
@@ -20568,7 +20568,7 @@
                               }
                             ]
                           },
-                          "failureMinSample": {
+                          "failureMinimumUpdateCount": {
                             "anyOf": [
                               {
                                 "type": "integer",
@@ -20655,7 +20655,7 @@
                           "createdAt",
                           "expiresAt",
                           "failureAction",
-                          "failureMinSample",
+                          "failureMinimumUpdateCount",
                           "failureThresholdPercent",
                           "id",
                           "isDiscoverable",
@@ -20741,7 +20741,7 @@
                             {
                               "type": "object",
                               "properties": {
-                                "hash": {
+                                "fingerprint": {
                                   "type": "string",
                                   "minLength": 1
                                 },
@@ -20751,7 +20751,7 @@
                                 }
                               },
                               "required": [
-                                "hash",
+                                "fingerprint",
                                 "type"
                               ],
                               "additionalProperties": false
@@ -20863,7 +20863,7 @@
                           }
                         ]
                       },
-                      "failureMinSample": {
+                      "failureMinimumUpdateCount": {
                         "anyOf": [
                           {
                             "type": "integer",
@@ -20935,16 +20935,6 @@
                           {
                             "type": "object",
                             "properties": {
-                              "minimumSample": {
-                                "type": "integer",
-                                "minimum": 1,
-                                "maximum": 9007199254740991
-                              },
-                              "minimumSeconds": {
-                                "type": "integer",
-                                "minimum": 0,
-                                "maximum": 2592000
-                              },
                               "percentages": {
                                 "minItems": 2,
                                 "maxItems": 10,
@@ -20954,12 +20944,22 @@
                                   "minimum": 1,
                                   "maximum": 100
                                 }
+                              },
+                              "stepMinimumSeconds": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2592000
+                              },
+                              "stepMinimumUpdateCount": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 9007199254740991
                               }
                             },
                             "required": [
-                              "minimumSample",
-                              "minimumSeconds",
-                              "percentages"
+                              "percentages",
+                              "stepMinimumSeconds",
+                              "stepMinimumUpdateCount"
                             ]
                           },
                           {
@@ -20982,38 +20982,38 @@
                                         "minimum": -9007199254740991,
                                         "maximum": 9007199254740991
                                       },
-                                      "kind": {
-                                        "type": "string",
-                                        "const": "sample"
-                                      },
-                                      "required": {
+                                      "requiredUpdateCount": {
                                         "type": "integer",
                                         "minimum": -9007199254740991,
                                         "maximum": 9007199254740991
+                                      },
+                                      "type": {
+                                        "type": "string",
+                                        "const": "sample"
                                       }
                                     },
                                     "required": [
                                       "attemptedUpdateCount",
-                                      "kind",
-                                      "required"
+                                      "requiredUpdateCount",
+                                      "type"
                                     ]
                                   },
                                   {
                                     "type": "object",
                                     "properties": {
-                                      "kind": {
-                                        "type": "string",
-                                        "const": "time"
-                                      },
                                       "readyAt": {
                                         "type": "string",
                                         "format": "date-time",
                                         "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                                      },
+                                      "type": {
+                                        "type": "string",
+                                        "const": "time"
                                       }
                                     },
                                     "required": [
-                                      "kind",
-                                      "readyAt"
+                                      "readyAt",
+                                      "type"
                                     ]
                                   }
                                 ]
@@ -21085,7 +21085,7 @@
                       "createdFromReleaseId",
                       "deviceCount",
                       "failureAction",
-                      "failureMinSample",
+                      "failureMinimumUpdateCount",
                       "failureThresholdPercent",
                       "id",
                       "isMandatory",
@@ -21237,7 +21237,7 @@
     "/v1/apps/{appId}/channels/{channelId}/audience": {
       "get": {
         "operationId": "getV1AppsByAppIdChannelsByChannelIdAudience",
-        "description": "The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `fingerprint` hashes, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; the `rollout` percentage, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type asked for, and `FINGERPRINT_UNKNOWN` for each `fingerprint` no binary of the app carries once the app has a binary.",
+        "description": "The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `fingerprint` values, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; `rolloutPercentage`, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type asked for, and `FINGERPRINT_UNKNOWN` for each `fingerprint` no binary of the app carries once the app has a binary.",
         "responses": {
           "200": {
             "content": {
@@ -21250,7 +21250,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "count": {
+                          "deviceCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
@@ -21263,7 +21263,7 @@
                           }
                         },
                         "required": [
-                          "count",
+                          "deviceCount",
                           "value"
                         ]
                       }
@@ -21273,7 +21273,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "count": {
+                          "deviceCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
@@ -21286,22 +21286,22 @@
                           }
                         },
                         "required": [
-                          "count",
+                          "deviceCount",
                           "value"
                         ]
                       }
                     },
-                    "estimatedAtRollout": {
+                    "deviceCount": {
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
-                    "reached": {
+                    "estimatedDeviceCount": {
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
-                    "total": {
+                    "reachedDeviceCount": {
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
@@ -21347,9 +21347,9 @@
                   "required": [
                     "byBinaryVersion",
                     "byPlatform",
-                    "estimatedAtRollout",
-                    "reached",
-                    "total",
+                    "deviceCount",
+                    "estimatedDeviceCount",
+                    "reachedDeviceCount",
                     "warnings"
                   ]
                 }
@@ -21488,7 +21488,7 @@
           },
           {
             "in": "query",
-            "name": "rollout",
+            "name": "rolloutPercentage",
             "schema": {
               "default": 100,
               "type": "integer",
@@ -21593,7 +21593,7 @@
                               }
                             ]
                           },
-                          "failureMinSample": {
+                          "failureMinimumUpdateCount": {
                             "anyOf": [
                               {
                                 "type": "integer",
@@ -21680,7 +21680,7 @@
                           "createdAt",
                           "expiresAt",
                           "failureAction",
-                          "failureMinSample",
+                          "failureMinimumUpdateCount",
                           "failureThresholdPercent",
                           "id",
                           "isDiscoverable",
@@ -21950,7 +21950,7 @@
                                   }
                                 ]
                               },
-                              "failureMinSample": {
+                              "failureMinimumUpdateCount": {
                                 "anyOf": [
                                   {
                                     "type": "integer",
@@ -22037,7 +22037,7 @@
                               "createdAt",
                               "expiresAt",
                               "failureAction",
-                              "failureMinSample",
+                              "failureMinimumUpdateCount",
                               "failureThresholdPercent",
                               "id",
                               "isDiscoverable",
@@ -22123,7 +22123,7 @@
                                 {
                                   "type": "object",
                                   "properties": {
-                                    "hash": {
+                                    "fingerprint": {
                                       "type": "string",
                                       "minLength": 1
                                     },
@@ -22133,7 +22133,7 @@
                                     }
                                   },
                                   "required": [
-                                    "hash",
+                                    "fingerprint",
                                     "type"
                                   ],
                                   "additionalProperties": false
@@ -22245,7 +22245,7 @@
                               }
                             ]
                           },
-                          "failureMinSample": {
+                          "failureMinimumUpdateCount": {
                             "anyOf": [
                               {
                                 "type": "integer",
@@ -22317,16 +22317,6 @@
                               {
                                 "type": "object",
                                 "properties": {
-                                  "minimumSample": {
-                                    "type": "integer",
-                                    "minimum": 1,
-                                    "maximum": 9007199254740991
-                                  },
-                                  "minimumSeconds": {
-                                    "type": "integer",
-                                    "minimum": 0,
-                                    "maximum": 2592000
-                                  },
                                   "percentages": {
                                     "minItems": 2,
                                     "maxItems": 10,
@@ -22336,12 +22326,22 @@
                                       "minimum": 1,
                                       "maximum": 100
                                     }
+                                  },
+                                  "stepMinimumSeconds": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 2592000
+                                  },
+                                  "stepMinimumUpdateCount": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 9007199254740991
                                   }
                                 },
                                 "required": [
-                                  "minimumSample",
-                                  "minimumSeconds",
-                                  "percentages"
+                                  "percentages",
+                                  "stepMinimumSeconds",
+                                  "stepMinimumUpdateCount"
                                 ]
                               },
                               {
@@ -22364,38 +22364,38 @@
                                             "minimum": -9007199254740991,
                                             "maximum": 9007199254740991
                                           },
-                                          "kind": {
-                                            "type": "string",
-                                            "const": "sample"
-                                          },
-                                          "required": {
+                                          "requiredUpdateCount": {
                                             "type": "integer",
                                             "minimum": -9007199254740991,
                                             "maximum": 9007199254740991
+                                          },
+                                          "type": {
+                                            "type": "string",
+                                            "const": "sample"
                                           }
                                         },
                                         "required": [
                                           "attemptedUpdateCount",
-                                          "kind",
-                                          "required"
+                                          "requiredUpdateCount",
+                                          "type"
                                         ]
                                       },
                                       {
                                         "type": "object",
                                         "properties": {
-                                          "kind": {
-                                            "type": "string",
-                                            "const": "time"
-                                          },
                                           "readyAt": {
                                             "type": "string",
                                             "format": "date-time",
                                             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                                          },
+                                          "type": {
+                                            "type": "string",
+                                            "const": "time"
                                           }
                                         },
                                         "required": [
-                                          "kind",
-                                          "readyAt"
+                                          "readyAt",
+                                          "type"
                                         ]
                                       }
                                     ]
@@ -22467,7 +22467,7 @@
                           "createdFromReleaseId",
                           "deviceCount",
                           "failureAction",
-                          "failureMinSample",
+                          "failureMinimumUpdateCount",
                           "failureThresholdPercent",
                           "id",
                           "isMandatory",
@@ -22889,14 +22889,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -23138,7 +23138,7 @@
                             }
                           ]
                         },
-                        "failureMinSample": {
+                        "failureMinimumUpdateCount": {
                           "anyOf": [
                             {
                               "type": "integer",
@@ -23225,7 +23225,7 @@
                         "createdAt",
                         "expiresAt",
                         "failureAction",
-                        "failureMinSample",
+                        "failureMinimumUpdateCount",
                         "failureThresholdPercent",
                         "id",
                         "isDiscoverable",
@@ -23495,7 +23495,7 @@
                                 }
                               ]
                             },
-                            "failureMinSample": {
+                            "failureMinimumUpdateCount": {
                               "anyOf": [
                                 {
                                   "type": "integer",
@@ -23582,7 +23582,7 @@
                             "createdAt",
                             "expiresAt",
                             "failureAction",
-                            "failureMinSample",
+                            "failureMinimumUpdateCount",
                             "failureThresholdPercent",
                             "id",
                             "isDiscoverable",
@@ -23668,7 +23668,7 @@
                               {
                                 "type": "object",
                                 "properties": {
-                                  "hash": {
+                                  "fingerprint": {
                                     "type": "string",
                                     "minLength": 1
                                   },
@@ -23678,7 +23678,7 @@
                                   }
                                 },
                                 "required": [
-                                  "hash",
+                                  "fingerprint",
                                   "type"
                                 ],
                                 "additionalProperties": false
@@ -23790,7 +23790,7 @@
                             }
                           ]
                         },
-                        "failureMinSample": {
+                        "failureMinimumUpdateCount": {
                           "anyOf": [
                             {
                               "type": "integer",
@@ -23862,16 +23862,6 @@
                             {
                               "type": "object",
                               "properties": {
-                                "minimumSample": {
-                                  "type": "integer",
-                                  "minimum": 1,
-                                  "maximum": 9007199254740991
-                                },
-                                "minimumSeconds": {
-                                  "type": "integer",
-                                  "minimum": 0,
-                                  "maximum": 2592000
-                                },
                                 "percentages": {
                                   "minItems": 2,
                                   "maxItems": 10,
@@ -23881,12 +23871,22 @@
                                     "minimum": 1,
                                     "maximum": 100
                                   }
+                                },
+                                "stepMinimumSeconds": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 2592000
+                                },
+                                "stepMinimumUpdateCount": {
+                                  "type": "integer",
+                                  "minimum": 1,
+                                  "maximum": 9007199254740991
                                 }
                               },
                               "required": [
-                                "minimumSample",
-                                "minimumSeconds",
-                                "percentages"
+                                "percentages",
+                                "stepMinimumSeconds",
+                                "stepMinimumUpdateCount"
                               ]
                             },
                             {
@@ -23909,38 +23909,38 @@
                                           "minimum": -9007199254740991,
                                           "maximum": 9007199254740991
                                         },
-                                        "kind": {
-                                          "type": "string",
-                                          "const": "sample"
-                                        },
-                                        "required": {
+                                        "requiredUpdateCount": {
                                           "type": "integer",
                                           "minimum": -9007199254740991,
                                           "maximum": 9007199254740991
+                                        },
+                                        "type": {
+                                          "type": "string",
+                                          "const": "sample"
                                         }
                                       },
                                       "required": [
                                         "attemptedUpdateCount",
-                                        "kind",
-                                        "required"
+                                        "requiredUpdateCount",
+                                        "type"
                                       ]
                                     },
                                     {
                                       "type": "object",
                                       "properties": {
-                                        "kind": {
-                                          "type": "string",
-                                          "const": "time"
-                                        },
                                         "readyAt": {
                                           "type": "string",
                                           "format": "date-time",
                                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                                        },
+                                        "type": {
+                                          "type": "string",
+                                          "const": "time"
                                         }
                                       },
                                       "required": [
-                                        "kind",
-                                        "readyAt"
+                                        "readyAt",
+                                        "type"
                                       ]
                                     }
                                   ]
@@ -24012,7 +24012,7 @@
                         "createdFromReleaseId",
                         "deviceCount",
                         "failureAction",
-                        "failureMinSample",
+                        "failureMinimumUpdateCount",
                         "failureThresholdPercent",
                         "id",
                         "isMandatory",
@@ -24535,14 +24535,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -25799,7 +25799,7 @@
                               }
                             ]
                           },
-                          "failureMinSample": {
+                          "failureMinimumUpdateCount": {
                             "anyOf": [
                               {
                                 "type": "integer",
@@ -25886,7 +25886,7 @@
                           "createdAt",
                           "expiresAt",
                           "failureAction",
-                          "failureMinSample",
+                          "failureMinimumUpdateCount",
                           "failureThresholdPercent",
                           "id",
                           "isDiscoverable",
@@ -25972,7 +25972,7 @@
                             {
                               "type": "object",
                               "properties": {
-                                "hash": {
+                                "fingerprint": {
                                   "type": "string",
                                   "minLength": 1
                                 },
@@ -25982,7 +25982,7 @@
                                 }
                               },
                               "required": [
-                                "hash",
+                                "fingerprint",
                                 "type"
                               ],
                               "additionalProperties": false
@@ -26094,7 +26094,7 @@
                           }
                         ]
                       },
-                      "failureMinSample": {
+                      "failureMinimumUpdateCount": {
                         "anyOf": [
                           {
                             "type": "integer",
@@ -26166,16 +26166,6 @@
                           {
                             "type": "object",
                             "properties": {
-                              "minimumSample": {
-                                "type": "integer",
-                                "minimum": 1,
-                                "maximum": 9007199254740991
-                              },
-                              "minimumSeconds": {
-                                "type": "integer",
-                                "minimum": 0,
-                                "maximum": 2592000
-                              },
                               "percentages": {
                                 "minItems": 2,
                                 "maxItems": 10,
@@ -26185,12 +26175,22 @@
                                   "minimum": 1,
                                   "maximum": 100
                                 }
+                              },
+                              "stepMinimumSeconds": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 2592000
+                              },
+                              "stepMinimumUpdateCount": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 9007199254740991
                               }
                             },
                             "required": [
-                              "minimumSample",
-                              "minimumSeconds",
-                              "percentages"
+                              "percentages",
+                              "stepMinimumSeconds",
+                              "stepMinimumUpdateCount"
                             ]
                           },
                           {
@@ -26213,38 +26213,38 @@
                                         "minimum": -9007199254740991,
                                         "maximum": 9007199254740991
                                       },
-                                      "kind": {
-                                        "type": "string",
-                                        "const": "sample"
-                                      },
-                                      "required": {
+                                      "requiredUpdateCount": {
                                         "type": "integer",
                                         "minimum": -9007199254740991,
                                         "maximum": 9007199254740991
+                                      },
+                                      "type": {
+                                        "type": "string",
+                                        "const": "sample"
                                       }
                                     },
                                     "required": [
                                       "attemptedUpdateCount",
-                                      "kind",
-                                      "required"
+                                      "requiredUpdateCount",
+                                      "type"
                                     ]
                                   },
                                   {
                                     "type": "object",
                                     "properties": {
-                                      "kind": {
-                                        "type": "string",
-                                        "const": "time"
-                                      },
                                       "readyAt": {
                                         "type": "string",
                                         "format": "date-time",
                                         "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                                      },
+                                      "type": {
+                                        "type": "string",
+                                        "const": "time"
                                       }
                                     },
                                     "required": [
-                                      "kind",
-                                      "readyAt"
+                                      "readyAt",
+                                      "type"
                                     ]
                                   }
                                 ]
@@ -26316,7 +26316,7 @@
                       "createdFromReleaseId",
                       "deviceCount",
                       "failureAction",
-                      "failureMinSample",
+                      "failureMinimumUpdateCount",
                       "failureThresholdPercent",
                       "id",
                       "isMandatory",
@@ -26512,14 +26512,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -26890,7 +26890,7 @@
                             }
                           ]
                         },
-                        "failureMinSample": {
+                        "failureMinimumUpdateCount": {
                           "anyOf": [
                             {
                               "type": "integer",
@@ -26977,7 +26977,7 @@
                         "createdAt",
                         "expiresAt",
                         "failureAction",
-                        "failureMinSample",
+                        "failureMinimumUpdateCount",
                         "failureThresholdPercent",
                         "id",
                         "isDiscoverable",
@@ -27063,7 +27063,7 @@
                           {
                             "type": "object",
                             "properties": {
-                              "hash": {
+                              "fingerprint": {
                                 "type": "string",
                                 "minLength": 1
                               },
@@ -27073,7 +27073,7 @@
                               }
                             },
                             "required": [
-                              "hash",
+                              "fingerprint",
                               "type"
                             ],
                             "additionalProperties": false
@@ -27185,7 +27185,7 @@
                         }
                       ]
                     },
-                    "failureMinSample": {
+                    "failureMinimumUpdateCount": {
                       "anyOf": [
                         {
                           "type": "integer",
@@ -27257,16 +27257,6 @@
                         {
                           "type": "object",
                           "properties": {
-                            "minimumSample": {
-                              "type": "integer",
-                              "minimum": 1,
-                              "maximum": 9007199254740991
-                            },
-                            "minimumSeconds": {
-                              "type": "integer",
-                              "minimum": 0,
-                              "maximum": 2592000
-                            },
                             "percentages": {
                               "minItems": 2,
                               "maxItems": 10,
@@ -27276,12 +27266,22 @@
                                 "minimum": 1,
                                 "maximum": 100
                               }
+                            },
+                            "stepMinimumSeconds": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2592000
+                            },
+                            "stepMinimumUpdateCount": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 9007199254740991
                             }
                           },
                           "required": [
-                            "minimumSample",
-                            "minimumSeconds",
-                            "percentages"
+                            "percentages",
+                            "stepMinimumSeconds",
+                            "stepMinimumUpdateCount"
                           ]
                         },
                         {
@@ -27304,38 +27304,38 @@
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
                                     },
-                                    "kind": {
-                                      "type": "string",
-                                      "const": "sample"
-                                    },
-                                    "required": {
+                                    "requiredUpdateCount": {
                                       "type": "integer",
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "const": "sample"
                                     }
                                   },
                                   "required": [
                                     "attemptedUpdateCount",
-                                    "kind",
-                                    "required"
+                                    "requiredUpdateCount",
+                                    "type"
                                   ]
                                 },
                                 {
                                   "type": "object",
                                   "properties": {
-                                    "kind": {
-                                      "type": "string",
-                                      "const": "time"
-                                    },
                                     "readyAt": {
                                       "type": "string",
                                       "format": "date-time",
                                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "const": "time"
                                     }
                                   },
                                   "required": [
-                                    "kind",
-                                    "readyAt"
+                                    "readyAt",
+                                    "type"
                                   ]
                                 }
                               ]
@@ -27407,7 +27407,7 @@
                     "createdFromReleaseId",
                     "deviceCount",
                     "failureAction",
-                    "failureMinSample",
+                    "failureMinimumUpdateCount",
                     "failureThresholdPercent",
                     "id",
                     "isMandatory",
@@ -27777,7 +27777,7 @@
                             }
                           ]
                         },
-                        "failureMinSample": {
+                        "failureMinimumUpdateCount": {
                           "anyOf": [
                             {
                               "type": "integer",
@@ -27864,7 +27864,7 @@
                         "createdAt",
                         "expiresAt",
                         "failureAction",
-                        "failureMinSample",
+                        "failureMinimumUpdateCount",
                         "failureThresholdPercent",
                         "id",
                         "isDiscoverable",
@@ -27950,7 +27950,7 @@
                           {
                             "type": "object",
                             "properties": {
-                              "hash": {
+                              "fingerprint": {
                                 "type": "string",
                                 "minLength": 1
                               },
@@ -27960,7 +27960,7 @@
                               }
                             },
                             "required": [
-                              "hash",
+                              "fingerprint",
                               "type"
                             ],
                             "additionalProperties": false
@@ -28072,7 +28072,7 @@
                         }
                       ]
                     },
-                    "failureMinSample": {
+                    "failureMinimumUpdateCount": {
                       "anyOf": [
                         {
                           "type": "integer",
@@ -28144,16 +28144,6 @@
                         {
                           "type": "object",
                           "properties": {
-                            "minimumSample": {
-                              "type": "integer",
-                              "minimum": 1,
-                              "maximum": 9007199254740991
-                            },
-                            "minimumSeconds": {
-                              "type": "integer",
-                              "minimum": 0,
-                              "maximum": 2592000
-                            },
                             "percentages": {
                               "minItems": 2,
                               "maxItems": 10,
@@ -28163,12 +28153,22 @@
                                 "minimum": 1,
                                 "maximum": 100
                               }
+                            },
+                            "stepMinimumSeconds": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2592000
+                            },
+                            "stepMinimumUpdateCount": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 9007199254740991
                             }
                           },
                           "required": [
-                            "minimumSample",
-                            "minimumSeconds",
-                            "percentages"
+                            "percentages",
+                            "stepMinimumSeconds",
+                            "stepMinimumUpdateCount"
                           ]
                         },
                         {
@@ -28191,38 +28191,38 @@
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
                                     },
-                                    "kind": {
-                                      "type": "string",
-                                      "const": "sample"
-                                    },
-                                    "required": {
+                                    "requiredUpdateCount": {
                                       "type": "integer",
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "const": "sample"
                                     }
                                   },
                                   "required": [
                                     "attemptedUpdateCount",
-                                    "kind",
-                                    "required"
+                                    "requiredUpdateCount",
+                                    "type"
                                   ]
                                 },
                                 {
                                   "type": "object",
                                   "properties": {
-                                    "kind": {
-                                      "type": "string",
-                                      "const": "time"
-                                    },
                                     "readyAt": {
                                       "type": "string",
                                       "format": "date-time",
                                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "const": "time"
                                     }
                                   },
                                   "required": [
-                                    "kind",
-                                    "readyAt"
+                                    "readyAt",
+                                    "type"
                                   ]
                                 }
                               ]
@@ -28294,7 +28294,7 @@
                     "createdFromReleaseId",
                     "deviceCount",
                     "failureAction",
-                    "failureMinSample",
+                    "failureMinimumUpdateCount",
                     "failureThresholdPercent",
                     "id",
                     "isMandatory",
@@ -28422,7 +28422,7 @@
                       }
                     ]
                   },
-                  "failureMinSample": {
+                  "failureMinimumUpdateCount": {
                     "anyOf": [
                       {
                         "type": "integer",
@@ -28465,16 +28465,6 @@
                       {
                         "type": "object",
                         "properties": {
-                          "minimumSample": {
-                            "type": "integer",
-                            "minimum": 1,
-                            "maximum": 9007199254740991
-                          },
-                          "minimumSeconds": {
-                            "type": "integer",
-                            "minimum": 0,
-                            "maximum": 2592000
-                          },
                           "percentages": {
                             "minItems": 2,
                             "maxItems": 10,
@@ -28484,12 +28474,22 @@
                               "minimum": 1,
                               "maximum": 100
                             }
+                          },
+                          "stepMinimumSeconds": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2592000
+                          },
+                          "stepMinimumUpdateCount": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 9007199254740991
                           }
                         },
                         "required": [
-                          "minimumSample",
-                          "minimumSeconds",
-                          "percentages"
+                          "percentages",
+                          "stepMinimumSeconds",
+                          "stepMinimumUpdateCount"
                         ]
                       },
                       {
@@ -28548,7 +28548,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "count": {
+                          "deviceCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
@@ -28561,7 +28561,7 @@
                           }
                         },
                         "required": [
-                          "count",
+                          "deviceCount",
                           "value"
                         ]
                       }
@@ -28571,7 +28571,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "count": {
+                          "deviceCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
@@ -28584,22 +28584,22 @@
                           }
                         },
                         "required": [
-                          "count",
+                          "deviceCount",
                           "value"
                         ]
                       }
                     },
-                    "estimatedAtRollout": {
+                    "deviceCount": {
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
-                    "reached": {
+                    "estimatedDeviceCount": {
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
-                    "total": {
+                    "reachedDeviceCount": {
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
@@ -28645,9 +28645,9 @@
                   "required": [
                     "byBinaryVersion",
                     "byPlatform",
-                    "estimatedAtRollout",
-                    "reached",
-                    "total",
+                    "deviceCount",
+                    "estimatedDeviceCount",
+                    "reachedDeviceCount",
                     "warnings"
                   ]
                 }
@@ -28991,7 +28991,7 @@
                             }
                           ]
                         },
-                        "failureMinSample": {
+                        "failureMinimumUpdateCount": {
                           "anyOf": [
                             {
                               "type": "integer",
@@ -29078,7 +29078,7 @@
                         "createdAt",
                         "expiresAt",
                         "failureAction",
-                        "failureMinSample",
+                        "failureMinimumUpdateCount",
                         "failureThresholdPercent",
                         "id",
                         "isDiscoverable",
@@ -29164,7 +29164,7 @@
                           {
                             "type": "object",
                             "properties": {
-                              "hash": {
+                              "fingerprint": {
                                 "type": "string",
                                 "minLength": 1
                               },
@@ -29174,7 +29174,7 @@
                               }
                             },
                             "required": [
-                              "hash",
+                              "fingerprint",
                               "type"
                             ],
                             "additionalProperties": false
@@ -29286,7 +29286,7 @@
                         }
                       ]
                     },
-                    "failureMinSample": {
+                    "failureMinimumUpdateCount": {
                       "anyOf": [
                         {
                           "type": "integer",
@@ -29358,16 +29358,6 @@
                         {
                           "type": "object",
                           "properties": {
-                            "minimumSample": {
-                              "type": "integer",
-                              "minimum": 1,
-                              "maximum": 9007199254740991
-                            },
-                            "minimumSeconds": {
-                              "type": "integer",
-                              "minimum": 0,
-                              "maximum": 2592000
-                            },
                             "percentages": {
                               "minItems": 2,
                               "maxItems": 10,
@@ -29377,12 +29367,22 @@
                                 "minimum": 1,
                                 "maximum": 100
                               }
+                            },
+                            "stepMinimumSeconds": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2592000
+                            },
+                            "stepMinimumUpdateCount": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 9007199254740991
                             }
                           },
                           "required": [
-                            "minimumSample",
-                            "minimumSeconds",
-                            "percentages"
+                            "percentages",
+                            "stepMinimumSeconds",
+                            "stepMinimumUpdateCount"
                           ]
                         },
                         {
@@ -29405,38 +29405,38 @@
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
                                     },
-                                    "kind": {
-                                      "type": "string",
-                                      "const": "sample"
-                                    },
-                                    "required": {
+                                    "requiredUpdateCount": {
                                       "type": "integer",
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "const": "sample"
                                     }
                                   },
                                   "required": [
                                     "attemptedUpdateCount",
-                                    "kind",
-                                    "required"
+                                    "requiredUpdateCount",
+                                    "type"
                                   ]
                                 },
                                 {
                                   "type": "object",
                                   "properties": {
-                                    "kind": {
-                                      "type": "string",
-                                      "const": "time"
-                                    },
                                     "readyAt": {
                                       "type": "string",
                                       "format": "date-time",
                                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "const": "time"
                                     }
                                   },
                                   "required": [
-                                    "kind",
-                                    "readyAt"
+                                    "readyAt",
+                                    "type"
                                   ]
                                 }
                               ]
@@ -29508,7 +29508,7 @@
                     "createdFromReleaseId",
                     "deviceCount",
                     "failureAction",
-                    "failureMinSample",
+                    "failureMinimumUpdateCount",
                     "failureThresholdPercent",
                     "id",
                     "isMandatory",
@@ -29875,7 +29875,7 @@
                             }
                           ]
                         },
-                        "failureMinSample": {
+                        "failureMinimumUpdateCount": {
                           "anyOf": [
                             {
                               "type": "integer",
@@ -29962,7 +29962,7 @@
                         "createdAt",
                         "expiresAt",
                         "failureAction",
-                        "failureMinSample",
+                        "failureMinimumUpdateCount",
                         "failureThresholdPercent",
                         "id",
                         "isDiscoverable",
@@ -30048,7 +30048,7 @@
                           {
                             "type": "object",
                             "properties": {
-                              "hash": {
+                              "fingerprint": {
                                 "type": "string",
                                 "minLength": 1
                               },
@@ -30058,7 +30058,7 @@
                               }
                             },
                             "required": [
-                              "hash",
+                              "fingerprint",
                               "type"
                             ],
                             "additionalProperties": false
@@ -30170,7 +30170,7 @@
                         }
                       ]
                     },
-                    "failureMinSample": {
+                    "failureMinimumUpdateCount": {
                       "anyOf": [
                         {
                           "type": "integer",
@@ -30242,16 +30242,6 @@
                         {
                           "type": "object",
                           "properties": {
-                            "minimumSample": {
-                              "type": "integer",
-                              "minimum": 1,
-                              "maximum": 9007199254740991
-                            },
-                            "minimumSeconds": {
-                              "type": "integer",
-                              "minimum": 0,
-                              "maximum": 2592000
-                            },
                             "percentages": {
                               "minItems": 2,
                               "maxItems": 10,
@@ -30261,12 +30251,22 @@
                                 "minimum": 1,
                                 "maximum": 100
                               }
+                            },
+                            "stepMinimumSeconds": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2592000
+                            },
+                            "stepMinimumUpdateCount": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 9007199254740991
                             }
                           },
                           "required": [
-                            "minimumSample",
-                            "minimumSeconds",
-                            "percentages"
+                            "percentages",
+                            "stepMinimumSeconds",
+                            "stepMinimumUpdateCount"
                           ]
                         },
                         {
@@ -30289,38 +30289,38 @@
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
                                     },
-                                    "kind": {
-                                      "type": "string",
-                                      "const": "sample"
-                                    },
-                                    "required": {
+                                    "requiredUpdateCount": {
                                       "type": "integer",
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "const": "sample"
                                     }
                                   },
                                   "required": [
                                     "attemptedUpdateCount",
-                                    "kind",
-                                    "required"
+                                    "requiredUpdateCount",
+                                    "type"
                                   ]
                                 },
                                 {
                                   "type": "object",
                                   "properties": {
-                                    "kind": {
-                                      "type": "string",
-                                      "const": "time"
-                                    },
                                     "readyAt": {
                                       "type": "string",
                                       "format": "date-time",
                                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "const": "time"
                                     }
                                   },
                                   "required": [
-                                    "kind",
-                                    "readyAt"
+                                    "readyAt",
+                                    "type"
                                   ]
                                 }
                               ]
@@ -30392,7 +30392,7 @@
                     "createdFromReleaseId",
                     "deviceCount",
                     "failureAction",
-                    "failureMinSample",
+                    "failureMinimumUpdateCount",
                     "failureThresholdPercent",
                     "id",
                     "isMandatory",
@@ -30759,7 +30759,7 @@
                             }
                           ]
                         },
-                        "failureMinSample": {
+                        "failureMinimumUpdateCount": {
                           "anyOf": [
                             {
                               "type": "integer",
@@ -30846,7 +30846,7 @@
                         "createdAt",
                         "expiresAt",
                         "failureAction",
-                        "failureMinSample",
+                        "failureMinimumUpdateCount",
                         "failureThresholdPercent",
                         "id",
                         "isDiscoverable",
@@ -30932,7 +30932,7 @@
                           {
                             "type": "object",
                             "properties": {
-                              "hash": {
+                              "fingerprint": {
                                 "type": "string",
                                 "minLength": 1
                               },
@@ -30942,7 +30942,7 @@
                               }
                             },
                             "required": [
-                              "hash",
+                              "fingerprint",
                               "type"
                             ],
                             "additionalProperties": false
@@ -31054,7 +31054,7 @@
                         }
                       ]
                     },
-                    "failureMinSample": {
+                    "failureMinimumUpdateCount": {
                       "anyOf": [
                         {
                           "type": "integer",
@@ -31126,16 +31126,6 @@
                         {
                           "type": "object",
                           "properties": {
-                            "minimumSample": {
-                              "type": "integer",
-                              "minimum": 1,
-                              "maximum": 9007199254740991
-                            },
-                            "minimumSeconds": {
-                              "type": "integer",
-                              "minimum": 0,
-                              "maximum": 2592000
-                            },
                             "percentages": {
                               "minItems": 2,
                               "maxItems": 10,
@@ -31145,12 +31135,22 @@
                                 "minimum": 1,
                                 "maximum": 100
                               }
+                            },
+                            "stepMinimumSeconds": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2592000
+                            },
+                            "stepMinimumUpdateCount": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 9007199254740991
                             }
                           },
                           "required": [
-                            "minimumSample",
-                            "minimumSeconds",
-                            "percentages"
+                            "percentages",
+                            "stepMinimumSeconds",
+                            "stepMinimumUpdateCount"
                           ]
                         },
                         {
@@ -31173,38 +31173,38 @@
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
                                     },
-                                    "kind": {
-                                      "type": "string",
-                                      "const": "sample"
-                                    },
-                                    "required": {
+                                    "requiredUpdateCount": {
                                       "type": "integer",
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "const": "sample"
                                     }
                                   },
                                   "required": [
                                     "attemptedUpdateCount",
-                                    "kind",
-                                    "required"
+                                    "requiredUpdateCount",
+                                    "type"
                                   ]
                                 },
                                 {
                                   "type": "object",
                                   "properties": {
-                                    "kind": {
-                                      "type": "string",
-                                      "const": "time"
-                                    },
                                     "readyAt": {
                                       "type": "string",
                                       "format": "date-time",
                                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "const": "time"
                                     }
                                   },
                                   "required": [
-                                    "kind",
-                                    "readyAt"
+                                    "readyAt",
+                                    "type"
                                   ]
                                 }
                               ]
@@ -31276,7 +31276,7 @@
                     "createdFromReleaseId",
                     "deviceCount",
                     "failureAction",
-                    "failureMinSample",
+                    "failureMinimumUpdateCount",
                     "failureThresholdPercent",
                     "id",
                     "isMandatory",
@@ -31787,14 +31787,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "total": {
+                    "count": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "total"
+                    "count"
                   ]
                 }
               }
@@ -32017,7 +32017,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "count": {
+                          "deviceCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
@@ -32030,7 +32030,7 @@
                           }
                         },
                         "required": [
-                          "count",
+                          "deviceCount",
                           "value"
                         ]
                       }
@@ -32040,7 +32040,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "count": {
+                          "deviceCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
@@ -32053,7 +32053,7 @@
                           }
                         },
                         "required": [
-                          "count",
+                          "deviceCount",
                           "value"
                         ]
                       }
@@ -32063,7 +32063,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "count": {
+                          "deviceCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
@@ -32083,7 +32083,7 @@
                           }
                         },
                         "required": [
-                          "count",
+                          "deviceCount",
                           "value",
                           "platform"
                         ]
@@ -32094,7 +32094,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "count": {
+                          "deviceCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
@@ -32107,7 +32107,7 @@
                           }
                         },
                         "required": [
-                          "count",
+                          "deviceCount",
                           "value"
                         ]
                       }
@@ -32117,7 +32117,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "count": {
+                          "deviceCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
@@ -32154,7 +32154,7 @@
                           }
                         },
                         "required": [
-                          "count",
+                          "deviceCount",
                           "value",
                           "channelId",
                           "number"
@@ -32166,7 +32166,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "count": {
+                          "deviceCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
@@ -32179,7 +32179,7 @@
                           }
                         },
                         "required": [
-                          "count",
+                          "deviceCount",
                           "value"
                         ]
                       }
@@ -32361,7 +32361,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "count": {
+                          "eventCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
@@ -32371,7 +32371,7 @@
                           }
                         },
                         "required": [
-                          "count",
+                          "eventCount",
                           "reason"
                         ]
                       }
@@ -32472,7 +32472,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "count": {
+                          "eventCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
@@ -32482,7 +32482,7 @@
                           }
                         },
                         "required": [
-                          "count",
+                          "eventCount",
                           "reason"
                         ]
                       }

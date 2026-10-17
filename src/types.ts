@@ -18,7 +18,7 @@ export interface BlobUploadBody {
 }
 
 /**
- * What every list's `/count` answers: `total`, the rows the list's filters match.
+ * What every list's `/count` answers: `count`, the rows the list's filters match.
  */
 export type Count = JsonResponseBody<'/v1/organizations/count', 'get', 200>;
 

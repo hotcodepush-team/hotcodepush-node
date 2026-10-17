@@ -1361,7 +1361,7 @@ export interface paths {
         };
         /**
          * Preview the audience of a release
-         * @description The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `fingerprint` hashes, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; the `rollout` percentage, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type asked for, and `FINGERPRINT_UNKNOWN` for each `fingerprint` no binary of the app carries once the app has a binary.
+         * @description The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `fingerprint` values, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; `rolloutPercentage`, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type asked for, and `FINGERPRINT_UNKNOWN` for each `fingerprint` no binary of the app carries once the app has a binary.
          */
         get: operations["getV1AppsByAppIdChannelsByChannelIdAudience"];
         put?: never;
@@ -2138,7 +2138,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -2764,7 +2764,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -3198,7 +3198,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -3427,7 +3427,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -4262,7 +4262,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -4741,7 +4741,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -6085,7 +6085,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -6415,7 +6415,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -7205,7 +7205,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -7767,7 +7767,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -8340,7 +8340,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -9070,7 +9070,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -9800,7 +9800,7 @@ export interface operations {
                         createdAt: string;
                         expiresAt: string | null;
                         failureAction: ("notify" | "pause" | "revoke") | null;
-                        failureMinSample: number | null;
+                        failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -9902,7 +9902,7 @@ export interface operations {
                     isProtected?: boolean;
                     name: string;
                     failureAction?: ("notify" | "pause" | "revoke") | null;
-                    failureMinSample?: number | null;
+                    failureMinimumUpdateCount?: number | null;
                     failureThresholdPercent?: number | null;
                 };
             };
@@ -9921,7 +9921,7 @@ export interface operations {
                         createdAt: string;
                         expiresAt: string | null;
                         failureAction: ("notify" | "pause" | "revoke") | null;
-                        failureMinSample: number | null;
+                        failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -10139,7 +10139,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -10236,7 +10236,7 @@ export interface operations {
                         createdAt: string;
                         expiresAt: string | null;
                         failureAction: ("notify" | "pause" | "revoke") | null;
-                        failureMinSample: number | null;
+                        failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -10436,7 +10436,7 @@ export interface operations {
                     isProtected?: boolean;
                     name?: string;
                     failureAction?: ("notify" | "pause" | "revoke") | null;
-                    failureMinSample?: number | null;
+                    failureMinimumUpdateCount?: number | null;
                     failureThresholdPercent?: number | null;
                 };
             };
@@ -10455,7 +10455,7 @@ export interface operations {
                         createdAt: string;
                         expiresAt: string | null;
                         failureAction: ("notify" | "pause" | "revoke") | null;
-                        failureMinSample: number | null;
+                        failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -10572,7 +10572,7 @@ export interface operations {
                         createdAt: string;
                         expiresAt: string | null;
                         failureAction: ("notify" | "pause" | "revoke") | null;
-                        failureMinSample: number | null;
+                        failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -10680,7 +10680,7 @@ export interface operations {
                         createdAt: string;
                         expiresAt: string | null;
                         failureAction: ("notify" | "pause" | "revoke") | null;
-                        failureMinSample: number | null;
+                        failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -10812,7 +10812,7 @@ export interface operations {
                             } & {
                                 [key: string]: unknown;
                             }) | ({
-                                hash: string;
+                                fingerprint: string;
                                 /** @constant */
                                 type: "fingerprint";
                             } & {
@@ -10837,7 +10837,7 @@ export interface operations {
                             manifestUrl: string;
                             notes: string | null;
                             number: number;
-                            rollout: number;
+                            rolloutPercentage: number;
                             sizeBytes: number;
                         } & {
                             [key: string]: unknown;
@@ -10982,7 +10982,7 @@ export interface operations {
                             createdAt: string;
                             expiresAt: string | null;
                             failureAction: ("notify" | "pause" | "revoke") | null;
-                            failureMinSample: number | null;
+                            failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
@@ -11011,7 +11011,7 @@ export interface operations {
                             /** @constant */
                             type: "device";
                         } | {
-                            hash: string;
+                            fingerprint: string;
                             /** @constant */
                             type: "fingerprint";
                         } | {
@@ -11033,7 +11033,7 @@ export interface operations {
                         createdFromReleaseId: string | null;
                         deviceCount: number;
                         failureAction: ("notify" | "pause" | "revoke") | null;
-                        failureMinSample: number | null;
+                        failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -11043,21 +11043,21 @@ export interface operations {
                         number: number;
                         pausedAt: string | null;
                         progression: {
-                            minimumSample: number;
-                            minimumSeconds: number;
                             percentages: number[];
+                            stepMinimumSeconds: number;
+                            stepMinimumUpdateCount: number;
                         } | null;
                         progressionStep: {
                             gate: {
                                 attemptedUpdateCount: number;
+                                requiredUpdateCount: number;
                                 /** @constant */
-                                kind: "sample";
-                                required: number;
+                                type: "sample";
                             } | {
-                                /** @constant */
-                                kind: "time";
                                 /** Format: date-time */
                                 readyAt: string;
+                                /** @constant */
+                                type: "time";
                             };
                             number: number;
                         } | null;
@@ -11171,7 +11171,7 @@ export interface operations {
                         /** @constant */
                         type: "device";
                     } | {
-                        hash: string;
+                        fingerprint: string;
                         /** @constant */
                         type: "fingerprint";
                     } | {
@@ -11182,7 +11182,7 @@ export interface operations {
                     /** @default null */
                     failureAction?: ("notify" | "pause" | "revoke") | null;
                     /** @default null */
-                    failureMinSample?: number | null;
+                    failureMinimumUpdateCount?: number | null;
                     /** @default null */
                     failureThresholdPercent?: number | null;
                     /** Format: uuid */
@@ -11193,9 +11193,9 @@ export interface operations {
                     notes?: string | null;
                     /** @default null */
                     progression?: {
-                        minimumSample: number;
-                        minimumSeconds: number;
                         percentages: number[];
+                        stepMinimumSeconds: number;
+                        stepMinimumUpdateCount: number;
                     } | null;
                     /** @default 100 */
                     rolloutPercentage?: number;
@@ -11250,7 +11250,7 @@ export interface operations {
                             createdAt: string;
                             expiresAt: string | null;
                             failureAction: ("notify" | "pause" | "revoke") | null;
-                            failureMinSample: number | null;
+                            failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
@@ -11279,7 +11279,7 @@ export interface operations {
                             /** @constant */
                             type: "device";
                         } | {
-                            hash: string;
+                            fingerprint: string;
                             /** @constant */
                             type: "fingerprint";
                         } | {
@@ -11301,7 +11301,7 @@ export interface operations {
                         createdFromReleaseId: string | null;
                         deviceCount: number;
                         failureAction: ("notify" | "pause" | "revoke") | null;
-                        failureMinSample: number | null;
+                        failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -11311,21 +11311,21 @@ export interface operations {
                         number: number;
                         pausedAt: string | null;
                         progression: {
-                            minimumSample: number;
-                            minimumSeconds: number;
                             percentages: number[];
+                            stepMinimumSeconds: number;
+                            stepMinimumUpdateCount: number;
                         } | null;
                         progressionStep: {
                             gate: {
                                 attemptedUpdateCount: number;
+                                requiredUpdateCount: number;
                                 /** @constant */
-                                kind: "sample";
-                                required: number;
+                                type: "sample";
                             } | {
-                                /** @constant */
-                                kind: "time";
                                 /** Format: date-time */
                                 readyAt: string;
+                                /** @constant */
+                                type: "time";
                             };
                             number: number;
                         } | null;
@@ -11452,7 +11452,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -11594,7 +11594,7 @@ export interface operations {
                             createdAt: string;
                             expiresAt: string | null;
                             failureAction: ("notify" | "pause" | "revoke") | null;
-                            failureMinSample: number | null;
+                            failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
@@ -11623,7 +11623,7 @@ export interface operations {
                             /** @constant */
                             type: "device";
                         } | {
-                            hash: string;
+                            fingerprint: string;
                             /** @constant */
                             type: "fingerprint";
                         } | {
@@ -11645,7 +11645,7 @@ export interface operations {
                         createdFromReleaseId: string | null;
                         deviceCount: number;
                         failureAction: ("notify" | "pause" | "revoke") | null;
-                        failureMinSample: number | null;
+                        failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -11655,21 +11655,21 @@ export interface operations {
                         number: number;
                         pausedAt: string | null;
                         progression: {
-                            minimumSample: number;
-                            minimumSeconds: number;
                             percentages: number[];
+                            stepMinimumSeconds: number;
+                            stepMinimumUpdateCount: number;
                         } | null;
                         progressionStep: {
                             gate: {
                                 attemptedUpdateCount: number;
+                                requiredUpdateCount: number;
                                 /** @constant */
-                                kind: "sample";
-                                required: number;
+                                type: "sample";
                             } | {
-                                /** @constant */
-                                kind: "time";
                                 /** Format: date-time */
                                 readyAt: string;
+                                /** @constant */
+                                type: "time";
                             };
                             number: number;
                         } | null;
@@ -11835,7 +11835,7 @@ export interface operations {
                             createdAt: string;
                             expiresAt: string | null;
                             failureAction: ("notify" | "pause" | "revoke") | null;
-                            failureMinSample: number | null;
+                            failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
@@ -11864,7 +11864,7 @@ export interface operations {
                             /** @constant */
                             type: "device";
                         } | {
-                            hash: string;
+                            fingerprint: string;
                             /** @constant */
                             type: "fingerprint";
                         } | {
@@ -11886,7 +11886,7 @@ export interface operations {
                         createdFromReleaseId: string | null;
                         deviceCount: number;
                         failureAction: ("notify" | "pause" | "revoke") | null;
-                        failureMinSample: number | null;
+                        failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -11896,21 +11896,21 @@ export interface operations {
                         number: number;
                         pausedAt: string | null;
                         progression: {
-                            minimumSample: number;
-                            minimumSeconds: number;
                             percentages: number[];
+                            stepMinimumSeconds: number;
+                            stepMinimumUpdateCount: number;
                         } | null;
                         progressionStep: {
                             gate: {
                                 attemptedUpdateCount: number;
+                                requiredUpdateCount: number;
                                 /** @constant */
-                                kind: "sample";
-                                required: number;
+                                type: "sample";
                             } | {
-                                /** @constant */
-                                kind: "time";
                                 /** Format: date-time */
                                 readyAt: string;
+                                /** @constant */
+                                type: "time";
                             };
                             number: number;
                         } | null;
@@ -11997,7 +11997,7 @@ export interface operations {
                 device?: string[];
                 fingerprint?: string[];
                 os?: string[];
-                rollout?: number;
+                rolloutPercentage?: number;
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -12019,16 +12019,16 @@ export interface operations {
                 content: {
                     "application/json": {
                         byBinaryVersion: {
-                            count: number;
+                            deviceCount: number;
                             value: string | null;
                         }[];
                         byPlatform: {
-                            count: number;
+                            deviceCount: number;
                             value: string | null;
                         }[];
-                        estimatedAtRollout: number;
-                        reached: number;
-                        total: number;
+                        deviceCount: number;
+                        estimatedDeviceCount: number;
+                        reachedDeviceCount: number;
                         warnings: {
                             /** @enum {string} */
                             code: "FINGERPRINT_UNKNOWN" | "UNSUPPORTED_CONDITION_SHARE";
@@ -12153,7 +12153,7 @@ export interface operations {
                             createdAt: string;
                             expiresAt: string | null;
                             failureAction: ("notify" | "pause" | "revoke") | null;
-                            failureMinSample: number | null;
+                            failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
@@ -12213,7 +12213,7 @@ export interface operations {
                                 createdAt: string;
                                 expiresAt: string | null;
                                 failureAction: ("notify" | "pause" | "revoke") | null;
-                                failureMinSample: number | null;
+                                failureMinimumUpdateCount: number | null;
                                 failureThresholdPercent: number | null;
                                 /** Format: uuid */
                                 id: string;
@@ -12242,7 +12242,7 @@ export interface operations {
                                 /** @constant */
                                 type: "device";
                             } | {
-                                hash: string;
+                                fingerprint: string;
                                 /** @constant */
                                 type: "fingerprint";
                             } | {
@@ -12264,7 +12264,7 @@ export interface operations {
                             createdFromReleaseId: string | null;
                             deviceCount: number;
                             failureAction: ("notify" | "pause" | "revoke") | null;
-                            failureMinSample: number | null;
+                            failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
@@ -12274,21 +12274,21 @@ export interface operations {
                             number: number;
                             pausedAt: string | null;
                             progression: {
-                                minimumSample: number;
-                                minimumSeconds: number;
                                 percentages: number[];
+                                stepMinimumSeconds: number;
+                                stepMinimumUpdateCount: number;
                             } | null;
                             progressionStep: {
                                 gate: {
                                     attemptedUpdateCount: number;
+                                    requiredUpdateCount: number;
                                     /** @constant */
-                                    kind: "sample";
-                                    required: number;
+                                    type: "sample";
                                 } | {
-                                    /** @constant */
-                                    kind: "time";
                                     /** Format: date-time */
                                     readyAt: string;
+                                    /** @constant */
+                                    type: "time";
                                 };
                                 number: number;
                             } | null;
@@ -12500,7 +12500,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -12607,7 +12607,7 @@ export interface operations {
                             createdAt: string;
                             expiresAt: string | null;
                             failureAction: ("notify" | "pause" | "revoke") | null;
-                            failureMinSample: number | null;
+                            failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
@@ -12667,7 +12667,7 @@ export interface operations {
                                 createdAt: string;
                                 expiresAt: string | null;
                                 failureAction: ("notify" | "pause" | "revoke") | null;
-                                failureMinSample: number | null;
+                                failureMinimumUpdateCount: number | null;
                                 failureThresholdPercent: number | null;
                                 /** Format: uuid */
                                 id: string;
@@ -12696,7 +12696,7 @@ export interface operations {
                                 /** @constant */
                                 type: "device";
                             } | {
-                                hash: string;
+                                fingerprint: string;
                                 /** @constant */
                                 type: "fingerprint";
                             } | {
@@ -12718,7 +12718,7 @@ export interface operations {
                             createdFromReleaseId: string | null;
                             deviceCount: number;
                             failureAction: ("notify" | "pause" | "revoke") | null;
-                            failureMinSample: number | null;
+                            failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
@@ -12728,21 +12728,21 @@ export interface operations {
                             number: number;
                             pausedAt: string | null;
                             progression: {
-                                minimumSample: number;
-                                minimumSeconds: number;
                                 percentages: number[];
+                                stepMinimumSeconds: number;
+                                stepMinimumUpdateCount: number;
                             } | null;
                             progressionStep: {
                                 gate: {
                                     attemptedUpdateCount: number;
+                                    requiredUpdateCount: number;
                                     /** @constant */
-                                    kind: "sample";
-                                    required: number;
+                                    type: "sample";
                                 } | {
-                                    /** @constant */
-                                    kind: "time";
                                     /** Format: date-time */
                                     readyAt: string;
+                                    /** @constant */
+                                    type: "time";
                                 };
                                 number: number;
                             } | null;
@@ -13051,7 +13051,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -13777,7 +13777,7 @@ export interface operations {
                             createdAt: string;
                             expiresAt: string | null;
                             failureAction: ("notify" | "pause" | "revoke") | null;
-                            failureMinSample: number | null;
+                            failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
@@ -13806,7 +13806,7 @@ export interface operations {
                             /** @constant */
                             type: "device";
                         } | {
-                            hash: string;
+                            fingerprint: string;
                             /** @constant */
                             type: "fingerprint";
                         } | {
@@ -13828,7 +13828,7 @@ export interface operations {
                         createdFromReleaseId: string | null;
                         deviceCount: number;
                         failureAction: ("notify" | "pause" | "revoke") | null;
-                        failureMinSample: number | null;
+                        failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -13838,21 +13838,21 @@ export interface operations {
                         number: number;
                         pausedAt: string | null;
                         progression: {
-                            minimumSample: number;
-                            minimumSeconds: number;
                             percentages: number[];
+                            stepMinimumSeconds: number;
+                            stepMinimumUpdateCount: number;
                         } | null;
                         progressionStep: {
                             gate: {
                                 attemptedUpdateCount: number;
+                                requiredUpdateCount: number;
                                 /** @constant */
-                                kind: "sample";
-                                required: number;
+                                type: "sample";
                             } | {
-                                /** @constant */
-                                kind: "time";
                                 /** Format: date-time */
                                 readyAt: string;
+                                /** @constant */
+                                type: "time";
                             };
                             number: number;
                         } | null;
@@ -13957,7 +13957,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -14090,7 +14090,7 @@ export interface operations {
                             createdAt: string;
                             expiresAt: string | null;
                             failureAction: ("notify" | "pause" | "revoke") | null;
-                            failureMinSample: number | null;
+                            failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
@@ -14119,7 +14119,7 @@ export interface operations {
                             /** @constant */
                             type: "device";
                         } | {
-                            hash: string;
+                            fingerprint: string;
                             /** @constant */
                             type: "fingerprint";
                         } | {
@@ -14141,7 +14141,7 @@ export interface operations {
                         createdFromReleaseId: string | null;
                         deviceCount: number;
                         failureAction: ("notify" | "pause" | "revoke") | null;
-                        failureMinSample: number | null;
+                        failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -14151,21 +14151,21 @@ export interface operations {
                         number: number;
                         pausedAt: string | null;
                         progression: {
-                            minimumSample: number;
-                            minimumSeconds: number;
                             percentages: number[];
+                            stepMinimumSeconds: number;
+                            stepMinimumUpdateCount: number;
                         } | null;
                         progressionStep: {
                             gate: {
                                 attemptedUpdateCount: number;
+                                requiredUpdateCount: number;
                                 /** @constant */
-                                kind: "sample";
-                                required: number;
+                                type: "sample";
                             } | {
-                                /** @constant */
-                                kind: "time";
                                 /** Format: date-time */
                                 readyAt: string;
+                                /** @constant */
+                                type: "time";
                             };
                             number: number;
                         } | null;
@@ -14261,14 +14261,14 @@ export interface operations {
             content: {
                 "application/json": {
                     failureAction?: ("notify" | "pause" | "revoke") | null;
-                    failureMinSample?: number | null;
+                    failureMinimumUpdateCount?: number | null;
                     failureThresholdPercent?: number | null;
                     isMandatory?: boolean;
                     notes?: string | null;
                     progression?: {
-                        minimumSample: number;
-                        minimumSeconds: number;
                         percentages: number[];
+                        stepMinimumSeconds: number;
+                        stepMinimumUpdateCount: number;
                     } | null;
                     rolloutPercentage?: number;
                 };
@@ -14322,7 +14322,7 @@ export interface operations {
                             createdAt: string;
                             expiresAt: string | null;
                             failureAction: ("notify" | "pause" | "revoke") | null;
-                            failureMinSample: number | null;
+                            failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
@@ -14351,7 +14351,7 @@ export interface operations {
                             /** @constant */
                             type: "device";
                         } | {
-                            hash: string;
+                            fingerprint: string;
                             /** @constant */
                             type: "fingerprint";
                         } | {
@@ -14373,7 +14373,7 @@ export interface operations {
                         createdFromReleaseId: string | null;
                         deviceCount: number;
                         failureAction: ("notify" | "pause" | "revoke") | null;
-                        failureMinSample: number | null;
+                        failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -14383,21 +14383,21 @@ export interface operations {
                         number: number;
                         pausedAt: string | null;
                         progression: {
-                            minimumSample: number;
-                            minimumSeconds: number;
                             percentages: number[];
+                            stepMinimumSeconds: number;
+                            stepMinimumUpdateCount: number;
                         } | null;
                         progressionStep: {
                             gate: {
                                 attemptedUpdateCount: number;
+                                requiredUpdateCount: number;
                                 /** @constant */
-                                kind: "sample";
-                                required: number;
+                                type: "sample";
                             } | {
-                                /** @constant */
-                                kind: "time";
                                 /** Format: date-time */
                                 readyAt: string;
+                                /** @constant */
+                                type: "time";
                             };
                             number: number;
                         } | null;
@@ -14508,16 +14508,16 @@ export interface operations {
                 content: {
                     "application/json": {
                         byBinaryVersion: {
-                            count: number;
+                            deviceCount: number;
                             value: string | null;
                         }[];
                         byPlatform: {
-                            count: number;
+                            deviceCount: number;
                             value: string | null;
                         }[];
-                        estimatedAtRollout: number;
-                        reached: number;
-                        total: number;
+                        deviceCount: number;
+                        estimatedDeviceCount: number;
+                        reachedDeviceCount: number;
                         warnings: {
                             /** @enum {string} */
                             code: "FINGERPRINT_UNKNOWN" | "UNSUPPORTED_CONDITION_SHARE";
@@ -14656,7 +14656,7 @@ export interface operations {
                             createdAt: string;
                             expiresAt: string | null;
                             failureAction: ("notify" | "pause" | "revoke") | null;
-                            failureMinSample: number | null;
+                            failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
@@ -14685,7 +14685,7 @@ export interface operations {
                             /** @constant */
                             type: "device";
                         } | {
-                            hash: string;
+                            fingerprint: string;
                             /** @constant */
                             type: "fingerprint";
                         } | {
@@ -14707,7 +14707,7 @@ export interface operations {
                         createdFromReleaseId: string | null;
                         deviceCount: number;
                         failureAction: ("notify" | "pause" | "revoke") | null;
-                        failureMinSample: number | null;
+                        failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -14717,21 +14717,21 @@ export interface operations {
                         number: number;
                         pausedAt: string | null;
                         progression: {
-                            minimumSample: number;
-                            minimumSeconds: number;
                             percentages: number[];
+                            stepMinimumSeconds: number;
+                            stepMinimumUpdateCount: number;
                         } | null;
                         progressionStep: {
                             gate: {
                                 attemptedUpdateCount: number;
+                                requiredUpdateCount: number;
                                 /** @constant */
-                                kind: "sample";
-                                required: number;
+                                type: "sample";
                             } | {
-                                /** @constant */
-                                kind: "time";
                                 /** Format: date-time */
                                 readyAt: string;
+                                /** @constant */
+                                type: "time";
                             };
                             number: number;
                         } | null;
@@ -14881,7 +14881,7 @@ export interface operations {
                             createdAt: string;
                             expiresAt: string | null;
                             failureAction: ("notify" | "pause" | "revoke") | null;
-                            failureMinSample: number | null;
+                            failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
@@ -14910,7 +14910,7 @@ export interface operations {
                             /** @constant */
                             type: "device";
                         } | {
-                            hash: string;
+                            fingerprint: string;
                             /** @constant */
                             type: "fingerprint";
                         } | {
@@ -14932,7 +14932,7 @@ export interface operations {
                         createdFromReleaseId: string | null;
                         deviceCount: number;
                         failureAction: ("notify" | "pause" | "revoke") | null;
-                        failureMinSample: number | null;
+                        failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -14942,21 +14942,21 @@ export interface operations {
                         number: number;
                         pausedAt: string | null;
                         progression: {
-                            minimumSample: number;
-                            minimumSeconds: number;
                             percentages: number[];
+                            stepMinimumSeconds: number;
+                            stepMinimumUpdateCount: number;
                         } | null;
                         progressionStep: {
                             gate: {
                                 attemptedUpdateCount: number;
+                                requiredUpdateCount: number;
                                 /** @constant */
-                                kind: "sample";
-                                required: number;
+                                type: "sample";
                             } | {
-                                /** @constant */
-                                kind: "time";
                                 /** Format: date-time */
                                 readyAt: string;
+                                /** @constant */
+                                type: "time";
                             };
                             number: number;
                         } | null;
@@ -15106,7 +15106,7 @@ export interface operations {
                             createdAt: string;
                             expiresAt: string | null;
                             failureAction: ("notify" | "pause" | "revoke") | null;
-                            failureMinSample: number | null;
+                            failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
@@ -15135,7 +15135,7 @@ export interface operations {
                             /** @constant */
                             type: "device";
                         } | {
-                            hash: string;
+                            fingerprint: string;
                             /** @constant */
                             type: "fingerprint";
                         } | {
@@ -15157,7 +15157,7 @@ export interface operations {
                         createdFromReleaseId: string | null;
                         deviceCount: number;
                         failureAction: ("notify" | "pause" | "revoke") | null;
-                        failureMinSample: number | null;
+                        failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -15167,21 +15167,21 @@ export interface operations {
                         number: number;
                         pausedAt: string | null;
                         progression: {
-                            minimumSample: number;
-                            minimumSeconds: number;
                             percentages: number[];
+                            stepMinimumSeconds: number;
+                            stepMinimumUpdateCount: number;
                         } | null;
                         progressionStep: {
                             gate: {
                                 attemptedUpdateCount: number;
+                                requiredUpdateCount: number;
                                 /** @constant */
-                                kind: "sample";
-                                required: number;
+                                type: "sample";
                             } | {
-                                /** @constant */
-                                kind: "time";
                                 /** Format: date-time */
                                 readyAt: string;
+                                /** @constant */
+                                type: "time";
                             };
                             number: number;
                         } | null;
@@ -15517,7 +15517,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        total: number;
+                        count: number;
                     };
                 };
             };
@@ -15697,31 +15697,31 @@ export interface operations {
                 content: {
                     "application/json": {
                         binaryVersion: {
-                            count: number;
+                            deviceCount: number;
                             value: string | null;
                         }[];
                         country: {
-                            count: number;
+                            deviceCount: number;
                             value: string | null;
                         }[];
                         osVersion: {
-                            count: number;
+                            deviceCount: number;
                             value: string | null;
                             /** @enum {string} */
                             platform: "android" | "ios";
                         }[];
                         platform: {
-                            count: number;
+                            deviceCount: number;
                             value: string | null;
                         }[];
                         release: {
-                            count: number;
+                            deviceCount: number;
                             value: string | null;
                             channelId: string | null;
                             number: number | null;
                         }[];
                         sdkVersion: {
-                            count: number;
+                            deviceCount: number;
                             value: string | null;
                         }[];
                     };
@@ -15827,7 +15827,7 @@ export interface operations {
                             rolledBackUpdateCount: number;
                         }[];
                         failureReasons: {
-                            count: number;
+                            eventCount: number;
                             reason: string;
                         }[];
                         releases: {
@@ -15849,7 +15849,7 @@ export interface operations {
                             };
                         }[];
                         skippedReasons: {
-                            count: number;
+                            eventCount: number;
                             reason: string;
                         }[];
                     };

@@ -16,13 +16,13 @@ afterEach(() => {
 
 describe('SigningKeysResource', () => {
   test('should count the signing keys of the app', async () => {
-    const fetchMock = stubFetch(() => Response.json({ total: 1 }));
+    const fetchMock = stubFetch(() => Response.json({ count: 1 }));
 
     const fetchedCount = await new HotCodePush().apps.signingKeys.count({
       appId: 'app',
     });
 
-    expect(fetchedCount).toEqual({ total: 1 });
+    expect(fetchedCount).toEqual({ count: 1 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${SIGNING_KEYS_URL}/count`,

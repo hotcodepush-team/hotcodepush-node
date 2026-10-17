@@ -12,11 +12,11 @@ afterEach(() => {
 
 describe('OrganizationsResource', () => {
   test("should count the caller's organizations", async () => {
-    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+    const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount = await new HotCodePush().organizations.count();
 
-    expect(fetchedCount).toEqual({ total: 3 });
+    expect(fetchedCount).toEqual({ count: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${BASE_URL}/v1/organizations/count`,

@@ -13,14 +13,14 @@ afterEach(() => {
 
 describe('OrganizationAppsResource', () => {
   test('should count the apps of the organization under the query', async () => {
-    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+    const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount = await new HotCodePush().organizations.apps.count({
       organizationId: 'organization',
       query: 'demo',
     });
 
-    expect(fetchedCount).toEqual({ total: 3 });
+    expect(fetchedCount).toEqual({ count: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${APPS_URL}/count?query=demo`,

@@ -216,7 +216,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       device: [DEVICE_ID],
       fingerprint: [`fp1:${SHA256}`],
       os: ['>=17'],
-      rollout: 10,
+      rolloutPercentage: 10,
     }),
   'apps.channels.count': hotCodePush =>
     hotCodePush.apps.channels.count({ appId: APP_ID, query: 'stag' }),
@@ -266,14 +266,14 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       channelId: CHANNEL_ID,
       conditions: [{ range: '>=2.0.0', type: 'binary' }],
       failureAction: 'pause',
-      failureMinSample: 20,
+      failureMinimumUpdateCount: 20,
       failureThresholdPercent: 10,
       idempotencyKey: 'key',
       isMandatory: true,
       progression: {
-        minimumSample: 100,
-        minimumSeconds: 3600,
         percentages: [25, 50],
+        stepMinimumSeconds: 3600,
+        stepMinimumUpdateCount: 100,
       },
       rolloutPercentage: 10,
     }),
@@ -434,9 +434,9 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.apps.releases.update({
       appId: APP_ID,
       progression: {
-        minimumSample: 100,
-        minimumSeconds: 3600,
         percentages: [75, 100],
+        stepMinimumSeconds: 3600,
+        stepMinimumUpdateCount: 100,
       },
       releaseId: RELEASE_ID,
       rolloutPercentage: 50,

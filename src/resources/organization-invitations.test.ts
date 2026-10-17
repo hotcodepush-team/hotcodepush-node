@@ -13,7 +13,7 @@ afterEach(() => {
 
 describe('OrganizationInvitationsResource', () => {
   test('should count the pending invitations of the organization', async () => {
-    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+    const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount =
       await new HotCodePush().organizations.invitations.count({
@@ -21,7 +21,7 @@ describe('OrganizationInvitationsResource', () => {
         status: 'pending',
       });
 
-    expect(fetchedCount).toEqual({ total: 3 });
+    expect(fetchedCount).toEqual({ count: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${INVITATIONS_URL}/count?status=pending`,

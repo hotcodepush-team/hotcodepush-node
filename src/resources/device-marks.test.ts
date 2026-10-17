@@ -13,7 +13,7 @@ afterEach(() => {
 
 describe('DeviceMarksResource', () => {
   test("should count the device's marks of the release", async () => {
-    const fetchMock = stubFetch(() => Response.json({ total: 2 }));
+    const fetchMock = stubFetch(() => Response.json({ count: 2 }));
 
     const fetchedCount = await new HotCodePush().apps.devices.marks.count({
       appId: 'app',
@@ -21,7 +21,7 @@ describe('DeviceMarksResource', () => {
       releaseId: 'release',
     });
 
-    expect(fetchedCount).toEqual({ total: 2 });
+    expect(fetchedCount).toEqual({ count: 2 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${MARKS_URL}/count?releaseId=release`,

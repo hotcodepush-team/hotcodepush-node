@@ -3,7 +3,9 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { HotCodePush } from '../client';
 import { resolveSentRequest, stubFetch } from '../test-helpers';
 
-const FLEET_STATISTICS = { binaryVersions: [{ count: 3, value: '2.4.1' }] };
+const FLEET_STATISTICS = {
+  binaryVersions: [{ deviceCount: 3, value: '2.4.1' }],
+};
 
 afterEach(() => {
   vi.unstubAllGlobals();

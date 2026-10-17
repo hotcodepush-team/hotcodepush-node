@@ -12,14 +12,14 @@ afterEach(() => {
 
 describe('UsageResource', () => {
   test('should count the apps with usage in the month', async () => {
-    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+    const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount = await new HotCodePush().organizations.usage.countApps({
       month: '2026-09',
       organizationId: 'organization',
     });
 
-    expect(fetchedCount).toEqual({ total: 3 });
+    expect(fetchedCount).toEqual({ count: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${USAGE_URL}/apps/count?month=2026-09`,

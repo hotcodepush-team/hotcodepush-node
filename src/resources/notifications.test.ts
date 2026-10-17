@@ -16,13 +16,13 @@ afterEach(() => {
 
 describe('NotificationsResource', () => {
   test("should count the caller's unread notifications", async () => {
-    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+    const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount = await new HotCodePush().notifications.count({
       isRead: 'false',
     });
 
-    expect(fetchedCount).toEqual({ total: 3 });
+    expect(fetchedCount).toEqual({ count: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${NOTIFICATIONS_URL}/count?isRead=false`,

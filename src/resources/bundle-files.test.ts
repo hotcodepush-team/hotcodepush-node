@@ -13,14 +13,14 @@ afterEach(() => {
 
 describe('BundleFilesResource', () => {
   test('should count the files of the bundle', async () => {
-    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+    const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount = await new HotCodePush().apps.bundles.files.count({
       appId: 'app',
       bundleId: 'bundle',
     });
 
-    expect(fetchedCount).toEqual({ total: 3 });
+    expect(fetchedCount).toEqual({ count: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${FILES_URL}/count`,

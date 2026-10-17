@@ -17,14 +17,14 @@ afterEach(() => {
 
 describe('ChannelReleasesResource', () => {
   test("should count the channel's release log", async () => {
-    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+    const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount = await new HotCodePush().apps.channels.releases.count({
       appId: 'app',
       channelId: 'channel',
     });
 
-    expect(fetchedCount).toEqual({ total: 3 });
+    expect(fetchedCount).toEqual({ count: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${RELEASES_URL}/count`,
@@ -62,7 +62,7 @@ describe('ChannelReleasesResource', () => {
         appId: 'app',
         channelId: 'channel',
         failureAction: 'revoke',
-        failureMinSample: 20,
+        failureMinimumUpdateCount: 20,
         failureThresholdPercent: 10,
         fromChannelId: 'source',
         idempotencyKey: 'key',
@@ -72,7 +72,7 @@ describe('ChannelReleasesResource', () => {
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       body: {
         failureAction: 'revoke',
-        failureMinSample: 20,
+        failureMinimumUpdateCount: 20,
         failureThresholdPercent: 10,
         fromChannelId: 'source',
       },

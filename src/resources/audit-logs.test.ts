@@ -13,14 +13,14 @@ afterEach(() => {
 
 describe('AuditLogsResource', () => {
   test('should count the rows of the audit log under the filters', async () => {
-    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+    const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount = await new HotCodePush().organizations.auditLogs.count({
       organizationId: 'organization',
       type: 'channel.*',
     });
 
-    expect(fetchedCount).toEqual({ total: 3 });
+    expect(fetchedCount).toEqual({ count: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${AUDIT_LOGS_URL}/count?type=channel.*`,

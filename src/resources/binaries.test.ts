@@ -14,7 +14,7 @@ afterEach(() => {
 
 describe('BinariesResource', () => {
   test('should count the binaries of the app filtered by platform and fingerprint', async () => {
-    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+    const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount = await new HotCodePush().apps.binaries.count({
       appId: 'app',
@@ -22,7 +22,7 @@ describe('BinariesResource', () => {
       platform: 'ios',
     });
 
-    expect(fetchedCount).toEqual({ total: 3 });
+    expect(fetchedCount).toEqual({ count: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${BINARIES_URL}/count?fingerprint=${encodeURIComponent(FINGERPRINT)}&platform=ios`,

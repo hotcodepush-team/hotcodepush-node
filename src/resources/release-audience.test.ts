@@ -4,9 +4,9 @@ import { HotCodePush } from '../client';
 import { resolveSentRequest, stubFetch } from '../test-helpers';
 
 const AUDIENCE = {
-  estimatedAtRollout: 5,
-  reached: 10,
-  total: 20,
+  deviceCount: 20,
+  estimatedDeviceCount: 5,
+  reachedDeviceCount: 10,
   warnings: [],
 };
 

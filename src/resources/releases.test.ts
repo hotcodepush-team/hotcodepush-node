@@ -16,7 +16,7 @@ afterEach(() => {
 
 describe('ReleasesResource', () => {
   test('should count the releases of the app filtered by channel and state', async () => {
-    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+    const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount = await new HotCodePush().apps.releases.count({
       appId: 'app',
@@ -24,7 +24,7 @@ describe('ReleasesResource', () => {
       state: 'paused',
     });
 
-    expect(fetchedCount).toEqual({ total: 3 });
+    expect(fetchedCount).toEqual({ count: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${RELEASES_URL}/count?channelId=channel&state=paused`,

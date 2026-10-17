@@ -16,14 +16,14 @@ afterEach(() => {
 
 describe('ChannelsResource', () => {
   test('should count the channels of the app under the query', async () => {
-    const fetchMock = stubFetch(() => Response.json({ total: 3 }));
+    const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount = await new HotCodePush().apps.channels.count({
       appId: 'app',
       query: 'stag',
     });
 
-    expect(fetchedCount).toEqual({ total: 3 });
+    expect(fetchedCount).toEqual({ count: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${CHANNELS_URL}/count?query=stag`,

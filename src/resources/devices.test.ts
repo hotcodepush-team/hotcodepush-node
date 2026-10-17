@@ -12,7 +12,7 @@ afterEach(() => {
 
 describe('DevicesResource', () => {
   test('should count the devices under the filters', async () => {
-    const fetchMock = stubFetch(() => Response.json({ total: 7 }));
+    const fetchMock = stubFetch(() => Response.json({ count: 7 }));
 
     const fetchedCount = await new HotCodePush().apps.devices.count({
       appId: 'app',
@@ -20,7 +20,7 @@ describe('DevicesResource', () => {
       platform: 'ios',
     });
 
-    expect(fetchedCount).toEqual({ total: 7 });
+    expect(fetchedCount).toEqual({ count: 7 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${DEVICES_URL}/count?binaryVersion=2.4.1&platform=ios`,

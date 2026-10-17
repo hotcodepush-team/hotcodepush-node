@@ -13,7 +13,7 @@ export type GetUsageStatisticsOptions = PathParameters<
   QueryParameters<'/v1/apps/{appId}/statistics/usage', 'get'>;
 
 /**
- * The monthly active devices per month the period touches and the checks and bytes per day.
+ * The monthly active devices and data transfer per month the period touches and the checks, data transfer and device downloads per day.
  */
 export type UsageStatistics = JsonResponseBody<
   '/v1/apps/{appId}/statistics/usage',

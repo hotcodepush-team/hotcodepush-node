@@ -6,11 +6,11 @@ import { resolveSentRequest, stubFetch } from '../test-helpers';
 const UPDATE_STATISTICS = {
   days: [
     {
-      activeDevices: 40,
-      applied: 9,
+      activeDeviceCount: 40,
+      appliedUpdateCount: 9,
       day: '2026-09-01',
-      failed: 1,
-      rolledBack: 0,
+      failureCount: 1,
+      rolledBackUpdateCount: 0,
     },
   ],
   failureReasons: [],

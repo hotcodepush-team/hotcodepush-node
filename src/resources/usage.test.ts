@@ -29,9 +29,12 @@ describe('UsageResource', () => {
   test("should download the apps' usage in the month as csv", async () => {
     const fetchMock = stubFetch(
       () =>
-        new Response('"appId","appName","mau","bytes"\n', {
-          headers: { 'Content-Type': 'text/csv; charset=utf-8' },
-        }),
+        new Response(
+          '"month","appId","appName","monthlyActiveDeviceCount","dataTransferBytes"\r\n',
+          {
+            headers: { 'Content-Type': 'text/csv; charset=utf-8' },
+          },
+        ),
     );
 
     const downloadedCsv =
@@ -41,7 +44,7 @@ describe('UsageResource', () => {
       });
 
     expect(await downloadedCsv.text()).toBe(
-      '"appId","appName","mau","bytes"\n',
+      '"month","appId","appName","monthlyActiveDeviceCount","dataTransferBytes"\r\n',
     );
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
@@ -50,7 +53,11 @@ describe('UsageResource', () => {
   });
 
   test("should get the organization's usage in the month", async () => {
-    const usage = { bytes: 2048, mau: 12, month: '2026-09' };
+    const usage = {
+      dataTransferBytes: 2048,
+      month: '2026-09',
+      monthlyActiveDeviceCount: 12,
+    };
     const fetchMock = stubFetch(() => Response.json(usage));
 
     const fetchedUsage = await new HotCodePush().organizations.usage.get({
@@ -69,9 +76,9 @@ describe('UsageResource', () => {
     const appUsageMonth = {
       app: { id: 'app', name: 'Demo' },
       appId: 'app',
-      bytes: 2048,
-      mau: 12,
+      dataTransferBytes: 2048,
       month: '2026-09',
+      monthlyActiveDeviceCount: 12,
     };
     const fetchMock = stubFetch(() => Response.json([appUsageMonth]));
 

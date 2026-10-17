@@ -167,7 +167,7 @@ export interface paths {
         put?: never;
         /**
          * Create an app
-         * @description Creates an app with its default channel `production`; the name is unique among the organization's live apps and the count against `apps_limit`.
+         * @description Creates an app with its default channel `production`; the name is unique among the organization's live apps and the count against `app_count_limit`.
          */
         post: operations["postV1OrganizationsByOrganizationIdApps"];
         delete?: never;
@@ -245,7 +245,7 @@ export interface paths {
         };
         /**
          * Get the billing
-         * @description The organization's billing this month: the plan and its subscription mirror, the spending cap, the MAU counted so far against the ceiling the plan sets, when the cap was reached if it was, and on Free the cap the last thirty days' active devices suggest. Owner, Admin and Billing.
+         * @description The organization's billing this month, the numbers derived from its devices: `monthlyActiveDeviceCount`, the devices the month counts so far, and on Free `suggestedSpendingCapCents`, the cap the last thirty days' active devices suggest. The plan, the spending cap, `cappedAt` and the subscription mirror are the organization's, which `GET /v1/organizations/{organizationId}` answers. Owner, Admin and Billing.
          */
         get: operations["getV1OrganizationsByOrganizationIdBilling"];
         put?: never;
@@ -255,7 +255,7 @@ export interface paths {
         head?: never;
         /**
          * Update the spending cap
-         * @description Sets the spending cap, in whole dollars from $5 to $10,000, applying now: a raise counts the devices waiting beyond the previous cap in the order they reported, a cap below the MAU the month counted stops counting further devices while the counted ones stay billed. Mails Owner and Billing and the caller. Owner, Admin and Billing, on a paying plan.
+         * @description Sets the spending cap, in whole dollars from $5 to $10,000, applying now: a raise counts the devices waiting beyond the previous cap in the order they reported, a cap below the MAU the month counted stops counting further devices while the counted ones stay billed. Mails Owner and Billing and the caller. Answers the billing read; the organization read answers the new `spendingCapCents` and `cappedAt`. Owner, Admin and Billing, on a paying plan.
          */
         patch: operations["patchV1OrganizationsByOrganizationIdBilling"];
         trace?: never;
@@ -377,7 +377,7 @@ export interface paths {
         };
         /**
          * Get the limits
-         * @description Every limit of the registry in effect for the organization, keyed by name: its value, the plan's default, and whether a row of ours overrides the default; read-only, since raising one is a row of ours. `tokensLimit` counts one user's tokens and is every user's ceiling, never overridden. Admin or Owner.
+         * @description Every limit of the registry in effect for the organization, keyed by name: its value, the plan's default, and whether a row of ours overrides the default; read-only, since raising one is a row of ours. `tokenCountLimit` counts one user's tokens and is every user's ceiling, never overridden. Admin or Owner.
          */
         get: operations["getV1OrganizationsByOrganizationIdLimits"];
         put?: never;
@@ -557,7 +557,7 @@ export interface paths {
         };
         /**
          * Get the usage
-         * @description The organization's usage in `month`, `YYYY-MM`, the current one by default: `mau` and `bytes` summed over the rows `GET …/usage/apps` lists, read from the stored months and never counted in the request. Any role of the organization, Billing included.
+         * @description The organization's usage in `month`, `YYYY-MM`, the current one by default: `monthlyActiveDeviceCount` and `dataTransferBytes` summed over the rows `GET …/usage/apps` lists, read from the stored months and never counted in the request. Any role of the organization, Billing included.
          */
         get: operations["getV1OrganizationsByOrganizationIdUsage"];
         put?: never;
@@ -577,7 +577,7 @@ export interface paths {
         };
         /**
          * List the usage per app
-         * @description The usage per app in `month`, `YYYY-MM`, the current one by default: the stored month of each of the organization's live apps that has one — `mau`, the counted devices, kept live, and `bytes`, the files host's, approximate by design, the open month's a day behind. Ordered by `mau`, the most first, then `appId`: the list's one exception to newest first. `?relations=app` embeds each row's app, `{ id, name }`. `?format=csv` answers every row of the month as `text/csv` with the app's name, unpaginated, in `appId` order. Any role of the organization, Billing included.
+         * @description The usage per app in `month`, `YYYY-MM`, the current one by default: the stored month of each of the organization's live apps that has one — `monthlyActiveDeviceCount`, the counted devices, kept live, and `dataTransferBytes`, the files host's, approximate by design, the open month's a day behind. Ordered by `monthlyActiveDeviceCount`, the most first, then `appId`: the list's one exception to newest first. `?relations=app` embeds each row's app, `{ id, name }`. `?format=csv` answers every row of the month as `text/csv` with the app's name, unpaginated, in `appId` order. Any role of the organization, Billing included.
          */
         get: operations["getV1OrganizationsByOrganizationIdUsageApps"];
         put?: never;
@@ -661,7 +661,7 @@ export interface paths {
         };
         /**
          * Get an organization
-         * @description The organization with its plan and `storageBytes`, the counter behind its storage limit; any role of it.
+         * @description The organization, its row: the plan, `storageBytes`, the counter behind its storage limit, and the subscription mirror — `subscriptionStatus`, `subscriptionProvider`, `cancelAtPeriodEnd`, `currentPeriodEndsAt`, `pastDueAt`, `spendingCapCents`, `cappedAt` and `enterpriseMonthlyActiveDeviceCountLimit` — from which a client derives the month's device ceiling; any role of it.
          */
         get: operations["getV1OrganizationsByOrganizationId"];
         put?: never;
@@ -1147,7 +1147,7 @@ export interface paths {
         put?: never;
         /**
          * Create a channel
-         * @description Creates a channel: the name is one to 64 letters, digits, hyphens or underscores and unique per app; only Owners and Admins protect one; an expiry never sits on a protected channel; the count is bounded by `channels_per_app_limit`.
+         * @description Creates a channel: the name is one to 64 letters, digits, hyphens or underscores and unique per app; only Owners and Admins protect one; an expiry never sits on a protected channel; the count is bounded by `channel_count_per_app_limit`.
          */
         post: operations["postV1AppsByAppIdChannels"];
         /**
@@ -1283,7 +1283,7 @@ export interface paths {
         put?: never;
         /**
          * Create a release
-         * @description Creates a release in the channel of a ready bundle, `bundleId`, or of what another channel's newest active release serves, `fromChannelId`, recorded as the provenance, with its conditions, rollout, mandatory flag, notes, the nullable auto-pause overrides and the nullable progression schedule, whose last percentage lies above the rollout, numbered next in the channel; refused on a protected channel below Admin, past `releases_per_app_per_day_limit` and, once the app has a signing key, for an unsigned bundle; an `Idempotency-Key` answers the same release again for 24 hours. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type the release uses.
+         * @description Creates a release in the channel of a ready bundle, `bundleId`, or of what another channel's newest active release serves, `fromChannelId`, recorded as the provenance, with its conditions, rollout, mandatory flag, notes, the nullable auto-pause overrides and the nullable progression schedule, whose last percentage lies above the rollout, numbered next in the channel; refused on a protected channel below Admin, past `release_count_per_app_per_day_limit` and, once the app has a signing key, for an unsigned bundle; an `Idempotency-Key` answers the same release again for 24 hours. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type the release uses.
          */
         post: operations["postV1AppsByAppIdChannelsByChannelIdReleases"];
         delete?: never;
@@ -1887,7 +1887,7 @@ export interface paths {
         put?: never;
         /**
          * Transfer an app
-         * @description Moves the app to another organization the caller is an Admin of, in one transaction, with the target's security settings, `apps_limit` and storage limit checked; audited in both organizations.
+         * @description Moves the app to another organization the caller is an Admin of, in one transaction, with the target's security settings, `app_count_limit` and storage limit checked; audited in both organizations.
          */
         post: operations["postV1AppsByAppIdTransfer"];
         delete?: never;
@@ -3526,16 +3526,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        cancelAtPeriodEnd: boolean;
-                        cappedAt: string | null;
-                        countedMau: number;
-                        currentPeriodEndsAt: string | null;
-                        mauCap: number | null;
-                        /** @enum {string} */
-                        plan: "enterprise" | "free" | "pay_as_you_go";
-                        spendingCapCents: number;
-                        subscriptionProvider: "polar" | null;
-                        subscriptionStatus: string | null;
+                        monthlyActiveDeviceCount: number;
                         suggestedSpendingCapCents: number | null;
                     };
                 };
@@ -3632,16 +3623,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        cancelAtPeriodEnd: boolean;
-                        cappedAt: string | null;
-                        countedMau: number;
-                        currentPeriodEndsAt: string | null;
-                        mauCap: number | null;
-                        /** @enum {string} */
-                        plan: "enterprise" | "free" | "pay_as_you_go";
-                        spendingCapCents: number;
-                        subscriptionProvider: "polar" | null;
-                        subscriptionStatus: string | null;
+                        monthlyActiveDeviceCount: number;
                         suggestedSpendingCapCents: number | null;
                     };
                 };
@@ -5903,9 +5885,9 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        bytes: number;
-                        mau: number;
+                        dataTransferBytes: number;
                         month: string;
+                        monthlyActiveDeviceCount: number;
                     };
                 };
             };
@@ -6008,9 +5990,9 @@ export interface operations {
                         };
                         /** Format: uuid */
                         appId: string;
-                        bytes: number;
-                        mau: number;
+                        dataTransferBytes: number;
                         month: string;
+                        monthlyActiveDeviceCount: number;
                     }[];
                     "text/csv": string;
                 };
@@ -6194,20 +6176,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        cancelAtPeriodEnd: boolean;
+                        cappedAt: string | null;
                         countryAllowlist: string[] | null;
                         /** Format: date-time */
                         createdAt: string;
+                        currentPeriodEndsAt: string | null;
+                        enterpriseMonthlyActiveDeviceCountLimit: number | null;
                         /** Format: uuid */
                         id: string;
                         ipAllowlist: string[] | null;
                         isTwoFactorRequired: boolean;
                         name: string;
+                        pastDueAt: string | null;
                         /** @enum {string} */
                         plan: "enterprise" | "free" | "pay_as_you_go";
                         region: string;
                         /** @enum {string} */
                         role?: "admin" | "billing" | "member" | "owner";
+                        spendingCapCents: number;
                         storageBytes: number;
+                        subscriptionProvider: "polar" | null;
+                        subscriptionStatus: string | null;
                         /** Format: date-time */
                         updatedAt: string;
                     }[];
@@ -6305,20 +6295,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        cancelAtPeriodEnd: boolean;
+                        cappedAt: string | null;
                         countryAllowlist: string[] | null;
                         /** Format: date-time */
                         createdAt: string;
+                        currentPeriodEndsAt: string | null;
+                        enterpriseMonthlyActiveDeviceCountLimit: number | null;
                         /** Format: uuid */
                         id: string;
                         ipAllowlist: string[] | null;
                         isTwoFactorRequired: boolean;
                         name: string;
+                        pastDueAt: string | null;
                         /** @enum {string} */
                         plan: "enterprise" | "free" | "pay_as_you_go";
                         region: string;
                         /** @enum {string} */
                         role?: "admin" | "billing" | "member" | "owner";
+                        spendingCapCents: number;
                         storageBytes: number;
+                        subscriptionProvider: "polar" | null;
+                        subscriptionStatus: string | null;
                         /** Format: date-time */
                         updatedAt: string;
                     };
@@ -6507,20 +6505,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        cancelAtPeriodEnd: boolean;
+                        cappedAt: string | null;
                         countryAllowlist: string[] | null;
                         /** Format: date-time */
                         createdAt: string;
+                        currentPeriodEndsAt: string | null;
+                        enterpriseMonthlyActiveDeviceCountLimit: number | null;
                         /** Format: uuid */
                         id: string;
                         ipAllowlist: string[] | null;
                         isTwoFactorRequired: boolean;
                         name: string;
+                        pastDueAt: string | null;
                         /** @enum {string} */
                         plan: "enterprise" | "free" | "pay_as_you_go";
                         region: string;
                         /** @enum {string} */
                         role?: "admin" | "billing" | "member" | "owner";
+                        spendingCapCents: number;
                         storageBytes: number;
+                        subscriptionProvider: "polar" | null;
+                        subscriptionStatus: string | null;
                         /** Format: date-time */
                         updatedAt: string;
                     };
@@ -6707,20 +6713,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        cancelAtPeriodEnd: boolean;
+                        cappedAt: string | null;
                         countryAllowlist: string[] | null;
                         /** Format: date-time */
                         createdAt: string;
+                        currentPeriodEndsAt: string | null;
+                        enterpriseMonthlyActiveDeviceCountLimit: number | null;
                         /** Format: uuid */
                         id: string;
                         ipAllowlist: string[] | null;
                         isTwoFactorRequired: boolean;
                         name: string;
+                        pastDueAt: string | null;
                         /** @enum {string} */
                         plan: "enterprise" | "free" | "pay_as_you_go";
                         region: string;
                         /** @enum {string} */
                         role?: "admin" | "billing" | "member" | "owner";
+                        spendingCapCents: number;
                         storageBytes: number;
+                        subscriptionProvider: "polar" | null;
+                        subscriptionStatus: string | null;
                         /** Format: date-time */
                         updatedAt: string;
                     };
@@ -11006,13 +11020,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
-                            applied: number;
-                            attempted: number;
-                            failedCrashed: number;
-                            failedDownload: number;
-                            failedReadyTimeout: number;
-                            failedReported: number;
-                            failedVerification: number;
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -11035,7 +11049,7 @@ export interface operations {
                         } | null;
                         progressionStep: {
                             gate: {
-                                attempted: number;
+                                attemptedUpdateCount: number;
                                 /** @constant */
                                 kind: "sample";
                                 required: number;
@@ -11274,13 +11288,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
-                            applied: number;
-                            attempted: number;
-                            failedCrashed: number;
-                            failedDownload: number;
-                            failedReadyTimeout: number;
-                            failedReported: number;
-                            failedVerification: number;
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -11303,7 +11317,7 @@ export interface operations {
                         } | null;
                         progressionStep: {
                             gate: {
-                                attempted: number;
+                                attemptedUpdateCount: number;
                                 /** @constant */
                                 kind: "sample";
                                 required: number;
@@ -11618,13 +11632,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
-                            applied: number;
-                            attempted: number;
-                            failedCrashed: number;
-                            failedDownload: number;
-                            failedReadyTimeout: number;
-                            failedReported: number;
-                            failedVerification: number;
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -11647,7 +11661,7 @@ export interface operations {
                         } | null;
                         progressionStep: {
                             gate: {
-                                attempted: number;
+                                attemptedUpdateCount: number;
                                 /** @constant */
                                 kind: "sample";
                                 required: number;
@@ -11859,13 +11873,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
-                            applied: number;
-                            attempted: number;
-                            failedCrashed: number;
-                            failedDownload: number;
-                            failedReadyTimeout: number;
-                            failedReported: number;
-                            failedVerification: number;
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -11888,7 +11902,7 @@ export interface operations {
                         } | null;
                         progressionStep: {
                             gate: {
-                                attempted: number;
+                                attemptedUpdateCount: number;
                                 /** @constant */
                                 kind: "sample";
                                 required: number;
@@ -12237,13 +12251,13 @@ export interface operations {
                                 type: "os";
                             })[];
                             counters?: {
-                                applied: number;
-                                attempted: number;
-                                failedCrashed: number;
-                                failedDownload: number;
-                                failedReadyTimeout: number;
-                                failedReported: number;
-                                failedVerification: number;
+                                appliedUpdateCount: number;
+                                attemptedUpdateCount: number;
+                                crashFailureCount: number;
+                                downloadFailureCount: number;
+                                readinessTimeoutFailureCount: number;
+                                reportedFailureCount: number;
+                                verificationFailureCount: number;
                             };
                             /** Format: date-time */
                             createdAt: string;
@@ -12266,7 +12280,7 @@ export interface operations {
                             } | null;
                             progressionStep: {
                                 gate: {
-                                    attempted: number;
+                                    attemptedUpdateCount: number;
                                     /** @constant */
                                     kind: "sample";
                                     required: number;
@@ -12691,13 +12705,13 @@ export interface operations {
                                 type: "os";
                             })[];
                             counters?: {
-                                applied: number;
-                                attempted: number;
-                                failedCrashed: number;
-                                failedDownload: number;
-                                failedReadyTimeout: number;
-                                failedReported: number;
-                                failedVerification: number;
+                                appliedUpdateCount: number;
+                                attemptedUpdateCount: number;
+                                crashFailureCount: number;
+                                downloadFailureCount: number;
+                                readinessTimeoutFailureCount: number;
+                                reportedFailureCount: number;
+                                verificationFailureCount: number;
                             };
                             /** Format: date-time */
                             createdAt: string;
@@ -12720,7 +12734,7 @@ export interface operations {
                             } | null;
                             progressionStep: {
                                 gate: {
-                                    attempted: number;
+                                    attemptedUpdateCount: number;
                                     /** @constant */
                                     kind: "sample";
                                     required: number;
@@ -13801,13 +13815,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
-                            applied: number;
-                            attempted: number;
-                            failedCrashed: number;
-                            failedDownload: number;
-                            failedReadyTimeout: number;
-                            failedReported: number;
-                            failedVerification: number;
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -13830,7 +13844,7 @@ export interface operations {
                         } | null;
                         progressionStep: {
                             gate: {
-                                attempted: number;
+                                attemptedUpdateCount: number;
                                 /** @constant */
                                 kind: "sample";
                                 required: number;
@@ -14114,13 +14128,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
-                            applied: number;
-                            attempted: number;
-                            failedCrashed: number;
-                            failedDownload: number;
-                            failedReadyTimeout: number;
-                            failedReported: number;
-                            failedVerification: number;
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -14143,7 +14157,7 @@ export interface operations {
                         } | null;
                         progressionStep: {
                             gate: {
-                                attempted: number;
+                                attemptedUpdateCount: number;
                                 /** @constant */
                                 kind: "sample";
                                 required: number;
@@ -14346,13 +14360,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
-                            applied: number;
-                            attempted: number;
-                            failedCrashed: number;
-                            failedDownload: number;
-                            failedReadyTimeout: number;
-                            failedReported: number;
-                            failedVerification: number;
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -14375,7 +14389,7 @@ export interface operations {
                         } | null;
                         progressionStep: {
                             gate: {
-                                attempted: number;
+                                attemptedUpdateCount: number;
                                 /** @constant */
                                 kind: "sample";
                                 required: number;
@@ -14680,13 +14694,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
-                            applied: number;
-                            attempted: number;
-                            failedCrashed: number;
-                            failedDownload: number;
-                            failedReadyTimeout: number;
-                            failedReported: number;
-                            failedVerification: number;
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -14709,7 +14723,7 @@ export interface operations {
                         } | null;
                         progressionStep: {
                             gate: {
-                                attempted: number;
+                                attemptedUpdateCount: number;
                                 /** @constant */
                                 kind: "sample";
                                 required: number;
@@ -14905,13 +14919,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
-                            applied: number;
-                            attempted: number;
-                            failedCrashed: number;
-                            failedDownload: number;
-                            failedReadyTimeout: number;
-                            failedReported: number;
-                            failedVerification: number;
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -14934,7 +14948,7 @@ export interface operations {
                         } | null;
                         progressionStep: {
                             gate: {
-                                attempted: number;
+                                attemptedUpdateCount: number;
                                 /** @constant */
                                 kind: "sample";
                                 required: number;
@@ -15130,13 +15144,13 @@ export interface operations {
                             type: "os";
                         })[];
                         counters?: {
-                            applied: number;
-                            attempted: number;
-                            failedCrashed: number;
-                            failedDownload: number;
-                            failedReadyTimeout: number;
-                            failedReported: number;
-                            failedVerification: number;
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
                         };
                         /** Format: date-time */
                         createdAt: string;
@@ -15159,7 +15173,7 @@ export interface operations {
                         } | null;
                         progressionStep: {
                             gate: {
-                                attempted: number;
+                                attemptedUpdateCount: number;
                                 /** @constant */
                                 kind: "sample";
                                 required: number;
@@ -15805,12 +15819,12 @@ export interface operations {
                 content: {
                     "application/json": {
                         days: {
-                            activeDevices: number | null;
-                            applied: number;
+                            activeDeviceCount: number | null;
+                            appliedUpdateCount: number;
                             /** Format: date */
                             day: string;
-                            failed: number;
-                            rolledBack: number;
+                            failureCount: number;
+                            rolledBackUpdateCount: number;
                         }[];
                         failureReasons: {
                             count: number;
@@ -15818,7 +15832,7 @@ export interface operations {
                         }[];
                         releases: {
                             adoption: {
-                                applied: number;
+                                appliedUpdateCount: number;
                                 /** Format: date-time */
                                 at: string;
                             }[];
@@ -15931,17 +15945,17 @@ export interface operations {
                 content: {
                     "application/json": {
                         days: {
-                            bytes: number;
-                            checks: number;
+                            checkCount: number;
+                            dataTransferBytes: number;
                             /** Format: date */
                             day: string;
-                            downloadedBytes: number;
+                            deviceDownloadBytes: number;
                         }[];
                         months: {
-                            bytes: number;
-                            mau: number;
+                            dataTransferBytes: number;
                             /** Format: date */
                             month: string;
+                            monthlyActiveDeviceCount: number;
                         }[];
                     };
                 };

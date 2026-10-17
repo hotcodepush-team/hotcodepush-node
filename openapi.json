@@ -1838,7 +1838,7 @@
       },
       "post": {
         "operationId": "postV1OrganizationsByOrganizationIdApps",
-        "description": "Creates an app with its default channel `production`; the name is unique among the organization's live apps and the count against `apps_limit`.",
+        "description": "Creates an app with its default channel `production`; the name is unique among the organization's live apps and the count against `app_count_limit`.",
         "parameters": [
           {
             "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
@@ -2743,81 +2743,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "cancelAtPeriodEnd": {
-                      "type": "boolean"
-                    },
-                    "cappedAt": {
-                      "anyOf": [
-                        {
-                          "type": "string",
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "countedMau": {
+                    "monthlyActiveDeviceCount": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
-                    },
-                    "currentPeriodEndsAt": {
-                      "anyOf": [
-                        {
-                          "type": "string",
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "mauCap": {
-                      "anyOf": [
-                        {
-                          "type": "integer",
-                          "minimum": 0,
-                          "maximum": 9007199254740991
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "plan": {
-                      "type": "string",
-                      "enum": [
-                        "enterprise",
-                        "free",
-                        "pay_as_you_go"
-                      ]
-                    },
-                    "spendingCapCents": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "maximum": 9007199254740991
-                    },
-                    "subscriptionProvider": {
-                      "anyOf": [
-                        {
-                          "type": "string",
-                          "enum": [
-                            "polar"
-                          ]
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "subscriptionStatus": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
                     },
                     "suggestedSpendingCapCents": {
                       "anyOf": [
@@ -2833,15 +2762,7 @@
                     }
                   },
                   "required": [
-                    "cancelAtPeriodEnd",
-                    "cappedAt",
-                    "countedMau",
-                    "currentPeriodEndsAt",
-                    "mauCap",
-                    "plan",
-                    "spendingCapCents",
-                    "subscriptionProvider",
-                    "subscriptionStatus",
+                    "monthlyActiveDeviceCount",
                     "suggestedSpendingCapCents"
                   ]
                 }
@@ -2920,7 +2841,7 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The organization's billing this month: the plan and its subscription mirror, the spending cap, the MAU counted so far against the ceiling the plan sets, when the cap was reached if it was, and on Free the cap the last thirty days' active devices suggest. Owner, Admin and Billing.",
+        "description": "The organization's billing this month, the numbers derived from its devices: `monthlyActiveDeviceCount`, the devices the month counts so far, and on Free `suggestedSpendingCapCents`, the cap the last thirty days' active devices suggest. The plan, the spending cap, `cappedAt` and the subscription mirror are the organization's, which `GET /v1/organizations/{organizationId}` answers. Owner, Admin and Billing.",
         "summary": "Get the billing",
         "tags": [
           "Billing"
@@ -2954,81 +2875,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "cancelAtPeriodEnd": {
-                      "type": "boolean"
-                    },
-                    "cappedAt": {
-                      "anyOf": [
-                        {
-                          "type": "string",
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "countedMau": {
+                    "monthlyActiveDeviceCount": {
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
-                    },
-                    "currentPeriodEndsAt": {
-                      "anyOf": [
-                        {
-                          "type": "string",
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "mauCap": {
-                      "anyOf": [
-                        {
-                          "type": "integer",
-                          "minimum": 0,
-                          "maximum": 9007199254740991
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "plan": {
-                      "type": "string",
-                      "enum": [
-                        "enterprise",
-                        "free",
-                        "pay_as_you_go"
-                      ]
-                    },
-                    "spendingCapCents": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "maximum": 9007199254740991
-                    },
-                    "subscriptionProvider": {
-                      "anyOf": [
-                        {
-                          "type": "string",
-                          "enum": [
-                            "polar"
-                          ]
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "subscriptionStatus": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
                     },
                     "suggestedSpendingCapCents": {
                       "anyOf": [
@@ -3044,15 +2894,7 @@
                     }
                   },
                   "required": [
-                    "cancelAtPeriodEnd",
-                    "cappedAt",
-                    "countedMau",
-                    "currentPeriodEndsAt",
-                    "mauCap",
-                    "plan",
-                    "spendingCapCents",
-                    "subscriptionProvider",
-                    "subscriptionStatus",
+                    "monthlyActiveDeviceCount",
                     "suggestedSpendingCapCents"
                   ]
                 }
@@ -3141,7 +2983,7 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Sets the spending cap, in whole dollars from $5 to $10,000, applying now: a raise counts the devices waiting beyond the previous cap in the order they reported, a cap below the MAU the month counted stops counting further devices while the counted ones stay billed. Mails Owner and Billing and the caller. Owner, Admin and Billing, on a paying plan.",
+        "description": "Sets the spending cap, in whole dollars from $5 to $10,000, applying now: a raise counts the devices waiting beyond the previous cap in the order they reported, a cap below the MAU the month counted stops counting further devices while the counted ones stay billed. Mails Owner and Billing and the caller. Answers the billing read; the organization read answers the new `spendingCapCents` and `cappedAt`. Owner, Admin and Billing, on a paying plan.",
         "summary": "Update the spending cap",
         "tags": [
           "Billing"
@@ -4341,17 +4183,17 @@
                   "propertyNames": {
                     "type": "string",
                     "enum": [
-                      "appsLimit",
+                      "appCountLimit",
                       "bundleBytesLimit",
-                      "bytesPerMauPerMonthLimit",
-                      "channelsPerAppLimit",
-                      "filesPerBundleLimit",
-                      "invitationsPerDayLimit",
-                      "membersLimit",
-                      "releasesPerAppPerDayLimit",
+                      "dataTransferBytesPerMonthlyActiveDeviceLimit",
+                      "channelCountPerAppLimit",
+                      "fileCountPerBundleLimit",
+                      "invitationCountPerDayLimit",
+                      "memberCountLimit",
+                      "releaseCountPerAppPerDayLimit",
                       "retentionDays",
                       "storageBytesLimit",
-                      "tokensLimit"
+                      "tokenCountLimit"
                     ]
                   },
                   "additionalProperties": {
@@ -4378,17 +4220,17 @@
                     ]
                   },
                   "required": [
-                    "appsLimit",
+                    "appCountLimit",
                     "bundleBytesLimit",
-                    "bytesPerMauPerMonthLimit",
-                    "channelsPerAppLimit",
-                    "filesPerBundleLimit",
-                    "invitationsPerDayLimit",
-                    "membersLimit",
-                    "releasesPerAppPerDayLimit",
+                    "dataTransferBytesPerMonthlyActiveDeviceLimit",
+                    "channelCountPerAppLimit",
+                    "fileCountPerBundleLimit",
+                    "invitationCountPerDayLimit",
+                    "memberCountLimit",
+                    "releaseCountPerAppPerDayLimit",
                     "retentionDays",
                     "storageBytesLimit",
-                    "tokensLimit"
+                    "tokenCountLimit"
                   ]
                 }
               }
@@ -4466,7 +4308,7 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "Every limit of the registry in effect for the organization, keyed by name: its value, the plan's default, and whether a row of ours overrides the default; read-only, since raising one is a row of ours. `tokensLimit` counts one user's tokens and is every user's ceiling, never overridden. Admin or Owner.",
+        "description": "Every limit of the registry in effect for the organization, keyed by name: its value, the plan's default, and whether a row of ours overrides the default; read-only, since raising one is a row of ours. `tokenCountLimit` counts one user's tokens and is every user's ceiling, never overridden. Admin or Owner.",
         "summary": "Get the limits",
         "tags": [
           "Organizations"
@@ -6972,7 +6814,7 @@
     "/v1/organizations/{organizationId}/usage": {
       "get": {
         "operationId": "getV1OrganizationsByOrganizationIdUsage",
-        "description": "The organization's usage in `month`, `YYYY-MM`, the current one by default: `mau` and `bytes` summed over the rows `GET …/usage/apps` lists, read from the stored months and never counted in the request. Any role of the organization, Billing included.",
+        "description": "The organization's usage in `month`, `YYYY-MM`, the current one by default: `monthlyActiveDeviceCount` and `dataTransferBytes` summed over the rows `GET …/usage/apps` lists, read from the stored months and never counted in the request. Any role of the organization, Billing included.",
         "responses": {
           "200": {
             "content": {
@@ -6980,24 +6822,24 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "bytes": {
-                      "type": "integer",
-                      "minimum": -9007199254740991,
-                      "maximum": 9007199254740991
-                    },
-                    "mau": {
+                    "dataTransferBytes": {
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
                     "month": {
                       "type": "string"
+                    },
+                    "monthlyActiveDeviceCount": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "bytes",
-                    "mau",
-                    "month"
+                    "dataTransferBytes",
+                    "month",
+                    "monthlyActiveDeviceCount"
                   ]
                 }
               }
@@ -7106,7 +6948,7 @@
     "/v1/organizations/{organizationId}/usage/apps": {
       "get": {
         "operationId": "getV1OrganizationsByOrganizationIdUsageApps",
-        "description": "The usage per app in `month`, `YYYY-MM`, the current one by default: the stored month of each of the organization's live apps that has one — `mau`, the counted devices, kept live, and `bytes`, the files host's, approximate by design, the open month's a day behind. Ordered by `mau`, the most first, then `appId`: the list's one exception to newest first. `?relations=app` embeds each row's app, `{ id, name }`. `?format=csv` answers every row of the month as `text/csv` with the app's name, unpaginated, in `appId` order. Any role of the organization, Billing included.",
+        "description": "The usage per app in `month`, `YYYY-MM`, the current one by default: the stored month of each of the organization's live apps that has one — `monthlyActiveDeviceCount`, the counted devices, kept live, and `dataTransferBytes`, the files host's, approximate by design, the open month's a day behind. Ordered by `monthlyActiveDeviceCount`, the most first, then `appId`: the list's one exception to newest first. `?relations=app` embeds each row's app, `{ id, name }`. `?format=csv` answers every row of the month as `text/csv` with the app's name, unpaginated, in `appId` order. Any role of the organization, Billing included.",
         "responses": {
           "200": {
             "content": {
@@ -7138,25 +6980,25 @@
                         "format": "uuid",
                         "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                       },
-                      "bytes": {
-                        "type": "integer",
-                        "minimum": -9007199254740991,
-                        "maximum": 9007199254740991
-                      },
-                      "mau": {
+                      "dataTransferBytes": {
                         "type": "integer",
                         "minimum": -9007199254740991,
                         "maximum": 9007199254740991
                       },
                       "month": {
                         "type": "string"
+                      },
+                      "monthlyActiveDeviceCount": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
                       }
                     },
                     "required": [
                       "appId",
-                      "bytes",
-                      "mau",
-                      "month"
+                      "dataTransferBytes",
+                      "month",
+                      "monthlyActiveDeviceCount"
                     ]
                   }
                 }
@@ -7462,6 +7304,21 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "cancelAtPeriodEnd": {
+                      "type": "boolean"
+                    },
+                    "cappedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
                     "countryAllowlist": {
                       "anyOf": [
                         {
@@ -7479,6 +7336,30 @@
                       "type": "string",
                       "format": "date-time",
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "currentPeriodEndsAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "enterpriseMonthlyActiveDeviceCountLimit": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     },
                     "id": {
                       "type": "string",
@@ -7504,6 +7385,18 @@
                     "name": {
                       "type": "string"
                     },
+                    "pastDueAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
                     "plan": {
                       "type": "string",
                       "enum": [
@@ -7524,10 +7417,34 @@
                         "owner"
                       ]
                     },
+                    "spendingCapCents": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
                     "storageBytes": {
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
+                    },
+                    "subscriptionProvider": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "polar"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "subscriptionStatus": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "updatedAt": {
                       "type": "string",
@@ -7536,15 +7453,23 @@
                     }
                   },
                   "required": [
+                    "cancelAtPeriodEnd",
+                    "cappedAt",
                     "countryAllowlist",
                     "createdAt",
+                    "currentPeriodEndsAt",
+                    "enterpriseMonthlyActiveDeviceCountLimit",
                     "id",
                     "ipAllowlist",
                     "isTwoFactorRequired",
                     "name",
+                    "pastDueAt",
                     "plan",
                     "region",
+                    "spendingCapCents",
                     "storageBytes",
+                    "subscriptionProvider",
+                    "subscriptionStatus",
                     "updatedAt"
                   ]
                 }
@@ -7675,6 +7600,21 @@
                   "items": {
                     "type": "object",
                     "properties": {
+                      "cancelAtPeriodEnd": {
+                        "type": "boolean"
+                      },
+                      "cappedAt": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
                       "countryAllowlist": {
                         "anyOf": [
                           {
@@ -7692,6 +7632,30 @@
                         "type": "string",
                         "format": "date-time",
                         "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      },
+                      "currentPeriodEndsAt": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "enterpriseMonthlyActiveDeviceCountLimit": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       },
                       "id": {
                         "type": "string",
@@ -7717,6 +7681,18 @@
                       "name": {
                         "type": "string"
                       },
+                      "pastDueAt": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
                       "plan": {
                         "type": "string",
                         "enum": [
@@ -7737,10 +7713,34 @@
                           "owner"
                         ]
                       },
+                      "spendingCapCents": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
                       "storageBytes": {
                         "type": "integer",
                         "minimum": -9007199254740991,
                         "maximum": 9007199254740991
+                      },
+                      "subscriptionProvider": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "polar"
+                            ]
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "subscriptionStatus": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "updatedAt": {
                         "type": "string",
@@ -7749,15 +7749,23 @@
                       }
                     },
                     "required": [
+                      "cancelAtPeriodEnd",
+                      "cappedAt",
                       "countryAllowlist",
                       "createdAt",
+                      "currentPeriodEndsAt",
+                      "enterpriseMonthlyActiveDeviceCountLimit",
                       "id",
                       "ipAllowlist",
                       "isTwoFactorRequired",
                       "name",
+                      "pastDueAt",
                       "plan",
                       "region",
+                      "spendingCapCents",
                       "storageBytes",
+                      "subscriptionProvider",
+                      "subscriptionStatus",
                       "updatedAt"
                     ]
                   }
@@ -7978,7 +7986,7 @@
     "/v1/organizations/{organizationId}": {
       "get": {
         "operationId": "getV1OrganizationsByOrganizationId",
-        "description": "The organization with its plan and `storageBytes`, the counter behind its storage limit; any role of it.",
+        "description": "The organization, its row: the plan, `storageBytes`, the counter behind its storage limit, and the subscription mirror — `subscriptionStatus`, `subscriptionProvider`, `cancelAtPeriodEnd`, `currentPeriodEndsAt`, `pastDueAt`, `spendingCapCents`, `cappedAt` and `enterpriseMonthlyActiveDeviceCountLimit` — from which a client derives the month's device ceiling; any role of it.",
         "responses": {
           "200": {
             "content": {
@@ -7986,6 +7994,21 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "cancelAtPeriodEnd": {
+                      "type": "boolean"
+                    },
+                    "cappedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
                     "countryAllowlist": {
                       "anyOf": [
                         {
@@ -8003,6 +8026,30 @@
                       "type": "string",
                       "format": "date-time",
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "currentPeriodEndsAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "enterpriseMonthlyActiveDeviceCountLimit": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     },
                     "id": {
                       "type": "string",
@@ -8028,6 +8075,18 @@
                     "name": {
                       "type": "string"
                     },
+                    "pastDueAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
                     "plan": {
                       "type": "string",
                       "enum": [
@@ -8048,10 +8107,34 @@
                         "owner"
                       ]
                     },
+                    "spendingCapCents": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
                     "storageBytes": {
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
+                    },
+                    "subscriptionProvider": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "polar"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "subscriptionStatus": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "updatedAt": {
                       "type": "string",
@@ -8060,15 +8143,23 @@
                     }
                   },
                   "required": [
+                    "cancelAtPeriodEnd",
+                    "cappedAt",
                     "countryAllowlist",
                     "createdAt",
+                    "currentPeriodEndsAt",
+                    "enterpriseMonthlyActiveDeviceCountLimit",
                     "id",
                     "ipAllowlist",
                     "isTwoFactorRequired",
                     "name",
+                    "pastDueAt",
                     "plan",
                     "region",
+                    "spendingCapCents",
                     "storageBytes",
+                    "subscriptionProvider",
+                    "subscriptionStatus",
                     "updatedAt"
                   ]
                 }
@@ -8176,6 +8267,21 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "cancelAtPeriodEnd": {
+                      "type": "boolean"
+                    },
+                    "cappedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
                     "countryAllowlist": {
                       "anyOf": [
                         {
@@ -8193,6 +8299,30 @@
                       "type": "string",
                       "format": "date-time",
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "currentPeriodEndsAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "enterpriseMonthlyActiveDeviceCountLimit": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     },
                     "id": {
                       "type": "string",
@@ -8218,6 +8348,18 @@
                     "name": {
                       "type": "string"
                     },
+                    "pastDueAt": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
                     "plan": {
                       "type": "string",
                       "enum": [
@@ -8238,10 +8380,34 @@
                         "owner"
                       ]
                     },
+                    "spendingCapCents": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
                     "storageBytes": {
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
+                    },
+                    "subscriptionProvider": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "polar"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "subscriptionStatus": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "updatedAt": {
                       "type": "string",
@@ -8250,15 +8416,23 @@
                     }
                   },
                   "required": [
+                    "cancelAtPeriodEnd",
+                    "cappedAt",
                     "countryAllowlist",
                     "createdAt",
+                    "currentPeriodEndsAt",
+                    "enterpriseMonthlyActiveDeviceCountLimit",
                     "id",
                     "ipAllowlist",
                     "isTwoFactorRequired",
                     "name",
+                    "pastDueAt",
                     "plan",
                     "region",
+                    "spendingCapCents",
                     "storageBytes",
+                    "subscriptionProvider",
+                    "subscriptionStatus",
                     "updatedAt"
                   ]
                 }
@@ -14946,7 +15120,7 @@
       },
       "post": {
         "operationId": "postV1AppsByAppIdChannels",
-        "description": "Creates a channel: the name is one to 64 letters, digits, hyphens or underscores and unique per app; only Owners and Admins protect one; an expiry never sits on a protected channel; the count is bounded by `channels_per_app_limit`.",
+        "description": "Creates a channel: the name is one to 64 letters, digits, hyphens or underscores and unique per app; only Owners and Admins protect one; an expiry never sits on a protected channel; the count is bounded by `channel_count_per_app_limit`.",
         "parameters": [
           {
             "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
@@ -17463,50 +17637,50 @@
                       "counters": {
                         "type": "object",
                         "properties": {
-                          "applied": {
+                          "appliedUpdateCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "attempted": {
+                          "attemptedUpdateCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "failedCrashed": {
+                          "crashFailureCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "failedDownload": {
+                          "downloadFailureCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "failedReadyTimeout": {
+                          "readinessTimeoutFailureCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "failedReported": {
+                          "reportedFailureCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "failedVerification": {
+                          "verificationFailureCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           }
                         },
                         "required": [
-                          "applied",
-                          "attempted",
-                          "failedCrashed",
-                          "failedDownload",
-                          "failedReadyTimeout",
-                          "failedReported",
-                          "failedVerification"
+                          "appliedUpdateCount",
+                          "attemptedUpdateCount",
+                          "crashFailureCount",
+                          "downloadFailureCount",
+                          "readinessTimeoutFailureCount",
+                          "reportedFailureCount",
+                          "verificationFailureCount"
                         ]
                       },
                       "createdAt": {
@@ -17660,7 +17834,7 @@
                                   {
                                     "type": "object",
                                     "properties": {
-                                      "attempted": {
+                                      "attemptedUpdateCount": {
                                         "type": "integer",
                                         "minimum": -9007199254740991,
                                         "maximum": 9007199254740991
@@ -17676,7 +17850,7 @@
                                       }
                                     },
                                     "required": [
-                                      "attempted",
+                                      "attemptedUpdateCount",
                                       "kind",
                                       "required"
                                     ]
@@ -17926,7 +18100,7 @@
       },
       "post": {
         "operationId": "postV1AppsByAppIdChannelsByChannelIdReleases",
-        "description": "Creates a release in the channel of a ready bundle, `bundleId`, or of what another channel's newest active release serves, `fromChannelId`, recorded as the provenance, with its conditions, rollout, mandatory flag, notes, the nullable auto-pause overrides and the nullable progression schedule, whose last percentage lies above the rollout, numbered next in the channel; refused on a protected channel below Admin, past `releases_per_app_per_day_limit` and, once the app has a signing key, for an unsigned bundle; an `Idempotency-Key` answers the same release again for 24 hours. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type the release uses.",
+        "description": "Creates a release in the channel of a ready bundle, `bundleId`, or of what another channel's newest active release serves, `fromChannelId`, recorded as the provenance, with its conditions, rollout, mandatory flag, notes, the nullable auto-pause overrides and the nullable progression schedule, whose last percentage lies above the rollout, numbered next in the channel; refused on a protected channel below Admin, past `release_count_per_app_per_day_limit` and, once the app has a signing key, for an unsigned bundle; an `Idempotency-Key` answers the same release again for 24 hours. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type the release uses.",
         "parameters": [
           {
             "description": "Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller.",
@@ -18405,50 +18579,50 @@
                     "counters": {
                       "type": "object",
                       "properties": {
-                        "applied": {
+                        "appliedUpdateCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "attempted": {
+                        "attemptedUpdateCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedCrashed": {
+                        "crashFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedDownload": {
+                        "downloadFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedReadyTimeout": {
+                        "readinessTimeoutFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedReported": {
+                        "reportedFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedVerification": {
+                        "verificationFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         }
                       },
                       "required": [
-                        "applied",
-                        "attempted",
-                        "failedCrashed",
-                        "failedDownload",
-                        "failedReadyTimeout",
-                        "failedReported",
-                        "failedVerification"
+                        "appliedUpdateCount",
+                        "attemptedUpdateCount",
+                        "crashFailureCount",
+                        "downloadFailureCount",
+                        "readinessTimeoutFailureCount",
+                        "reportedFailureCount",
+                        "verificationFailureCount"
                       ]
                     },
                     "createdAt": {
@@ -18602,7 +18776,7 @@
                                 {
                                   "type": "object",
                                   "properties": {
-                                    "attempted": {
+                                    "attemptedUpdateCount": {
                                       "type": "integer",
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
@@ -18618,7 +18792,7 @@
                                     }
                                   },
                                   "required": [
-                                    "attempted",
+                                    "attemptedUpdateCount",
                                     "kind",
                                     "required"
                                   ]
@@ -19704,50 +19878,50 @@
                     "counters": {
                       "type": "object",
                       "properties": {
-                        "applied": {
+                        "appliedUpdateCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "attempted": {
+                        "attemptedUpdateCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedCrashed": {
+                        "crashFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedDownload": {
+                        "downloadFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedReadyTimeout": {
+                        "readinessTimeoutFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedReported": {
+                        "reportedFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedVerification": {
+                        "verificationFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         }
                       },
                       "required": [
-                        "applied",
-                        "attempted",
-                        "failedCrashed",
-                        "failedDownload",
-                        "failedReadyTimeout",
-                        "failedReported",
-                        "failedVerification"
+                        "appliedUpdateCount",
+                        "attemptedUpdateCount",
+                        "crashFailureCount",
+                        "downloadFailureCount",
+                        "readinessTimeoutFailureCount",
+                        "reportedFailureCount",
+                        "verificationFailureCount"
                       ]
                     },
                     "createdAt": {
@@ -19901,7 +20075,7 @@
                                 {
                                   "type": "object",
                                   "properties": {
-                                    "attempted": {
+                                    "attemptedUpdateCount": {
                                       "type": "integer",
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
@@ -19917,7 +20091,7 @@
                                     }
                                   },
                                   "required": [
-                                    "attempted",
+                                    "attemptedUpdateCount",
                                     "kind",
                                     "required"
                                   ]
@@ -20606,50 +20780,50 @@
                       "counters": {
                         "type": "object",
                         "properties": {
-                          "applied": {
+                          "appliedUpdateCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "attempted": {
+                          "attemptedUpdateCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "failedCrashed": {
+                          "crashFailureCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "failedDownload": {
+                          "downloadFailureCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "failedReadyTimeout": {
+                          "readinessTimeoutFailureCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "failedReported": {
+                          "reportedFailureCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "failedVerification": {
+                          "verificationFailureCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           }
                         },
                         "required": [
-                          "applied",
-                          "attempted",
-                          "failedCrashed",
-                          "failedDownload",
-                          "failedReadyTimeout",
-                          "failedReported",
-                          "failedVerification"
+                          "appliedUpdateCount",
+                          "attemptedUpdateCount",
+                          "crashFailureCount",
+                          "downloadFailureCount",
+                          "readinessTimeoutFailureCount",
+                          "reportedFailureCount",
+                          "verificationFailureCount"
                         ]
                       },
                       "createdAt": {
@@ -20803,7 +20977,7 @@
                                   {
                                     "type": "object",
                                     "properties": {
-                                      "attempted": {
+                                      "attemptedUpdateCount": {
                                         "type": "integer",
                                         "minimum": -9007199254740991,
                                         "maximum": 9007199254740991
@@ -20819,7 +20993,7 @@
                                       }
                                     },
                                     "required": [
-                                      "attempted",
+                                      "attemptedUpdateCount",
                                       "kind",
                                       "required"
                                     ]
@@ -21988,50 +22162,50 @@
                           "counters": {
                             "type": "object",
                             "properties": {
-                              "applied": {
+                              "appliedUpdateCount": {
                                 "type": "integer",
                                 "minimum": -9007199254740991,
                                 "maximum": 9007199254740991
                               },
-                              "attempted": {
+                              "attemptedUpdateCount": {
                                 "type": "integer",
                                 "minimum": -9007199254740991,
                                 "maximum": 9007199254740991
                               },
-                              "failedCrashed": {
+                              "crashFailureCount": {
                                 "type": "integer",
                                 "minimum": -9007199254740991,
                                 "maximum": 9007199254740991
                               },
-                              "failedDownload": {
+                              "downloadFailureCount": {
                                 "type": "integer",
                                 "minimum": -9007199254740991,
                                 "maximum": 9007199254740991
                               },
-                              "failedReadyTimeout": {
+                              "readinessTimeoutFailureCount": {
                                 "type": "integer",
                                 "minimum": -9007199254740991,
                                 "maximum": 9007199254740991
                               },
-                              "failedReported": {
+                              "reportedFailureCount": {
                                 "type": "integer",
                                 "minimum": -9007199254740991,
                                 "maximum": 9007199254740991
                               },
-                              "failedVerification": {
+                              "verificationFailureCount": {
                                 "type": "integer",
                                 "minimum": -9007199254740991,
                                 "maximum": 9007199254740991
                               }
                             },
                             "required": [
-                              "applied",
-                              "attempted",
-                              "failedCrashed",
-                              "failedDownload",
-                              "failedReadyTimeout",
-                              "failedReported",
-                              "failedVerification"
+                              "appliedUpdateCount",
+                              "attemptedUpdateCount",
+                              "crashFailureCount",
+                              "downloadFailureCount",
+                              "readinessTimeoutFailureCount",
+                              "reportedFailureCount",
+                              "verificationFailureCount"
                             ]
                           },
                           "createdAt": {
@@ -22185,7 +22359,7 @@
                                       {
                                         "type": "object",
                                         "properties": {
-                                          "attempted": {
+                                          "attemptedUpdateCount": {
                                             "type": "integer",
                                             "minimum": -9007199254740991,
                                             "maximum": 9007199254740991
@@ -22201,7 +22375,7 @@
                                           }
                                         },
                                         "required": [
-                                          "attempted",
+                                          "attemptedUpdateCount",
                                           "kind",
                                           "required"
                                         ]
@@ -23533,50 +23707,50 @@
                         "counters": {
                           "type": "object",
                           "properties": {
-                            "applied": {
+                            "appliedUpdateCount": {
                               "type": "integer",
                               "minimum": -9007199254740991,
                               "maximum": 9007199254740991
                             },
-                            "attempted": {
+                            "attemptedUpdateCount": {
                               "type": "integer",
                               "minimum": -9007199254740991,
                               "maximum": 9007199254740991
                             },
-                            "failedCrashed": {
+                            "crashFailureCount": {
                               "type": "integer",
                               "minimum": -9007199254740991,
                               "maximum": 9007199254740991
                             },
-                            "failedDownload": {
+                            "downloadFailureCount": {
                               "type": "integer",
                               "minimum": -9007199254740991,
                               "maximum": 9007199254740991
                             },
-                            "failedReadyTimeout": {
+                            "readinessTimeoutFailureCount": {
                               "type": "integer",
                               "minimum": -9007199254740991,
                               "maximum": 9007199254740991
                             },
-                            "failedReported": {
+                            "reportedFailureCount": {
                               "type": "integer",
                               "minimum": -9007199254740991,
                               "maximum": 9007199254740991
                             },
-                            "failedVerification": {
+                            "verificationFailureCount": {
                               "type": "integer",
                               "minimum": -9007199254740991,
                               "maximum": 9007199254740991
                             }
                           },
                           "required": [
-                            "applied",
-                            "attempted",
-                            "failedCrashed",
-                            "failedDownload",
-                            "failedReadyTimeout",
-                            "failedReported",
-                            "failedVerification"
+                            "appliedUpdateCount",
+                            "attemptedUpdateCount",
+                            "crashFailureCount",
+                            "downloadFailureCount",
+                            "readinessTimeoutFailureCount",
+                            "reportedFailureCount",
+                            "verificationFailureCount"
                           ]
                         },
                         "createdAt": {
@@ -23730,7 +23904,7 @@
                                     {
                                       "type": "object",
                                       "properties": {
-                                        "attempted": {
+                                        "attemptedUpdateCount": {
                                           "type": "integer",
                                           "minimum": -9007199254740991,
                                           "maximum": 9007199254740991
@@ -23746,7 +23920,7 @@
                                         }
                                       },
                                       "required": [
-                                        "attempted",
+                                        "attemptedUpdateCount",
                                         "kind",
                                         "required"
                                       ]
@@ -25837,50 +26011,50 @@
                       "counters": {
                         "type": "object",
                         "properties": {
-                          "applied": {
+                          "appliedUpdateCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "attempted": {
+                          "attemptedUpdateCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "failedCrashed": {
+                          "crashFailureCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "failedDownload": {
+                          "downloadFailureCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "failedReadyTimeout": {
+                          "readinessTimeoutFailureCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "failedReported": {
+                          "reportedFailureCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "failedVerification": {
+                          "verificationFailureCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           }
                         },
                         "required": [
-                          "applied",
-                          "attempted",
-                          "failedCrashed",
-                          "failedDownload",
-                          "failedReadyTimeout",
-                          "failedReported",
-                          "failedVerification"
+                          "appliedUpdateCount",
+                          "attemptedUpdateCount",
+                          "crashFailureCount",
+                          "downloadFailureCount",
+                          "readinessTimeoutFailureCount",
+                          "reportedFailureCount",
+                          "verificationFailureCount"
                         ]
                       },
                       "createdAt": {
@@ -26034,7 +26208,7 @@
                                   {
                                     "type": "object",
                                     "properties": {
-                                      "attempted": {
+                                      "attemptedUpdateCount": {
                                         "type": "integer",
                                         "minimum": -9007199254740991,
                                         "maximum": 9007199254740991
@@ -26050,7 +26224,7 @@
                                       }
                                     },
                                     "required": [
-                                      "attempted",
+                                      "attemptedUpdateCount",
                                       "kind",
                                       "required"
                                     ]
@@ -26928,50 +27102,50 @@
                     "counters": {
                       "type": "object",
                       "properties": {
-                        "applied": {
+                        "appliedUpdateCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "attempted": {
+                        "attemptedUpdateCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedCrashed": {
+                        "crashFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedDownload": {
+                        "downloadFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedReadyTimeout": {
+                        "readinessTimeoutFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedReported": {
+                        "reportedFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedVerification": {
+                        "verificationFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         }
                       },
                       "required": [
-                        "applied",
-                        "attempted",
-                        "failedCrashed",
-                        "failedDownload",
-                        "failedReadyTimeout",
-                        "failedReported",
-                        "failedVerification"
+                        "appliedUpdateCount",
+                        "attemptedUpdateCount",
+                        "crashFailureCount",
+                        "downloadFailureCount",
+                        "readinessTimeoutFailureCount",
+                        "reportedFailureCount",
+                        "verificationFailureCount"
                       ]
                     },
                     "createdAt": {
@@ -27125,7 +27299,7 @@
                                 {
                                   "type": "object",
                                   "properties": {
-                                    "attempted": {
+                                    "attemptedUpdateCount": {
                                       "type": "integer",
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
@@ -27141,7 +27315,7 @@
                                     }
                                   },
                                   "required": [
-                                    "attempted",
+                                    "attemptedUpdateCount",
                                     "kind",
                                     "required"
                                   ]
@@ -27815,50 +27989,50 @@
                     "counters": {
                       "type": "object",
                       "properties": {
-                        "applied": {
+                        "appliedUpdateCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "attempted": {
+                        "attemptedUpdateCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedCrashed": {
+                        "crashFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedDownload": {
+                        "downloadFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedReadyTimeout": {
+                        "readinessTimeoutFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedReported": {
+                        "reportedFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedVerification": {
+                        "verificationFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         }
                       },
                       "required": [
-                        "applied",
-                        "attempted",
-                        "failedCrashed",
-                        "failedDownload",
-                        "failedReadyTimeout",
-                        "failedReported",
-                        "failedVerification"
+                        "appliedUpdateCount",
+                        "attemptedUpdateCount",
+                        "crashFailureCount",
+                        "downloadFailureCount",
+                        "readinessTimeoutFailureCount",
+                        "reportedFailureCount",
+                        "verificationFailureCount"
                       ]
                     },
                     "createdAt": {
@@ -28012,7 +28186,7 @@
                                 {
                                   "type": "object",
                                   "properties": {
-                                    "attempted": {
+                                    "attemptedUpdateCount": {
                                       "type": "integer",
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
@@ -28028,7 +28202,7 @@
                                     }
                                   },
                                   "required": [
-                                    "attempted",
+                                    "attemptedUpdateCount",
                                     "kind",
                                     "required"
                                   ]
@@ -29029,50 +29203,50 @@
                     "counters": {
                       "type": "object",
                       "properties": {
-                        "applied": {
+                        "appliedUpdateCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "attempted": {
+                        "attemptedUpdateCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedCrashed": {
+                        "crashFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedDownload": {
+                        "downloadFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedReadyTimeout": {
+                        "readinessTimeoutFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedReported": {
+                        "reportedFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedVerification": {
+                        "verificationFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         }
                       },
                       "required": [
-                        "applied",
-                        "attempted",
-                        "failedCrashed",
-                        "failedDownload",
-                        "failedReadyTimeout",
-                        "failedReported",
-                        "failedVerification"
+                        "appliedUpdateCount",
+                        "attemptedUpdateCount",
+                        "crashFailureCount",
+                        "downloadFailureCount",
+                        "readinessTimeoutFailureCount",
+                        "reportedFailureCount",
+                        "verificationFailureCount"
                       ]
                     },
                     "createdAt": {
@@ -29226,7 +29400,7 @@
                                 {
                                   "type": "object",
                                   "properties": {
-                                    "attempted": {
+                                    "attemptedUpdateCount": {
                                       "type": "integer",
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
@@ -29242,7 +29416,7 @@
                                     }
                                   },
                                   "required": [
-                                    "attempted",
+                                    "attemptedUpdateCount",
                                     "kind",
                                     "required"
                                   ]
@@ -29913,50 +30087,50 @@
                     "counters": {
                       "type": "object",
                       "properties": {
-                        "applied": {
+                        "appliedUpdateCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "attempted": {
+                        "attemptedUpdateCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedCrashed": {
+                        "crashFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedDownload": {
+                        "downloadFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedReadyTimeout": {
+                        "readinessTimeoutFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedReported": {
+                        "reportedFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedVerification": {
+                        "verificationFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         }
                       },
                       "required": [
-                        "applied",
-                        "attempted",
-                        "failedCrashed",
-                        "failedDownload",
-                        "failedReadyTimeout",
-                        "failedReported",
-                        "failedVerification"
+                        "appliedUpdateCount",
+                        "attemptedUpdateCount",
+                        "crashFailureCount",
+                        "downloadFailureCount",
+                        "readinessTimeoutFailureCount",
+                        "reportedFailureCount",
+                        "verificationFailureCount"
                       ]
                     },
                     "createdAt": {
@@ -30110,7 +30284,7 @@
                                 {
                                   "type": "object",
                                   "properties": {
-                                    "attempted": {
+                                    "attemptedUpdateCount": {
                                       "type": "integer",
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
@@ -30126,7 +30300,7 @@
                                     }
                                   },
                                   "required": [
-                                    "attempted",
+                                    "attemptedUpdateCount",
                                     "kind",
                                     "required"
                                   ]
@@ -30797,50 +30971,50 @@
                     "counters": {
                       "type": "object",
                       "properties": {
-                        "applied": {
+                        "appliedUpdateCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "attempted": {
+                        "attemptedUpdateCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedCrashed": {
+                        "crashFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedDownload": {
+                        "downloadFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedReadyTimeout": {
+                        "readinessTimeoutFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedReported": {
+                        "reportedFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "failedVerification": {
+                        "verificationFailureCount": {
                           "type": "integer",
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         }
                       },
                       "required": [
-                        "applied",
-                        "attempted",
-                        "failedCrashed",
-                        "failedDownload",
-                        "failedReadyTimeout",
-                        "failedReported",
-                        "failedVerification"
+                        "appliedUpdateCount",
+                        "attemptedUpdateCount",
+                        "crashFailureCount",
+                        "downloadFailureCount",
+                        "readinessTimeoutFailureCount",
+                        "reportedFailureCount",
+                        "verificationFailureCount"
                       ]
                     },
                     "createdAt": {
@@ -30994,7 +31168,7 @@
                                 {
                                   "type": "object",
                                   "properties": {
-                                    "attempted": {
+                                    "attemptedUpdateCount": {
                                       "type": "integer",
                                       "minimum": -9007199254740991,
                                       "maximum": 9007199254740991
@@ -31010,7 +31184,7 @@
                                     }
                                   },
                                   "required": [
-                                    "attempted",
+                                    "attemptedUpdateCount",
                                     "kind",
                                     "required"
                                   ]
@@ -32140,7 +32314,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "activeDevices": {
+                          "activeDeviceCount": {
                             "anyOf": [
                               {
                                 "type": "integer",
@@ -32152,7 +32326,7 @@
                               }
                             ]
                           },
-                          "applied": {
+                          "appliedUpdateCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
@@ -32162,23 +32336,23 @@
                             "format": "date",
                             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
                           },
-                          "failed": {
+                          "failureCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "rolledBack": {
+                          "rolledBackUpdateCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           }
                         },
                         "required": [
-                          "activeDevices",
-                          "applied",
+                          "activeDeviceCount",
+                          "appliedUpdateCount",
                           "day",
-                          "failed",
-                          "rolledBack"
+                          "failureCount",
+                          "rolledBackUpdateCount"
                         ]
                       }
                     },
@@ -32212,7 +32386,7 @@
                             "items": {
                               "type": "object",
                               "properties": {
-                                "applied": {
+                                "appliedUpdateCount": {
                                   "type": "integer",
                                   "minimum": -9007199254740991,
                                   "maximum": 9007199254740991
@@ -32224,7 +32398,7 @@
                                 }
                               },
                               "required": [
-                                "applied",
+                                "appliedUpdateCount",
                                 "at"
                               ]
                             }
@@ -32468,12 +32642,12 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "bytes": {
+                          "checkCount": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "checks": {
+                          "dataTransferBytes": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
@@ -32483,17 +32657,17 @@
                             "format": "date",
                             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
                           },
-                          "downloadedBytes": {
+                          "deviceDownloadBytes": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           }
                         },
                         "required": [
-                          "bytes",
-                          "checks",
+                          "checkCount",
+                          "dataTransferBytes",
                           "day",
-                          "downloadedBytes"
+                          "deviceDownloadBytes"
                         ]
                       }
                     },
@@ -32502,12 +32676,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "bytes": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "mau": {
+                          "dataTransferBytes": {
                             "type": "integer",
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
@@ -32516,12 +32685,17 @@
                             "type": "string",
                             "format": "date",
                             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                          },
+                          "monthlyActiveDeviceCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
                           }
                         },
                         "required": [
-                          "bytes",
-                          "mau",
-                          "month"
+                          "dataTransferBytes",
+                          "month",
+                          "monthlyActiveDeviceCount"
                         ]
                       }
                     }
@@ -33135,7 +33309,7 @@
     "/v1/apps/{appId}/transfer": {
       "post": {
         "operationId": "postV1AppsByAppIdTransfer",
-        "description": "Moves the app to another organization the caller is an Admin of, in one transaction, with the target's security settings, `apps_limit` and storage limit checked; audited in both organizations.",
+        "description": "Moves the app to another organization the caller is an Admin of, in one transaction, with the target's security settings, `app_count_limit` and storage limit checked; audited in both organizations.",
         "responses": {
           "200": {
             "content": {

@@ -10,7 +10,7 @@ afterEach(() => {
 describe('LimitsResource', () => {
   test('should get the limits in effect', async () => {
     const limits = {
-      appsLimit: { default: 3, isOverridden: true, value: 10 },
+      appCountLimit: { default: 3, isOverridden: true, value: 10 },
     };
     const fetchMock = stubFetch(() => Response.json(limits));
 

@@ -4,8 +4,21 @@ import { HotCodePush } from '../client';
 import { resolveSentRequest, stubFetch } from '../test-helpers';
 
 const USAGE_STATISTICS = {
-  days: [{ bytes: 2048, checks: 40, day: '2026-09-01', downloadedBytes: 1024 }],
-  months: [{ bytes: 2048, mau: 12, month: '2026-09-01' }],
+  days: [
+    {
+      checkCount: 40,
+      dataTransferBytes: 2048,
+      day: '2026-09-01',
+      deviceDownloadBytes: 1024,
+    },
+  ],
+  months: [
+    {
+      dataTransferBytes: 2048,
+      month: '2026-09-01',
+      monthlyActiveDeviceCount: 12,
+    },
+  ],
 };
 
 afterEach(() => {

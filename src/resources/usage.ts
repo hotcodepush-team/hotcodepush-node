@@ -8,7 +8,7 @@ import type {
 } from '../types';
 
 /**
- * One live app's usage in a month: its monthly active devices and the bytes its files served, with the app as `relations: ['app']` embeds it.
+ * One live app's usage in a month: its monthly active devices and its data transfer, with the app as `relations: ['app']` embeds it.
  */
 export type AppUsageMonth = JsonResponseBody<
   '/v1/organizations/{organizationId}/usage/apps',
@@ -43,7 +43,7 @@ export type ListUsageAppsOptions = PathParameters<
   >;
 
 /**
- * The organization's monthly active devices and bytes in `month`, `YYYY-MM`, summed over its apps' rows.
+ * The organization's monthly active devices and data transfer in `month`, `YYYY-MM`, summed over its apps' rows.
  */
 export type Usage = JsonResponseBody<
   '/v1/organizations/{organizationId}/usage',

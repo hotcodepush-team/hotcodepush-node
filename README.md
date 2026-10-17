@@ -44,7 +44,7 @@ The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.ch
 | `organizations.auditLogs`                                                                        | `count`, `downloadCsv`, `list`                                                        |
 | `organizations.invitations`                                                                      | `count`, `create`, `delete`, `deleteMany`, `list`                                     |
 | `organizations.members`                                                                          | `count`, `delete`, `deleteMany`, `get`, `list`, `update`                              |
-| `organizations.billing`, the plan, the subscription, the spending cap and this month's MAU       | `get`, `update`                                                                       |
+| `organizations.billing`, this month's monthly active device count and the cap Free suggests      | `get`, `update`                                                                       |
 | `organizations.checkouts`, enabling billing through Polar                                        | `create`                                                                              |
 | `organizations.customerPortalSessions`, Polar's portal for invoices and the card                 | `create`                                                                              |
 | `organizations.limits`, the limits in effect                                                     | `get`                                                                                 |

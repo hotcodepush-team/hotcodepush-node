@@ -563,7 +563,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       limit: 10,
       offset: 10,
       organizationId: ORGANIZATION_ID,
-      relations: ['user'],
+      relations: ['app', 'user'],
       type: 'channel.*',
       userId: USER_ID,
     }),
@@ -631,6 +631,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       organizationId: ORGANIZATION_ID,
       query: 'jane',
       role: 'admin',
+      userId: USER_ID,
     }),
   'organizations.members.delete': hotCodePush =>
     hotCodePush.organizations.members.delete({
@@ -656,6 +657,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       query: 'jane',
       relations: ['user'],
       role: 'admin',
+      userId: USER_ID,
     }),
   'organizations.members.update': hotCodePush =>
     hotCodePush.organizations.members.update({

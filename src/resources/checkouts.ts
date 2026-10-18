@@ -20,10 +20,9 @@ export class CheckoutsResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * Enables billing on a free organization: the organization becomes Polar's customer under `billingEmail`, the
-   * caller's email by default, and the Polar checkout for pay-as-you-go opens on it; the subscription arrives once it
-   * is paid and starts at the $5 minimum spending cap. An email another Polar customer holds answers `E_VALIDATION`
-   * with the rule `email_in_use`.
+   * Enables billing on a free organization: the Polar checkout for pay-as-you-go, the caller's email pre-filled and
+   * editable on Polar's page; the subscription arrives once it is paid, names the organization, and starts at the $5
+   * minimum spending cap, which the customer raises afterwards.
    * Each call creates another checkout and the API keeps no `Idempotency-Key` for it, so the call is never retried.
    * An API token answers `E_FORBIDDEN`; sign in with a session.
    */

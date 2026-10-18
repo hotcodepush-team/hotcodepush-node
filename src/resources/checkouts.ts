@@ -1,10 +1,6 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
-import type {
-  JsonRequestBody,
-  JsonResponseBody,
-  PathParameters,
-} from '../types';
+import type { JsonResponseBody, PathParameters } from '../types';
 
 /**
  * The URL of the Polar checkout to open.
@@ -18,8 +14,7 @@ export type Checkout = JsonResponseBody<
 export type CreateCheckoutOptions = PathParameters<
   '/v1/organizations/{organizationId}/checkouts',
   'post'
-> &
-  JsonRequestBody<'/v1/organizations/{organizationId}/checkouts', 'post'>;
+>;
 
 export class CheckoutsResource {
   constructor(private readonly httpClient: HttpClient) {}
@@ -33,13 +28,12 @@ export class CheckoutsResource {
    * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
   public async create(options: CreateCheckoutOptions): Promise<Checkout> {
-    const { organizationId, ...body } = options;
     return this.httpClient.fetchJson({
-      body,
       method: 'POST',
-      path: resolvePath('/v1/organizations/{organizationId}/checkouts', {
-        organizationId,
-      }),
+      path: resolvePath(
+        '/v1/organizations/{organizationId}/checkouts',
+        options,
+      ),
     });
   }
 }

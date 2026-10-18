@@ -2229,6 +2229,23 @@
                           }
                         ]
                       },
+                      "app": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name"
+                        ]
+                      },
                       "appId": {
                         "anyOf": [
                           {
@@ -2453,7 +2470,7 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The organization's audit log, newest first; each row's `actorType` is `user` when a user acted and `system` when none did, its `userId` null. Filtered by `type` — `channel.created`, or `channel.*` for every action on the object — `actorType`, `userId`, `appId`, and `createdSince` and `createdUntil`, both inclusive; `?relations=user` embeds each row's user while the user is live. `?format=csv` answers every matching row as `text/csv`, unpaginated. Paying plans only.",
+        "description": "The organization's audit log, newest first; each row's `actorType` is `user` when a user acted and `system` when none did, its `userId` null. Filtered by `type` — `channel.created`, or `channel.*` for every action on the object — `actorType`, `userId`, `appId`, and `createdSince` and `createdUntil`, both inclusive; `?relations=app,user` embeds each row's app while the app is live and its user while the user is live. `?format=csv` answers every matching row as `text/csv`, unpaginated. Paying plans only.",
         "summary": "List the audit log",
         "tags": [
           "Audit logs"
@@ -2542,6 +2559,7 @@
               "items": {
                 "type": "string",
                 "enum": [
+                  "app",
                   "user"
                 ]
               }
@@ -3033,7 +3051,7 @@
     "/v1/organizations/{organizationId}/checkouts": {
       "post": {
         "operationId": "postV1OrganizationsByOrganizationIdCheckouts",
-        "description": "Enables billing: makes the organization Polar's customer, the one it is already or a new one under `billingEmail`, the caller's email by default, then creates the Polar checkout for pay-as-you-go with that customer's email locked, and answers its URL. An email another Polar customer holds answers `E_VALIDATION` with the rule `email_in_use`. The subscription arrives with Polar's webhook once the checkout is paid and starts at the $5 minimum spending cap, which the customer raises afterwards. Free organizations only.",
+        "description": "Enables billing: creates the Polar checkout for pay-as-you-go, the organization as Polar's customer, and answers its URL. The subscription arrives with Polar's webhook once the checkout is paid and starts at the $5 minimum spending cap, which the customer raises afterwards. Free organizations only.",
         "responses": {
           "201": {
             "content": {
@@ -3134,23 +3152,6 @@
             "sessionAuth": []
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "billingEmail": {
-                    "type": "string",
-                    "format": "email",
-                    "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
-                  }
-                }
-              }
-            }
-          }
-        },
         "parameters": [
           {
             "schema": {
@@ -4332,7 +4333,7 @@
     "/v1/organizations/{organizationId}/members": {
       "get": {
         "operationId": "getV1OrganizationsByOrganizationIdMembers",
-        "description": "The organization's members, newest first, filtered by `role` and by `query`, the text their user's email contains, case-insensitively; `?relations=user` embeds each member's user with `hasPassword` and `isTwoFactorEnabled`.",
+        "description": "The organization's members, newest first, filtered by `role`, by `userId` and by `query`, the text their user's email contains, case-insensitively; `?relations=user` embeds each member's user with `hasPassword` and `isTwoFactorEnabled`.",
         "responses": {
           "200": {
             "content": {
@@ -4553,6 +4554,15 @@
           },
           {
             "in": "query",
+            "name": "userId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "in": "query",
             "name": "relations",
             "schema": {
               "type": "array",
@@ -4699,7 +4709,7 @@
     "/v1/organizations/{organizationId}/members/count": {
       "get": {
         "operationId": "getV1OrganizationsByOrganizationIdMembersCount",
-        "description": "The number of the organization's members under the list's filters, `role` and `query`, which the list pages through.",
+        "description": "The number of the organization's members under the list's filters, `role`, `userId` and `query`, which the list pages through.",
         "responses": {
           "200": {
             "content": {
@@ -4815,6 +4825,15 @@
                 "member",
                 "owner"
               ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "userId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             }
           },
           {
@@ -5645,7 +5664,7 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The organization's SSO provider: its domain, whether the domain is verified, the sign-in link, the `oidc` or `saml` block, the one present saying the kind, and the TXT record to set until the domain is verified.",
+        "description": "The organization's SSO provider: its domain, whether the domain is verified, the sign-in link, the `oidc` or `saml` block, the one present saying the type, and the TXT record to set until the domain is verified.",
         "summary": "Get the SSO provider",
         "tags": [
           "SSO provider"
@@ -12183,7 +12202,7 @@
     "/v1/apps/{appId}/bundles/{bundleId}/deltas": {
       "get": {
         "operationId": "getV1AppsByAppIdBundlesByBundleIdDeltas",
-        "description": "The bundle's delta packs, one per base its devices run, newest first, each with its status — `requested`, `built` or `failed` — and, once built, its size and its patch count; `?relations=baseBundle` embeds the base, whose number is null for an embedded one.",
+        "description": "The bundle's delta packs, one per base its devices run, newest first, each with its status — `requested`, `built` or `failed` — and, once built, its size and its patch count; `?relations=baseBundle` embeds the base, whose number is null for a binary's bundle.",
         "responses": {
           "200": {
             "content": {

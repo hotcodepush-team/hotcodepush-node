@@ -576,7 +576,6 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     }),
   'organizations.checkouts.create': hotCodePush =>
     hotCodePush.organizations.checkouts.create({
-      billingEmail: 'billing@example.com',
       organizationId: ORGANIZATION_ID,
     }),
   'organizations.count': hotCodePush => hotCodePush.organizations.count(),

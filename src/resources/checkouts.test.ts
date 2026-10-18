@@ -14,19 +14,18 @@ afterEach(() => {
 });
 
 describe('CheckoutsResource', () => {
-  test('should post the billing email without an idempotency key to create the checkout', async () => {
+  test('should post without an idempotency key to create the checkout', async () => {
     const fetchMock = stubFetch(() => Response.json(CHECKOUT, { status: 201 }));
 
     const createdCheckout =
       await new HotCodePush().organizations.checkouts.create({
-        billingEmail: 'billing@example.com',
         organizationId: 'organization',
       });
 
     expect(createdCheckout).toEqual(CHECKOUT);
     const sentRequest = resolveSentRequest(fetchMock);
     expect(sentRequest).toMatchObject({
-      body: { billingEmail: 'billing@example.com' },
+      body: undefined,
       method: 'POST',
       url: 'https://api.hotcodepush.com/v1/organizations/organization/checkouts',
     });

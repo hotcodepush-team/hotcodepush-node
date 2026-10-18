@@ -205,7 +205,7 @@ export interface paths {
         };
         /**
          * List the audit log
-         * @description The organization's audit log, newest first; each row's `actorType` is `user` when a user acted and `system` when none did, its `userId` null. Filtered by `type` — `channel.created`, or `channel.*` for every action on the object — `actorType`, `userId`, `appId`, and `createdSince` and `createdUntil`, both inclusive; `?relations=user` embeds each row's user while the user is live. `?format=csv` answers every matching row as `text/csv`, unpaginated. Paying plans only.
+         * @description The organization's audit log, newest first; each row's `actorType` is `user` when a user acted and `system` when none did, its `userId` null. Filtered by `type` — `channel.created`, or `channel.*` for every action on the object — `actorType`, `userId`, `appId`, and `createdSince` and `createdUntil`, both inclusive; `?relations=app,user` embeds each row's app while the app is live and its user while the user is live. `?format=csv` answers every matching row as `text/csv`, unpaginated. Paying plans only.
          */
         get: operations["getV1OrganizationsByOrganizationIdAuditLogs"];
         put?: never;
@@ -271,7 +271,7 @@ export interface paths {
         put?: never;
         /**
          * Create a checkout
-         * @description Enables billing: makes the organization Polar's customer, the one it is already or a new one under `billingEmail`, the caller's email by default, then creates the Polar checkout for pay-as-you-go with that customer's email locked, and answers its URL. An email another Polar customer holds answers `E_VALIDATION` with the rule `email_in_use`. The subscription arrives with Polar's webhook once the checkout is paid and starts at the $5 minimum spending cap, which the customer raises afterwards. Free organizations only.
+         * @description Enables billing: creates the Polar checkout for pay-as-you-go, the organization as Polar's customer, and answers its URL. The subscription arrives with Polar's webhook once the checkout is paid and starts at the $5 minimum spending cap, which the customer raises afterwards. Free organizations only.
          */
         post: operations["postV1OrganizationsByOrganizationIdCheckouts"];
         delete?: never;
@@ -397,7 +397,7 @@ export interface paths {
         };
         /**
          * List the members
-         * @description The organization's members, newest first, filtered by `role` and by `query`, the text their user's email contains, case-insensitively; `?relations=user` embeds each member's user with `hasPassword` and `isTwoFactorEnabled`.
+         * @description The organization's members, newest first, filtered by `role`, by `userId` and by `query`, the text their user's email contains, case-insensitively; `?relations=user` embeds each member's user with `hasPassword` and `isTwoFactorEnabled`.
          */
         get: operations["getV1OrganizationsByOrganizationIdMembers"];
         put?: never;
@@ -421,7 +421,7 @@ export interface paths {
         };
         /**
          * Count the members
-         * @description The number of the organization's members under the list's filters, `role` and `query`, which the list pages through.
+         * @description The number of the organization's members under the list's filters, `role`, `userId` and `query`, which the list pages through.
          */
         get: operations["getV1OrganizationsByOrganizationIdMembersCount"];
         put?: never;
@@ -469,7 +469,7 @@ export interface paths {
         };
         /**
          * Get the SSO provider
-         * @description The organization's SSO provider: its domain, whether the domain is verified, the sign-in link, the `oidc` or `saml` block, the one present saying the kind, and the TXT record to set until the domain is verified.
+         * @description The organization's SSO provider: its domain, whether the domain is verified, the sign-in link, the `oidc` or `saml` block, the one present saying the type, and the TXT record to set until the domain is verified.
          */
         get: operations["getV1OrganizationsByOrganizationIdSsoProvider"];
         /**
@@ -841,7 +841,7 @@ export interface paths {
         };
         /**
          * List the delta packs of a bundle
-         * @description The bundle's delta packs, one per base its devices run, newest first, each with its status — `requested`, `built` or `failed` — and, once built, its size and its patch count; `?relations=baseBundle` embeds the base, whose number is null for an embedded one.
+         * @description The bundle's delta packs, one per base its devices run, newest first, each with its status — `requested`, `built` or `failed` — and, once built, its size and its patch count; `?relations=baseBundle` embeds the base, whose number is null for a binary's bundle.
          */
         get: operations["getV1AppsByAppIdBundlesByBundleIdDeltas"];
         put?: never;
@@ -3278,7 +3278,7 @@ export interface operations {
                 createdUntil?: string;
                 type?: string;
                 userId?: string;
-                relations?: "user"[];
+                relations?: ("app" | "user")[];
                 format?: "csv";
             };
             header?: {
@@ -3303,6 +3303,11 @@ export interface operations {
                         actorType: "system" | "user";
                         address: string | null;
                         apiKeyId: string | null;
+                        app?: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
                         appId: string | null;
                         country: string | null;
                         /** Format: date-time */
@@ -3716,14 +3721,7 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** Format: email */
-                    billingEmail?: string;
-                };
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description The checkout to open. */
             201: {
@@ -4522,6 +4520,7 @@ export interface operations {
                 offset?: number;
                 query?: string;
                 role?: "admin" | "billing" | "member" | "owner";
+                userId?: string;
                 relations?: "user"[];
             };
             header?: {
@@ -4725,6 +4724,7 @@ export interface operations {
             query?: {
                 query?: string;
                 role?: "admin" | "billing" | "member" | "owner";
+                userId?: string;
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */

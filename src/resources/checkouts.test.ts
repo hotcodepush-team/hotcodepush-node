@@ -14,19 +14,19 @@ afterEach(() => {
 });
 
 describe('CheckoutsResource', () => {
-  test('should post the spending cap without an idempotency key to create the checkout', async () => {
+  test('should post the billing email without an idempotency key to create the checkout', async () => {
     const fetchMock = stubFetch(() => Response.json(CHECKOUT, { status: 201 }));
 
     const createdCheckout =
       await new HotCodePush().organizations.checkouts.create({
+        billingEmail: 'billing@example.com',
         organizationId: 'organization',
-        spendingCapCents: 5000,
       });
 
     expect(createdCheckout).toEqual(CHECKOUT);
     const sentRequest = resolveSentRequest(fetchMock);
     expect(sentRequest).toMatchObject({
-      body: { spendingCapCents: 5000 },
+      body: { billingEmail: 'billing@example.com' },
       method: 'POST',
       url: 'https://api.hotcodepush.com/v1/organizations/organization/checkouts',
     });
@@ -37,7 +37,6 @@ describe('CheckoutsResource', () => {
     const attemptCount = await countAttemptsWhenUnavailable(() =>
       new HotCodePush().organizations.checkouts.create({
         organizationId: 'organization',
-        spendingCapCents: 5000,
       }),
     );
 

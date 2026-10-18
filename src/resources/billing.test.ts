@@ -5,10 +5,7 @@ import { resolveSentRequest, stubFetch } from '../test-helpers';
 
 const BILLING_URL =
   'https://api.hotcodepush.com/v1/organizations/organization/billing';
-const BILLING = {
-  monthlyActiveDeviceCount: 12,
-  suggestedSpendingCapCents: null,
-};
+const BILLING = { monthlyActiveDeviceCount: 12 };
 
 afterEach(() => {
   vi.unstubAllGlobals();

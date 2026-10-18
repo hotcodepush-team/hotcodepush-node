@@ -237,7 +237,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
       indexFile.manifestEntry.sha256,
     ]);
     expect(uploadedFile.sha256).toBe(indexFile.manifestEntry.sha256);
-    expect(completedBundle.state).toBe('ready');
+    expect(completedBundle.status).toBe('ready');
     expect(completedBundle.manifestSha256).toMatch(/^[0-9a-f]{64}$/);
     expect(fetchedBundle.manifestSha256).toBe(completedBundle.manifestSha256);
   });
@@ -307,7 +307,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     });
     const readyBundles = await hotCodePush.apps.bundles.list({
       appId: app.id,
-      state: 'ready',
+      status: 'ready',
     });
     await hotCodePush.apps.bundles.delete({
       appId: app.id,

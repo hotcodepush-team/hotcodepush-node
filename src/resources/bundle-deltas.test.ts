@@ -41,7 +41,7 @@ describe('BundleDeltasResource', () => {
     const deltaPack = {
       baseBundle: { id: 'base', number: 16 },
       baseBundleId: 'base',
-      state: 'built',
+      status: 'built',
     };
     const fetchMock = stubFetch(() => Response.json([deltaPack]));
 

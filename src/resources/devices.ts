@@ -6,7 +6,7 @@ import type {
   PathParameters,
   QueryParameters,
 } from '../types';
-import { DeviceMarksResource } from './device-marks';
+import { DeviceEventsResource } from './device-events';
 
 export type CountDevicesOptions = PathParameters<
   '/v1/apps/{appId}/devices/count',
@@ -47,10 +47,10 @@ export type ListDevicesOptions = PathParameters<
   QueryParameters<'/v1/apps/{appId}/devices', 'get'>;
 
 export class DevicesResource {
-  public readonly marks: DeviceMarksResource;
+  public readonly events: DeviceEventsResource;
 
   constructor(private readonly httpClient: HttpClient) {
-    this.marks = new DeviceMarksResource(httpClient);
+    this.events = new DeviceEventsResource(httpClient);
   }
 
   /**

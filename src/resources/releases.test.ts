@@ -8,26 +8,26 @@ import {
 } from '../test-helpers';
 
 const RELEASES_URL = 'https://api.hotcodepush.com/v1/apps/app/releases';
-const RELEASE = { id: 'release', number: 1, state: 'active' };
+const RELEASE = { id: 'release', number: 1, status: 'active' };
 
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
 describe('ReleasesResource', () => {
-  test('should count the releases of the app filtered by channel and state', async () => {
+  test('should count the releases of the app filtered by channel and status', async () => {
     const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount = await new HotCodePush().apps.releases.count({
       appId: 'app',
       channelId: 'channel',
-      state: 'paused',
+      status: 'paused',
     });
 
     expect(fetchedCount).toEqual({ count: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${RELEASES_URL}/count?channelId=channel&state=paused`,
+      url: `${RELEASES_URL}/count?channelId=channel&status=paused`,
     });
   });
 
@@ -47,19 +47,19 @@ describe('ReleasesResource', () => {
     });
   });
 
-  test('should list the releases of the app filtered by channel and state', async () => {
+  test('should list the releases of the app filtered by channel and status', async () => {
     const fetchMock = stubFetch(() => Response.json([RELEASE]));
 
     const fetchedReleases = await new HotCodePush().apps.releases.list({
       appId: 'app',
       channelId: 'channel',
-      state: 'paused',
+      status: 'paused',
     });
 
     expect(fetchedReleases).toEqual([RELEASE]);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${RELEASES_URL}?channelId=channel&state=paused`,
+      url: `${RELEASES_URL}?channelId=channel&status=paused`,
     });
   });
 

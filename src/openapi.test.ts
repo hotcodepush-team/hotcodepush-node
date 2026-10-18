@@ -82,8 +82,8 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       isInUse: 'true',
       platform: 'ios',
       query: '12',
-      state: 'ready',
-      type: 'uploaded',
+      source: 'upload',
+      status: 'ready',
       version: '1.0.0',
     }),
   'apps.bundles.create': hotCodePush =>
@@ -170,8 +170,8 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       offset: 10,
       platform: 'ios',
       query: '12',
-      state: 'ready',
-      type: 'uploaded',
+      source: 'upload',
+      status: 'ready',
       version: '1.0.0',
     }),
   'apps.bundles.pack.upload': hotCodePush =>
@@ -325,25 +325,25 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.apps.devices.delete({ appId: APP_ID, deviceId: DEVICE_ID }),
   'apps.devices.deleteMany': hotCodePush =>
     hotCodePush.apps.devices.deleteMany({ appId: APP_ID, ids: [DEVICE_ID] }),
-  'apps.devices.get': hotCodePush =>
-    hotCodePush.apps.devices.get({
-      appId: APP_ID,
-      deviceId: DEVICE_ID,
-      relations: ['channel', 'currentRelease'],
-    }),
-  'apps.devices.marks.count': hotCodePush =>
-    hotCodePush.apps.devices.marks.count({
+  'apps.devices.events.count': hotCodePush =>
+    hotCodePush.apps.devices.events.count({
       appId: APP_ID,
       deviceId: DEVICE_ID,
       releaseId: RELEASE_ID,
     }),
-  'apps.devices.marks.list': hotCodePush =>
-    hotCodePush.apps.devices.marks.list({
+  'apps.devices.events.list': hotCodePush =>
+    hotCodePush.apps.devices.events.list({
       appId: APP_ID,
       deviceId: DEVICE_ID,
       limit: 10,
       offset: 10,
       releaseId: RELEASE_ID,
+    }),
+  'apps.devices.get': hotCodePush =>
+    hotCodePush.apps.devices.get({
+      appId: APP_ID,
+      deviceId: DEVICE_ID,
+      relations: ['channel', 'currentRelease'],
     }),
   'apps.devices.list': hotCodePush =>
     hotCodePush.apps.devices.list({
@@ -405,7 +405,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       bundleId: BUNDLE_ID,
       channelId: CHANNEL_ID,
       gitCommit: 'main',
-      state: 'active',
+      status: 'active',
     }),
   'apps.releases.get': hotCodePush =>
     hotCodePush.apps.releases.get({
@@ -422,7 +422,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       limit: 10,
       offset: 10,
       relations: ['channel'],
-      state: 'active',
+      status: 'active',
     }),
   'apps.releases.pause': hotCodePush =>
     hotCodePush.apps.releases.pause({ appId: APP_ID, releaseId: RELEASE_ID }),
@@ -536,6 +536,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     }),
   'organizations.auditLogs.count': hotCodePush =>
     hotCodePush.organizations.auditLogs.count({
+      actorType: 'user',
       appId: APP_ID,
       createdSince: '2026-01-01T00:00:00.000Z',
       createdUntil: '2026-02-01T00:00:00.000Z',
@@ -545,6 +546,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     }),
   'organizations.auditLogs.downloadCsv': hotCodePush =>
     hotCodePush.organizations.auditLogs.downloadCsv({
+      actorType: 'user',
       appId: APP_ID,
       createdSince: '2026-01-01T00:00:00.000Z',
       createdUntil: '2026-02-01T00:00:00.000Z',
@@ -554,6 +556,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     }),
   'organizations.auditLogs.list': hotCodePush =>
     hotCodePush.organizations.auditLogs.list({
+      actorType: 'user',
       appId: APP_ID,
       createdSince: '2026-01-01T00:00:00.000Z',
       createdUntil: '2026-02-01T00:00:00.000Z',
@@ -573,8 +576,8 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     }),
   'organizations.checkouts.create': hotCodePush =>
     hotCodePush.organizations.checkouts.create({
+      billingEmail: 'billing@example.com',
       organizationId: ORGANIZATION_ID,
-      spendingCapCents: 5000,
     }),
   'organizations.count': hotCodePush => hotCodePush.organizations.count(),
   'organizations.create': hotCodePush =>

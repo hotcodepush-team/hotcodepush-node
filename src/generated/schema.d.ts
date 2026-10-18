@@ -205,7 +205,7 @@ export interface paths {
         };
         /**
          * List the audit log
-         * @description The organization's audit log, newest first, filtered by `type` — `channel.created`, or `channel.*` for every action on the object — `userId`, `appId`, and `createdSince` and `createdUntil`, both inclusive; `?relations=user` embeds each row's user while the user is live. `?format=csv` answers every matching row as `text/csv`, unpaginated. Paying plans only.
+         * @description The organization's audit log, newest first; each row's `actorType` is `user` when a user acted and `system` when none did, its `userId` null. Filtered by `type` — `channel.created`, or `channel.*` for every action on the object — `actorType`, `userId`, `appId`, and `createdSince` and `createdUntil`, both inclusive; `?relations=user` embeds each row's user while the user is live. `?format=csv` answers every matching row as `text/csv`, unpaginated. Paying plans only.
          */
         get: operations["getV1OrganizationsByOrganizationIdAuditLogs"];
         put?: never;
@@ -245,7 +245,7 @@ export interface paths {
         };
         /**
          * Get the billing
-         * @description The organization's billing this month, the numbers derived from its devices: `monthlyActiveDeviceCount`, the devices the month counts so far, and on Free `suggestedSpendingCapCents`, the cap the last thirty days' active devices suggest. The plan, the spending cap, `cappedAt` and the subscription mirror are the organization's, which `GET /v1/organizations/{organizationId}` answers. Owner, Admin and Billing.
+         * @description The organization's billing this month, the number derived from its devices: `monthlyActiveDeviceCount`, the devices the month counts so far. The plan, the spending cap, `cappedAt` and the subscription mirror are the organization's, which `GET /v1/organizations/{organizationId}` answers. Owner, Admin and Billing.
          */
         get: operations["getV1OrganizationsByOrganizationIdBilling"];
         put?: never;
@@ -271,7 +271,7 @@ export interface paths {
         put?: never;
         /**
          * Create a checkout
-         * @description Enables billing: creates the Polar checkout for pay-as-you-go with the chosen spending cap, the organization as Polar's customer, and answers its URL. The subscription and the cap arrive with Polar's webhook once the checkout is paid. Free organizations only.
+         * @description Enables billing: makes the organization Polar's customer, the one it is already or a new one under `billingEmail`, the caller's email by default, then creates the Polar checkout for pay-as-you-go with that customer's email locked, and answers its URL. An email another Polar customer holds answers `E_VALIDATION` with the rule `email_in_use`. The subscription arrives with Polar's webhook once the checkout is paid and starts at the $5 minimum spending cap, which the customer raises afterwards. Free organizations only.
          */
         post: operations["postV1OrganizationsByOrganizationIdCheckouts"];
         delete?: never;
@@ -753,7 +753,7 @@ export interface paths {
         };
         /**
          * List the bundles
-         * @description The app's bundles, newest first, every type unless `type` selects one: `embedded` for the bundle a store build ships, which carries no number and no fingerprint, or `uploaded`. `isInUse` selects the bundles an active or paused release serves, `fingerprint` those built for that native layer, `query` those whose number contains it.
+         * @description The app's bundles, newest first, every source unless `source` selects one: `binary`, the bundle a store build ships, which carries no number and no fingerprint; `upload`, one the CLI uploaded. `isInUse` selects the bundles an active or paused release serves, `fingerprint` those built for that native layer, `query` those whose number contains it.
          */
         get: operations["getV1AppsByAppIdBundles"];
         put?: never;
@@ -841,7 +841,7 @@ export interface paths {
         };
         /**
          * List the delta packs of a bundle
-         * @description The bundle's delta packs, one per base its devices run, newest first, each with its state — `requested`, `built` or `failed` — and, once built, its size and its patch count; `?relations=baseBundle` embeds the base, whose number is null for an embedded one.
+         * @description The bundle's delta packs, one per base its devices run, newest first, each with its status — `requested`, `built` or `failed` — and, once built, its size and its patch count; `?relations=baseBundle` embeds the base, whose number is null for an embedded one.
          */
         get: operations["getV1AppsByAppIdBundlesByBundleIdDeltas"];
         put?: never;
@@ -1440,7 +1440,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/apps/{appId}/devices/{deviceId}/marks": {
+    "/v1/apps/{appId}/devices/{deviceId}/events": {
         parameters: {
             query?: never;
             header?: never;
@@ -1448,10 +1448,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List a device's marks
-         * @description The device's per-release marks with their reasons, newest first, read from Postgres, filtered by `releaseId`; a mark the same device id left on another app's release is left out.
+         * List a device's events
+         * @description The device's events on releases, the first of each type per release, with their reasons, newest first, read from Postgres, filtered by `releaseId`; an event the same device id left on another app's release is left out.
          */
-        get: operations["getV1AppsByAppIdDevicesByDeviceIdMarks"];
+        get: operations["getV1AppsByAppIdDevicesByDeviceIdEvents"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1460,7 +1460,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/apps/{appId}/devices/{deviceId}/marks/count": {
+    "/v1/apps/{appId}/devices/{deviceId}/events/count": {
         parameters: {
             query?: never;
             header?: never;
@@ -1468,10 +1468,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Count a device's marks
-         * @description The number of the device's marks under the list's filter, which the list pages through.
+         * Count a device's events
+         * @description The number of the device's events under the list's filter, which the list pages through.
          */
-        get: operations["getV1AppsByAppIdDevicesByDeviceIdMarksCount"];
+        get: operations["getV1AppsByAppIdDevicesByDeviceIdEventsCount"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1589,7 +1589,7 @@ export interface paths {
         };
         /**
          * List the releases
-         * @description Every release of the app, newest first, filtered by `channelId`, `bundleId`, `state` and `gitCommit`, the text the hash, ref or message of the bundle's Git commit contains, case-insensitively; `?relations=channel,bundle,counters` embeds the linked rows.
+         * @description Every release of the app, newest first, filtered by `channelId`, `bundleId`, `status` and `gitCommit`, the text the hash, ref or message of the bundle's Git commit contains, case-insensitively; `?relations=channel,bundle,counters` embeds the linked rows.
          */
         get: operations["getV1AppsByAppIdReleases"];
         put?: never;
@@ -1609,7 +1609,7 @@ export interface paths {
         };
         /**
          * Count the releases
-         * @description The number of the app's releases under the list's filters, `channelId`, `bundleId`, `state` and `gitCommit`, which the list pages through.
+         * @description The number of the app's releases under the list's filters, `channelId`, `bundleId`, `status` and `gitCommit`, which the list pages through.
          */
         get: operations["getV1AppsByAppIdReleasesCount"];
         put?: never;
@@ -3272,6 +3272,7 @@ export interface operations {
             query?: {
                 limit?: number;
                 offset?: number;
+                actorType?: "system" | "user";
                 appId?: string;
                 createdSince?: string;
                 createdUntil?: string;
@@ -3298,6 +3299,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @enum {string} */
+                        actorType: "system" | "user";
                         address: string | null;
                         apiKeyId: string | null;
                         appId: string | null;
@@ -3403,6 +3406,7 @@ export interface operations {
     getV1OrganizationsByOrganizationIdAuditLogsCount: {
         parameters: {
             query?: {
+                actorType?: "system" | "user";
                 appId?: string;
                 createdSince?: string;
                 createdUntil?: string;
@@ -3527,7 +3531,6 @@ export interface operations {
                 content: {
                     "application/json": {
                         monthlyActiveDeviceCount: number;
-                        suggestedSpendingCapCents: number | null;
                     };
                 };
             };
@@ -3624,7 +3627,6 @@ export interface operations {
                 content: {
                     "application/json": {
                         monthlyActiveDeviceCount: number;
-                        suggestedSpendingCapCents: number | null;
                     };
                 };
             };
@@ -3717,7 +3719,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    spendingCapCents: number;
+                    /** Format: email */
+                    billingEmail?: string;
                 };
             };
         };
@@ -6867,9 +6870,9 @@ export interface operations {
                             signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
-                            state: "ready" | "uploading";
+                            source: "binary" | "upload";
                             /** @enum {string} */
-                            type: "embedded" | "uploaded";
+                            status: "ready" | "uploading";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
@@ -7024,9 +7027,9 @@ export interface operations {
                             signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
-                            state: "ready" | "uploading";
+                            source: "binary" | "upload";
                             /** @enum {string} */
-                            type: "embedded" | "uploaded";
+                            status: "ready" | "uploading";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
@@ -7082,9 +7085,9 @@ export interface operations {
                             signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
-                            state: "ready" | "uploading";
+                            source: "binary" | "upload";
                             /** @enum {string} */
-                            type: "embedded" | "uploaded";
+                            status: "ready" | "uploading";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
@@ -7324,9 +7327,9 @@ export interface operations {
                             signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
-                            state: "ready" | "uploading";
+                            source: "binary" | "upload";
                             /** @enum {string} */
-                            type: "embedded" | "uploaded";
+                            status: "ready" | "uploading";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
@@ -7423,8 +7426,8 @@ export interface operations {
                 isInUse?: "false" | "true";
                 platform?: "android" | "ios";
                 query?: string;
-                state?: "ready" | "uploading";
-                type?: "embedded" | "uploaded";
+                source?: "binary" | "upload";
+                status?: "ready" | "uploading";
                 version?: string;
             };
             header?: {
@@ -7467,9 +7470,9 @@ export interface operations {
                         signatureKeyId: string | null;
                         sizeBytes: number;
                         /** @enum {string} */
-                        state: "ready" | "uploading";
+                        source: "binary" | "upload";
                         /** @enum {string} */
-                        type: "embedded" | "uploaded";
+                        status: "ready" | "uploading";
                         unusedSince: string | null;
                         /** Format: date-time */
                         updatedAt: string;
@@ -7618,9 +7621,9 @@ export interface operations {
                         signatureKeyId: string | null;
                         sizeBytes: number;
                         /** @enum {string} */
-                        state: "ready" | "uploading";
+                        source: "binary" | "upload";
                         /** @enum {string} */
-                        type: "embedded" | "uploaded";
+                        status: "ready" | "uploading";
                         unusedSince: string | null;
                         /** Format: date-time */
                         updatedAt: string;
@@ -7745,8 +7748,8 @@ export interface operations {
                 isInUse?: "false" | "true";
                 platform?: "android" | "ios";
                 query?: string;
-                state?: "ready" | "uploading";
-                type?: "embedded" | "uploaded";
+                source?: "binary" | "upload";
+                status?: "ready" | "uploading";
                 version?: string;
             };
             header?: {
@@ -7880,9 +7883,9 @@ export interface operations {
                         signatureKeyId: string | null;
                         sizeBytes: number;
                         /** @enum {string} */
-                        state: "ready" | "uploading";
+                        source: "binary" | "upload";
                         /** @enum {string} */
-                        type: "embedded" | "uploaded";
+                        status: "ready" | "uploading";
                         unusedSince: string | null;
                         /** Format: date-time */
                         updatedAt: string;
@@ -8095,9 +8098,9 @@ export interface operations {
                         signatureKeyId: string | null;
                         sizeBytes: number;
                         /** @enum {string} */
-                        state: "ready" | "uploading";
+                        source: "binary" | "upload";
                         /** @enum {string} */
-                        type: "embedded" | "uploaded";
+                        status: "ready" | "uploading";
                         unusedSince: string | null;
                         /** Format: date-time */
                         updatedAt: string;
@@ -8228,9 +8231,9 @@ export interface operations {
                             signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
-                            state: "ready" | "uploading";
+                            source: "binary" | "upload";
                             /** @enum {string} */
-                            type: "embedded" | "uploaded";
+                            status: "ready" | "uploading";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
@@ -8247,7 +8250,7 @@ export interface operations {
                         requestedAt: string;
                         sizeBytes: number | null;
                         /** @enum {string} */
-                        state: "built" | "failed" | "requested";
+                        status: "built" | "failed" | "requested";
                         /** Format: date-time */
                         updatedAt: string;
                     }[];
@@ -10965,9 +10968,9 @@ export interface operations {
                             signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
-                            state: "ready" | "uploading";
+                            source: "binary" | "upload";
                             /** @enum {string} */
-                            type: "embedded" | "uploaded";
+                            status: "ready" | "uploading";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
@@ -11065,7 +11068,7 @@ export interface operations {
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
-                        state: "active" | "paused" | "revoked";
+                        status: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
                     }[];
@@ -11233,9 +11236,9 @@ export interface operations {
                             signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
-                            state: "ready" | "uploading";
+                            source: "binary" | "upload";
                             /** @enum {string} */
-                            type: "embedded" | "uploaded";
+                            status: "ready" | "uploading";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
@@ -11333,7 +11336,7 @@ export interface operations {
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
-                        state: "active" | "paused" | "revoked";
+                        status: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
                         warnings: {
@@ -11577,9 +11580,9 @@ export interface operations {
                             signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
-                            state: "ready" | "uploading";
+                            source: "binary" | "upload";
                             /** @enum {string} */
-                            type: "embedded" | "uploaded";
+                            status: "ready" | "uploading";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
@@ -11677,7 +11680,7 @@ export interface operations {
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
-                        state: "active" | "paused" | "revoked";
+                        status: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
                     };
@@ -11818,9 +11821,9 @@ export interface operations {
                             signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
-                            state: "ready" | "uploading";
+                            source: "binary" | "upload";
                             /** @enum {string} */
-                            type: "embedded" | "uploaded";
+                            status: "ready" | "uploading";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
@@ -11918,7 +11921,7 @@ export interface operations {
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
-                        state: "active" | "paused" | "revoked";
+                        status: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
                     }[];
@@ -12196,9 +12199,9 @@ export interface operations {
                                 signatureKeyId: string | null;
                                 sizeBytes: number;
                                 /** @enum {string} */
-                                state: "ready" | "uploading";
+                                source: "binary" | "upload";
                                 /** @enum {string} */
-                                type: "embedded" | "uploaded";
+                                status: "ready" | "uploading";
                                 unusedSince: string | null;
                                 /** Format: date-time */
                                 updatedAt: string;
@@ -12296,7 +12299,7 @@ export interface operations {
                             rolledBackFromReleaseId: string | null;
                             rolloutPercentage: number;
                             /** @enum {string} */
-                            state: "active" | "paused" | "revoked";
+                            status: "active" | "paused" | "revoked";
                             /** Format: date-time */
                             updatedAt: string;
                         };
@@ -12650,9 +12653,9 @@ export interface operations {
                                 signatureKeyId: string | null;
                                 sizeBytes: number;
                                 /** @enum {string} */
-                                state: "ready" | "uploading";
+                                source: "binary" | "upload";
                                 /** @enum {string} */
-                                type: "embedded" | "uploaded";
+                                status: "ready" | "uploading";
                                 unusedSince: string | null;
                                 /** Format: date-time */
                                 updatedAt: string;
@@ -12750,7 +12753,7 @@ export interface operations {
                             rolledBackFromReleaseId: string | null;
                             rolloutPercentage: number;
                             /** @enum {string} */
-                            state: "active" | "paused" | "revoked";
+                            status: "active" | "paused" | "revoked";
                             /** Format: date-time */
                             updatedAt: string;
                         };
@@ -12922,7 +12925,7 @@ export interface operations {
             };
         };
     };
-    getV1AppsByAppIdDevicesByDeviceIdMarks: {
+    getV1AppsByAppIdDevicesByDeviceIdEvents: {
         parameters: {
             query?: {
                 limit?: number;
@@ -12941,7 +12944,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description The marks. */
+            /** @description The events. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -12952,11 +12955,11 @@ export interface operations {
                         createdAt: string;
                         /** Format: uuid */
                         deviceId: string;
-                        /** @enum {string} */
-                        kind: "applied" | "attempted" | "checked" | "failed";
                         reason: string | null;
                         /** Format: uuid */
                         releaseId: string;
+                        /** @enum {string} */
+                        type: "applied" | "attempted" | "checked" | "failed";
                         /** Format: date-time */
                         updatedAt: string;
                     }[];
@@ -13027,7 +13030,7 @@ export interface operations {
             };
         };
     };
-    getV1AppsByAppIdDevicesByDeviceIdMarksCount: {
+    getV1AppsByAppIdDevicesByDeviceIdEventsCount: {
         parameters: {
             query?: {
                 releaseId?: string;
@@ -13716,7 +13719,7 @@ export interface operations {
                 bundleId?: string;
                 channelId?: string;
                 gitCommit?: string;
-                state?: "active" | "paused" | "revoked";
+                status?: "active" | "paused" | "revoked";
                 relations?: ("bundle" | "channel" | "counters")[];
             };
             header?: {
@@ -13760,9 +13763,9 @@ export interface operations {
                             signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
-                            state: "ready" | "uploading";
+                            source: "binary" | "upload";
                             /** @enum {string} */
-                            type: "embedded" | "uploaded";
+                            status: "ready" | "uploading";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
@@ -13860,7 +13863,7 @@ export interface operations {
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
-                        state: "active" | "paused" | "revoked";
+                        status: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
                     }[];
@@ -13937,7 +13940,7 @@ export interface operations {
                 bundleId?: string;
                 channelId?: string;
                 gitCommit?: string;
-                state?: "active" | "paused" | "revoked";
+                status?: "active" | "paused" | "revoked";
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -14073,9 +14076,9 @@ export interface operations {
                             signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
-                            state: "ready" | "uploading";
+                            source: "binary" | "upload";
                             /** @enum {string} */
-                            type: "embedded" | "uploaded";
+                            status: "ready" | "uploading";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
@@ -14173,7 +14176,7 @@ export interface operations {
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
-                        state: "active" | "paused" | "revoked";
+                        status: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
                     };
@@ -14305,9 +14308,9 @@ export interface operations {
                             signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
-                            state: "ready" | "uploading";
+                            source: "binary" | "upload";
                             /** @enum {string} */
-                            type: "embedded" | "uploaded";
+                            status: "ready" | "uploading";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
@@ -14405,7 +14408,7 @@ export interface operations {
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
-                        state: "active" | "paused" | "revoked";
+                        status: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
                     };
@@ -14639,9 +14642,9 @@ export interface operations {
                             signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
-                            state: "ready" | "uploading";
+                            source: "binary" | "upload";
                             /** @enum {string} */
-                            type: "embedded" | "uploaded";
+                            status: "ready" | "uploading";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
@@ -14739,7 +14742,7 @@ export interface operations {
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
-                        state: "active" | "paused" | "revoked";
+                        status: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
                     };
@@ -14864,9 +14867,9 @@ export interface operations {
                             signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
-                            state: "ready" | "uploading";
+                            source: "binary" | "upload";
                             /** @enum {string} */
-                            type: "embedded" | "uploaded";
+                            status: "ready" | "uploading";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
@@ -14964,7 +14967,7 @@ export interface operations {
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
-                        state: "active" | "paused" | "revoked";
+                        status: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
                     };
@@ -15089,9 +15092,9 @@ export interface operations {
                             signatureKeyId: string | null;
                             sizeBytes: number;
                             /** @enum {string} */
-                            state: "ready" | "uploading";
+                            source: "binary" | "upload";
                             /** @enum {string} */
-                            type: "embedded" | "uploaded";
+                            status: "ready" | "uploading";
                             unusedSince: string | null;
                             /** Format: date-time */
                             updatedAt: string;
@@ -15189,7 +15192,7 @@ export interface operations {
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
-                        state: "active" | "paused" | "revoked";
+                        status: "active" | "paused" | "revoked";
                         /** Format: date-time */
                         updatedAt: string;
                     };

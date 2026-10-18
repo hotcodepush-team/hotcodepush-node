@@ -20,7 +20,7 @@ export type * from './resources/channel-releases';
 export type * from './resources/channels';
 export type * from './resources/checkouts';
 export type * from './resources/customer-portal-sessions';
-export type * from './resources/device-marks';
+export type * from './resources/device-events';
 export type * from './resources/devices';
 export type * from './resources/file-upload-parts';
 export type * from './resources/file-uploads';

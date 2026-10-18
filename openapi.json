@@ -2204,6 +2204,13 @@
                   "items": {
                     "type": "object",
                     "properties": {
+                      "actorType": {
+                        "type": "string",
+                        "enum": [
+                          "system",
+                          "user"
+                        ]
+                      },
                       "address": {
                         "type": [
                           "string",
@@ -2339,6 +2346,7 @@
                       }
                     },
                     "required": [
+                      "actorType",
                       "address",
                       "apiKeyId",
                       "appId",
@@ -2445,7 +2453,7 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The organization's audit log, newest first, filtered by `type` — `channel.created`, or `channel.*` for every action on the object — `userId`, `appId`, and `createdSince` and `createdUntil`, both inclusive; `?relations=user` embeds each row's user while the user is live. `?format=csv` answers every matching row as `text/csv`, unpaginated. Paying plans only.",
+        "description": "The organization's audit log, newest first; each row's `actorType` is `user` when a user acted and `system` when none did, its `userId` null. Filtered by `type` — `channel.created`, or `channel.*` for every action on the object — `actorType`, `userId`, `appId`, and `createdSince` and `createdUntil`, both inclusive; `?relations=user` embeds each row's user while the user is live. `?format=csv` answers every matching row as `text/csv`, unpaginated. Paying plans only.",
         "summary": "List the audit log",
         "tags": [
           "Audit logs"
@@ -2469,6 +2477,17 @@
               "type": "integer",
               "minimum": 0,
               "maximum": 9007199254740991
+            }
+          },
+          {
+            "in": "query",
+            "name": "actorType",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "system",
+                "user"
+              ]
             }
           },
           {
@@ -2671,6 +2690,17 @@
         "parameters": [
           {
             "in": "query",
+            "name": "actorType",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "system",
+                "user"
+              ]
+            }
+          },
+          {
+            "in": "query",
             "name": "appId",
             "schema": {
               "type": "string",
@@ -2747,23 +2777,10 @@
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
-                    },
-                    "suggestedSpendingCapCents": {
-                      "anyOf": [
-                        {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
                     }
                   },
                   "required": [
-                    "monthlyActiveDeviceCount",
-                    "suggestedSpendingCapCents"
+                    "monthlyActiveDeviceCount"
                   ]
                 }
               }
@@ -2841,7 +2858,7 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "description": "The organization's billing this month, the numbers derived from its devices: `monthlyActiveDeviceCount`, the devices the month counts so far, and on Free `suggestedSpendingCapCents`, the cap the last thirty days' active devices suggest. The plan, the spending cap, `cappedAt` and the subscription mirror are the organization's, which `GET /v1/organizations/{organizationId}` answers. Owner, Admin and Billing.",
+        "description": "The organization's billing this month, the number derived from its devices: `monthlyActiveDeviceCount`, the devices the month counts so far. The plan, the spending cap, `cappedAt` and the subscription mirror are the organization's, which `GET /v1/organizations/{organizationId}` answers. Owner, Admin and Billing.",
         "summary": "Get the billing",
         "tags": [
           "Billing"
@@ -2879,23 +2896,10 @@
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
-                    },
-                    "suggestedSpendingCapCents": {
-                      "anyOf": [
-                        {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
                     }
                   },
                   "required": [
-                    "monthlyActiveDeviceCount",
-                    "suggestedSpendingCapCents"
+                    "monthlyActiveDeviceCount"
                   ]
                 }
               }
@@ -3029,7 +3033,7 @@
     "/v1/organizations/{organizationId}/checkouts": {
       "post": {
         "operationId": "postV1OrganizationsByOrganizationIdCheckouts",
-        "description": "Enables billing: creates the Polar checkout for pay-as-you-go with the chosen spending cap, the organization as Polar's customer, and answers its URL. The subscription and the cap arrive with Polar's webhook once the checkout is paid. Free organizations only.",
+        "description": "Enables billing: makes the organization Polar's customer, the one it is already or a new one under `billingEmail`, the caller's email by default, then creates the Polar checkout for pay-as-you-go with that customer's email locked, and answers its URL. An email another Polar customer holds answers `E_VALIDATION` with the rule `email_in_use`. The subscription arrives with Polar's webhook once the checkout is paid and starts at the $5 minimum spending cap, which the customer raises afterwards. Free organizations only.",
         "responses": {
           "201": {
             "content": {
@@ -3137,16 +3141,12 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "spendingCapCents": {
-                    "type": "integer",
-                    "minimum": 500,
-                    "maximum": 1000000,
-                    "multipleOf": 100
+                  "billingEmail": {
+                    "type": "string",
+                    "format": "email",
+                    "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
                   }
-                },
-                "required": [
-                  "spendingCapCents"
-                ]
+                }
               }
             }
           }
@@ -8839,18 +8839,18 @@
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "state": {
+                          "source": {
+                            "type": "string",
+                            "enum": [
+                              "binary",
+                              "upload"
+                            ]
+                          },
+                          "status": {
                             "type": "string",
                             "enum": [
                               "ready",
                               "uploading"
-                            ]
-                          },
-                          "type": {
-                            "type": "string",
-                            "enum": [
-                              "embedded",
-                              "uploaded"
                             ]
                           },
                           "unusedSince": {
@@ -8892,8 +8892,8 @@
                           "signature",
                           "signatureKeyId",
                           "sizeBytes",
-                          "state",
-                          "type",
+                          "source",
+                          "status",
                           "unusedSince",
                           "updatedAt",
                           "version"
@@ -9277,18 +9277,18 @@
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "state": {
+                        "source": {
+                          "type": "string",
+                          "enum": [
+                            "binary",
+                            "upload"
+                          ]
+                        },
+                        "status": {
                           "type": "string",
                           "enum": [
                             "ready",
                             "uploading"
-                          ]
-                        },
-                        "type": {
-                          "type": "string",
-                          "enum": [
-                            "embedded",
-                            "uploaded"
                           ]
                         },
                         "unusedSince": {
@@ -9330,8 +9330,8 @@
                         "signature",
                         "signatureKeyId",
                         "sizeBytes",
-                        "state",
-                        "type",
+                        "source",
+                        "status",
                         "unusedSince",
                         "updatedAt",
                         "version"
@@ -9543,18 +9543,18 @@
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "state": {
+                        "source": {
+                          "type": "string",
+                          "enum": [
+                            "binary",
+                            "upload"
+                          ]
+                        },
+                        "status": {
                           "type": "string",
                           "enum": [
                             "ready",
                             "uploading"
-                          ]
-                        },
-                        "type": {
-                          "type": "string",
-                          "enum": [
-                            "embedded",
-                            "uploaded"
                           ]
                         },
                         "unusedSince": {
@@ -9596,8 +9596,8 @@
                         "signature",
                         "signatureKeyId",
                         "sizeBytes",
-                        "state",
-                        "type",
+                        "source",
+                        "status",
                         "unusedSince",
                         "updatedAt",
                         "version"
@@ -10117,18 +10117,18 @@
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "state": {
+                        "source": {
+                          "type": "string",
+                          "enum": [
+                            "binary",
+                            "upload"
+                          ]
+                        },
+                        "status": {
                           "type": "string",
                           "enum": [
                             "ready",
                             "uploading"
-                          ]
-                        },
-                        "type": {
-                          "type": "string",
-                          "enum": [
-                            "embedded",
-                            "uploaded"
                           ]
                         },
                         "unusedSince": {
@@ -10170,8 +10170,8 @@
                         "signature",
                         "signatureKeyId",
                         "sizeBytes",
-                        "state",
-                        "type",
+                        "source",
+                        "status",
                         "unusedSince",
                         "updatedAt",
                         "version"
@@ -10366,7 +10366,7 @@
     "/v1/apps/{appId}/bundles": {
       "get": {
         "operationId": "getV1AppsByAppIdBundles",
-        "description": "The app's bundles, newest first, every type unless `type` selects one: `embedded` for the bundle a store build ships, which carries no number and no fingerprint, or `uploaded`. `isInUse` selects the bundles an active or paused release serves, `fingerprint` those built for that native layer, `query` those whose number contains it.",
+        "description": "The app's bundles, newest first, every source unless `source` selects one: `binary`, the bundle a store build ships, which carries no number and no fingerprint; `upload`, one the CLI uploaded. `isInUse` selects the bundles an active or paused release serves, `fingerprint` those built for that native layer, `query` those whose number contains it.",
         "responses": {
           "200": {
             "content": {
@@ -10493,18 +10493,18 @@
                         "minimum": -9007199254740991,
                         "maximum": 9007199254740991
                       },
-                      "state": {
+                      "source": {
+                        "type": "string",
+                        "enum": [
+                          "binary",
+                          "upload"
+                        ]
+                      },
+                      "status": {
                         "type": "string",
                         "enum": [
                           "ready",
                           "uploading"
-                        ]
-                      },
-                      "type": {
-                        "type": "string",
-                        "enum": [
-                          "embedded",
-                          "uploaded"
                         ]
                       },
                       "unusedSince": {
@@ -10546,8 +10546,8 @@
                       "signature",
                       "signatureKeyId",
                       "sizeBytes",
-                      "state",
-                      "type",
+                      "source",
+                      "status",
                       "unusedSince",
                       "updatedAt",
                       "version"
@@ -10693,23 +10693,23 @@
           },
           {
             "in": "query",
-            "name": "state",
+            "name": "source",
             "schema": {
               "type": "string",
               "enum": [
-                "ready",
-                "uploading"
+                "binary",
+                "upload"
               ]
             }
           },
           {
             "in": "query",
-            "name": "type",
+            "name": "status",
             "schema": {
               "type": "string",
               "enum": [
-                "embedded",
-                "uploaded"
+                "ready",
+                "uploading"
               ]
             }
           },
@@ -10886,18 +10886,18 @@
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
-                    "state": {
+                    "source": {
+                      "type": "string",
+                      "enum": [
+                        "binary",
+                        "upload"
+                      ]
+                    },
+                    "status": {
                       "type": "string",
                       "enum": [
                         "ready",
                         "uploading"
-                      ]
-                    },
-                    "type": {
-                      "type": "string",
-                      "enum": [
-                        "embedded",
-                        "uploaded"
                       ]
                     },
                     "unusedSince": {
@@ -11014,8 +11014,8 @@
                     "signature",
                     "signatureKeyId",
                     "sizeBytes",
-                    "state",
-                    "type",
+                    "source",
+                    "status",
                     "unusedSince",
                     "updatedAt",
                     "version",
@@ -11428,23 +11428,23 @@
           },
           {
             "in": "query",
-            "name": "state",
+            "name": "source",
             "schema": {
               "type": "string",
               "enum": [
-                "ready",
-                "uploading"
+                "binary",
+                "upload"
               ]
             }
           },
           {
             "in": "query",
-            "name": "type",
+            "name": "status",
             "schema": {
               "type": "string",
               "enum": [
-                "embedded",
-                "uploaded"
+                "ready",
+                "uploading"
               ]
             }
           },
@@ -11598,18 +11598,18 @@
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
-                    "state": {
+                    "source": {
+                      "type": "string",
+                      "enum": [
+                        "binary",
+                        "upload"
+                      ]
+                    },
+                    "status": {
                       "type": "string",
                       "enum": [
                         "ready",
                         "uploading"
-                      ]
-                    },
-                    "type": {
-                      "type": "string",
-                      "enum": [
-                        "embedded",
-                        "uploaded"
                       ]
                     },
                     "unusedSince": {
@@ -11651,8 +11651,8 @@
                     "signature",
                     "signatureKeyId",
                     "sizeBytes",
-                    "state",
-                    "type",
+                    "source",
+                    "status",
                     "unusedSince",
                     "updatedAt",
                     "version"
@@ -12006,18 +12006,18 @@
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
-                    "state": {
+                    "source": {
+                      "type": "string",
+                      "enum": [
+                        "binary",
+                        "upload"
+                      ]
+                    },
+                    "status": {
                       "type": "string",
                       "enum": [
                         "ready",
                         "uploading"
-                      ]
-                    },
-                    "type": {
-                      "type": "string",
-                      "enum": [
-                        "embedded",
-                        "uploaded"
                       ]
                     },
                     "unusedSince": {
@@ -12059,8 +12059,8 @@
                     "signature",
                     "signatureKeyId",
                     "sizeBytes",
-                    "state",
-                    "type",
+                    "source",
+                    "status",
                     "unusedSince",
                     "updatedAt",
                     "version"
@@ -12183,7 +12183,7 @@
     "/v1/apps/{appId}/bundles/{bundleId}/deltas": {
       "get": {
         "operationId": "getV1AppsByAppIdBundlesByBundleIdDeltas",
-        "description": "The bundle's delta packs, one per base its devices run, newest first, each with its state — `requested`, `built` or `failed` — and, once built, its size and its patch count; `?relations=baseBundle` embeds the base, whose number is null for an embedded one.",
+        "description": "The bundle's delta packs, one per base its devices run, newest first, each with its status — `requested`, `built` or `failed` — and, once built, its size and its patch count; `?relations=baseBundle` embeds the base, whose number is null for an embedded one.",
         "responses": {
           "200": {
             "content": {
@@ -12313,18 +12313,18 @@
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "state": {
+                          "source": {
+                            "type": "string",
+                            "enum": [
+                              "binary",
+                              "upload"
+                            ]
+                          },
+                          "status": {
                             "type": "string",
                             "enum": [
                               "ready",
                               "uploading"
-                            ]
-                          },
-                          "type": {
-                            "type": "string",
-                            "enum": [
-                              "embedded",
-                              "uploaded"
                             ]
                           },
                           "unusedSince": {
@@ -12366,8 +12366,8 @@
                           "signature",
                           "signatureKeyId",
                           "sizeBytes",
-                          "state",
-                          "type",
+                          "source",
+                          "status",
                           "unusedSince",
                           "updatedAt",
                           "version"
@@ -12417,7 +12417,7 @@
                           }
                         ]
                       },
-                      "state": {
+                      "status": {
                         "type": "string",
                         "enum": [
                           "built",
@@ -12438,7 +12438,7 @@
                       "patchCount",
                       "requestedAt",
                       "sizeBytes",
-                      "state",
+                      "status",
                       "updatedAt"
                     ]
                   }
@@ -17320,18 +17320,18 @@
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "state": {
+                          "source": {
+                            "type": "string",
+                            "enum": [
+                              "binary",
+                              "upload"
+                            ]
+                          },
+                          "status": {
                             "type": "string",
                             "enum": [
                               "ready",
                               "uploading"
-                            ]
-                          },
-                          "type": {
-                            "type": "string",
-                            "enum": [
-                              "embedded",
-                              "uploaded"
                             ]
                           },
                           "unusedSince": {
@@ -17373,8 +17373,8 @@
                           "signature",
                           "signatureKeyId",
                           "sizeBytes",
-                          "state",
-                          "type",
+                          "source",
+                          "status",
                           "unusedSince",
                           "updatedAt",
                           "version"
@@ -17920,7 +17920,7 @@
                         "minimum": -9007199254740991,
                         "maximum": 9007199254740991
                       },
-                      "state": {
+                      "status": {
                         "type": "string",
                         "enum": [
                           "active",
@@ -17955,7 +17955,7 @@
                       "purgedAt",
                       "rolledBackFromReleaseId",
                       "rolloutPercentage",
-                      "state",
+                      "status",
                       "updatedAt"
                     ]
                   }
@@ -18262,18 +18262,18 @@
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "state": {
+                        "source": {
+                          "type": "string",
+                          "enum": [
+                            "binary",
+                            "upload"
+                          ]
+                        },
+                        "status": {
                           "type": "string",
                           "enum": [
                             "ready",
                             "uploading"
-                          ]
-                        },
-                        "type": {
-                          "type": "string",
-                          "enum": [
-                            "embedded",
-                            "uploaded"
                           ]
                         },
                         "unusedSince": {
@@ -18315,8 +18315,8 @@
                         "signature",
                         "signatureKeyId",
                         "sizeBytes",
-                        "state",
-                        "type",
+                        "source",
+                        "status",
                         "unusedSince",
                         "updatedAt",
                         "version"
@@ -18862,7 +18862,7 @@
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
-                    "state": {
+                    "status": {
                       "type": "string",
                       "enum": [
                         "active",
@@ -18934,7 +18934,7 @@
                     "purgedAt",
                     "rolledBackFromReleaseId",
                     "rolloutPercentage",
-                    "state",
+                    "status",
                     "updatedAt",
                     "warnings"
                   ]
@@ -19561,18 +19561,18 @@
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "state": {
+                        "source": {
+                          "type": "string",
+                          "enum": [
+                            "binary",
+                            "upload"
+                          ]
+                        },
+                        "status": {
                           "type": "string",
                           "enum": [
                             "ready",
                             "uploading"
-                          ]
-                        },
-                        "type": {
-                          "type": "string",
-                          "enum": [
-                            "embedded",
-                            "uploaded"
                           ]
                         },
                         "unusedSince": {
@@ -19614,8 +19614,8 @@
                         "signature",
                         "signatureKeyId",
                         "sizeBytes",
-                        "state",
-                        "type",
+                        "source",
+                        "status",
                         "unusedSince",
                         "updatedAt",
                         "version"
@@ -20161,7 +20161,7 @@
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
-                    "state": {
+                    "status": {
                       "type": "string",
                       "enum": [
                         "active",
@@ -20196,7 +20196,7 @@
                     "purgedAt",
                     "rolledBackFromReleaseId",
                     "rolloutPercentage",
-                    "state",
+                    "status",
                     "updatedAt"
                   ]
                 }
@@ -20463,18 +20463,18 @@
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "state": {
+                          "source": {
+                            "type": "string",
+                            "enum": [
+                              "binary",
+                              "upload"
+                            ]
+                          },
+                          "status": {
                             "type": "string",
                             "enum": [
                               "ready",
                               "uploading"
-                            ]
-                          },
-                          "type": {
-                            "type": "string",
-                            "enum": [
-                              "embedded",
-                              "uploaded"
                             ]
                           },
                           "unusedSince": {
@@ -20516,8 +20516,8 @@
                           "signature",
                           "signatureKeyId",
                           "sizeBytes",
-                          "state",
-                          "type",
+                          "source",
+                          "status",
                           "unusedSince",
                           "updatedAt",
                           "version"
@@ -21063,7 +21063,7 @@
                         "minimum": -9007199254740991,
                         "maximum": 9007199254740991
                       },
-                      "state": {
+                      "status": {
                         "type": "string",
                         "enum": [
                           "active",
@@ -21098,7 +21098,7 @@
                       "purgedAt",
                       "rolledBackFromReleaseId",
                       "rolloutPercentage",
-                      "state",
+                      "status",
                       "updatedAt"
                     ]
                   }
@@ -21845,18 +21845,18 @@
                                 "minimum": -9007199254740991,
                                 "maximum": 9007199254740991
                               },
-                              "state": {
+                              "source": {
+                                "type": "string",
+                                "enum": [
+                                  "binary",
+                                  "upload"
+                                ]
+                              },
+                              "status": {
                                 "type": "string",
                                 "enum": [
                                   "ready",
                                   "uploading"
-                                ]
-                              },
-                              "type": {
-                                "type": "string",
-                                "enum": [
-                                  "embedded",
-                                  "uploaded"
                                 ]
                               },
                               "unusedSince": {
@@ -21898,8 +21898,8 @@
                               "signature",
                               "signatureKeyId",
                               "sizeBytes",
-                              "state",
-                              "type",
+                              "source",
+                              "status",
                               "unusedSince",
                               "updatedAt",
                               "version"
@@ -22445,7 +22445,7 @@
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "state": {
+                          "status": {
                             "type": "string",
                             "enum": [
                               "active",
@@ -22480,7 +22480,7 @@
                           "purgedAt",
                           "rolledBackFromReleaseId",
                           "rolloutPercentage",
-                          "state",
+                          "status",
                           "updatedAt"
                         ]
                       },
@@ -23390,18 +23390,18 @@
                               "minimum": -9007199254740991,
                               "maximum": 9007199254740991
                             },
-                            "state": {
+                            "source": {
+                              "type": "string",
+                              "enum": [
+                                "binary",
+                                "upload"
+                              ]
+                            },
+                            "status": {
                               "type": "string",
                               "enum": [
                                 "ready",
                                 "uploading"
-                              ]
-                            },
-                            "type": {
-                              "type": "string",
-                              "enum": [
-                                "embedded",
-                                "uploaded"
                               ]
                             },
                             "unusedSince": {
@@ -23443,8 +23443,8 @@
                             "signature",
                             "signatureKeyId",
                             "sizeBytes",
-                            "state",
-                            "type",
+                            "source",
+                            "status",
                             "unusedSince",
                             "updatedAt",
                             "version"
@@ -23990,7 +23990,7 @@
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "state": {
+                        "status": {
                           "type": "string",
                           "enum": [
                             "active",
@@ -24025,7 +24025,7 @@
                         "purgedAt",
                         "rolledBackFromReleaseId",
                         "rolloutPercentage",
-                        "state",
+                        "status",
                         "updatedAt"
                       ]
                     },
@@ -24332,10 +24332,10 @@
         ]
       }
     },
-    "/v1/apps/{appId}/devices/{deviceId}/marks": {
+    "/v1/apps/{appId}/devices/{deviceId}/events": {
       "get": {
-        "operationId": "getV1AppsByAppIdDevicesByDeviceIdMarks",
-        "description": "The device's per-release marks with their reasons, newest first, read from Postgres, filtered by `releaseId`; a mark the same device id left on another app's release is left out.",
+        "operationId": "getV1AppsByAppIdDevicesByDeviceIdEvents",
+        "description": "The device's events on releases, the first of each type per release, with their reasons, newest first, read from Postgres, filtered by `releaseId`; an event the same device id left on another app's release is left out.",
         "responses": {
           "200": {
             "content": {
@@ -24355,15 +24355,6 @@
                         "format": "uuid",
                         "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                       },
-                      "kind": {
-                        "type": "string",
-                        "enum": [
-                          "applied",
-                          "attempted",
-                          "checked",
-                          "failed"
-                        ]
-                      },
                       "reason": {
                         "type": [
                           "string",
@@ -24375,6 +24366,15 @@
                         "format": "uuid",
                         "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                       },
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "applied",
+                          "attempted",
+                          "checked",
+                          "failed"
+                        ]
+                      },
                       "updatedAt": {
                         "type": "string",
                         "format": "date-time",
@@ -24384,16 +24384,16 @@
                     "required": [
                       "createdAt",
                       "deviceId",
-                      "kind",
                       "reason",
                       "releaseId",
+                      "type",
                       "updatedAt"
                     ]
                   }
                 }
               }
             },
-            "description": "The marks."
+            "description": "The events."
           },
           "400": {
             "content": {
@@ -24466,7 +24466,7 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "summary": "List a device's marks",
+        "summary": "List a device's events",
         "tags": [
           "Devices"
         ],
@@ -24524,10 +24524,10 @@
         ]
       }
     },
-    "/v1/apps/{appId}/devices/{deviceId}/marks/count": {
+    "/v1/apps/{appId}/devices/{deviceId}/events/count": {
       "get": {
-        "operationId": "getV1AppsByAppIdDevicesByDeviceIdMarksCount",
-        "description": "The number of the device's marks under the list's filter, which the list pages through.",
+        "operationId": "getV1AppsByAppIdDevicesByDeviceIdEventsCount",
+        "description": "The number of the device's events under the list's filter, which the list pages through.",
         "responses": {
           "200": {
             "content": {
@@ -24620,7 +24620,7 @@
             "description": "E_MAINTENANCE"
           }
         },
-        "summary": "Count a device's marks",
+        "summary": "Count a device's events",
         "tags": [
           "Devices"
         ],
@@ -25564,7 +25564,7 @@
     "/v1/apps/{appId}/releases": {
       "get": {
         "operationId": "getV1AppsByAppIdReleases",
-        "description": "Every release of the app, newest first, filtered by `channelId`, `bundleId`, `state` and `gitCommit`, the text the hash, ref or message of the bundle's Git commit contains, case-insensitively; `?relations=channel,bundle,counters` embeds the linked rows.",
+        "description": "Every release of the app, newest first, filtered by `channelId`, `bundleId`, `status` and `gitCommit`, the text the hash, ref or message of the bundle's Git commit contains, case-insensitively; `?relations=channel,bundle,counters` embeds the linked rows.",
         "responses": {
           "200": {
             "content": {
@@ -25694,18 +25694,18 @@
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
-                          "state": {
+                          "source": {
+                            "type": "string",
+                            "enum": [
+                              "binary",
+                              "upload"
+                            ]
+                          },
+                          "status": {
                             "type": "string",
                             "enum": [
                               "ready",
                               "uploading"
-                            ]
-                          },
-                          "type": {
-                            "type": "string",
-                            "enum": [
-                              "embedded",
-                              "uploaded"
                             ]
                           },
                           "unusedSince": {
@@ -25747,8 +25747,8 @@
                           "signature",
                           "signatureKeyId",
                           "sizeBytes",
-                          "state",
-                          "type",
+                          "source",
+                          "status",
                           "unusedSince",
                           "updatedAt",
                           "version"
@@ -26294,7 +26294,7 @@
                         "minimum": -9007199254740991,
                         "maximum": 9007199254740991
                       },
-                      "state": {
+                      "status": {
                         "type": "string",
                         "enum": [
                           "active",
@@ -26329,7 +26329,7 @@
                       "purgedAt",
                       "rolledBackFromReleaseId",
                       "rolloutPercentage",
-                      "state",
+                      "status",
                       "updatedAt"
                     ]
                   }
@@ -26461,7 +26461,7 @@
           },
           {
             "in": "query",
-            "name": "state",
+            "name": "status",
             "schema": {
               "type": "string",
               "enum": [
@@ -26504,7 +26504,7 @@
     "/v1/apps/{appId}/releases/count": {
       "get": {
         "operationId": "getV1AppsByAppIdReleasesCount",
-        "description": "The number of the app's releases under the list's filters, `channelId`, `bundleId`, `state` and `gitCommit`, which the list pages through.",
+        "description": "The number of the app's releases under the list's filters, `channelId`, `bundleId`, `status` and `gitCommit`, which the list pages through.",
         "responses": {
           "200": {
             "content": {
@@ -26629,7 +26629,7 @@
           },
           {
             "in": "query",
-            "name": "state",
+            "name": "status",
             "schema": {
               "type": "string",
               "enum": [
@@ -26785,18 +26785,18 @@
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "state": {
+                        "source": {
+                          "type": "string",
+                          "enum": [
+                            "binary",
+                            "upload"
+                          ]
+                        },
+                        "status": {
                           "type": "string",
                           "enum": [
                             "ready",
                             "uploading"
-                          ]
-                        },
-                        "type": {
-                          "type": "string",
-                          "enum": [
-                            "embedded",
-                            "uploaded"
                           ]
                         },
                         "unusedSince": {
@@ -26838,8 +26838,8 @@
                         "signature",
                         "signatureKeyId",
                         "sizeBytes",
-                        "state",
-                        "type",
+                        "source",
+                        "status",
                         "unusedSince",
                         "updatedAt",
                         "version"
@@ -27385,7 +27385,7 @@
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
-                    "state": {
+                    "status": {
                       "type": "string",
                       "enum": [
                         "active",
@@ -27420,7 +27420,7 @@
                     "purgedAt",
                     "rolledBackFromReleaseId",
                     "rolloutPercentage",
-                    "state",
+                    "status",
                     "updatedAt"
                   ]
                 }
@@ -27672,18 +27672,18 @@
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "state": {
+                        "source": {
+                          "type": "string",
+                          "enum": [
+                            "binary",
+                            "upload"
+                          ]
+                        },
+                        "status": {
                           "type": "string",
                           "enum": [
                             "ready",
                             "uploading"
-                          ]
-                        },
-                        "type": {
-                          "type": "string",
-                          "enum": [
-                            "embedded",
-                            "uploaded"
                           ]
                         },
                         "unusedSince": {
@@ -27725,8 +27725,8 @@
                         "signature",
                         "signatureKeyId",
                         "sizeBytes",
-                        "state",
-                        "type",
+                        "source",
+                        "status",
                         "unusedSince",
                         "updatedAt",
                         "version"
@@ -28272,7 +28272,7 @@
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
-                    "state": {
+                    "status": {
                       "type": "string",
                       "enum": [
                         "active",
@@ -28307,7 +28307,7 @@
                     "purgedAt",
                     "rolledBackFromReleaseId",
                     "rolloutPercentage",
-                    "state",
+                    "status",
                     "updatedAt"
                   ]
                 }
@@ -28886,18 +28886,18 @@
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "state": {
+                        "source": {
+                          "type": "string",
+                          "enum": [
+                            "binary",
+                            "upload"
+                          ]
+                        },
+                        "status": {
                           "type": "string",
                           "enum": [
                             "ready",
                             "uploading"
-                          ]
-                        },
-                        "type": {
-                          "type": "string",
-                          "enum": [
-                            "embedded",
-                            "uploaded"
                           ]
                         },
                         "unusedSince": {
@@ -28939,8 +28939,8 @@
                         "signature",
                         "signatureKeyId",
                         "sizeBytes",
-                        "state",
-                        "type",
+                        "source",
+                        "status",
                         "unusedSince",
                         "updatedAt",
                         "version"
@@ -29486,7 +29486,7 @@
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
-                    "state": {
+                    "status": {
                       "type": "string",
                       "enum": [
                         "active",
@@ -29521,7 +29521,7 @@
                     "purgedAt",
                     "rolledBackFromReleaseId",
                     "rolloutPercentage",
-                    "state",
+                    "status",
                     "updatedAt"
                   ]
                 }
@@ -29770,18 +29770,18 @@
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "state": {
+                        "source": {
+                          "type": "string",
+                          "enum": [
+                            "binary",
+                            "upload"
+                          ]
+                        },
+                        "status": {
                           "type": "string",
                           "enum": [
                             "ready",
                             "uploading"
-                          ]
-                        },
-                        "type": {
-                          "type": "string",
-                          "enum": [
-                            "embedded",
-                            "uploaded"
                           ]
                         },
                         "unusedSince": {
@@ -29823,8 +29823,8 @@
                         "signature",
                         "signatureKeyId",
                         "sizeBytes",
-                        "state",
-                        "type",
+                        "source",
+                        "status",
                         "unusedSince",
                         "updatedAt",
                         "version"
@@ -30370,7 +30370,7 @@
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
-                    "state": {
+                    "status": {
                       "type": "string",
                       "enum": [
                         "active",
@@ -30405,7 +30405,7 @@
                     "purgedAt",
                     "rolledBackFromReleaseId",
                     "rolloutPercentage",
-                    "state",
+                    "status",
                     "updatedAt"
                   ]
                 }
@@ -30654,18 +30654,18 @@
                           "minimum": -9007199254740991,
                           "maximum": 9007199254740991
                         },
-                        "state": {
+                        "source": {
+                          "type": "string",
+                          "enum": [
+                            "binary",
+                            "upload"
+                          ]
+                        },
+                        "status": {
                           "type": "string",
                           "enum": [
                             "ready",
                             "uploading"
-                          ]
-                        },
-                        "type": {
-                          "type": "string",
-                          "enum": [
-                            "embedded",
-                            "uploaded"
                           ]
                         },
                         "unusedSince": {
@@ -30707,8 +30707,8 @@
                         "signature",
                         "signatureKeyId",
                         "sizeBytes",
-                        "state",
-                        "type",
+                        "source",
+                        "status",
                         "unusedSince",
                         "updatedAt",
                         "version"
@@ -31254,7 +31254,7 @@
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
-                    "state": {
+                    "status": {
                       "type": "string",
                       "enum": [
                         "active",
@@ -31289,7 +31289,7 @@
                     "purgedAt",
                     "rolledBackFromReleaseId",
                     "rolloutPercentage",
-                    "state",
+                    "status",
                     "updatedAt"
                   ]
                 }

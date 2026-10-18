@@ -5,7 +5,11 @@ import { resolveSentRequest, stubFetch } from '../test-helpers';
 
 const AUDIT_LOGS_URL =
   'https://api.hotcodepush.com/v1/organizations/organization/audit-logs';
-const AUDIT_LOG = { id: 'audit-log', type: 'channel.created' };
+const AUDIT_LOG = {
+  actorType: 'user',
+  id: 'audit-log',
+  type: 'channel.created',
+};
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -16,6 +20,7 @@ describe('AuditLogsResource', () => {
     const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount = await new HotCodePush().organizations.auditLogs.count({
+      actorType: 'system',
       organizationId: 'organization',
       type: 'channel.*',
     });
@@ -23,7 +28,7 @@ describe('AuditLogsResource', () => {
     expect(fetchedCount).toEqual({ count: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${AUDIT_LOGS_URL}/count?type=channel.*`,
+      url: `${AUDIT_LOGS_URL}/count?actorType=system&type=channel.*`,
     });
   });
 

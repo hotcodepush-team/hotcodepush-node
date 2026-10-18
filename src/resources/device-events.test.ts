@@ -3,19 +3,19 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { HotCodePush } from '../client';
 import { resolveSentRequest, stubFetch } from '../test-helpers';
 
-const MARK = { kind: 'applied', releaseId: 'release' };
-const MARKS_URL =
-  'https://api.hotcodepush.com/v1/apps/app/devices/device/marks';
+const EVENT = { releaseId: 'release', type: 'applied' };
+const EVENTS_URL =
+  'https://api.hotcodepush.com/v1/apps/app/devices/device/events';
 
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe('DeviceMarksResource', () => {
-  test("should count the device's marks of the release", async () => {
+describe('DeviceEventsResource', () => {
+  test("should count the device's events of the release", async () => {
     const fetchMock = stubFetch(() => Response.json({ count: 2 }));
 
-    const fetchedCount = await new HotCodePush().apps.devices.marks.count({
+    const fetchedCount = await new HotCodePush().apps.devices.events.count({
       appId: 'app',
       deviceId: 'device',
       releaseId: 'release',
@@ -24,24 +24,24 @@ describe('DeviceMarksResource', () => {
     expect(fetchedCount).toEqual({ count: 2 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${MARKS_URL}/count?releaseId=release`,
+      url: `${EVENTS_URL}/count?releaseId=release`,
     });
   });
 
-  test("should list a page of the device's marks", async () => {
-    const fetchMock = stubFetch(() => Response.json([MARK]));
+  test("should list a page of the device's events", async () => {
+    const fetchMock = stubFetch(() => Response.json([EVENT]));
 
-    const fetchedMarks = await new HotCodePush().apps.devices.marks.list({
+    const fetchedEvents = await new HotCodePush().apps.devices.events.list({
       appId: 'app',
       deviceId: 'device',
       limit: 100,
       offset: 100,
     });
 
-    expect(fetchedMarks).toEqual([MARK]);
+    expect(fetchedEvents).toEqual([EVENT]);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${MARKS_URL}?limit=100&offset=100`,
+      url: `${EVENTS_URL}?limit=100&offset=100`,
     });
   });
 });

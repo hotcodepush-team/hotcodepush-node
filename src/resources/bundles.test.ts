@@ -8,7 +8,7 @@ import {
 } from '../test-helpers';
 
 const BUNDLES_URL = 'https://api.hotcodepush.com/v1/apps/app/bundles';
-const BUNDLE = { id: 'bundle', state: 'uploading' };
+const BUNDLE = { id: 'bundle', status: 'uploading' };
 const FILE = { path: 'index.html', sha256: 'a'.repeat(64), sizeBytes: 5 };
 const FINGERPRINT = `fp1:${'a'.repeat(64)}`;
 
@@ -19,7 +19,7 @@ afterEach(() => {
 describe('BundlesResource', () => {
   test('should post to complete the bundle', async () => {
     const fetchMock = stubFetch(() =>
-      Response.json({ ...BUNDLE, state: 'ready' }),
+      Response.json({ ...BUNDLE, status: 'ready' }),
     );
 
     const completedBundle = await new HotCodePush().apps.bundles.complete({
@@ -27,7 +27,7 @@ describe('BundlesResource', () => {
       bundleId: 'bundle',
     });
 
-    expect(completedBundle).toEqual({ ...BUNDLE, state: 'ready' });
+    expect(completedBundle).toEqual({ ...BUNDLE, status: 'ready' });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       body: undefined,
       method: 'POST',
@@ -115,7 +115,7 @@ describe('BundlesResource', () => {
     });
   });
 
-  test('should list the bundles of the app filtered by fingerprint, use, platform and type', async () => {
+  test('should list the bundles of the app filtered by fingerprint, use, platform and source', async () => {
     const fetchMock = stubFetch(() => Response.json([BUNDLE]));
 
     const fetchedBundles = await new HotCodePush().apps.bundles.list({
@@ -123,13 +123,13 @@ describe('BundlesResource', () => {
       fingerprint: FINGERPRINT,
       isInUse: 'false',
       platform: 'ios',
-      type: 'uploaded',
+      source: 'upload',
     });
 
     expect(fetchedBundles).toEqual([BUNDLE]);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${BUNDLES_URL}?fingerprint=${encodeURIComponent(FINGERPRINT)}&isInUse=false&platform=ios&type=uploaded`,
+      url: `${BUNDLES_URL}?fingerprint=${encodeURIComponent(FINGERPRINT)}&isInUse=false&platform=ios&source=upload`,
     });
   });
 });

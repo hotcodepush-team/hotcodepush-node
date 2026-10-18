@@ -9,7 +9,7 @@ import {
 
 const RELEASES_URL =
   'https://api.hotcodepush.com/v1/apps/app/channels/channel/releases';
-const RELEASE = { id: 'release', number: 1, state: 'active' };
+const RELEASE = { id: 'release', number: 1, status: 'active' };
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -101,7 +101,7 @@ describe('ChannelReleasesResource', () => {
 
   test('should post the bulk revocation from a release number', async () => {
     const fetchMock = stubFetch(() =>
-      Response.json([{ ...RELEASE, state: 'revoked' }]),
+      Response.json([{ ...RELEASE, status: 'revoked' }]),
     );
 
     const revokedReleases =
@@ -111,7 +111,7 @@ describe('ChannelReleasesResource', () => {
         fromNumber: 1,
       });
 
-    expect(revokedReleases).toEqual([{ ...RELEASE, state: 'revoked' }]);
+    expect(revokedReleases).toEqual([{ ...RELEASE, status: 'revoked' }]);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       body: { fromNumber: 1 },
       method: 'POST',

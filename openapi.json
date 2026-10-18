@@ -14784,10 +14784,12 @@
                           {
                             "type": "string",
                             "enum": [
+                              "none",
                               "notify",
                               "pause",
                               "revoke"
-                            ]
+                            ],
+                            "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                           },
                           {
                             "type": "null"
@@ -15199,10 +15201,12 @@
                         {
                           "type": "string",
                           "enum": [
+                            "none",
                             "notify",
                             "pause",
                             "revoke"
-                          ]
+                          ],
+                          "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                         },
                         {
                           "type": "null"
@@ -15441,10 +15445,12 @@
                       {
                         "type": "string",
                         "enum": [
+                          "none",
                           "notify",
                           "pause",
                           "revoke"
-                        ]
+                        ],
+                        "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                       },
                       {
                         "type": "null"
@@ -15646,10 +15652,12 @@
                         {
                           "type": "string",
                           "enum": [
+                            "none",
                             "notify",
                             "pause",
                             "revoke"
-                          ]
+                          ],
+                          "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                         },
                         {
                           "type": "null"
@@ -15913,10 +15921,12 @@
                         {
                           "type": "string",
                           "enum": [
+                            "none",
                             "notify",
                             "pause",
                             "revoke"
-                          ]
+                          ],
+                          "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                         },
                         {
                           "type": "null"
@@ -16145,10 +16155,12 @@
                       {
                         "type": "string",
                         "enum": [
+                          "none",
                           "notify",
                           "pause",
                           "revoke"
-                        ]
+                        ],
+                        "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                       },
                       {
                         "type": "null"
@@ -16363,10 +16375,12 @@
                         {
                           "type": "string",
                           "enum": [
+                            "none",
                             "notify",
                             "pause",
                             "revoke"
-                          ]
+                          ],
+                          "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                         },
                         {
                           "type": "null"
@@ -16614,10 +16628,12 @@
                         {
                           "type": "string",
                           "enum": [
+                            "none",
                             "notify",
                             "pause",
                             "revoke"
-                          ]
+                          ],
+                          "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                         },
                         {
                           "type": "null"
@@ -17434,10 +17450,12 @@
                               {
                                 "type": "string",
                                 "enum": [
+                                  "none",
                                   "notify",
                                   "pause",
                                   "revoke"
-                                ]
+                                ],
+                                "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                               },
                               {
                                 "type": "null"
@@ -17729,10 +17747,12 @@
                           {
                             "type": "string",
                             "enum": [
+                              "none",
                               "notify",
                               "pause",
                               "revoke"
-                            ]
+                            ],
+                            "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                           },
                           {
                             "type": "null"
@@ -18376,10 +18396,12 @@
                             {
                               "type": "string",
                               "enum": [
+                                "none",
                                 "notify",
                                 "pause",
                                 "revoke"
-                              ]
+                              ],
+                              "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                             },
                             {
                               "type": "null"
@@ -18671,10 +18693,12 @@
                         {
                           "type": "string",
                           "enum": [
+                            "none",
                             "notify",
                             "pause",
                             "revoke"
-                          ]
+                          ],
+                          "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                         },
                         {
                           "type": "null"
@@ -19182,10 +19206,12 @@
                       {
                         "type": "string",
                         "enum": [
+                          "none",
                           "notify",
                           "pause",
                           "revoke"
-                        ]
+                        ],
+                        "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                       },
                       {
                         "type": "null"
@@ -19675,10 +19701,12 @@
                             {
                               "type": "string",
                               "enum": [
+                                "none",
                                 "notify",
                                 "pause",
                                 "revoke"
-                              ]
+                              ],
+                              "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                             },
                             {
                               "type": "null"
@@ -19970,10 +19998,12 @@
                         {
                           "type": "string",
                           "enum": [
+                            "none",
                             "notify",
                             "pause",
                             "revoke"
-                          ]
+                          ],
+                          "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                         },
                         {
                           "type": "null"
@@ -20577,10 +20607,12 @@
                               {
                                 "type": "string",
                                 "enum": [
+                                  "none",
                                   "notify",
                                   "pause",
                                   "revoke"
-                                ]
+                                ],
+                                "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                               },
                               {
                                 "type": "null"
@@ -20872,10 +20904,12 @@
                           {
                             "type": "string",
                             "enum": [
+                              "none",
                               "notify",
                               "pause",
                               "revoke"
-                            ]
+                            ],
+                            "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                           },
                           {
                             "type": "null"
@@ -21602,10 +21636,12 @@
                               {
                                 "type": "string",
                                 "enum": [
+                                  "none",
                                   "notify",
                                   "pause",
                                   "revoke"
-                                ]
+                                ],
+                                "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                               },
                               {
                                 "type": "null"
@@ -21959,10 +21995,12 @@
                                   {
                                     "type": "string",
                                     "enum": [
+                                      "none",
                                       "notify",
                                       "pause",
                                       "revoke"
-                                    ]
+                                    ],
+                                    "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                                   },
                                   {
                                     "type": "null"
@@ -22254,10 +22292,12 @@
                               {
                                 "type": "string",
                                 "enum": [
+                                  "none",
                                   "notify",
                                   "pause",
                                   "revoke"
-                                ]
+                                ],
+                                "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                               },
                               {
                                 "type": "null"
@@ -23147,10 +23187,12 @@
                             {
                               "type": "string",
                               "enum": [
+                                "none",
                                 "notify",
                                 "pause",
                                 "revoke"
-                              ]
+                              ],
+                              "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                             },
                             {
                               "type": "null"
@@ -23504,10 +23546,12 @@
                                 {
                                   "type": "string",
                                   "enum": [
+                                    "none",
                                     "notify",
                                     "pause",
                                     "revoke"
-                                  ]
+                                  ],
+                                  "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                                 },
                                 {
                                   "type": "null"
@@ -23799,10 +23843,12 @@
                             {
                               "type": "string",
                               "enum": [
+                                "none",
                                 "notify",
                                 "pause",
                                 "revoke"
-                              ]
+                              ],
+                              "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                             },
                             {
                               "type": "null"
@@ -25808,10 +25854,12 @@
                               {
                                 "type": "string",
                                 "enum": [
+                                  "none",
                                   "notify",
                                   "pause",
                                   "revoke"
-                                ]
+                                ],
+                                "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                               },
                               {
                                 "type": "null"
@@ -26103,10 +26151,12 @@
                           {
                             "type": "string",
                             "enum": [
+                              "none",
                               "notify",
                               "pause",
                               "revoke"
-                            ]
+                            ],
+                            "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                           },
                           {
                             "type": "null"
@@ -26899,10 +26949,12 @@
                             {
                               "type": "string",
                               "enum": [
+                                "none",
                                 "notify",
                                 "pause",
                                 "revoke"
-                              ]
+                              ],
+                              "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                             },
                             {
                               "type": "null"
@@ -27194,10 +27246,12 @@
                         {
                           "type": "string",
                           "enum": [
+                            "none",
                             "notify",
                             "pause",
                             "revoke"
-                          ]
+                          ],
+                          "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                         },
                         {
                           "type": "null"
@@ -27786,10 +27840,12 @@
                             {
                               "type": "string",
                               "enum": [
+                                "none",
                                 "notify",
                                 "pause",
                                 "revoke"
-                              ]
+                              ],
+                              "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                             },
                             {
                               "type": "null"
@@ -28081,10 +28137,12 @@
                         {
                           "type": "string",
                           "enum": [
+                            "none",
                             "notify",
                             "pause",
                             "revoke"
-                          ]
+                          ],
+                          "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                         },
                         {
                           "type": "null"
@@ -28431,10 +28489,12 @@
                       {
                         "type": "string",
                         "enum": [
+                          "none",
                           "notify",
                           "pause",
                           "revoke"
-                        ]
+                        ],
+                        "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                       },
                       {
                         "type": "null"
@@ -29000,10 +29060,12 @@
                             {
                               "type": "string",
                               "enum": [
+                                "none",
                                 "notify",
                                 "pause",
                                 "revoke"
-                              ]
+                              ],
+                              "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                             },
                             {
                               "type": "null"
@@ -29295,10 +29357,12 @@
                         {
                           "type": "string",
                           "enum": [
+                            "none",
                             "notify",
                             "pause",
                             "revoke"
-                          ]
+                          ],
+                          "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                         },
                         {
                           "type": "null"
@@ -29884,10 +29948,12 @@
                             {
                               "type": "string",
                               "enum": [
+                                "none",
                                 "notify",
                                 "pause",
                                 "revoke"
-                              ]
+                              ],
+                              "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                             },
                             {
                               "type": "null"
@@ -30179,10 +30245,12 @@
                         {
                           "type": "string",
                           "enum": [
+                            "none",
                             "notify",
                             "pause",
                             "revoke"
-                          ]
+                          ],
+                          "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                         },
                         {
                           "type": "null"
@@ -30768,10 +30836,12 @@
                             {
                               "type": "string",
                               "enum": [
+                                "none",
                                 "notify",
                                 "pause",
                                 "revoke"
-                              ]
+                              ],
+                              "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                             },
                             {
                               "type": "null"
@@ -31063,10 +31133,12 @@
                         {
                           "type": "string",
                           "enum": [
+                            "none",
                             "notify",
                             "pause",
                             "revoke"
-                          ]
+                          ],
+                          "description": "What auto-pause does when a release fails above the threshold: `pause` stops offering it, and devices running it keep it; `revoke` also moves those devices to the newest eligible release or the embedded bundle; `notify` only notifies; `none` evaluates the rule but acts on nothing and sends nothing, while a progression still stops widening."
                         },
                         {
                           "type": "null"

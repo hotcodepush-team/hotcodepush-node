@@ -9802,7 +9802,7 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         expiresAt: string | null;
-                        failureAction: ("notify" | "pause" | "revoke") | null;
+                        failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
@@ -9904,7 +9904,7 @@ export interface operations {
                     isDiscoverable?: boolean;
                     isProtected?: boolean;
                     name: string;
-                    failureAction?: ("notify" | "pause" | "revoke") | null;
+                    failureAction?: ("none" | "notify" | "pause" | "revoke") | null;
                     failureMinimumUpdateCount?: number | null;
                     failureThresholdPercent?: number | null;
                 };
@@ -9923,7 +9923,7 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         expiresAt: string | null;
-                        failureAction: ("notify" | "pause" | "revoke") | null;
+                        failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
@@ -10238,7 +10238,7 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         expiresAt: string | null;
-                        failureAction: ("notify" | "pause" | "revoke") | null;
+                        failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
@@ -10438,7 +10438,7 @@ export interface operations {
                     isDiscoverable?: boolean;
                     isProtected?: boolean;
                     name?: string;
-                    failureAction?: ("notify" | "pause" | "revoke") | null;
+                    failureAction?: ("none" | "notify" | "pause" | "revoke") | null;
                     failureMinimumUpdateCount?: number | null;
                     failureThresholdPercent?: number | null;
                 };
@@ -10457,7 +10457,7 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         expiresAt: string | null;
-                        failureAction: ("notify" | "pause" | "revoke") | null;
+                        failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
@@ -10574,7 +10574,7 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         expiresAt: string | null;
-                        failureAction: ("notify" | "pause" | "revoke") | null;
+                        failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
@@ -10682,7 +10682,7 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         expiresAt: string | null;
-                        failureAction: ("notify" | "pause" | "revoke") | null;
+                        failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
@@ -10984,7 +10984,7 @@ export interface operations {
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
-                            failureAction: ("notify" | "pause" | "revoke") | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                             failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
@@ -11035,7 +11035,7 @@ export interface operations {
                         createdAt: string;
                         createdFromReleaseId: string | null;
                         deviceCount: number;
-                        failureAction: ("notify" | "pause" | "revoke") | null;
+                        failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
@@ -11183,7 +11183,7 @@ export interface operations {
                         type: "os";
                     })[];
                     /** @default null */
-                    failureAction?: ("notify" | "pause" | "revoke") | null;
+                    failureAction?: ("none" | "notify" | "pause" | "revoke") | null;
                     /** @default null */
                     failureMinimumUpdateCount?: number | null;
                     /** @default null */
@@ -11252,7 +11252,7 @@ export interface operations {
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
-                            failureAction: ("notify" | "pause" | "revoke") | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                             failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
@@ -11303,7 +11303,7 @@ export interface operations {
                         createdAt: string;
                         createdFromReleaseId: string | null;
                         deviceCount: number;
-                        failureAction: ("notify" | "pause" | "revoke") | null;
+                        failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
@@ -11596,7 +11596,7 @@ export interface operations {
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
-                            failureAction: ("notify" | "pause" | "revoke") | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                             failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
@@ -11647,7 +11647,7 @@ export interface operations {
                         createdAt: string;
                         createdFromReleaseId: string | null;
                         deviceCount: number;
-                        failureAction: ("notify" | "pause" | "revoke") | null;
+                        failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
@@ -11837,7 +11837,7 @@ export interface operations {
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
-                            failureAction: ("notify" | "pause" | "revoke") | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                             failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
@@ -11888,7 +11888,7 @@ export interface operations {
                         createdAt: string;
                         createdFromReleaseId: string | null;
                         deviceCount: number;
-                        failureAction: ("notify" | "pause" | "revoke") | null;
+                        failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
@@ -12155,7 +12155,7 @@ export interface operations {
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
-                            failureAction: ("notify" | "pause" | "revoke") | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                             failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
@@ -12215,7 +12215,7 @@ export interface operations {
                                 /** Format: date-time */
                                 createdAt: string;
                                 expiresAt: string | null;
-                                failureAction: ("notify" | "pause" | "revoke") | null;
+                                failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                                 failureMinimumUpdateCount: number | null;
                                 failureThresholdPercent: number | null;
                                 /** Format: uuid */
@@ -12266,7 +12266,7 @@ export interface operations {
                             createdAt: string;
                             createdFromReleaseId: string | null;
                             deviceCount: number;
-                            failureAction: ("notify" | "pause" | "revoke") | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                             failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
@@ -12609,7 +12609,7 @@ export interface operations {
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
-                            failureAction: ("notify" | "pause" | "revoke") | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                             failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
@@ -12669,7 +12669,7 @@ export interface operations {
                                 /** Format: date-time */
                                 createdAt: string;
                                 expiresAt: string | null;
-                                failureAction: ("notify" | "pause" | "revoke") | null;
+                                failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                                 failureMinimumUpdateCount: number | null;
                                 failureThresholdPercent: number | null;
                                 /** Format: uuid */
@@ -12720,7 +12720,7 @@ export interface operations {
                             createdAt: string;
                             createdFromReleaseId: string | null;
                             deviceCount: number;
-                            failureAction: ("notify" | "pause" | "revoke") | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                             failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
@@ -13779,7 +13779,7 @@ export interface operations {
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
-                            failureAction: ("notify" | "pause" | "revoke") | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                             failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
@@ -13830,7 +13830,7 @@ export interface operations {
                         createdAt: string;
                         createdFromReleaseId: string | null;
                         deviceCount: number;
-                        failureAction: ("notify" | "pause" | "revoke") | null;
+                        failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
@@ -14092,7 +14092,7 @@ export interface operations {
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
-                            failureAction: ("notify" | "pause" | "revoke") | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                             failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
@@ -14143,7 +14143,7 @@ export interface operations {
                         createdAt: string;
                         createdFromReleaseId: string | null;
                         deviceCount: number;
-                        failureAction: ("notify" | "pause" | "revoke") | null;
+                        failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
@@ -14263,7 +14263,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    failureAction?: ("notify" | "pause" | "revoke") | null;
+                    failureAction?: ("none" | "notify" | "pause" | "revoke") | null;
                     failureMinimumUpdateCount?: number | null;
                     failureThresholdPercent?: number | null;
                     isMandatory?: boolean;
@@ -14324,7 +14324,7 @@ export interface operations {
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
-                            failureAction: ("notify" | "pause" | "revoke") | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                             failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
@@ -14375,7 +14375,7 @@ export interface operations {
                         createdAt: string;
                         createdFromReleaseId: string | null;
                         deviceCount: number;
-                        failureAction: ("notify" | "pause" | "revoke") | null;
+                        failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
@@ -14658,7 +14658,7 @@ export interface operations {
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
-                            failureAction: ("notify" | "pause" | "revoke") | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                             failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
@@ -14709,7 +14709,7 @@ export interface operations {
                         createdAt: string;
                         createdFromReleaseId: string | null;
                         deviceCount: number;
-                        failureAction: ("notify" | "pause" | "revoke") | null;
+                        failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
@@ -14883,7 +14883,7 @@ export interface operations {
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
-                            failureAction: ("notify" | "pause" | "revoke") | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                             failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
@@ -14934,7 +14934,7 @@ export interface operations {
                         createdAt: string;
                         createdFromReleaseId: string | null;
                         deviceCount: number;
-                        failureAction: ("notify" | "pause" | "revoke") | null;
+                        failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
@@ -15108,7 +15108,7 @@ export interface operations {
                             /** Format: date-time */
                             createdAt: string;
                             expiresAt: string | null;
-                            failureAction: ("notify" | "pause" | "revoke") | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                             failureMinimumUpdateCount: number | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
@@ -15159,7 +15159,7 @@ export interface operations {
                         createdAt: string;
                         createdFromReleaseId: string | null;
                         deviceCount: number;
-                        failureAction: ("notify" | "pause" | "revoke") | null;
+                        failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */

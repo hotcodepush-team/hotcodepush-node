@@ -88,14 +88,14 @@ describe('ChannelReleasesResource', () => {
       {
         appId: 'app',
         channelId: 'channel',
-        relations: ['bundle', 'channel', 'counters'],
+        relations: ['bundle', 'channel', 'releaseCounters'],
       },
     );
 
     expect(fetchedReleases).toEqual([RELEASE]);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${RELEASES_URL}?relations=bundle%2Cchannel%2Ccounters`,
+      url: `${RELEASES_URL}?relations=bundle%2Cchannel%2CreleaseCounters`,
     });
   });
 

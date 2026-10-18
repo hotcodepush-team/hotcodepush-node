@@ -36,14 +36,14 @@ describe('ReleasesResource', () => {
 
     const fetchedRelease = await new HotCodePush().apps.releases.get({
       appId: 'app',
-      relations: ['counters'],
+      relations: ['releaseCounters'],
       releaseId: 'release',
     });
 
     expect(fetchedRelease).toEqual(RELEASE);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${RELEASES_URL}/release?relations=counters`,
+      url: `${RELEASES_URL}/release?relations=releaseCounters`,
     });
   });
 

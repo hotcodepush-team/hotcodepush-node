@@ -1277,7 +1277,7 @@ export interface paths {
         };
         /**
          * List the releases of a channel
-         * @description The channel's release log, newest first, each release with the devices whose current release it is; `?relations=channel,bundle,counters` embeds the linked rows.
+         * @description The channel's release log, newest first, each release with the devices whose current release it is; `?relations=channel,bundle,releaseCounters` embeds the linked rows.
          */
         get: operations["getV1AppsByAppIdChannelsByChannelIdReleases"];
         put?: never;
@@ -1589,7 +1589,7 @@ export interface paths {
         };
         /**
          * List the releases
-         * @description Every release of the app, newest first, filtered by `channelId`, `bundleId`, `status` and `gitCommit`, the text the hash, ref or message of the bundle's Git commit contains, case-insensitively; `?relations=channel,bundle,counters` embeds the linked rows.
+         * @description Every release of the app, newest first, filtered by `channelId`, `bundleId`, `status` and `gitCommit`, the text the hash, ref or message of the bundle's Git commit contains, case-insensitively; `?relations=channel,bundle,releaseCounters` embeds the linked rows.
          */
         get: operations["getV1AppsByAppIdReleases"];
         put?: never;
@@ -1629,7 +1629,7 @@ export interface paths {
         };
         /**
          * Get a release
-         * @description One release with its status — when it went live in the index and when the purge completed; `?relations=channel,bundle,counters` embeds the linked rows, the channel with the verifier's last result.
+         * @description One release with its status — when it went live in the index and when the purge completed; `?relations=channel,bundle,releaseCounters` embeds the linked rows, the channel with the verifier's last result.
          */
         get: operations["getV1AppsByAppIdReleasesByReleaseId"];
         put?: never;
@@ -10924,7 +10924,7 @@ export interface operations {
             query?: {
                 limit?: number;
                 offset?: number;
-                relations?: ("bundle" | "channel" | "counters")[];
+                relations?: ("bundle" | "channel" | "releaseCounters")[];
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -11022,15 +11022,6 @@ export interface operations {
                             /** @constant */
                             type: "os";
                         })[];
-                        counters?: {
-                            appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
-                            crashFailureCount: number;
-                            downloadFailureCount: number;
-                            readinessTimeoutFailureCount: number;
-                            reportedFailureCount: number;
-                            verificationFailureCount: number;
-                        };
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
@@ -11065,6 +11056,15 @@ export interface operations {
                             number: number;
                         } | null;
                         purgedAt: string | null;
+                        releaseCounters?: {
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
+                        };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
@@ -11290,15 +11290,6 @@ export interface operations {
                             /** @constant */
                             type: "os";
                         })[];
-                        counters?: {
-                            appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
-                            crashFailureCount: number;
-                            downloadFailureCount: number;
-                            readinessTimeoutFailureCount: number;
-                            reportedFailureCount: number;
-                            verificationFailureCount: number;
-                        };
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
@@ -11333,6 +11324,15 @@ export interface operations {
                             number: number;
                         } | null;
                         purgedAt: string | null;
+                        releaseCounters?: {
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
+                        };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
@@ -11634,15 +11634,6 @@ export interface operations {
                             /** @constant */
                             type: "os";
                         })[];
-                        counters?: {
-                            appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
-                            crashFailureCount: number;
-                            downloadFailureCount: number;
-                            readinessTimeoutFailureCount: number;
-                            reportedFailureCount: number;
-                            verificationFailureCount: number;
-                        };
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
@@ -11677,6 +11668,15 @@ export interface operations {
                             number: number;
                         } | null;
                         purgedAt: string | null;
+                        releaseCounters?: {
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
+                        };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
@@ -11875,15 +11875,6 @@ export interface operations {
                             /** @constant */
                             type: "os";
                         })[];
-                        counters?: {
-                            appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
-                            crashFailureCount: number;
-                            downloadFailureCount: number;
-                            readinessTimeoutFailureCount: number;
-                            reportedFailureCount: number;
-                            verificationFailureCount: number;
-                        };
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
@@ -11918,6 +11909,15 @@ export interface operations {
                             number: number;
                         } | null;
                         purgedAt: string | null;
+                        releaseCounters?: {
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
+                        };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
@@ -12253,15 +12253,6 @@ export interface operations {
                                 /** @constant */
                                 type: "os";
                             })[];
-                            counters?: {
-                                appliedUpdateCount: number;
-                                attemptedUpdateCount: number;
-                                crashFailureCount: number;
-                                downloadFailureCount: number;
-                                readinessTimeoutFailureCount: number;
-                                reportedFailureCount: number;
-                                verificationFailureCount: number;
-                            };
                             /** Format: date-time */
                             createdAt: string;
                             createdFromReleaseId: string | null;
@@ -12296,6 +12287,15 @@ export interface operations {
                                 number: number;
                             } | null;
                             purgedAt: string | null;
+                            releaseCounters?: {
+                                appliedUpdateCount: number;
+                                attemptedUpdateCount: number;
+                                crashFailureCount: number;
+                                downloadFailureCount: number;
+                                readinessTimeoutFailureCount: number;
+                                reportedFailureCount: number;
+                                verificationFailureCount: number;
+                            };
                             rolledBackFromReleaseId: string | null;
                             rolloutPercentage: number;
                             /** @enum {string} */
@@ -12707,15 +12707,6 @@ export interface operations {
                                 /** @constant */
                                 type: "os";
                             })[];
-                            counters?: {
-                                appliedUpdateCount: number;
-                                attemptedUpdateCount: number;
-                                crashFailureCount: number;
-                                downloadFailureCount: number;
-                                readinessTimeoutFailureCount: number;
-                                reportedFailureCount: number;
-                                verificationFailureCount: number;
-                            };
                             /** Format: date-time */
                             createdAt: string;
                             createdFromReleaseId: string | null;
@@ -12750,6 +12741,15 @@ export interface operations {
                                 number: number;
                             } | null;
                             purgedAt: string | null;
+                            releaseCounters?: {
+                                appliedUpdateCount: number;
+                                attemptedUpdateCount: number;
+                                crashFailureCount: number;
+                                downloadFailureCount: number;
+                                readinessTimeoutFailureCount: number;
+                                reportedFailureCount: number;
+                                verificationFailureCount: number;
+                            };
                             rolledBackFromReleaseId: string | null;
                             rolloutPercentage: number;
                             /** @enum {string} */
@@ -13720,7 +13720,7 @@ export interface operations {
                 channelId?: string;
                 gitCommit?: string;
                 status?: "active" | "paused" | "revoked";
-                relations?: ("bundle" | "channel" | "counters")[];
+                relations?: ("bundle" | "channel" | "releaseCounters")[];
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -13817,15 +13817,6 @@ export interface operations {
                             /** @constant */
                             type: "os";
                         })[];
-                        counters?: {
-                            appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
-                            crashFailureCount: number;
-                            downloadFailureCount: number;
-                            readinessTimeoutFailureCount: number;
-                            reportedFailureCount: number;
-                            verificationFailureCount: number;
-                        };
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
@@ -13860,6 +13851,15 @@ export interface operations {
                             number: number;
                         } | null;
                         purgedAt: string | null;
+                        releaseCounters?: {
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
+                        };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
@@ -14032,7 +14032,7 @@ export interface operations {
     getV1AppsByAppIdReleasesByReleaseId: {
         parameters: {
             query?: {
-                relations?: ("bundle" | "channel" | "counters")[];
+                relations?: ("bundle" | "channel" | "releaseCounters")[];
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -14130,15 +14130,6 @@ export interface operations {
                             /** @constant */
                             type: "os";
                         })[];
-                        counters?: {
-                            appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
-                            crashFailureCount: number;
-                            downloadFailureCount: number;
-                            readinessTimeoutFailureCount: number;
-                            reportedFailureCount: number;
-                            verificationFailureCount: number;
-                        };
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
@@ -14173,6 +14164,15 @@ export interface operations {
                             number: number;
                         } | null;
                         purgedAt: string | null;
+                        releaseCounters?: {
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
+                        };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
@@ -14362,15 +14362,6 @@ export interface operations {
                             /** @constant */
                             type: "os";
                         })[];
-                        counters?: {
-                            appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
-                            crashFailureCount: number;
-                            downloadFailureCount: number;
-                            readinessTimeoutFailureCount: number;
-                            reportedFailureCount: number;
-                            verificationFailureCount: number;
-                        };
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
@@ -14405,6 +14396,15 @@ export interface operations {
                             number: number;
                         } | null;
                         purgedAt: string | null;
+                        releaseCounters?: {
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
+                        };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
@@ -14696,15 +14696,6 @@ export interface operations {
                             /** @constant */
                             type: "os";
                         })[];
-                        counters?: {
-                            appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
-                            crashFailureCount: number;
-                            downloadFailureCount: number;
-                            readinessTimeoutFailureCount: number;
-                            reportedFailureCount: number;
-                            verificationFailureCount: number;
-                        };
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
@@ -14739,6 +14730,15 @@ export interface operations {
                             number: number;
                         } | null;
                         purgedAt: string | null;
+                        releaseCounters?: {
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
+                        };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
@@ -14921,15 +14921,6 @@ export interface operations {
                             /** @constant */
                             type: "os";
                         })[];
-                        counters?: {
-                            appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
-                            crashFailureCount: number;
-                            downloadFailureCount: number;
-                            readinessTimeoutFailureCount: number;
-                            reportedFailureCount: number;
-                            verificationFailureCount: number;
-                        };
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
@@ -14964,6 +14955,15 @@ export interface operations {
                             number: number;
                         } | null;
                         purgedAt: string | null;
+                        releaseCounters?: {
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
+                        };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
@@ -15146,15 +15146,6 @@ export interface operations {
                             /** @constant */
                             type: "os";
                         })[];
-                        counters?: {
-                            appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
-                            crashFailureCount: number;
-                            downloadFailureCount: number;
-                            readinessTimeoutFailureCount: number;
-                            reportedFailureCount: number;
-                            verificationFailureCount: number;
-                        };
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
@@ -15189,6 +15180,15 @@ export interface operations {
                             number: number;
                         } | null;
                         purgedAt: string | null;
+                        releaseCounters?: {
+                            appliedUpdateCount: number;
+                            attemptedUpdateCount: number;
+                            crashFailureCount: number;
+                            downloadFailureCount: number;
+                            readinessTimeoutFailureCount: number;
+                            reportedFailureCount: number;
+                            verificationFailureCount: number;
+                        };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */

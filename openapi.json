@@ -17225,7 +17225,7 @@
     "/v1/apps/{appId}/channels/{channelId}/releases": {
       "get": {
         "operationId": "getV1AppsByAppIdChannelsByChannelIdReleases",
-        "description": "The channel's release log, newest first, each release with the devices whose current release it is; `?relations=channel,bundle,counters` embeds the linked rows.",
+        "description": "The channel's release log, newest first, each release with the devices whose current release it is; `?relations=channel,bundle,releaseCounters` embeds the linked rows.",
         "responses": {
           "200": {
             "content": {
@@ -17671,55 +17671,6 @@
                           ]
                         }
                       },
-                      "counters": {
-                        "type": "object",
-                        "properties": {
-                          "appliedUpdateCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "attemptedUpdateCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "crashFailureCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "downloadFailureCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "readinessTimeoutFailureCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "reportedFailureCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "verificationFailureCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          }
-                        },
-                        "required": [
-                          "appliedUpdateCount",
-                          "attemptedUpdateCount",
-                          "crashFailureCount",
-                          "downloadFailureCount",
-                          "readinessTimeoutFailureCount",
-                          "reportedFailureCount",
-                          "verificationFailureCount"
-                        ]
-                      },
                       "createdAt": {
                         "type": "string",
                         "format": "date-time",
@@ -17942,6 +17893,55 @@
                           }
                         ]
                       },
+                      "releaseCounters": {
+                        "type": "object",
+                        "properties": {
+                          "appliedUpdateCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "attemptedUpdateCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "crashFailureCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "downloadFailureCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "readinessTimeoutFailureCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "reportedFailureCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "verificationFailureCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "appliedUpdateCount",
+                          "attemptedUpdateCount",
+                          "crashFailureCount",
+                          "downloadFailureCount",
+                          "readinessTimeoutFailureCount",
+                          "reportedFailureCount",
+                          "verificationFailureCount"
+                        ]
+                      },
                       "rolledBackFromReleaseId": {
                         "anyOf": [
                           {
@@ -18109,7 +18109,7 @@
                 "enum": [
                   "bundle",
                   "channel",
-                  "counters"
+                  "releaseCounters"
                 ]
               }
             }
@@ -18617,55 +18617,6 @@
                         ]
                       }
                     },
-                    "counters": {
-                      "type": "object",
-                      "properties": {
-                        "appliedUpdateCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "attemptedUpdateCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "crashFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "downloadFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "readinessTimeoutFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "reportedFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "verificationFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        }
-                      },
-                      "required": [
-                        "appliedUpdateCount",
-                        "attemptedUpdateCount",
-                        "crashFailureCount",
-                        "downloadFailureCount",
-                        "readinessTimeoutFailureCount",
-                        "reportedFailureCount",
-                        "verificationFailureCount"
-                      ]
-                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time",
@@ -18886,6 +18837,55 @@
                         {
                           "type": "null"
                         }
+                      ]
+                    },
+                    "releaseCounters": {
+                      "type": "object",
+                      "properties": {
+                        "appliedUpdateCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "attemptedUpdateCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "crashFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "downloadFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "readinessTimeoutFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "reportedFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "verificationFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "appliedUpdateCount",
+                        "attemptedUpdateCount",
+                        "crashFailureCount",
+                        "downloadFailureCount",
+                        "readinessTimeoutFailureCount",
+                        "reportedFailureCount",
+                        "verificationFailureCount"
                       ]
                     },
                     "rolledBackFromReleaseId": {
@@ -19922,55 +19922,6 @@
                         ]
                       }
                     },
-                    "counters": {
-                      "type": "object",
-                      "properties": {
-                        "appliedUpdateCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "attemptedUpdateCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "crashFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "downloadFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "readinessTimeoutFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "reportedFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "verificationFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        }
-                      },
-                      "required": [
-                        "appliedUpdateCount",
-                        "attemptedUpdateCount",
-                        "crashFailureCount",
-                        "downloadFailureCount",
-                        "readinessTimeoutFailureCount",
-                        "reportedFailureCount",
-                        "verificationFailureCount"
-                      ]
-                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time",
@@ -20191,6 +20142,55 @@
                         {
                           "type": "null"
                         }
+                      ]
+                    },
+                    "releaseCounters": {
+                      "type": "object",
+                      "properties": {
+                        "appliedUpdateCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "attemptedUpdateCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "crashFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "downloadFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "readinessTimeoutFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "reportedFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "verificationFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "appliedUpdateCount",
+                        "attemptedUpdateCount",
+                        "crashFailureCount",
+                        "downloadFailureCount",
+                        "readinessTimeoutFailureCount",
+                        "reportedFailureCount",
+                        "verificationFailureCount"
                       ]
                     },
                     "rolledBackFromReleaseId": {
@@ -20828,55 +20828,6 @@
                           ]
                         }
                       },
-                      "counters": {
-                        "type": "object",
-                        "properties": {
-                          "appliedUpdateCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "attemptedUpdateCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "crashFailureCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "downloadFailureCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "readinessTimeoutFailureCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "reportedFailureCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "verificationFailureCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          }
-                        },
-                        "required": [
-                          "appliedUpdateCount",
-                          "attemptedUpdateCount",
-                          "crashFailureCount",
-                          "downloadFailureCount",
-                          "readinessTimeoutFailureCount",
-                          "reportedFailureCount",
-                          "verificationFailureCount"
-                        ]
-                      },
                       "createdAt": {
                         "type": "string",
                         "format": "date-time",
@@ -21097,6 +21048,55 @@
                           {
                             "type": "null"
                           }
+                        ]
+                      },
+                      "releaseCounters": {
+                        "type": "object",
+                        "properties": {
+                          "appliedUpdateCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "attemptedUpdateCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "crashFailureCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "downloadFailureCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "readinessTimeoutFailureCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "reportedFailureCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "verificationFailureCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "appliedUpdateCount",
+                          "attemptedUpdateCount",
+                          "crashFailureCount",
+                          "downloadFailureCount",
+                          "readinessTimeoutFailureCount",
+                          "reportedFailureCount",
+                          "verificationFailureCount"
                         ]
                       },
                       "rolledBackFromReleaseId": {
@@ -22216,55 +22216,6 @@
                               ]
                             }
                           },
-                          "counters": {
-                            "type": "object",
-                            "properties": {
-                              "appliedUpdateCount": {
-                                "type": "integer",
-                                "minimum": -9007199254740991,
-                                "maximum": 9007199254740991
-                              },
-                              "attemptedUpdateCount": {
-                                "type": "integer",
-                                "minimum": -9007199254740991,
-                                "maximum": 9007199254740991
-                              },
-                              "crashFailureCount": {
-                                "type": "integer",
-                                "minimum": -9007199254740991,
-                                "maximum": 9007199254740991
-                              },
-                              "downloadFailureCount": {
-                                "type": "integer",
-                                "minimum": -9007199254740991,
-                                "maximum": 9007199254740991
-                              },
-                              "readinessTimeoutFailureCount": {
-                                "type": "integer",
-                                "minimum": -9007199254740991,
-                                "maximum": 9007199254740991
-                              },
-                              "reportedFailureCount": {
-                                "type": "integer",
-                                "minimum": -9007199254740991,
-                                "maximum": 9007199254740991
-                              },
-                              "verificationFailureCount": {
-                                "type": "integer",
-                                "minimum": -9007199254740991,
-                                "maximum": 9007199254740991
-                              }
-                            },
-                            "required": [
-                              "appliedUpdateCount",
-                              "attemptedUpdateCount",
-                              "crashFailureCount",
-                              "downloadFailureCount",
-                              "readinessTimeoutFailureCount",
-                              "reportedFailureCount",
-                              "verificationFailureCount"
-                            ]
-                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time",
@@ -22485,6 +22436,55 @@
                               {
                                 "type": "null"
                               }
+                            ]
+                          },
+                          "releaseCounters": {
+                            "type": "object",
+                            "properties": {
+                              "appliedUpdateCount": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "attemptedUpdateCount": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "crashFailureCount": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "downloadFailureCount": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "readinessTimeoutFailureCount": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "reportedFailureCount": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "verificationFailureCount": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              }
+                            },
+                            "required": [
+                              "appliedUpdateCount",
+                              "attemptedUpdateCount",
+                              "crashFailureCount",
+                              "downloadFailureCount",
+                              "readinessTimeoutFailureCount",
+                              "reportedFailureCount",
+                              "verificationFailureCount"
                             ]
                           },
                           "rolledBackFromReleaseId": {
@@ -23767,55 +23767,6 @@
                             ]
                           }
                         },
-                        "counters": {
-                          "type": "object",
-                          "properties": {
-                            "appliedUpdateCount": {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            },
-                            "attemptedUpdateCount": {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            },
-                            "crashFailureCount": {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            },
-                            "downloadFailureCount": {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            },
-                            "readinessTimeoutFailureCount": {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            },
-                            "reportedFailureCount": {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            },
-                            "verificationFailureCount": {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            }
-                          },
-                          "required": [
-                            "appliedUpdateCount",
-                            "attemptedUpdateCount",
-                            "crashFailureCount",
-                            "downloadFailureCount",
-                            "readinessTimeoutFailureCount",
-                            "reportedFailureCount",
-                            "verificationFailureCount"
-                          ]
-                        },
                         "createdAt": {
                           "type": "string",
                           "format": "date-time",
@@ -24036,6 +23987,55 @@
                             {
                               "type": "null"
                             }
+                          ]
+                        },
+                        "releaseCounters": {
+                          "type": "object",
+                          "properties": {
+                            "appliedUpdateCount": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "attemptedUpdateCount": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "crashFailureCount": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "downloadFailureCount": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "readinessTimeoutFailureCount": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "reportedFailureCount": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "verificationFailureCount": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            }
+                          },
+                          "required": [
+                            "appliedUpdateCount",
+                            "attemptedUpdateCount",
+                            "crashFailureCount",
+                            "downloadFailureCount",
+                            "readinessTimeoutFailureCount",
+                            "reportedFailureCount",
+                            "verificationFailureCount"
                           ]
                         },
                         "rolledBackFromReleaseId": {
@@ -25629,7 +25629,7 @@
     "/v1/apps/{appId}/releases": {
       "get": {
         "operationId": "getV1AppsByAppIdReleases",
-        "description": "Every release of the app, newest first, filtered by `channelId`, `bundleId`, `status` and `gitCommit`, the text the hash, ref or message of the bundle's Git commit contains, case-insensitively; `?relations=channel,bundle,counters` embeds the linked rows.",
+        "description": "Every release of the app, newest first, filtered by `channelId`, `bundleId`, `status` and `gitCommit`, the text the hash, ref or message of the bundle's Git commit contains, case-insensitively; `?relations=channel,bundle,releaseCounters` embeds the linked rows.",
         "responses": {
           "200": {
             "content": {
@@ -26075,55 +26075,6 @@
                           ]
                         }
                       },
-                      "counters": {
-                        "type": "object",
-                        "properties": {
-                          "appliedUpdateCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "attemptedUpdateCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "crashFailureCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "downloadFailureCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "readinessTimeoutFailureCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "reportedFailureCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "verificationFailureCount": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          }
-                        },
-                        "required": [
-                          "appliedUpdateCount",
-                          "attemptedUpdateCount",
-                          "crashFailureCount",
-                          "downloadFailureCount",
-                          "readinessTimeoutFailureCount",
-                          "reportedFailureCount",
-                          "verificationFailureCount"
-                        ]
-                      },
                       "createdAt": {
                         "type": "string",
                         "format": "date-time",
@@ -26346,6 +26297,55 @@
                           }
                         ]
                       },
+                      "releaseCounters": {
+                        "type": "object",
+                        "properties": {
+                          "appliedUpdateCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "attemptedUpdateCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "crashFailureCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "downloadFailureCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "readinessTimeoutFailureCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "reportedFailureCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "verificationFailureCount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "appliedUpdateCount",
+                          "attemptedUpdateCount",
+                          "crashFailureCount",
+                          "downloadFailureCount",
+                          "readinessTimeoutFailureCount",
+                          "reportedFailureCount",
+                          "verificationFailureCount"
+                        ]
+                      },
                       "rolledBackFromReleaseId": {
                         "anyOf": [
                           {
@@ -26550,7 +26550,7 @@
                 "enum": [
                   "bundle",
                   "channel",
-                  "counters"
+                  "releaseCounters"
                 ]
               }
             }
@@ -26726,7 +26726,7 @@
     "/v1/apps/{appId}/releases/{releaseId}": {
       "get": {
         "operationId": "getV1AppsByAppIdReleasesByReleaseId",
-        "description": "One release with its status — when it went live in the index and when the purge completed; `?relations=channel,bundle,counters` embeds the linked rows, the channel with the verifier's last result.",
+        "description": "One release with its status — when it went live in the index and when the purge completed; `?relations=channel,bundle,releaseCounters` embeds the linked rows, the channel with the verifier's last result.",
         "responses": {
           "200": {
             "content": {
@@ -27170,55 +27170,6 @@
                         ]
                       }
                     },
-                    "counters": {
-                      "type": "object",
-                      "properties": {
-                        "appliedUpdateCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "attemptedUpdateCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "crashFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "downloadFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "readinessTimeoutFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "reportedFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "verificationFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        }
-                      },
-                      "required": [
-                        "appliedUpdateCount",
-                        "attemptedUpdateCount",
-                        "crashFailureCount",
-                        "downloadFailureCount",
-                        "readinessTimeoutFailureCount",
-                        "reportedFailureCount",
-                        "verificationFailureCount"
-                      ]
-                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time",
@@ -27441,6 +27392,55 @@
                         }
                       ]
                     },
+                    "releaseCounters": {
+                      "type": "object",
+                      "properties": {
+                        "appliedUpdateCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "attemptedUpdateCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "crashFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "downloadFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "readinessTimeoutFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "reportedFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "verificationFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "appliedUpdateCount",
+                        "attemptedUpdateCount",
+                        "crashFailureCount",
+                        "downloadFailureCount",
+                        "readinessTimeoutFailureCount",
+                        "reportedFailureCount",
+                        "verificationFailureCount"
+                      ]
+                    },
                     "rolledBackFromReleaseId": {
                       "anyOf": [
                         {
@@ -27587,7 +27587,7 @@
                 "enum": [
                   "bundle",
                   "channel",
-                  "counters"
+                  "releaseCounters"
                 ]
               }
             }
@@ -28061,55 +28061,6 @@
                         ]
                       }
                     },
-                    "counters": {
-                      "type": "object",
-                      "properties": {
-                        "appliedUpdateCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "attemptedUpdateCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "crashFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "downloadFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "readinessTimeoutFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "reportedFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "verificationFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        }
-                      },
-                      "required": [
-                        "appliedUpdateCount",
-                        "attemptedUpdateCount",
-                        "crashFailureCount",
-                        "downloadFailureCount",
-                        "readinessTimeoutFailureCount",
-                        "reportedFailureCount",
-                        "verificationFailureCount"
-                      ]
-                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time",
@@ -28330,6 +28281,55 @@
                         {
                           "type": "null"
                         }
+                      ]
+                    },
+                    "releaseCounters": {
+                      "type": "object",
+                      "properties": {
+                        "appliedUpdateCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "attemptedUpdateCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "crashFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "downloadFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "readinessTimeoutFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "reportedFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "verificationFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "appliedUpdateCount",
+                        "attemptedUpdateCount",
+                        "crashFailureCount",
+                        "downloadFailureCount",
+                        "readinessTimeoutFailureCount",
+                        "reportedFailureCount",
+                        "verificationFailureCount"
                       ]
                     },
                     "rolledBackFromReleaseId": {
@@ -29281,55 +29281,6 @@
                         ]
                       }
                     },
-                    "counters": {
-                      "type": "object",
-                      "properties": {
-                        "appliedUpdateCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "attemptedUpdateCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "crashFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "downloadFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "readinessTimeoutFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "reportedFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "verificationFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        }
-                      },
-                      "required": [
-                        "appliedUpdateCount",
-                        "attemptedUpdateCount",
-                        "crashFailureCount",
-                        "downloadFailureCount",
-                        "readinessTimeoutFailureCount",
-                        "reportedFailureCount",
-                        "verificationFailureCount"
-                      ]
-                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time",
@@ -29550,6 +29501,55 @@
                         {
                           "type": "null"
                         }
+                      ]
+                    },
+                    "releaseCounters": {
+                      "type": "object",
+                      "properties": {
+                        "appliedUpdateCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "attemptedUpdateCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "crashFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "downloadFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "readinessTimeoutFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "reportedFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "verificationFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "appliedUpdateCount",
+                        "attemptedUpdateCount",
+                        "crashFailureCount",
+                        "downloadFailureCount",
+                        "readinessTimeoutFailureCount",
+                        "reportedFailureCount",
+                        "verificationFailureCount"
                       ]
                     },
                     "rolledBackFromReleaseId": {
@@ -30169,55 +30169,6 @@
                         ]
                       }
                     },
-                    "counters": {
-                      "type": "object",
-                      "properties": {
-                        "appliedUpdateCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "attemptedUpdateCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "crashFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "downloadFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "readinessTimeoutFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "reportedFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "verificationFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        }
-                      },
-                      "required": [
-                        "appliedUpdateCount",
-                        "attemptedUpdateCount",
-                        "crashFailureCount",
-                        "downloadFailureCount",
-                        "readinessTimeoutFailureCount",
-                        "reportedFailureCount",
-                        "verificationFailureCount"
-                      ]
-                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time",
@@ -30438,6 +30389,55 @@
                         {
                           "type": "null"
                         }
+                      ]
+                    },
+                    "releaseCounters": {
+                      "type": "object",
+                      "properties": {
+                        "appliedUpdateCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "attemptedUpdateCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "crashFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "downloadFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "readinessTimeoutFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "reportedFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "verificationFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "appliedUpdateCount",
+                        "attemptedUpdateCount",
+                        "crashFailureCount",
+                        "downloadFailureCount",
+                        "readinessTimeoutFailureCount",
+                        "reportedFailureCount",
+                        "verificationFailureCount"
                       ]
                     },
                     "rolledBackFromReleaseId": {
@@ -31057,55 +31057,6 @@
                         ]
                       }
                     },
-                    "counters": {
-                      "type": "object",
-                      "properties": {
-                        "appliedUpdateCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "attemptedUpdateCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "crashFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "downloadFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "readinessTimeoutFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "reportedFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "verificationFailureCount": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        }
-                      },
-                      "required": [
-                        "appliedUpdateCount",
-                        "attemptedUpdateCount",
-                        "crashFailureCount",
-                        "downloadFailureCount",
-                        "readinessTimeoutFailureCount",
-                        "reportedFailureCount",
-                        "verificationFailureCount"
-                      ]
-                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time",
@@ -31326,6 +31277,55 @@
                         {
                           "type": "null"
                         }
+                      ]
+                    },
+                    "releaseCounters": {
+                      "type": "object",
+                      "properties": {
+                        "appliedUpdateCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "attemptedUpdateCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "crashFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "downloadFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "readinessTimeoutFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "reportedFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "verificationFailureCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "appliedUpdateCount",
+                        "attemptedUpdateCount",
+                        "crashFailureCount",
+                        "downloadFailureCount",
+                        "readinessTimeoutFailureCount",
+                        "reportedFailureCount",
+                        "verificationFailureCount"
                       ]
                     },
                     "rolledBackFromReleaseId": {

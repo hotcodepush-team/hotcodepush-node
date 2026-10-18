@@ -410,7 +410,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
   'apps.releases.get': hotCodePush =>
     hotCodePush.apps.releases.get({
       appId: APP_ID,
-      relations: ['counters'],
+      relations: ['releaseCounters'],
       releaseId: RELEASE_ID,
     }),
   'apps.releases.list': hotCodePush =>

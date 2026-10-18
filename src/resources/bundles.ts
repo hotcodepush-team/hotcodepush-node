@@ -18,15 +18,6 @@ export type Bundle = JsonResponseBody<
   200
 >[number];
 
-/**
- * A created bundle with the upload URLs of the files the app lacks and of its pack.
- */
-export type BundleWithUploads = JsonResponseBody<
-  '/v1/apps/{appId}/bundles',
-  'post',
-  201
->;
-
 export type CompleteBundleOptions = PathParameters<
   '/v1/apps/{appId}/bundles/{bundleId}/complete',
   'post'
@@ -101,10 +92,10 @@ export class BundlesResource {
 
   /**
    * Creates a bundle from its manifest; it stays `uploading` until completed.
+   * `apps.bundles.files.list` with `isStored: 'false'` names the files the app lacks, each uploaded through `apps.files.upload`;
+   * the pack goes up through `apps.bundles.pack.upload`.
    */
-  public async create(
-    options: CreateBundleOptions,
-  ): Promise<BundleWithUploads> {
+  public async create(options: CreateBundleOptions): Promise<Bundle> {
     const { appId, idempotencyKey, ...body } = options;
     return this.httpClient.fetchCreatingPost({
       body,

@@ -24,7 +24,8 @@ export type PutSsoProviderOptions = PathParameters<
   JsonRequestBody<'/v1/organizations/{organizationId}/sso-provider', 'put'>;
 
 /**
- * The organization's one SSO provider, OIDC or SAML, with its domain and, until the domain is verified, the TXT record to set.
+ * The organization's one SSO provider, its row: the domain, the token its TXT record `_hotcodepush-sso-{providerId}.{domain}` must carry
+ * until `domainVerified` is true, and the `type`, `oidc` or `saml`; the configs are write-only.
  */
 export type SsoProvider = JsonResponseBody<
   '/v1/organizations/{organizationId}/sso-provider',
@@ -67,7 +68,7 @@ export class SsoProviderResource {
   }
 
   /**
-   * Sets the OIDC or SAML provider and its domain, replacing the one before; a new or changed domain starts unverified.
+   * Sets the OIDC or SAML provider and its domain, replacing the one before; a new or changed domain starts unverified, with a new token for its TXT record.
    * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
   public async put(options: PutSsoProviderOptions): Promise<SsoProvider> {

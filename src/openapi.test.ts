@@ -59,11 +59,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       version: '1.0.0',
     }),
   'apps.binaries.get': hotCodePush =>
-    hotCodePush.apps.binaries.get({
-      appId: APP_ID,
-      binaryId: BINARY_ID,
-      relations: ['bundle'],
-    }),
+    hotCodePush.apps.binaries.get({ appId: APP_ID, binaryId: BINARY_ID }),
   'apps.binaries.list': hotCodePush =>
     hotCodePush.apps.binaries.list({
       appId: APP_ID,
@@ -71,7 +67,6 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       limit: 10,
       offset: 10,
       platform: 'ios',
-      relations: ['bundle'],
     }),
   'apps.bundles.complete': hotCodePush =>
     hotCodePush.apps.bundles.complete({ appId: APP_ID, bundleId: BUNDLE_ID }),
@@ -151,11 +146,13 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.apps.bundles.files.count({
       appId: APP_ID,
       bundleId: BUNDLE_ID,
+      isStored: 'false',
     }),
   'apps.bundles.files.list': hotCodePush =>
     hotCodePush.apps.bundles.files.list({
       appId: APP_ID,
       bundleId: BUNDLE_ID,
+      isStored: 'false',
       limit: 10,
       offset: 10,
     }),
@@ -733,7 +730,11 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       password: 'correct horse battery staple',
       userId: 'me',
     }),
-  'users.get': hotCodePush => hotCodePush.users.get({ userId: 'me' }),
+  'users.get': hotCodePush =>
+    hotCodePush.users.get({
+      relations: ['accounts', 'members', 'members.organization'],
+      userId: 'me',
+    }),
   'users.password.create': hotCodePush =>
     hotCodePush.users.password.create({
       password: 'correct horse battery staple',

@@ -7,7 +7,7 @@ const SSO_PROVIDER_URL =
   'https://api.hotcodepush.com/v1/organizations/organization/sso-provider';
 const SSO_PROVIDER = {
   domain: 'example.com',
-  isDomainVerified: false,
+  domainVerified: false,
 };
 
 afterEach(() => {

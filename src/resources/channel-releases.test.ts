@@ -53,9 +53,7 @@ describe('ChannelReleasesResource', () => {
   });
 
   test('should post a release of what another channel serves with its auto-pause overrides', async () => {
-    const fetchMock = stubFetch(() =>
-      Response.json({ ...RELEASE, warnings: [] }, { status: 201 }),
-    );
+    const fetchMock = stubFetch(() => Response.json(RELEASE, { status: 201 }));
 
     const createdRelease =
       await new HotCodePush().apps.channels.releases.create({
@@ -68,7 +66,7 @@ describe('ChannelReleasesResource', () => {
         idempotencyKey: 'key',
       });
 
-    expect(createdRelease).toEqual({ ...RELEASE, warnings: [] });
+    expect(createdRelease).toEqual(RELEASE);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       body: {
         failureAction: 'revoke',

@@ -4,7 +4,7 @@ import { HotCodePush } from '../client';
 import { resolveSentRequest, stubFetch } from '../test-helpers';
 
 const BINARIES_URL = 'https://api.hotcodepush.com/v1/apps/app/binaries';
-const BINARY = { bundleId: 'bundle', deviceCount: 3, id: 'binary' };
+const BINARY = { bundleId: 'bundle', id: 'binary' };
 const FILE = { path: 'index.html', sha256: 'a'.repeat(64), sizeBytes: 5 };
 const FINGERPRINT = `fp1:${'a'.repeat(64)}`;
 
@@ -57,19 +57,18 @@ describe('BinariesResource', () => {
     });
   });
 
-  test('should get the binary with its bundle', async () => {
+  test('should get the binary', async () => {
     const fetchMock = stubFetch(() => Response.json(BINARY));
 
     const fetchedBinary = await new HotCodePush().apps.binaries.get({
       appId: 'app',
       binaryId: 'binary',
-      relations: ['bundle'],
     });
 
     expect(fetchedBinary).toEqual(BINARY);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${BINARIES_URL}/binary?relations=bundle`,
+      url: `${BINARIES_URL}/binary`,
     });
   });
 

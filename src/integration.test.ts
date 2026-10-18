@@ -57,7 +57,6 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
       organizationId: organization.id,
     });
 
-    expect(organization.role).toBe('owner');
     expect(fetchedOrganization).toMatchObject({
       id: organization.id,
       plan: 'free',
@@ -155,7 +154,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
       channelId: channel.id,
     });
 
-    expect(fetchedChannel).toMatchObject({ activeDeviceCount: 0 });
+    expect(fetchedChannel).toMatchObject({ id: channel.id, name: 'staging' });
     expect(fetchedChannels.map(({ name }) => name).sort()).toEqual([
       'production',
       'staging',
@@ -213,6 +212,11 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
       platforms: ['android'],
       version: '1.0.0',
     });
+    const fetchedUnstoredFiles = await hotCodePush.apps.bundles.files.list({
+      appId: app.id,
+      bundleId: createdBundle.id,
+      isStored: 'false',
+    });
     const uploadedFile = await hotCodePush.apps.files.upload({
       appId: app.id,
       body: new Blob([indexFile.gzipBytes]).stream(),
@@ -233,7 +237,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
       bundleId: createdBundle.id,
     });
 
-    expect(createdBundle.uploads.files.map(({ sha256 }) => sha256)).toEqual([
+    expect(fetchedUnstoredFiles.map(({ sha256 }) => sha256)).toEqual([
       indexFile.manifestEntry.sha256,
     ]);
     expect(uploadedFile.sha256).toBe(indexFile.manifestEntry.sha256);
@@ -290,6 +294,11 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
       platforms: ['android'],
       version: '1.0.1',
     });
+    const fetchedUnstoredFiles = await hotCodePush.apps.bundles.files.list({
+      appId: app.id,
+      bundleId: createdBundle.id,
+      isStored: 'false',
+    });
     await hotCodePush.apps.bundles.pack.upload({
       appId: app.id,
       body: new Blob([PACK_PLACEHOLDER]),
@@ -314,7 +323,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
       bundleId: createdBundle.id,
     });
 
-    expect(createdBundle.uploads.files).toEqual([]);
+    expect(fetchedUnstoredFiles).toEqual([]);
     expect(uploadedDelta.sizeBytes).toBe(PACK_PLACEHOLDER.byteLength);
     expect(readyBundles.map(({ id }) => id)).toContain(createdBundle.id);
     await expect(
@@ -346,12 +355,14 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     });
     const fetchedBinaries = await hotCodePush.apps.binaries.list({
       appId: app.id,
-      relations: ['bundle'],
     });
     const fetchedBinary = await hotCodePush.apps.binaries.get({
       appId: app.id,
       binaryId: createdBinary.id,
-      relations: ['bundle'],
+    });
+    const fetchedBundle = await hotCodePush.apps.bundles.get({
+      appId: app.id,
+      bundleId: fetchedBinary.bundleId,
     });
 
     expect(forceCreatedBinary).toMatchObject({
@@ -359,8 +370,8 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
       id: createdBinary.id,
     });
     expect(fetchedBinaries.map(({ id }) => id)).toEqual([createdBinary.id]);
-    expect(fetchedBinary.bundle?.id).toBe(forceCreatedBinary.bundleId);
-    expect(fetchedBinary.bundle?.number).toBeNull();
+    expect(fetchedBinary.bundleId).toBe(forceCreatedBinary.bundleId);
+    expect(fetchedBundle.number).toBeNull();
   });
 
   test('should delete the channel', async () => {

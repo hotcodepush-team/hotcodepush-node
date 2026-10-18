@@ -10,7 +10,7 @@ import type {
 } from '../types';
 
 /**
- * A store build, created by `binary create`, with the bundle it ships and the devices running it.
+ * A store build, created by `binary create`; the devices running it are the fleet statistics' `binary` buckets.
  */
 export type Binary = JsonResponseBody<
   '/v1/apps/{appId}/binaries/{binaryId}',
@@ -34,8 +34,7 @@ export type CreateBinaryOptions = PathParameters<
 export type GetBinaryOptions = PathParameters<
   '/v1/apps/{appId}/binaries/{binaryId}',
   'get'
-> &
-  QueryParameters<'/v1/apps/{appId}/binaries/{binaryId}', 'get'>;
+>;
 
 export type ListBinariesOptions = PathParameters<
   '/v1/apps/{appId}/binaries',
@@ -72,14 +71,9 @@ export class BinariesResource {
   }
 
   public async get(options: GetBinaryOptions): Promise<Binary> {
-    const { appId, binaryId, ...query } = options;
     return this.httpClient.fetchJson({
       method: 'GET',
-      path: resolvePath('/v1/apps/{appId}/binaries/{binaryId}', {
-        appId,
-        binaryId,
-      }),
-      query,
+      path: resolvePath('/v1/apps/{appId}/binaries/{binaryId}', options),
     });
   }
 

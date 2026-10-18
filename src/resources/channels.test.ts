@@ -78,15 +78,14 @@ describe('ChannelsResource', () => {
   });
 
   test('should get the channel', async () => {
-    const channel = { ...CHANNEL, activeDeviceCount: 3 };
-    const fetchMock = stubFetch(() => Response.json(channel));
+    const fetchMock = stubFetch(() => Response.json(CHANNEL));
 
     const fetchedChannel = await new HotCodePush().apps.channels.get({
       appId: 'app',
       channelId: 'channel',
     });
 
-    expect(fetchedChannel).toEqual(channel);
+    expect(fetchedChannel).toEqual(CHANNEL);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${CHANNELS_URL}/channel`,

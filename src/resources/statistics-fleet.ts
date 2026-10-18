@@ -7,7 +7,8 @@ import type {
 } from '../types';
 
 /**
- * The devices seen in the last thirty days counted per dimension, each the most common first.
+ * The devices seen in the last thirty days: `deviceCount`, `currentDeviceCount` the ones running their channel's newest active release,
+ * and their counts per dimension, the binaries' with their platform, version and newest report, each the most common first.
  */
 export type FleetStatistics = JsonResponseBody<
   '/v1/apps/{appId}/statistics/fleet',

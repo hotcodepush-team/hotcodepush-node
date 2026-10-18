@@ -4,6 +4,7 @@ import type {
   JsonRequestBody,
   JsonResponseBody,
   PathParameters,
+  QueryParameters,
 } from '../types';
 import { UserPasswordResource } from './user-password';
 import { UserSessionsResource } from './user-sessions';
@@ -12,7 +13,8 @@ import { UserTokensResource } from './user-tokens';
 export type DeleteUserOptions = PathParameters<'/v1/users/{userId}', 'delete'> &
   JsonRequestBody<'/v1/users/{userId}', 'delete'>;
 
-export type GetUserOptions = PathParameters<'/v1/users/{userId}', 'get'>;
+export type GetUserOptions = PathParameters<'/v1/users/{userId}', 'get'> &
+  QueryParameters<'/v1/users/{userId}', 'get'>;
 
 export type User = JsonResponseBody<'/v1/users/{userId}', 'get', 200>;
 
@@ -45,11 +47,15 @@ export class UsersResource {
   /**
    * The caller behind the token and whether it is a session or an API token.
    * `userId` takes `me` for the caller; another user answers `E_FORBIDDEN`.
+   * `relations` embeds the caller's `accounts`, their sign-in identities, their `members` rows of live organizations
+   * and, with `members.organization`, each row's organization.
    */
   public async get(options: GetUserOptions): Promise<User> {
+    const { userId, ...query } = options;
     return this.httpClient.fetchJson({
       method: 'GET',
-      path: resolvePath('/v1/users/{userId}', options),
+      path: resolvePath('/v1/users/{userId}', { userId }),
+      query,
     });
   }
 }

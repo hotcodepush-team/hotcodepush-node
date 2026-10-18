@@ -83,7 +83,7 @@ export interface paths {
         head?: never;
         /**
          * Update a notification preference
-         * @description Sets one row of the caller's preferences, the category and the medium, for the account or with `organizationId` for that membership, and answers it; a mandatory category's email is always on.
+         * @description Sets one row of the caller's preferences, the category and the medium, for the account or with `organizationId` for that membership, and answers the row as stored; a mandatory category's email is always on.
          */
         patch: operations["patchV1NotificationPreferences"];
         trace?: never;
@@ -205,7 +205,7 @@ export interface paths {
         };
         /**
          * List the audit log
-         * @description The organization's audit log, newest first; each row's `actorType` is `user` when a user acted and `system` when none did, its `userId` null. Filtered by `type` — `channel.created`, or `channel.*` for every action on the object — `actorType`, `userId`, `appId`, and `createdSince` and `createdUntil`, both inclusive; `?relations=app,user` embeds each row's app while the app is live and its user while the user is live. `?format=csv` answers every matching row as `text/csv`, unpaginated. Paying plans only.
+         * @description The organization's audit log, newest first; each row's `actorType`, written with the row, is `user` when a user acted and `system` when none did, its `userId` null. Filtered by `type` — `channel.created`, or `channel.*` for every action on the object — `actorType`, `userId`, `appId`, and `createdSince` and `createdUntil`, both inclusive; `?relations=app,user` embeds each row's app while the app is live and its user while the user is live. `?format=csv` answers every matching row as `text/csv`, unpaginated. Paying plans only.
          */
         get: operations["getV1OrganizationsByOrganizationIdAuditLogs"];
         put?: never;
@@ -397,7 +397,7 @@ export interface paths {
         };
         /**
          * List the members
-         * @description The organization's members, newest first, filtered by `role`, by `userId` and by `query`, the text their user's email contains, case-insensitively; `?relations=user` embeds each member's user with `hasPassword` and `isTwoFactorEnabled`.
+         * @description The organization's members, newest first, filtered by `role`, by `userId` and by `query`, the text their user's email contains, case-insensitively; `?relations=user` embeds each member's user, and `?relations=user,user.accounts` the user's sign-in identities under it.
          */
         get: operations["getV1OrganizationsByOrganizationIdMembers"];
         put?: never;
@@ -441,7 +441,7 @@ export interface paths {
         };
         /**
          * Get a member
-         * @description One member of the organization; `?relations=user` embeds the member's user with `hasPassword` and `isTwoFactorEnabled`.
+         * @description One member of the organization; `?relations=user` embeds the member's user, and `?relations=user,user.accounts` the user's sign-in identities under it.
          */
         get: operations["getV1OrganizationsByOrganizationIdMembersByMemberId"];
         put?: never;
@@ -469,12 +469,12 @@ export interface paths {
         };
         /**
          * Get the SSO provider
-         * @description The organization's SSO provider: its domain, whether the domain is verified, the sign-in link, the `oidc` or `saml` block, the one present saying the type, and the TXT record to set until the domain is verified.
+         * @description The organization's SSO provider, its row: the domain, the token its TXT record `_hotcodepush-sso-{providerId}.{domain}` must carry until `domainVerified` is true, and the `type`, `oidc` or `saml`. The configs are write-only.
          */
         get: operations["getV1OrganizationsByOrganizationIdSsoProvider"];
         /**
          * Set the SSO provider
-         * @description Sets the OIDC or SAML provider and its domain, replacing the one before; one per organization, paying plans only. A new or changed domain starts unverified, with the TXT record to set in the answer.
+         * @description Sets the OIDC or SAML provider and its domain, replacing the one before; one per organization, paying plans only. A new or changed domain starts unverified, with a new token for its TXT record.
          */
         put: operations["putV1OrganizationsByOrganizationIdSsoProvider"];
         post?: never;
@@ -499,7 +499,7 @@ export interface paths {
         put?: never;
         /**
          * Verify the SSO domain
-         * @description Checks the domain's TXT record for the token the provider waits for and marks the domain verified when it is there; the answer is the provider, its `isDomainVerified` the result. A resolver that cannot be asked leaves the domain unverified, `details.reason` then `lookup_failed`.
+         * @description Looks up the domain's TXT record `_hotcodepush-sso-{providerId}.{domain}` for the provider's `domainVerificationToken` and sets `domainVerified` when the record carries it; the answer is the provider, verified or still waiting for the record. A verified provider answers unchanged without a lookup.
          */
         post: operations["postV1OrganizationsByOrganizationIdSsoProviderVerifications"];
         delete?: never;
@@ -617,7 +617,7 @@ export interface paths {
         };
         /**
          * List the organizations
-         * @description The caller's organizations with their roles, newest first.
+         * @description The caller's organizations, newest first; the caller's role in each is on their member rows, `GET /v1/users/{userId}?relations=members`.
          */
         get: operations["getV1Organizations"];
         put?: never;
@@ -689,7 +689,7 @@ export interface paths {
         };
         /**
          * List the binaries
-         * @description The app's store builds, newest first, each with the devices running it, filtered by `platform` and `fingerprint`; `?relations=bundle` embeds the bundle each ships.
+         * @description The app's store builds, newest first, filtered by `platform` and `fingerprint`; the devices running each are the fleet statistics' `binary` buckets.
          */
         get: operations["getV1AppsByAppIdBinaries"];
         put?: never;
@@ -733,7 +733,7 @@ export interface paths {
         };
         /**
          * Get a binary
-         * @description One store build with the devices running it; `?relations=bundle` embeds the bundle it ships.
+         * @description One store build.
          */
         get: operations["getV1AppsByAppIdBinariesByBinaryId"];
         put?: never;
@@ -759,7 +759,7 @@ export interface paths {
         put?: never;
         /**
          * Create a bundle
-         * @description Creates the bundle from its manifest — platforms, version label, files with path, hash and size, fingerprint, git provenance — and answers the hashes the app lacks with their upload URLs and the URL of the pack; the bundle is `uploading` until completed. The signed content is the manifest the CLI builds from those fields with the signing key’s fingerprint as `keyId` — the files sorted by path and the platforms sorted, each by UTF-16 code units — as canonical JSON; `signature` covers those bytes and is verified here against the app’s keys, `E_SIGNATURE_INVALID` otherwise, and required once the app has a key, `E_SIGNATURE_REQUIRED`. `warnings` carries `FINGERPRINT_UNKNOWN` when no binary of the app carries the fingerprint.
+         * @description Creates the bundle from its manifest — platforms, version label, files with path, hash and size, fingerprint, git provenance — and answers the bundle row, `uploading` until completed; its files list with `isStored=false` names the hashes the app lacks, each put at `/v1/apps/{appId}/files/{sha256}`, and the pack goes to `…/bundles/{bundleId}/pack`. The signed content is the manifest the CLI builds from those fields with the signing key’s fingerprint as `keyId` — the files sorted by path and the platforms sorted, each by UTF-16 code units — as canonical JSON; `signature` covers those bytes and is verified here against the app’s keys, `E_SIGNATURE_INVALID` otherwise, and required once the app has a key, `E_SIGNATURE_REQUIRED`.
          */
         post: operations["postV1AppsByAppIdBundles"];
         delete?: never;
@@ -797,7 +797,7 @@ export interface paths {
         };
         /**
          * Get a bundle
-         * @description One bundle, with the derived expiry — `unusedSince` plus the retention — while it is in use nowhere; its delta packs are the `deltas` list beside it.
+         * @description One bundle; while it is in use nowhere, `expiresAt` is `unusedSince` plus the organization's retention, written with it; its delta packs are the `deltas` list beside it.
          */
         get: operations["getV1AppsByAppIdBundlesByBundleId"];
         put?: never;
@@ -823,7 +823,7 @@ export interface paths {
         put?: never;
         /**
          * Complete a bundle
-         * @description Verifies every listed file and the pack are present, rebuilds the signed manifest from the rows and checks its signature against the app's keys again, writes the envelope at the bundle's key — the manifest, the signature and, unsigned beside them, the bundle's id and creation time and the pack with its URL and stored size, the delta list empty since the platform builds the delta packs and devices reach them through the delta route — and sets `ready`; a completed bundle answers itself again.
+         * @description Verifies every listed file is stored and the pack is present, rebuilds the signed manifest from the rows and checks its signature against the app's keys again, writes the envelope at the bundle's key — the manifest, the signature and, unsigned beside them, the bundle's id and creation time and the pack with its URL and stored size, the delta list empty since the platform builds the delta packs and devices reach them through the delta route — and sets `ready`; a completed bundle answers itself again.
          */
         post: operations["postV1AppsByAppIdBundlesByBundleIdComplete"];
         delete?: never;
@@ -981,7 +981,7 @@ export interface paths {
         };
         /**
          * List the files of a bundle
-         * @description The bundle's files, ordered by path, each with its content hash and uncompressed size; an embedded bundle answers the files its binary was created with. `limit` goes up to 1000, beyond every other list's 100, since a tool reads the whole list of each base bundle it builds a delta pack against.
+         * @description The bundle's files, ordered by path, each with its content hash, its uncompressed size and `storedAt`, when the app's store held the hash; an embedded bundle answers the files its binary was created with. `isStored=false` selects the files still to upload after the bundle's create. `limit` goes up to 1000, beyond every other list's 100, since a tool reads the whole list of each base bundle it builds a delta pack against.
          */
         get: operations["getV1AppsByAppIdBundlesByBundleIdFiles"];
         put?: never;
@@ -1001,7 +1001,7 @@ export interface paths {
         };
         /**
          * Count the files of a bundle
-         * @description The number of files the bundle lists, which the list pages through.
+         * @description The number of the bundle's files under the list's filters, which the list pages through.
          */
         get: operations["getV1AppsByAppIdBundlesByBundleIdFilesCount"];
         put?: never;
@@ -1189,7 +1189,7 @@ export interface paths {
         };
         /**
          * Get a channel
-         * @description One channel with the header numbers of its page from the registry: the active devices on it, the ones on its newest release and the ones on their embedded bundle.
+         * @description One channel; its devices are the fleet statistics' under `channelId`.
          */
         get: operations["getV1AppsByAppIdChannelsByChannelId"];
         put?: never;
@@ -1277,13 +1277,13 @@ export interface paths {
         };
         /**
          * List the releases of a channel
-         * @description The channel's release log, newest first, each release with the devices whose current release it is; `?relations=channel,bundle,releaseCounters` embeds the linked rows.
+         * @description The channel's release log, newest first; `?relations=channel,bundle,releaseCounters` embeds the linked rows.
          */
         get: operations["getV1AppsByAppIdChannelsByChannelIdReleases"];
         put?: never;
         /**
          * Create a release
-         * @description Creates a release in the channel of a ready bundle, `bundleId`, or of what another channel's newest active release serves, `fromChannelId`, recorded as the provenance, with its conditions, rollout, mandatory flag, notes, the nullable auto-pause overrides and the nullable progression schedule, whose last percentage lies above the rollout, numbered next in the channel; refused on a protected channel below Admin, past `release_count_per_app_per_day_limit` and, once the app has a signing key, for an unsigned bundle; an `Idempotency-Key` answers the same release again for 24 hours. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type the release uses.
+         * @description Creates a release in the channel of a ready bundle, `bundleId`, or of what another channel's newest active release serves, `fromChannelId`, recorded as the provenance, with its conditions, rollout, mandatory flag, notes, the nullable auto-pause overrides and the nullable progression schedule, whose last percentage lies above the rollout, numbered next in the channel; refused on a protected channel below Admin, past `release_count_per_app_per_day_limit` and, once the app has a signing key, for an unsigned bundle; an `Idempotency-Key` answers the same release again for 24 hours. The audience preview, `GET …/channels/{channelId}/audience`, answers the warnings for the same conditions before the create.
          */
         post: operations["postV1AppsByAppIdChannelsByChannelIdReleases"];
         delete?: never;
@@ -1343,7 +1343,7 @@ export interface paths {
         put?: never;
         /**
          * Revoke releases in bulk
-         * @description Revokes several releases of the channel at once — the ones named by `releaseIds`, or every release numbered at or above `fromNumber` — in one transaction with one index rewrite: each release revoked gets its own `release.revoked` audit row with the devices it moves, a release already revoked is a no-op, so a retried call answers the same, and the answer lists the releases newest first with their device counts, as the single revoke answers. Revoking every release of the channel sends its devices to the embedded bundle. Admin or Owner on a protected channel.
+         * @description Revokes several releases of the channel at once — the ones named by `releaseIds`, or every release numbered at or above `fromNumber` — in one transaction with one index rewrite: each release revoked gets its own `release.revoked` audit row with the devices it moves, a release already revoked is a no-op, so a retried call answers the same, and the answer lists the releases newest first, each as the single revoke answers it. Revoking every release of the channel sends its devices to the embedded bundle. Admin or Owner on a protected channel.
          */
         post: operations["postV1AppsByAppIdChannelsByChannelIdReleasesRevoke"];
         delete?: never;
@@ -1490,7 +1490,7 @@ export interface paths {
         get?: never;
         /**
          * Upload a file
-         * @description Uploads one file of the web build: the body is the file gzip-compressed, `Content-Length` its size, and the path the SHA-256 of the uncompressed content, checked as the bytes pass; a hash the app already holds answers the existing file.
+         * @description Uploads one file of the web build: the body is the file gzip-compressed, `Content-Length` its size, and the path the SHA-256 of the uncompressed content, checked as the bytes pass; a hash the app already holds answers the existing file. Every file of the app's bundles with the hash and no `storedAt` is stamped stored, the stored file and the held one alike.
          */
         put: operations["putV1AppsByAppIdFilesBySha256"];
         post?: never;
@@ -1551,7 +1551,7 @@ export interface paths {
         put?: never;
         /**
          * Complete a multipart upload
-         * @description Assembles the parts, checks the assembled size against the byte limit and the content's hash by one streamed read; a refusal leaves nothing behind, and a hash the app already holds answers the existing file.
+         * @description Assembles the parts, checks the assembled size against the byte limit and the content's hash by one streamed read; a refusal leaves nothing behind, and a hash the app already holds answers the existing file. Every file of the app's bundles with the hash and no `storedAt` is stamped stored, as the single PUT does.
          */
         post: operations["postV1AppsByAppIdFilesBySha256UploadsByUploadIdComplete"];
         delete?: never;
@@ -1797,7 +1797,7 @@ export interface paths {
         };
         /**
          * Get the device statistics
-         * @description The registry's snapshot of the devices seen in the last thirty days, counted per release with its number and channel and the embedded bundles as `null`, binary version, SDK version, platform, OS version and country, each the most common first; `channelId` narrows it to one channel's devices.
+         * @description The registry's snapshot of the devices seen in the last thirty days: their count, the ones running the newest active release of their channel, and their counts per binary with its platform, version and newest report, per release with its number and channel and the embedded bundles as `null`, binary version, SDK version, platform, OS version and country, each the most common first and each summing to the count; `channelId` narrows it to one channel's devices.
          */
         get: operations["getV1AppsByAppIdStatisticsFleet"];
         put?: never;
@@ -1945,7 +1945,7 @@ export interface paths {
         };
         /**
          * Get the user
-         * @description The caller behind the session or the API token. Profiles are private: `me` or the caller's own id, any other user answers `E_FORBIDDEN`.
+         * @description The caller behind the session or the API token. Profiles are private: `me` or the caller's own id, any other user answers `E_FORBIDDEN`. `?relations=accounts` embeds the caller's sign-in identities, `members` their member rows of live organizations, newest first, and `members,members.organization` each row's organization.
          */
         get: operations["getV1UsersByUserId"];
         put?: never;
@@ -1987,7 +1987,7 @@ export interface components {
         /** @description The one error shape: a context-free code from the catalog, one sentence of what happened and what to do, and the field, rule and target of a failed validation in `details`. */
         Error: {
             /** @enum {string} */
-            code: "E_ACCOUNT_BANNED" | "E_APP_NAME_TAKEN" | "E_APPS_LIMIT_REACHED" | "E_AUTH_FLOW_FAILED" | "E_BINARY_CONFLICT" | "E_BUNDLE_IN_USE" | "E_BUNDLE_NOT_READY" | "E_BUNDLE_TOO_LARGE" | "E_CHANNEL_NAME_TAKEN" | "E_CHANNEL_PROTECTED" | "E_CHANNELS_PER_APP_LIMIT_REACHED" | "E_CLIENT_UPDATE_REQUIRED" | "E_COUNTRY_NOT_ALLOWED" | "E_DEFAULT_CHANNEL" | "E_FILES_PER_BUNDLE_LIMIT_REACHED" | "E_FORBIDDEN" | "E_HASH_MISMATCH" | "E_IDEMPOTENCY_KEY_REUSED" | "E_INTERNAL" | "E_INVITATION_INVALID" | "E_INVITATIONS_PER_DAY_LIMIT_REACHED" | "E_IP_NOT_ALLOWED" | "E_MAINTENANCE" | "E_MEMBERS_LIMIT_REACHED" | "E_NOT_FOUND" | "E_NOTIFICATION_MANDATORY" | "E_ORIGIN_UNTRUSTED" | "E_PASSWORD_ALREADY_SET" | "E_PLAN_REQUIRED" | "E_RATE_LIMITED" | "E_RELEASE_REVOKED" | "E_RELEASES_PER_DAY_LIMIT_REACHED" | "E_SIGNATURE_INVALID" | "E_SIGNATURE_REQUIRED" | "E_SOLE_OWNER" | "E_SSO_REQUIRED" | "E_STORAGE_LIMIT_REACHED" | "E_TOKENS_LIMIT_REACHED" | "E_TURNSTILE_FAILED" | "E_TWO_FACTOR_REQUIRED" | "E_UNAUTHENTICATED" | "E_UPLOAD_INCOMPLETE" | "E_VALIDATION" | "E_WEBHOOK_NAME_TAKEN";
+            code: "E_ACCOUNT_BANNED" | "E_APP_NAME_TAKEN" | "E_APPS_LIMIT_REACHED" | "E_AUTH_FLOW_FAILED" | "E_BINARY_CONFLICT" | "E_BUNDLE_IN_USE" | "E_BUNDLE_NOT_READY" | "E_BUNDLE_TOO_LARGE" | "E_CHANNEL_NAME_TAKEN" | "E_CHANNEL_PROTECTED" | "E_CHANNELS_PER_APP_LIMIT_REACHED" | "E_CLIENT_UPDATE_REQUIRED" | "E_COUNTRY_NOT_ALLOWED" | "E_DEFAULT_CHANNEL" | "E_DNS_LOOKUP_FAILED" | "E_FILES_PER_BUNDLE_LIMIT_REACHED" | "E_FORBIDDEN" | "E_HASH_MISMATCH" | "E_IDEMPOTENCY_KEY_REUSED" | "E_INTERNAL" | "E_INVITATION_INVALID" | "E_INVITATIONS_PER_DAY_LIMIT_REACHED" | "E_IP_NOT_ALLOWED" | "E_MAINTENANCE" | "E_MEMBERS_LIMIT_REACHED" | "E_NOT_FOUND" | "E_NOTIFICATION_MANDATORY" | "E_ORIGIN_UNTRUSTED" | "E_PASSWORD_ALREADY_SET" | "E_PLAN_REQUIRED" | "E_RATE_LIMITED" | "E_RELEASE_REVOKED" | "E_RELEASES_PER_DAY_LIMIT_REACHED" | "E_SIGNATURE_INVALID" | "E_SIGNATURE_REQUIRED" | "E_SOLE_OWNER" | "E_SSO_REQUIRED" | "E_STORAGE_LIMIT_REACHED" | "E_TOKENS_LIMIT_REACHED" | "E_TURNSTILE_FAILED" | "E_TWO_FACTOR_REQUIRED" | "E_UNAUTHENTICATED" | "E_UPLOAD_INCOMPLETE" | "E_VALIDATION" | "E_WEBHOOK_NAME_TAKEN";
             details: {
                 [key: string]: unknown;
             } | null;
@@ -2246,13 +2246,27 @@ export interface operations {
                         /** Format: date-time */
                         updatedAt: string;
                         user?: {
+                            /** Format: date-time */
+                            createdAt: string;
                             /** Format: email */
                             email: string;
+                            emailVerified: boolean;
                             /** Format: uuid */
                             id: string;
+                            image: string | null;
                             name: string;
-                            hasPassword: boolean;
-                            isTwoFactorEnabled: boolean;
+                            twoFactorEnabled: boolean;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            accounts?: {
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: uuid */
+                                id: string;
+                                providerId: string;
+                                /** Format: uuid */
+                                userId: string;
+                            }[];
                         };
                         /** Format: uuid */
                         userId: string;
@@ -2578,12 +2592,16 @@ export interface operations {
                         createdAt: string;
                         /** Format: uuid */
                         id: string;
-                        isRead: boolean;
                         organizationId: string | null;
                         payload: {
                             [key: string]: unknown;
                         };
+                        readAt: string | null;
                         type: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        /** Format: uuid */
+                        userId: string;
                     }[];
                 };
             };
@@ -2865,12 +2883,16 @@ export interface operations {
                         createdAt: string;
                         /** Format: uuid */
                         id: string;
-                        isRead: boolean;
                         organizationId: string | null;
                         payload: {
                             [key: string]: unknown;
                         };
+                        readAt: string | null;
                         type: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        /** Format: uuid */
+                        userId: string;
                     };
                 };
             };
@@ -2968,6 +2990,7 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         defaultChannelId: string | null;
+                        deletedAt: string | null;
                         /** @enum {string} */
                         framework: "capacitor" | "cordova" | "expo" | "react-native";
                         /** Format: uuid */
@@ -3080,6 +3103,7 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         defaultChannelId: string | null;
+                        deletedAt: string | null;
                         /** @enum {string} */
                         framework: "capacitor" | "cordova" | "expo" | "react-native";
                         /** Format: uuid */
@@ -3312,6 +3336,7 @@ export interface operations {
                         country: string | null;
                         /** Format: date-time */
                         createdAt: string;
+                        dispatchedAt: string | null;
                         /** Format: uuid */
                         id: string;
                         objectId: string | null;
@@ -3321,12 +3346,21 @@ export interface operations {
                             [key: string]: unknown;
                         };
                         type: string;
+                        /** Format: date-time */
+                        updatedAt: string;
                         user?: {
+                            /** Format: date-time */
+                            createdAt: string;
                             /** Format: email */
                             email: string;
+                            emailVerified: boolean;
                             /** Format: uuid */
                             id: string;
+                            image: string | null;
                             name: string;
+                            twoFactorEnabled: boolean;
+                            /** Format: date-time */
+                            updatedAt: string;
                         };
                         userAgent: string | null;
                         userId: string | null;
@@ -4521,7 +4555,7 @@ export interface operations {
                 query?: string;
                 role?: "admin" | "billing" | "member" | "owner";
                 userId?: string;
-                relations?: "user"[];
+                relations?: ("user" | "user.accounts")[];
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -4553,13 +4587,27 @@ export interface operations {
                         /** Format: date-time */
                         updatedAt: string;
                         user?: {
+                            /** Format: date-time */
+                            createdAt: string;
                             /** Format: email */
                             email: string;
+                            emailVerified: boolean;
                             /** Format: uuid */
                             id: string;
+                            image: string | null;
                             name: string;
-                            hasPassword: boolean;
-                            isTwoFactorEnabled: boolean;
+                            twoFactorEnabled: boolean;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            accounts?: {
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: uuid */
+                                id: string;
+                                providerId: string;
+                                /** Format: uuid */
+                                userId: string;
+                            }[];
                         };
                         /** Format: uuid */
                         userId: string;
@@ -4816,7 +4864,7 @@ export interface operations {
     getV1OrganizationsByOrganizationIdMembersByMemberId: {
         parameters: {
             query?: {
-                relations?: "user"[];
+                relations?: ("user" | "user.accounts")[];
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -4849,13 +4897,27 @@ export interface operations {
                         /** Format: date-time */
                         updatedAt: string;
                         user?: {
+                            /** Format: date-time */
+                            createdAt: string;
                             /** Format: email */
                             email: string;
+                            emailVerified: boolean;
                             /** Format: uuid */
                             id: string;
+                            image: string | null;
                             name: string;
-                            hasPassword: boolean;
-                            isTwoFactorEnabled: boolean;
+                            twoFactorEnabled: boolean;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            accounts?: {
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: uuid */
+                                id: string;
+                                providerId: string;
+                                /** Format: uuid */
+                                userId: string;
+                            }[];
                         };
                         /** Format: uuid */
                         userId: string;
@@ -5064,13 +5126,27 @@ export interface operations {
                         /** Format: date-time */
                         updatedAt: string;
                         user?: {
+                            /** Format: date-time */
+                            createdAt: string;
                             /** Format: email */
                             email: string;
+                            emailVerified: boolean;
                             /** Format: uuid */
                             id: string;
+                            image: string | null;
                             name: string;
-                            hasPassword: boolean;
-                            isTwoFactorEnabled: boolean;
+                            twoFactorEnabled: boolean;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            accounts?: {
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: uuid */
+                                id: string;
+                                providerId: string;
+                                /** Format: uuid */
+                                userId: string;
+                            }[];
                         };
                         /** Format: uuid */
                         userId: string;
@@ -5166,39 +5242,19 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         domain: string;
+                        domainVerificationToken: string | null;
+                        domainVerified: boolean;
                         /** Format: uuid */
                         id: string;
-                        isDomainVerified: boolean;
-                        oidc: {
-                            clientId: string;
-                            /** Format: uri */
-                            discoveryEndpoint: string;
-                            /** Format: uri */
-                            issuer: string;
-                            /** Format: uri */
-                            redirectUri: string;
-                            scopes: string[] | null;
-                        } | null;
+                        issuer: string;
                         /** Format: uuid */
                         organizationId: string;
-                        saml: {
-                            /** Format: uri */
-                            acsUrl: string;
-                            entityId: string | null;
-                            /** Format: uri */
-                            entryPoint: string;
-                            issuer: string;
-                            /** Format: uri */
-                            spMetadataUrl: string;
-                        } | null;
-                        /** Format: uri */
-                        signInUrl: string;
+                        providerId: string;
+                        /** @enum {string} */
+                        type: "oidc" | "saml";
                         /** Format: date-time */
                         updatedAt: string;
-                        verification: {
-                            name: string;
-                            value: string;
-                        } | null;
+                        userId: string | null;
                     };
                 };
             };
@@ -5314,39 +5370,19 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         domain: string;
+                        domainVerificationToken: string | null;
+                        domainVerified: boolean;
                         /** Format: uuid */
                         id: string;
-                        isDomainVerified: boolean;
-                        oidc: {
-                            clientId: string;
-                            /** Format: uri */
-                            discoveryEndpoint: string;
-                            /** Format: uri */
-                            issuer: string;
-                            /** Format: uri */
-                            redirectUri: string;
-                            scopes: string[] | null;
-                        } | null;
+                        issuer: string;
                         /** Format: uuid */
                         organizationId: string;
-                        saml: {
-                            /** Format: uri */
-                            acsUrl: string;
-                            entityId: string | null;
-                            /** Format: uri */
-                            entryPoint: string;
-                            issuer: string;
-                            /** Format: uri */
-                            spMetadataUrl: string;
-                        } | null;
-                        /** Format: uri */
-                        signInUrl: string;
+                        providerId: string;
+                        /** @enum {string} */
+                        type: "oidc" | "saml";
                         /** Format: date-time */
                         updatedAt: string;
-                        verification: {
-                            name: string;
-                            value: string;
-                        } | null;
+                        userId: string | null;
                     };
                 };
             };
@@ -5360,39 +5396,19 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         domain: string;
+                        domainVerificationToken: string | null;
+                        domainVerified: boolean;
                         /** Format: uuid */
                         id: string;
-                        isDomainVerified: boolean;
-                        oidc: {
-                            clientId: string;
-                            /** Format: uri */
-                            discoveryEndpoint: string;
-                            /** Format: uri */
-                            issuer: string;
-                            /** Format: uri */
-                            redirectUri: string;
-                            scopes: string[] | null;
-                        } | null;
+                        issuer: string;
                         /** Format: uuid */
                         organizationId: string;
-                        saml: {
-                            /** Format: uri */
-                            acsUrl: string;
-                            entityId: string | null;
-                            /** Format: uri */
-                            entryPoint: string;
-                            issuer: string;
-                            /** Format: uri */
-                            spMetadataUrl: string;
-                        } | null;
-                        /** Format: uri */
-                        signInUrl: string;
+                        providerId: string;
+                        /** @enum {string} */
+                        type: "oidc" | "saml";
                         /** Format: date-time */
                         updatedAt: string;
-                        verification: {
-                            name: string;
-                            value: string;
-                        } | null;
+                        userId: string | null;
                     };
                 };
             };
@@ -5580,43 +5596,19 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         domain: string;
+                        domainVerificationToken: string | null;
+                        domainVerified: boolean;
                         /** Format: uuid */
                         id: string;
-                        isDomainVerified: boolean;
-                        oidc: {
-                            clientId: string;
-                            /** Format: uri */
-                            discoveryEndpoint: string;
-                            /** Format: uri */
-                            issuer: string;
-                            /** Format: uri */
-                            redirectUri: string;
-                            scopes: string[] | null;
-                        } | null;
+                        issuer: string;
                         /** Format: uuid */
                         organizationId: string;
-                        saml: {
-                            /** Format: uri */
-                            acsUrl: string;
-                            entityId: string | null;
-                            /** Format: uri */
-                            entryPoint: string;
-                            issuer: string;
-                            /** Format: uri */
-                            spMetadataUrl: string;
-                        } | null;
-                        /** Format: uri */
-                        signInUrl: string;
+                        providerId: string;
+                        /** @enum {string} */
+                        type: "oidc" | "saml";
                         /** Format: date-time */
                         updatedAt: string;
-                        verification: {
-                            name: string;
-                            value: string;
-                        } | null;
-                        details: {
-                            /** @enum {string} */
-                            reason: "lookup_failed";
-                        } | null;
+                        userId: string | null;
                     };
                 };
             };
@@ -5667,6 +5659,15 @@ export interface operations {
             };
             /** @description E_INTERNAL */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_DNS_LOOKUP_FAILED */
+            502: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6179,26 +6180,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        appCountLimit: number | null;
                         cancelAtPeriodEnd: boolean;
                         cappedAt: string | null;
+                        channelCountPerAppLimit: number | null;
                         countryAllowlist: string[] | null;
                         /** Format: date-time */
                         createdAt: string;
                         currentPeriodEndsAt: string | null;
+                        dataTransferBytesPerMonthlyActiveDeviceLimit: number | null;
+                        deletedAt: string | null;
                         enterpriseMonthlyActiveDeviceCountLimit: number | null;
+                        fileCountPerBundleLimit: number | null;
                         /** Format: uuid */
                         id: string;
                         ipAllowlist: string[] | null;
                         isTwoFactorRequired: boolean;
+                        lastSpendingCapReachedSentAt: string | null;
+                        lastSpendingCapWarningSentAt: string | null;
+                        lastStorageLimitReachedSentAt: string | null;
+                        lastStorageWarningSentAt: string | null;
+                        memberCountLimit: number | null;
                         name: string;
                         pastDueAt: string | null;
                         /** @enum {string} */
                         plan: "enterprise" | "free" | "pay_as_you_go";
                         region: string;
-                        /** @enum {string} */
-                        role?: "admin" | "billing" | "member" | "owner";
+                        releaseCountPerAppPerDayLimit: number | null;
+                        retentionDays: number | null;
                         spendingCapCents: number;
                         storageBytes: number;
+                        storageBytesLimit: number | null;
                         subscriptionProvider: "polar" | null;
                         subscriptionStatus: string | null;
                         /** Format: date-time */
@@ -6291,33 +6303,44 @@ export interface operations {
             };
         };
         responses: {
-            /** @description The organization, with the role owner. */
+            /** @description The organization. */
             201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
+                        appCountLimit: number | null;
                         cancelAtPeriodEnd: boolean;
                         cappedAt: string | null;
+                        channelCountPerAppLimit: number | null;
                         countryAllowlist: string[] | null;
                         /** Format: date-time */
                         createdAt: string;
                         currentPeriodEndsAt: string | null;
+                        dataTransferBytesPerMonthlyActiveDeviceLimit: number | null;
+                        deletedAt: string | null;
                         enterpriseMonthlyActiveDeviceCountLimit: number | null;
+                        fileCountPerBundleLimit: number | null;
                         /** Format: uuid */
                         id: string;
                         ipAllowlist: string[] | null;
                         isTwoFactorRequired: boolean;
+                        lastSpendingCapReachedSentAt: string | null;
+                        lastSpendingCapWarningSentAt: string | null;
+                        lastStorageLimitReachedSentAt: string | null;
+                        lastStorageWarningSentAt: string | null;
+                        memberCountLimit: number | null;
                         name: string;
                         pastDueAt: string | null;
                         /** @enum {string} */
                         plan: "enterprise" | "free" | "pay_as_you_go";
                         region: string;
-                        /** @enum {string} */
-                        role?: "admin" | "billing" | "member" | "owner";
+                        releaseCountPerAppPerDayLimit: number | null;
+                        retentionDays: number | null;
                         spendingCapCents: number;
                         storageBytes: number;
+                        storageBytesLimit: number | null;
                         subscriptionProvider: "polar" | null;
                         subscriptionStatus: string | null;
                         /** Format: date-time */
@@ -6508,26 +6531,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        appCountLimit: number | null;
                         cancelAtPeriodEnd: boolean;
                         cappedAt: string | null;
+                        channelCountPerAppLimit: number | null;
                         countryAllowlist: string[] | null;
                         /** Format: date-time */
                         createdAt: string;
                         currentPeriodEndsAt: string | null;
+                        dataTransferBytesPerMonthlyActiveDeviceLimit: number | null;
+                        deletedAt: string | null;
                         enterpriseMonthlyActiveDeviceCountLimit: number | null;
+                        fileCountPerBundleLimit: number | null;
                         /** Format: uuid */
                         id: string;
                         ipAllowlist: string[] | null;
                         isTwoFactorRequired: boolean;
+                        lastSpendingCapReachedSentAt: string | null;
+                        lastSpendingCapWarningSentAt: string | null;
+                        lastStorageLimitReachedSentAt: string | null;
+                        lastStorageWarningSentAt: string | null;
+                        memberCountLimit: number | null;
                         name: string;
                         pastDueAt: string | null;
                         /** @enum {string} */
                         plan: "enterprise" | "free" | "pay_as_you_go";
                         region: string;
-                        /** @enum {string} */
-                        role?: "admin" | "billing" | "member" | "owner";
+                        releaseCountPerAppPerDayLimit: number | null;
+                        retentionDays: number | null;
                         spendingCapCents: number;
                         storageBytes: number;
+                        storageBytesLimit: number | null;
                         subscriptionProvider: "polar" | null;
                         subscriptionStatus: string | null;
                         /** Format: date-time */
@@ -6716,26 +6750,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        appCountLimit: number | null;
                         cancelAtPeriodEnd: boolean;
                         cappedAt: string | null;
+                        channelCountPerAppLimit: number | null;
                         countryAllowlist: string[] | null;
                         /** Format: date-time */
                         createdAt: string;
                         currentPeriodEndsAt: string | null;
+                        dataTransferBytesPerMonthlyActiveDeviceLimit: number | null;
+                        deletedAt: string | null;
                         enterpriseMonthlyActiveDeviceCountLimit: number | null;
+                        fileCountPerBundleLimit: number | null;
                         /** Format: uuid */
                         id: string;
                         ipAllowlist: string[] | null;
                         isTwoFactorRequired: boolean;
+                        lastSpendingCapReachedSentAt: string | null;
+                        lastSpendingCapWarningSentAt: string | null;
+                        lastStorageLimitReachedSentAt: string | null;
+                        lastStorageWarningSentAt: string | null;
+                        memberCountLimit: number | null;
                         name: string;
                         pastDueAt: string | null;
                         /** @enum {string} */
                         plan: "enterprise" | "free" | "pay_as_you_go";
                         region: string;
-                        /** @enum {string} */
-                        role?: "admin" | "billing" | "member" | "owner";
+                        releaseCountPerAppPerDayLimit: number | null;
+                        retentionDays: number | null;
                         spendingCapCents: number;
                         storageBytes: number;
+                        storageBytesLimit: number | null;
                         subscriptionProvider: "polar" | null;
                         subscriptionStatus: string | null;
                         /** Format: date-time */
@@ -6824,7 +6869,6 @@ export interface operations {
                 offset?: number;
                 fingerprint?: string;
                 platform?: "android" | "ios";
-                relations?: "bundle"[];
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -6847,46 +6891,13 @@ export interface operations {
                         /** Format: uuid */
                         appId: string;
                         build: string;
-                        bundle?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            fingerprint: string | null;
-                            /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
-                            gitMessage: string | null;
-                            gitRef: string | null;
-                            gitRemote: string | null;
-                            gitSha: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            isGitDirty: boolean | null;
-                            manifestSha256: string | null;
-                            number: number | null;
-                            platforms: ("android" | "ios")[];
-                            signature: string | null;
-                            signatureKeyId: string | null;
-                            sizeBytes: number;
-                            /** @enum {string} */
-                            source: "binary" | "upload";
-                            /** @enum {string} */
-                            status: "ready" | "uploading";
-                            unusedSince: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            version: string;
-                        };
                         /** Format: uuid */
                         bundleId: string;
                         /** Format: date-time */
                         createdAt: string;
-                        deviceCount: number;
                         fingerprint: string | null;
                         /** Format: uuid */
                         id: string;
-                        lastSeenAt: string | null;
                         /** @enum {string} */
                         platform: "android" | "ios";
                         /** Format: date-time */
@@ -7004,46 +7015,13 @@ export interface operations {
                         /** Format: uuid */
                         appId: string;
                         build: string;
-                        bundle?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            fingerprint: string | null;
-                            /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
-                            gitMessage: string | null;
-                            gitRef: string | null;
-                            gitRemote: string | null;
-                            gitSha: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            isGitDirty: boolean | null;
-                            manifestSha256: string | null;
-                            number: number | null;
-                            platforms: ("android" | "ios")[];
-                            signature: string | null;
-                            signatureKeyId: string | null;
-                            sizeBytes: number;
-                            /** @enum {string} */
-                            source: "binary" | "upload";
-                            /** @enum {string} */
-                            status: "ready" | "uploading";
-                            unusedSince: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            version: string;
-                        };
                         /** Format: uuid */
                         bundleId: string;
                         /** Format: date-time */
                         createdAt: string;
-                        deviceCount: number;
                         fingerprint: string | null;
                         /** Format: uuid */
                         id: string;
-                        lastSeenAt: string | null;
                         /** @enum {string} */
                         platform: "android" | "ios";
                         /** Format: date-time */
@@ -7062,46 +7040,13 @@ export interface operations {
                         /** Format: uuid */
                         appId: string;
                         build: string;
-                        bundle?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            fingerprint: string | null;
-                            /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
-                            gitMessage: string | null;
-                            gitRef: string | null;
-                            gitRemote: string | null;
-                            gitSha: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            isGitDirty: boolean | null;
-                            manifestSha256: string | null;
-                            number: number | null;
-                            platforms: ("android" | "ios")[];
-                            signature: string | null;
-                            signatureKeyId: string | null;
-                            sizeBytes: number;
-                            /** @enum {string} */
-                            source: "binary" | "upload";
-                            /** @enum {string} */
-                            status: "ready" | "uploading";
-                            unusedSince: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            version: string;
-                        };
                         /** Format: uuid */
                         bundleId: string;
                         /** Format: date-time */
                         createdAt: string;
-                        deviceCount: number;
                         fingerprint: string | null;
                         /** Format: uuid */
                         id: string;
-                        lastSeenAt: string | null;
                         /** @enum {string} */
                         platform: "android" | "ios";
                         /** Format: date-time */
@@ -7279,9 +7224,7 @@ export interface operations {
     };
     getV1AppsByAppIdBinariesByBinaryId: {
         parameters: {
-            query?: {
-                relations?: "bundle"[];
-            };
+            query?: never;
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
@@ -7304,46 +7247,13 @@ export interface operations {
                         /** Format: uuid */
                         appId: string;
                         build: string;
-                        bundle?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            fingerprint: string | null;
-                            /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
-                            gitMessage: string | null;
-                            gitRef: string | null;
-                            gitRemote: string | null;
-                            gitSha: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            isGitDirty: boolean | null;
-                            manifestSha256: string | null;
-                            number: number | null;
-                            platforms: ("android" | "ios")[];
-                            signature: string | null;
-                            signatureKeyId: string | null;
-                            sizeBytes: number;
-                            /** @enum {string} */
-                            source: "binary" | "upload";
-                            /** @enum {string} */
-                            status: "ready" | "uploading";
-                            unusedSince: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            version: string;
-                        };
                         /** Format: uuid */
                         bundleId: string;
                         /** Format: date-time */
                         createdAt: string;
-                        deviceCount: number;
                         fingerprint: string | null;
                         /** Format: uuid */
                         id: string;
-                        lastSeenAt: string | null;
                         /** @enum {string} */
                         platform: "android" | "ios";
                         /** Format: date-time */
@@ -7628,24 +7538,6 @@ export interface operations {
                         /** Format: date-time */
                         updatedAt: string;
                         version: string;
-                        uploads: {
-                            files: {
-                                sha256: string;
-                                sizeBytes: number;
-                                /** Format: uri */
-                                url: string;
-                            }[];
-                            /** Format: uri */
-                            pack: string;
-                        };
-                        warnings: {
-                            /** @enum {string} */
-                            code: "FINGERPRINT_UNKNOWN" | "UNSUPPORTED_CONDITION_SHARE";
-                            details: {
-                                [key: string]: unknown;
-                            } | null;
-                            message: string;
-                        }[];
                     };
                 };
             };
@@ -8960,6 +8852,7 @@ export interface operations {
             query?: {
                 limit?: number;
                 offset?: number;
+                isStored?: "false" | "true";
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -8980,9 +8873,16 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** Format: uuid */
+                        bundleId: string;
+                        /** Format: date-time */
+                        createdAt: string;
                         path: string;
                         sha256: string;
                         sizeBytes: number;
+                        storedAt: string | null;
+                        /** Format: date-time */
+                        updatedAt: string;
                     }[];
                 };
             };
@@ -9053,7 +8953,9 @@ export interface operations {
     };
     getV1AppsByAppIdBundlesByBundleIdFilesCount: {
         parameters: {
-            query?: never;
+            query?: {
+                isStored?: "false" | "true";
+            };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
@@ -10251,9 +10153,6 @@ export interface operations {
                         updatedAt: string;
                         verificationResult: ("drifted" | "matched") | null;
                         verifiedAt: string | null;
-                        activeDeviceCount: number;
-                        currentDeviceCount: number;
-                        embeddedDeviceCount: number;
                     };
                 };
             };
@@ -11025,9 +10924,9 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
-                        deviceCount: number;
                         failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
+                        failureNotifiedAt: string | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -11041,36 +10940,32 @@ export interface operations {
                             stepMinimumSeconds: number;
                             stepMinimumUpdateCount: number;
                         } | null;
-                        progressionStep: {
-                            gate: {
-                                attemptedUpdateCount: number;
-                                requiredUpdateCount: number;
-                                /** @constant */
-                                type: "sample";
-                            } | {
-                                /** Format: date-time */
-                                readyAt: string;
-                                /** @constant */
-                                type: "time";
-                            };
-                            number: number;
-                        } | null;
+                        progressionStepStartedAt: string | null;
                         purgedAt: string | null;
                         releaseCounters?: {
                             appliedUpdateCount: number;
                             attemptedUpdateCount: number;
                             crashFailureCount: number;
+                            /** Format: date-time */
+                            createdAt: string;
                             downloadFailureCount: number;
                             readinessTimeoutFailureCount: number;
+                            /** Format: uuid */
+                            releaseId: string;
                             reportedFailureCount: number;
+                            /** Format: date-time */
+                            updatedAt: string;
                             verificationFailureCount: number;
                         };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
+                        stepStartAttemptedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
+                        windowStartAttemptedUpdateCount: number;
+                        windowStartFailureCount: number;
                     }[];
                 };
             };
@@ -11206,7 +11101,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description The release with its warnings. */
+            /** @description The release. */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -11293,9 +11188,9 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
-                        deviceCount: number;
                         failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
+                        failureNotifiedAt: string | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -11309,44 +11204,32 @@ export interface operations {
                             stepMinimumSeconds: number;
                             stepMinimumUpdateCount: number;
                         } | null;
-                        progressionStep: {
-                            gate: {
-                                attemptedUpdateCount: number;
-                                requiredUpdateCount: number;
-                                /** @constant */
-                                type: "sample";
-                            } | {
-                                /** Format: date-time */
-                                readyAt: string;
-                                /** @constant */
-                                type: "time";
-                            };
-                            number: number;
-                        } | null;
+                        progressionStepStartedAt: string | null;
                         purgedAt: string | null;
                         releaseCounters?: {
                             appliedUpdateCount: number;
                             attemptedUpdateCount: number;
                             crashFailureCount: number;
+                            /** Format: date-time */
+                            createdAt: string;
                             downloadFailureCount: number;
                             readinessTimeoutFailureCount: number;
+                            /** Format: uuid */
+                            releaseId: string;
                             reportedFailureCount: number;
+                            /** Format: date-time */
+                            updatedAt: string;
                             verificationFailureCount: number;
                         };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
+                        stepStartAttemptedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
-                        warnings: {
-                            /** @enum {string} */
-                            code: "FINGERPRINT_UNKNOWN" | "UNSUPPORTED_CONDITION_SHARE";
-                            details: {
-                                [key: string]: unknown;
-                            } | null;
-                            message: string;
-                        }[];
+                        windowStartAttemptedUpdateCount: number;
+                        windowStartFailureCount: number;
                     };
                 };
             };
@@ -11637,9 +11520,9 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
-                        deviceCount: number;
                         failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
+                        failureNotifiedAt: string | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -11653,36 +11536,32 @@ export interface operations {
                             stepMinimumSeconds: number;
                             stepMinimumUpdateCount: number;
                         } | null;
-                        progressionStep: {
-                            gate: {
-                                attemptedUpdateCount: number;
-                                requiredUpdateCount: number;
-                                /** @constant */
-                                type: "sample";
-                            } | {
-                                /** Format: date-time */
-                                readyAt: string;
-                                /** @constant */
-                                type: "time";
-                            };
-                            number: number;
-                        } | null;
+                        progressionStepStartedAt: string | null;
                         purgedAt: string | null;
                         releaseCounters?: {
                             appliedUpdateCount: number;
                             attemptedUpdateCount: number;
                             crashFailureCount: number;
+                            /** Format: date-time */
+                            createdAt: string;
                             downloadFailureCount: number;
                             readinessTimeoutFailureCount: number;
+                            /** Format: uuid */
+                            releaseId: string;
                             reportedFailureCount: number;
+                            /** Format: date-time */
+                            updatedAt: string;
                             verificationFailureCount: number;
                         };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
+                        stepStartAttemptedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
+                        windowStartAttemptedUpdateCount: number;
+                        windowStartFailureCount: number;
                     };
                 };
             };
@@ -11878,9 +11757,9 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
-                        deviceCount: number;
                         failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
+                        failureNotifiedAt: string | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -11894,36 +11773,32 @@ export interface operations {
                             stepMinimumSeconds: number;
                             stepMinimumUpdateCount: number;
                         } | null;
-                        progressionStep: {
-                            gate: {
-                                attemptedUpdateCount: number;
-                                requiredUpdateCount: number;
-                                /** @constant */
-                                type: "sample";
-                            } | {
-                                /** Format: date-time */
-                                readyAt: string;
-                                /** @constant */
-                                type: "time";
-                            };
-                            number: number;
-                        } | null;
+                        progressionStepStartedAt: string | null;
                         purgedAt: string | null;
                         releaseCounters?: {
                             appliedUpdateCount: number;
                             attemptedUpdateCount: number;
                             crashFailureCount: number;
+                            /** Format: date-time */
+                            createdAt: string;
                             downloadFailureCount: number;
                             readinessTimeoutFailureCount: number;
+                            /** Format: uuid */
+                            releaseId: string;
                             reportedFailureCount: number;
+                            /** Format: date-time */
+                            updatedAt: string;
                             verificationFailureCount: number;
                         };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
+                        stepStartAttemptedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
+                        windowStartAttemptedUpdateCount: number;
+                        windowStartFailureCount: number;
                     }[];
                 };
             };
@@ -12256,9 +12131,9 @@ export interface operations {
                             /** Format: date-time */
                             createdAt: string;
                             createdFromReleaseId: string | null;
-                            deviceCount: number;
                             failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                             failureMinimumUpdateCount: number | null;
+                            failureNotifiedAt: string | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
@@ -12272,36 +12147,32 @@ export interface operations {
                                 stepMinimumSeconds: number;
                                 stepMinimumUpdateCount: number;
                             } | null;
-                            progressionStep: {
-                                gate: {
-                                    attemptedUpdateCount: number;
-                                    requiredUpdateCount: number;
-                                    /** @constant */
-                                    type: "sample";
-                                } | {
-                                    /** Format: date-time */
-                                    readyAt: string;
-                                    /** @constant */
-                                    type: "time";
-                                };
-                                number: number;
-                            } | null;
+                            progressionStepStartedAt: string | null;
                             purgedAt: string | null;
                             releaseCounters?: {
                                 appliedUpdateCount: number;
                                 attemptedUpdateCount: number;
                                 crashFailureCount: number;
+                                /** Format: date-time */
+                                createdAt: string;
                                 downloadFailureCount: number;
                                 readinessTimeoutFailureCount: number;
+                                /** Format: uuid */
+                                releaseId: string;
                                 reportedFailureCount: number;
+                                /** Format: date-time */
+                                updatedAt: string;
                                 verificationFailureCount: number;
                             };
                             rolledBackFromReleaseId: string | null;
                             rolloutPercentage: number;
                             /** @enum {string} */
                             status: "active" | "paused" | "revoked";
+                            stepStartAttemptedUpdateCount: number;
                             /** Format: date-time */
                             updatedAt: string;
+                            windowStartAttemptedUpdateCount: number;
+                            windowStartFailureCount: number;
                         };
                         currentReleaseId: string | null;
                         /** Format: uuid */
@@ -12710,9 +12581,9 @@ export interface operations {
                             /** Format: date-time */
                             createdAt: string;
                             createdFromReleaseId: string | null;
-                            deviceCount: number;
                             failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                             failureMinimumUpdateCount: number | null;
+                            failureNotifiedAt: string | null;
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
@@ -12726,36 +12597,32 @@ export interface operations {
                                 stepMinimumSeconds: number;
                                 stepMinimumUpdateCount: number;
                             } | null;
-                            progressionStep: {
-                                gate: {
-                                    attemptedUpdateCount: number;
-                                    requiredUpdateCount: number;
-                                    /** @constant */
-                                    type: "sample";
-                                } | {
-                                    /** Format: date-time */
-                                    readyAt: string;
-                                    /** @constant */
-                                    type: "time";
-                                };
-                                number: number;
-                            } | null;
+                            progressionStepStartedAt: string | null;
                             purgedAt: string | null;
                             releaseCounters?: {
                                 appliedUpdateCount: number;
                                 attemptedUpdateCount: number;
                                 crashFailureCount: number;
+                                /** Format: date-time */
+                                createdAt: string;
                                 downloadFailureCount: number;
                                 readinessTimeoutFailureCount: number;
+                                /** Format: uuid */
+                                releaseId: string;
                                 reportedFailureCount: number;
+                                /** Format: date-time */
+                                updatedAt: string;
                                 verificationFailureCount: number;
                             };
                             rolledBackFromReleaseId: string | null;
                             rolloutPercentage: number;
                             /** @enum {string} */
                             status: "active" | "paused" | "revoked";
+                            stepStartAttemptedUpdateCount: number;
                             /** Format: date-time */
                             updatedAt: string;
+                            windowStartAttemptedUpdateCount: number;
+                            windowStartFailureCount: number;
                         };
                         currentReleaseId: string | null;
                         /** Format: uuid */
@@ -13820,9 +13687,9 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
-                        deviceCount: number;
                         failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
+                        failureNotifiedAt: string | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -13836,36 +13703,32 @@ export interface operations {
                             stepMinimumSeconds: number;
                             stepMinimumUpdateCount: number;
                         } | null;
-                        progressionStep: {
-                            gate: {
-                                attemptedUpdateCount: number;
-                                requiredUpdateCount: number;
-                                /** @constant */
-                                type: "sample";
-                            } | {
-                                /** Format: date-time */
-                                readyAt: string;
-                                /** @constant */
-                                type: "time";
-                            };
-                            number: number;
-                        } | null;
+                        progressionStepStartedAt: string | null;
                         purgedAt: string | null;
                         releaseCounters?: {
                             appliedUpdateCount: number;
                             attemptedUpdateCount: number;
                             crashFailureCount: number;
+                            /** Format: date-time */
+                            createdAt: string;
                             downloadFailureCount: number;
                             readinessTimeoutFailureCount: number;
+                            /** Format: uuid */
+                            releaseId: string;
                             reportedFailureCount: number;
+                            /** Format: date-time */
+                            updatedAt: string;
                             verificationFailureCount: number;
                         };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
+                        stepStartAttemptedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
+                        windowStartAttemptedUpdateCount: number;
+                        windowStartFailureCount: number;
                     }[];
                 };
             };
@@ -14133,9 +13996,9 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
-                        deviceCount: number;
                         failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
+                        failureNotifiedAt: string | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -14149,36 +14012,32 @@ export interface operations {
                             stepMinimumSeconds: number;
                             stepMinimumUpdateCount: number;
                         } | null;
-                        progressionStep: {
-                            gate: {
-                                attemptedUpdateCount: number;
-                                requiredUpdateCount: number;
-                                /** @constant */
-                                type: "sample";
-                            } | {
-                                /** Format: date-time */
-                                readyAt: string;
-                                /** @constant */
-                                type: "time";
-                            };
-                            number: number;
-                        } | null;
+                        progressionStepStartedAt: string | null;
                         purgedAt: string | null;
                         releaseCounters?: {
                             appliedUpdateCount: number;
                             attemptedUpdateCount: number;
                             crashFailureCount: number;
+                            /** Format: date-time */
+                            createdAt: string;
                             downloadFailureCount: number;
                             readinessTimeoutFailureCount: number;
+                            /** Format: uuid */
+                            releaseId: string;
                             reportedFailureCount: number;
+                            /** Format: date-time */
+                            updatedAt: string;
                             verificationFailureCount: number;
                         };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
+                        stepStartAttemptedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
+                        windowStartAttemptedUpdateCount: number;
+                        windowStartFailureCount: number;
                     };
                 };
             };
@@ -14365,9 +14224,9 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
-                        deviceCount: number;
                         failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
+                        failureNotifiedAt: string | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -14381,36 +14240,32 @@ export interface operations {
                             stepMinimumSeconds: number;
                             stepMinimumUpdateCount: number;
                         } | null;
-                        progressionStep: {
-                            gate: {
-                                attemptedUpdateCount: number;
-                                requiredUpdateCount: number;
-                                /** @constant */
-                                type: "sample";
-                            } | {
-                                /** Format: date-time */
-                                readyAt: string;
-                                /** @constant */
-                                type: "time";
-                            };
-                            number: number;
-                        } | null;
+                        progressionStepStartedAt: string | null;
                         purgedAt: string | null;
                         releaseCounters?: {
                             appliedUpdateCount: number;
                             attemptedUpdateCount: number;
                             crashFailureCount: number;
+                            /** Format: date-time */
+                            createdAt: string;
                             downloadFailureCount: number;
                             readinessTimeoutFailureCount: number;
+                            /** Format: uuid */
+                            releaseId: string;
                             reportedFailureCount: number;
+                            /** Format: date-time */
+                            updatedAt: string;
                             verificationFailureCount: number;
                         };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
+                        stepStartAttemptedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
+                        windowStartAttemptedUpdateCount: number;
+                        windowStartFailureCount: number;
                     };
                 };
             };
@@ -14699,9 +14554,9 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
-                        deviceCount: number;
                         failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
+                        failureNotifiedAt: string | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -14715,36 +14570,32 @@ export interface operations {
                             stepMinimumSeconds: number;
                             stepMinimumUpdateCount: number;
                         } | null;
-                        progressionStep: {
-                            gate: {
-                                attemptedUpdateCount: number;
-                                requiredUpdateCount: number;
-                                /** @constant */
-                                type: "sample";
-                            } | {
-                                /** Format: date-time */
-                                readyAt: string;
-                                /** @constant */
-                                type: "time";
-                            };
-                            number: number;
-                        } | null;
+                        progressionStepStartedAt: string | null;
                         purgedAt: string | null;
                         releaseCounters?: {
                             appliedUpdateCount: number;
                             attemptedUpdateCount: number;
                             crashFailureCount: number;
+                            /** Format: date-time */
+                            createdAt: string;
                             downloadFailureCount: number;
                             readinessTimeoutFailureCount: number;
+                            /** Format: uuid */
+                            releaseId: string;
                             reportedFailureCount: number;
+                            /** Format: date-time */
+                            updatedAt: string;
                             verificationFailureCount: number;
                         };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
+                        stepStartAttemptedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
+                        windowStartAttemptedUpdateCount: number;
+                        windowStartFailureCount: number;
                     };
                 };
             };
@@ -14924,9 +14775,9 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
-                        deviceCount: number;
                         failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
+                        failureNotifiedAt: string | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -14940,36 +14791,32 @@ export interface operations {
                             stepMinimumSeconds: number;
                             stepMinimumUpdateCount: number;
                         } | null;
-                        progressionStep: {
-                            gate: {
-                                attemptedUpdateCount: number;
-                                requiredUpdateCount: number;
-                                /** @constant */
-                                type: "sample";
-                            } | {
-                                /** Format: date-time */
-                                readyAt: string;
-                                /** @constant */
-                                type: "time";
-                            };
-                            number: number;
-                        } | null;
+                        progressionStepStartedAt: string | null;
                         purgedAt: string | null;
                         releaseCounters?: {
                             appliedUpdateCount: number;
                             attemptedUpdateCount: number;
                             crashFailureCount: number;
+                            /** Format: date-time */
+                            createdAt: string;
                             downloadFailureCount: number;
                             readinessTimeoutFailureCount: number;
+                            /** Format: uuid */
+                            releaseId: string;
                             reportedFailureCount: number;
+                            /** Format: date-time */
+                            updatedAt: string;
                             verificationFailureCount: number;
                         };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
+                        stepStartAttemptedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
+                        windowStartAttemptedUpdateCount: number;
+                        windowStartFailureCount: number;
                     };
                 };
             };
@@ -15149,9 +14996,9 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         createdFromReleaseId: string | null;
-                        deviceCount: number;
                         failureAction: ("none" | "notify" | "pause" | "revoke") | null;
                         failureMinimumUpdateCount: number | null;
+                        failureNotifiedAt: string | null;
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
@@ -15165,36 +15012,32 @@ export interface operations {
                             stepMinimumSeconds: number;
                             stepMinimumUpdateCount: number;
                         } | null;
-                        progressionStep: {
-                            gate: {
-                                attemptedUpdateCount: number;
-                                requiredUpdateCount: number;
-                                /** @constant */
-                                type: "sample";
-                            } | {
-                                /** Format: date-time */
-                                readyAt: string;
-                                /** @constant */
-                                type: "time";
-                            };
-                            number: number;
-                        } | null;
+                        progressionStepStartedAt: string | null;
                         purgedAt: string | null;
                         releaseCounters?: {
                             appliedUpdateCount: number;
                             attemptedUpdateCount: number;
                             crashFailureCount: number;
+                            /** Format: date-time */
+                            createdAt: string;
                             downloadFailureCount: number;
                             readinessTimeoutFailureCount: number;
+                            /** Format: uuid */
+                            releaseId: string;
                             reportedFailureCount: number;
+                            /** Format: date-time */
+                            updatedAt: string;
                             verificationFailureCount: number;
                         };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
+                        stepStartAttemptedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
+                        windowStartAttemptedUpdateCount: number;
+                        windowStartFailureCount: number;
                     };
                 };
             };
@@ -15699,6 +15542,14 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        binary: {
+                            deviceCount: number;
+                            value: string | null;
+                            /** Format: date-time */
+                            lastSeenAt: string;
+                            platform: ("android" | "ios") | null;
+                            version: string | null;
+                        }[];
                         binaryVersion: {
                             deviceCount: number;
                             value: string | null;
@@ -15707,6 +15558,8 @@ export interface operations {
                             deviceCount: number;
                             value: string | null;
                         }[];
+                        currentDeviceCount: number;
+                        deviceCount: number;
                         osVersion: {
                             deviceCount: number;
                             value: string | null;
@@ -16053,6 +15906,7 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         defaultChannelId: string | null;
+                        deletedAt: string | null;
                         /** @enum {string} */
                         framework: "capacitor" | "cordova" | "expo" | "react-native";
                         /** Format: uuid */
@@ -16252,6 +16106,7 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         defaultChannelId: string | null;
+                        deletedAt: string | null;
                         /** @enum {string} */
                         framework: "capacitor" | "cordova" | "expo" | "react-native";
                         /** Format: uuid */
@@ -16370,6 +16225,7 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         defaultChannelId: string | null;
+                        deletedAt: string | null;
                         /** @enum {string} */
                         framework: "capacitor" | "cordova" | "expo" | "react-native";
                         /** Format: uuid */
@@ -16643,7 +16499,9 @@ export interface operations {
     };
     getV1UsersByUserId: {
         parameters: {
-            query?: never;
+            query?: {
+                relations?: ("accounts" | "members" | "members.organization")[];
+            };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
@@ -16662,16 +16520,18 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        bannedAt: string | null;
                         /** Format: date-time */
                         createdAt: string;
+                        deletedAt: string | null;
                         discoverySource: ("ai_assistant" | "blog_or_article" | "friend_or_colleague" | "github" | "linkedin" | "other" | "reddit" | "search_engine" | "x_twitter" | "youtube") | null;
+                        /** Format: email */
                         email: string;
+                        emailVerified: boolean;
                         /** Format: uuid */
                         id: string;
                         image: string | null;
                         intendedFramework: ("capacitor" | "cordova" | "expo" | "react_native" | "unsure") | null;
-                        isEmailVerified: boolean;
-                        isTwoFactorEnabled: boolean;
                         jobRole: ("cto_or_founder" | "developer" | "freelancer_or_agency" | "manager_or_lead" | "other" | "student_or_hobbyist") | null;
                         /** Format: date-time */
                         lastSeenAt: string;
@@ -16679,8 +16539,70 @@ export interface operations {
                         name: string;
                         timeFormat: ("12h" | "24h") | null;
                         timeZone: string | null;
+                        twoFactorEnabled: boolean;
                         /** Format: date-time */
                         updatedAt: string;
+                        accounts?: {
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: uuid */
+                            id: string;
+                            providerId: string;
+                            /** Format: uuid */
+                            userId: string;
+                        }[];
+                        members?: {
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: uuid */
+                            id: string;
+                            lastSeenAt: string | null;
+                            /** Format: uuid */
+                            organizationId: string;
+                            /** @enum {string} */
+                            role: "admin" | "billing" | "member" | "owner";
+                            /** Format: date-time */
+                            updatedAt: string;
+                            /** Format: uuid */
+                            userId: string;
+                            organization?: {
+                                appCountLimit: number | null;
+                                cancelAtPeriodEnd: boolean;
+                                cappedAt: string | null;
+                                channelCountPerAppLimit: number | null;
+                                countryAllowlist: string[] | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                                currentPeriodEndsAt: string | null;
+                                dataTransferBytesPerMonthlyActiveDeviceLimit: number | null;
+                                deletedAt: string | null;
+                                enterpriseMonthlyActiveDeviceCountLimit: number | null;
+                                fileCountPerBundleLimit: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                ipAllowlist: string[] | null;
+                                isTwoFactorRequired: boolean;
+                                lastSpendingCapReachedSentAt: string | null;
+                                lastSpendingCapWarningSentAt: string | null;
+                                lastStorageLimitReachedSentAt: string | null;
+                                lastStorageWarningSentAt: string | null;
+                                memberCountLimit: number | null;
+                                name: string;
+                                pastDueAt: string | null;
+                                /** @enum {string} */
+                                plan: "enterprise" | "free" | "pay_as_you_go";
+                                region: string;
+                                releaseCountPerAppPerDayLimit: number | null;
+                                retentionDays: number | null;
+                                spendingCapCents: number;
+                                storageBytes: number;
+                                storageBytesLimit: number | null;
+                                subscriptionProvider: "polar" | null;
+                                subscriptionStatus: string | null;
+                                /** Format: date-time */
+                                updatedAt: string;
+                            };
+                        }[];
                     };
                 };
             };

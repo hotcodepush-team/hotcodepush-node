@@ -5,20 +5,22 @@ import { resolveSentRequest, stubFetch } from '../test-helpers';
 import type { User } from './users';
 
 const USER: User = {
+  bannedAt: null,
   createdAt: '2026-09-29T00:00:00.000Z',
+  deletedAt: null,
   discoverySource: null,
   email: 'user@example.test',
+  emailVerified: true,
   id: 'user',
   image: null,
   intendedFramework: null,
-  isEmailVerified: true,
-  isTwoFactorEnabled: false,
   jobRole: null,
   lastSeenAt: '2026-10-12T00:00:00.000Z',
   locale: null,
   name: 'User',
   timeFormat: null,
   timeZone: null,
+  twoFactorEnabled: false,
   updatedAt: '2026-09-29T00:00:00.000Z',
 };
 
@@ -53,6 +55,21 @@ describe('UsersResource', () => {
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: 'https://api.hotcodepush.com/v1/users/me',
+    });
+  });
+
+  test('should get the caller with their members and organizations when the relations are set', async () => {
+    const fetchMock = stubFetch(() => Response.json({ ...USER, members: [] }));
+
+    const fetchedUser = await new HotCodePush().users.get({
+      relations: ['members', 'members.organization'],
+      userId: 'me',
+    });
+
+    expect(fetchedUser).toEqual({ ...USER, members: [] });
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: 'https://api.hotcodepush.com/v1/users/me?relations=members%2Cmembers.organization',
     });
   });
 });

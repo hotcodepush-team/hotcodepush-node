@@ -4,7 +4,6 @@ import type {
   Count,
   IdempotencyOptions,
   JsonRequestBody,
-  JsonResponseBody,
   PathParameters,
   QueryParameters,
 } from '../types';
@@ -13,15 +12,6 @@ import type { Release } from './releases';
 export type CountChannelReleasesOptions = PathParameters<
   '/v1/apps/{appId}/channels/{channelId}/releases/count',
   'get'
->;
-
-/**
- * A release as its creation answers it, with the warnings of what it will likely not do.
- */
-export type CreatedRelease = JsonResponseBody<
-  '/v1/apps/{appId}/channels/{channelId}/releases',
-  'post',
-  201
 >;
 
 export type CreateReleaseOptions = PathParameters<
@@ -65,7 +55,7 @@ export class ChannelReleasesResource {
   /**
    * Releases a ready bundle, or what another channel serves, in the channel, numbered next in the channel.
    */
-  public async create(options: CreateReleaseOptions): Promise<CreatedRelease> {
+  public async create(options: CreateReleaseOptions): Promise<Release> {
     const { appId, channelId, idempotencyKey, ...body } = options;
     return this.httpClient.fetchCreatingPost({
       body,

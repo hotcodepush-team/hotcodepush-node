@@ -13,19 +13,15 @@ afterEach(() => {
 
 describe('SsoProviderVerificationsResource', () => {
   test('should post to verify the domain', async () => {
-    const verification = {
-      details: { reason: 'lookup_failed' },
-      domain: 'example.com',
-      isDomainVerified: false,
-    };
-    const fetchMock = stubFetch(() => Response.json(verification));
+    const ssoProvider = { domain: 'example.com', domainVerified: true };
+    const fetchMock = stubFetch(() => Response.json(ssoProvider));
 
-    const createdVerification =
+    const verifiedSsoProvider =
       await new HotCodePush().organizations.ssoProvider.verifications.create({
         organizationId: 'organization',
       });
 
-    expect(createdVerification).toEqual(verification);
+    expect(verifiedSsoProvider).toEqual(ssoProvider);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       body: undefined,
       method: 'POST',

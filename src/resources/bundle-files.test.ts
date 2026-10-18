@@ -3,7 +3,12 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { HotCodePush } from '../client';
 import { resolveSentRequest, stubFetch } from '../test-helpers';
 
-const FILE = { path: 'index.html', sha256: 'a'.repeat(64), sizeBytes: 5 };
+const FILE = {
+  path: 'index.html',
+  sha256: 'a'.repeat(64),
+  sizeBytes: 5,
+  storedAt: null,
+};
 const FILES_URL =
   'https://api.hotcodepush.com/v1/apps/app/bundles/bundle/files';
 
@@ -12,27 +17,29 @@ afterEach(() => {
 });
 
 describe('BundleFilesResource', () => {
-  test('should count the files of the bundle', async () => {
+  test('should count the files of the bundle still to upload', async () => {
     const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount = await new HotCodePush().apps.bundles.files.count({
       appId: 'app',
       bundleId: 'bundle',
+      isStored: 'false',
     });
 
     expect(fetchedCount).toEqual({ count: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${FILES_URL}/count`,
+      url: `${FILES_URL}/count?isStored=false`,
     });
   });
 
-  test('should list a page of the files of the bundle', async () => {
+  test('should list a page of the files of the bundle still to upload', async () => {
     const fetchMock = stubFetch(() => Response.json([FILE]));
 
     const fetchedFiles = await new HotCodePush().apps.bundles.files.list({
       appId: 'app',
       bundleId: 'bundle',
+      isStored: 'false',
       limit: 100,
       offset: 100,
     });
@@ -40,7 +47,7 @@ describe('BundleFilesResource', () => {
     expect(fetchedFiles).toEqual([FILE]);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${FILES_URL}?limit=100&offset=100`,
+      url: `${FILES_URL}?isStored=false&limit=100&offset=100`,
     });
   });
 });

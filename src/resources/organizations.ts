@@ -126,7 +126,7 @@ export class OrganizationsResource {
   }
 
   /**
-   * The caller's organizations with their roles, newest first.
+   * The caller's organizations, newest first; the caller's role in each is on their member rows, `users.get({ relations: ['members'], userId: 'me' })`.
    */
   public async list(
     options: ListOrganizationsOptions = {},

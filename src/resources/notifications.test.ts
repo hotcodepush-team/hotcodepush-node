@@ -6,7 +6,7 @@ import { resolveSentRequest, stubFetch } from '../test-helpers';
 const NOTIFICATIONS_URL = 'https://api.hotcodepush.com/v1/notifications';
 const NOTIFICATION = {
   id: 'notification',
-  isRead: false,
+  readAt: null,
   type: 'release-paused',
 };
 
@@ -46,7 +46,7 @@ describe('NotificationsResource', () => {
 
   test('should patch the notification read', async () => {
     const fetchMock = stubFetch(() =>
-      Response.json({ ...NOTIFICATION, isRead: true }),
+      Response.json({ ...NOTIFICATION, readAt: '2026-10-18T00:00:00.000Z' }),
     );
 
     const updatedNotification = await new HotCodePush().notifications.update({
@@ -54,7 +54,10 @@ describe('NotificationsResource', () => {
       notificationId: 'notification',
     });
 
-    expect(updatedNotification).toEqual({ ...NOTIFICATION, isRead: true });
+    expect(updatedNotification).toEqual({
+      ...NOTIFICATION,
+      readAt: '2026-10-18T00:00:00.000Z',
+    });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       body: { isRead: true },
       method: 'PATCH',

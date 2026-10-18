@@ -1,32 +1,25 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
-import type { JsonResponseBody, PathParameters } from '../types';
+import type { PathParameters } from '../types';
+import type { SsoProvider } from './sso-provider';
 
 export type CreateSsoProviderVerificationOptions = PathParameters<
   '/v1/organizations/{organizationId}/sso-provider/verifications',
   'post'
 >;
 
-/**
- * The provider after the lookup, `isDomainVerified` its result, and `details.reason` `lookup_failed` when the resolver could not be asked.
- */
-export type SsoProviderVerification = JsonResponseBody<
-  '/v1/organizations/{organizationId}/sso-provider/verifications',
-  'post',
-  200
->;
-
 export class SsoProviderVerificationsResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * Looks up the domain's TXT record for the provider's token and marks the domain verified when it is there.
+   * Looks up the domain's TXT record for the provider's `domainVerificationToken` and sets `domainVerified` when the record carries it;
+   * the answer is the provider, verified or still waiting for the record, and a resolver that cannot be asked answers `E_DNS_LOOKUP_FAILED`.
    * A verified provider answers unchanged without a lookup, so the call is retried.
    * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
   public async create(
     options: CreateSsoProviderVerificationOptions,
-  ): Promise<SsoProviderVerification> {
+  ): Promise<SsoProvider> {
     return this.httpClient.fetchJson({
       isRetryable: true,
       method: 'POST',

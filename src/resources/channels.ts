@@ -20,12 +20,6 @@ export type Channel = JsonResponseBody<
   201
 >;
 
-export type ChannelWithDeviceCounts = JsonResponseBody<
-  '/v1/apps/{appId}/channels/{channelId}',
-  'get',
-  200
->;
-
 export type CountChannelsOptions = PathParameters<
   '/v1/apps/{appId}/channels/count',
   'get'
@@ -137,11 +131,9 @@ export class ChannelsResource {
   }
 
   /**
-   * A channel with the device counts of its page's header.
+   * A channel; `apps.statistics.fleet.get` with its `channelId` counts its devices.
    */
-  public async get(
-    options: GetChannelOptions,
-  ): Promise<ChannelWithDeviceCounts> {
+  public async get(options: GetChannelOptions): Promise<Channel> {
     return this.httpClient.fetchJson({
       method: 'GET',
       path: resolvePath('/v1/apps/{appId}/channels/{channelId}', options),

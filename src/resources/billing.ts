@@ -7,9 +7,8 @@ import type {
 } from '../types';
 
 /**
- * The organization's billing this month: `monthlyActiveDeviceCount`, the devices the month counts so far, and on Free
- * `suggestedSpendingCapCents`, the cap the last thirty days' active devices suggest; the plan, the spending cap,
- * `cappedAt` and the subscription are the organization's.
+ * The organization's billing this month: `monthlyActiveDeviceCount`, the devices the month counts so far; the plan,
+ * the spending cap, `cappedAt` and the subscription are the organization's.
  */
 export type Billing = JsonResponseBody<
   '/v1/organizations/{organizationId}/billing',

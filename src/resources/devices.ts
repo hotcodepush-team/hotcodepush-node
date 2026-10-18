@@ -66,7 +66,7 @@ export class DevicesResource {
   }
 
   /**
-   * Deletes a device's registry row and marks, the erasure request.
+   * Deletes a device's registry row, the erasure request.
    */
   public async delete(options: DeleteDeviceOptions): Promise<void> {
     await this.httpClient.fetchJson({

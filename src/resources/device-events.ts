@@ -20,7 +20,7 @@ export type ListDeviceEventsOptions = PathParameters<
   QueryParameters<'/v1/apps/{appId}/devices/{deviceId}/events', 'get'>;
 
 /**
- * A device's event on a release: applied, attempted, checked or failed, with the reason a failure gave.
+ * A device's first event of each type on a release: applied, attempted, checked or failed, with the reason a failure gave.
  */
 export type ReleaseDeviceEvent = JsonResponseBody<
   '/v1/apps/{appId}/devices/{deviceId}/events',

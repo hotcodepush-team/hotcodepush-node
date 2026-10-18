@@ -67,6 +67,7 @@ The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.ch
 | `apps.binaries`, the store builds `binary create` creates                                        | `count`, `create`, `get`, `list`                                                      |
 | `apps.channels.audience`, the audience preview                                                   | `get`                                                                                 |
 | `apps.devices`                                                                                   | `count`, `delete`, `deleteMany`, `get`, `list`                                        |
+| `apps.devices.events`                                                                            | `count`, `list`                                                                       |
 | `apps.signingKeys`                                                                               | `count`, `create`, `delete`, `list`                                                   |
 | `apps.statistics.fleet`, the registry counted by dimension                                       | `get`                                                                                 |
 | `apps.statistics.updates`, `apps.statistics.usage`, the time-series read models                  | `get`                                                                                 |

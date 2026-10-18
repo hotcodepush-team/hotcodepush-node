@@ -69,7 +69,7 @@ The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.ch
 | `apps.devices`                                                                                   | `count`, `delete`, `deleteMany`, `get`, `list`                                        |
 | `apps.devices.events`, a device's first event of each type on a release                          | `count`, `list`                                                                       |
 | `apps.signingKeys`                                                                               | `count`, `create`, `delete`, `list`                                                   |
-| `apps.statistics.fleet`, the registry counted by dimension                                       | `get`                                                                                 |
+| `apps.statistics.fleet`, the registry counted in total and by dimension                          | `get`                                                                                 |
 | `apps.statistics.updates`, `apps.statistics.usage`, the time-series read models                  | `get`                                                                                 |
 | `apps.files`                                                                                     | `upload`                                                                              |
 | `apps.files.uploads`, the multipart upload                                                       | `complete`, `create`, `delete`                                                        |

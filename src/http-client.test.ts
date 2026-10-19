@@ -6,6 +6,7 @@ import { HttpClient, resolvePath, withRetry, withTimeout } from './http-client';
 import {
   countAttemptsWhenUnavailable,
   resolveSentRequest,
+  runCallAfterBadGateway,
   stubFetch,
 } from './test-helpers';
 
@@ -379,21 +380,18 @@ describe('HttpClient.fetchUpload', () => {
   });
 
   test('should retry a blob when the status is retryable', async () => {
-    const fetchMock = vi
-      .fn<typeof fetch>()
-      .mockResolvedValueOnce(new Response(null, { status: 503 }))
-      .mockResolvedValueOnce(Response.json({ sizeBytes: 9 }));
-    vi.stubGlobal('fetch', fetchMock);
+    const { attemptCount, result } = await runCallAfterBadGateway(
+      () =>
+        new HttpClient({}).fetchUpload({
+          body: new Blob(['tar bytes']),
+          contentType: 'application/x-tar',
+          path: '/v1/apps/app/bundles/bundle/pack',
+        }),
+      () => Response.json({ sizeBytes: 9 }),
+    );
 
-    const uploadPromise = new HttpClient({}).fetchUpload({
-      body: new Blob(['tar bytes']),
-      contentType: 'application/x-tar',
-      path: '/v1/apps/app/bundles/bundle/pack',
-    });
-    await vi.runAllTimersAsync();
-
-    await expect(uploadPromise).resolves.toEqual({ sizeBytes: 9 });
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(result).toEqual({ sizeBytes: 9 });
+    expect(attemptCount).toBe(2);
   });
 
   test('should not retry a stream, which is read once', async () => {

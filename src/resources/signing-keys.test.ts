@@ -47,7 +47,7 @@ describe('SigningKeysResource', () => {
     });
   });
 
-  test('should not retry the registration when the api is unavailable', async () => {
+  test('should retry the registration when the api is unavailable', async () => {
     const attemptCount = await countAttemptsWhenUnavailable(() =>
       new HotCodePush().apps.signingKeys.create({
         appId: 'app',
@@ -55,7 +55,7 @@ describe('SigningKeysResource', () => {
       }),
     );
 
-    expect(attemptCount).toBe(1);
+    expect(attemptCount).toBe(3);
   });
 
   test('should delete the signing key', async () => {

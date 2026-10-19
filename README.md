@@ -56,7 +56,8 @@ The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.ch
 | `apps`                                                                                           | `delete`, `get`, `transfer`, `update`                                                 |
 | `apps.bundles`                                                                                   | `complete`, `count`, `create`, `delete`, `get`, `list`                                |
 | `apps.bundles.files`, a bundle's files ordered by path                                           | `count`, `list`                                                                       |
-| `apps.bundles.pack`, `apps.bundles.deltas`                                                       | `upload`                                                                              |
+| `apps.bundles.pack`                                                                              | `upload`                                                                              |
+| `apps.bundles.deltas`                                                                            | `count`, `list`, `upload`                                                             |
 | `apps.bundles.pack.uploads`, `apps.bundles.deltas.uploads`, the multipart upload                 | `complete`, `create`, `delete`                                                        |
 | `apps.bundles.pack.uploads.parts`, `apps.bundles.deltas.uploads.parts`                           | `upload`                                                                              |
 | `apps.channels`                                                                                  | `count`, `create`, `delete`, `deleteMany`, `get`, `list`, `pause`, `resume`, `update` |

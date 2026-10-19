@@ -54,12 +54,13 @@ export class SigningKeysResource {
 
   /**
    * Registers a public key, `rsa-v1_5-sha256:` and the base64 of an RSA key's SPKI DER, of at least 2048 bits; from then on the app releases only signed bundles.
-   * A repeat registers the key a second time, so the call is never retried.
+   * A key the app already holds answers its row unchanged, so the call is retried.
    */
   public async create(options: CreateSigningKeyOptions): Promise<SigningKey> {
     const { appId, ...body } = options;
     return this.httpClient.fetchJson({
       body,
+      isRetryable: true,
       method: 'POST',
       path: resolvePath('/v1/apps/{appId}/signing-keys', { appId }),
     });

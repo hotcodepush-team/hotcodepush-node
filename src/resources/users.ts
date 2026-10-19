@@ -45,7 +45,7 @@ export class UsersResource {
   }
 
   /**
-   * The caller behind the token and whether it is a session or an API token.
+   * The caller behind the token.
    * `userId` takes `me` for the caller; another user answers `E_FORBIDDEN`.
    * `relations` embeds the caller's `accounts`, their sign-in identities, their `members` rows of live organizations
    * and, with `members.organization`, each row's organization.

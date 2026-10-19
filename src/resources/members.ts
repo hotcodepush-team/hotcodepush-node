@@ -46,6 +46,15 @@ export type Member = JsonResponseBody<
   200
 >;
 
+/**
+ * A member without its user, as an update and an accepted invitation answer it.
+ */
+export type MemberRow = JsonResponseBody<
+  '/v1/organizations/{organizationId}/members/{memberId}',
+  'patch',
+  200
+>;
+
 export type UpdateMemberOptions = PathParameters<
   '/v1/organizations/{organizationId}/members/{memberId}',
   'patch'
@@ -132,7 +141,7 @@ export class MembersResource {
    * Changes a member's role; setting `owner` transfers the ownership.
    * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
-  public async update(options: UpdateMemberOptions): Promise<Member> {
+  public async update(options: UpdateMemberOptions): Promise<MemberRow> {
     const { memberId, organizationId, ...body } = options;
     return this.httpClient.fetchJson({
       body,

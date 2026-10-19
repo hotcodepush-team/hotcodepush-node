@@ -5,7 +5,7 @@ import type {
   JsonRequestBody,
   PathParameters,
 } from '../types';
-import type { Release } from './releases';
+import type { ReleaseRow } from './releases';
 
 export type CreateRollbackOptions = PathParameters<
   '/v1/apps/{appId}/channels/{channelId}/rollbacks',
@@ -20,7 +20,7 @@ export class RollbacksResource {
   /**
    * Releases the channel's previous bundle again, or the one of `toReleaseId`; a rollback is a new release.
    */
-  public async create(options: CreateRollbackOptions): Promise<Release> {
+  public async create(options: CreateRollbackOptions): Promise<ReleaseRow> {
     const { appId, channelId, idempotencyKey, ...body } = options;
     return this.httpClient.fetchCreatingPost({
       body,

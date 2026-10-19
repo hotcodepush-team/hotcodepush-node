@@ -7,7 +7,7 @@ import type {
   PathParameters,
   QueryParameters,
 } from '../types';
-import type { Member } from './members';
+import type { MemberRow } from './members';
 
 export type AcceptInvitationOptions = PathParameters<
   '/v1/invitations/{invitationId}/accept',
@@ -34,7 +34,7 @@ export class InvitationsResource {
    * A repeat answers `E_INVITATION_INVALID`, so the call is never retried.
    * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
-  public async accept(options: AcceptInvitationOptions): Promise<Member> {
+  public async accept(options: AcceptInvitationOptions): Promise<MemberRow> {
     const { invitationId, ...body } = options;
     return this.httpClient.fetchJson({
       body,

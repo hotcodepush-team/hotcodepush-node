@@ -4,10 +4,10 @@ import type {
   Count,
   IdempotencyOptions,
   JsonRequestBody,
+  JsonResponseBody,
   PathParameters,
   QueryParameters,
 } from '../types';
-import type { Invitation } from './invitations';
 
 export type CountInvitationsOptions = PathParameters<
   '/v1/organizations/{organizationId}/invitations/count',
@@ -35,6 +35,15 @@ export type DeleteManyInvitationsOptions = PathParameters<
   'delete'
 > &
   QueryParameters<'/v1/organizations/{organizationId}/invitations', 'delete'>;
+
+/**
+ * An invitation without its organization, as the organization's list and a created invitation answer it.
+ */
+export type InvitationRow = JsonResponseBody<
+  '/v1/organizations/{organizationId}/invitations',
+  'get',
+  200
+>[number];
 
 export type ListInvitationsOptions = PathParameters<
   '/v1/organizations/{organizationId}/invitations',
@@ -65,7 +74,9 @@ export class OrganizationInvitationsResource {
    * Invites an address to the organization; the invitation mail carries the token.
    * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
-  public async create(options: CreateInvitationOptions): Promise<Invitation> {
+  public async create(
+    options: CreateInvitationOptions,
+  ): Promise<InvitationRow> {
     const { idempotencyKey, organizationId, ...body } = options;
     return this.httpClient.fetchCreatingPost({
       body,
@@ -111,7 +122,7 @@ export class OrganizationInvitationsResource {
    * The organization's invitations, newest first.
    * An API token answers `E_FORBIDDEN`; sign in with a session.
    */
-  public async list(options: ListInvitationsOptions): Promise<Invitation[]> {
+  public async list(options: ListInvitationsOptions): Promise<InvitationRow[]> {
     const { organizationId, ...query } = options;
     return this.httpClient.fetchJson({
       method: 'GET',

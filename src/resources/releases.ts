@@ -38,6 +38,15 @@ export type Release = JsonResponseBody<
   200
 >;
 
+/**
+ * A release without its relations, as every write answers it.
+ */
+export type ReleaseRow = JsonResponseBody<
+  '/v1/apps/{appId}/releases/{releaseId}',
+  'patch',
+  200
+>;
+
 export type ResumeReleaseOptions = PathParameters<
   '/v1/apps/{appId}/releases/{releaseId}/resume',
   'post'
@@ -104,7 +113,7 @@ export class ReleasesResource {
    * Stops offering a release; devices on it keep it.
    * Pausing a paused release answers it unchanged, so the call is retried.
    */
-  public async pause(options: PauseReleaseOptions): Promise<Release> {
+  public async pause(options: PauseReleaseOptions): Promise<ReleaseRow> {
     return this.httpClient.fetchJson({
       isRetryable: true,
       method: 'POST',
@@ -116,7 +125,7 @@ export class ReleasesResource {
    * Offers a paused release again.
    * Resuming an active release answers it unchanged, so the call is retried.
    */
-  public async resume(options: ResumeReleaseOptions): Promise<Release> {
+  public async resume(options: ResumeReleaseOptions): Promise<ReleaseRow> {
     return this.httpClient.fetchJson({
       isRetryable: true,
       method: 'POST',
@@ -131,7 +140,7 @@ export class ReleasesResource {
    * Revokes a release for good: devices on it move to the newest eligible older release or the embedded bundle.
    * A repeat answers `E_RELEASE_REVOKED`, so the call is never retried.
    */
-  public async revoke(options: RevokeReleaseOptions): Promise<Release> {
+  public async revoke(options: RevokeReleaseOptions): Promise<ReleaseRow> {
     return this.httpClient.fetchJson({
       method: 'POST',
       path: resolvePath(
@@ -144,7 +153,7 @@ export class ReleasesResource {
   /**
    * Changes the rollout percentage in both directions, the progression schedule, null stopping it, the mandatory flag or the notes.
    */
-  public async update(options: UpdateReleaseOptions): Promise<Release> {
+  public async update(options: UpdateReleaseOptions): Promise<ReleaseRow> {
     const { appId, releaseId, ...body } = options;
     return this.httpClient.fetchJson({
       body,

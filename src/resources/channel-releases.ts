@@ -7,7 +7,7 @@ import type {
   PathParameters,
   QueryParameters,
 } from '../types';
-import type { Release } from './releases';
+import type { Release, ReleaseRow } from './releases';
 
 export type CountChannelReleasesOptions = PathParameters<
   '/v1/apps/{appId}/channels/{channelId}/releases/count',
@@ -55,7 +55,7 @@ export class ChannelReleasesResource {
   /**
    * Releases a ready bundle, or what another channel serves, in the channel, numbered next in the channel.
    */
-  public async create(options: CreateReleaseOptions): Promise<Release> {
+  public async create(options: CreateReleaseOptions): Promise<ReleaseRow> {
     const { appId, channelId, idempotencyKey, ...body } = options;
     return this.httpClient.fetchCreatingPost({
       body,
@@ -88,7 +88,7 @@ export class ChannelReleasesResource {
    */
   public async revoke(
     options: RevokeChannelReleasesOptions,
-  ): Promise<Release[]> {
+  ): Promise<ReleaseRow[]> {
     const { appId, channelId, ...body } = options;
     return this.httpClient.fetchJson({
       body,

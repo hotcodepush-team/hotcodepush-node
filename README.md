@@ -44,7 +44,6 @@ The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.ch
 | `organizations.auditLogs`                                                                        | `count`, `downloadCsv`, `list`                                                        |
 | `organizations.invitations`                                                                      | `count`, `create`, `delete`, `deleteMany`, `list`                                     |
 | `organizations.members`                                                                          | `count`, `delete`, `deleteMany`, `get`, `list`, `update`                              |
-| `organizations.billing`, this month's monthly active device count                                | `get`, `update`                                                                       |
 | `organizations.checkouts`, enabling billing through Polar                                        | `create`                                                                              |
 | `organizations.customerPortalSessions`, Polar's portal for invoices and the card                 | `create`                                                                              |
 | `organizations.limits`, the limits in effect                                                     | `get`                                                                                 |
@@ -57,9 +56,9 @@ The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.ch
 | `apps.bundles`                                                                                   | `complete`, `count`, `create`, `delete`, `get`, `list`                                |
 | `apps.bundles.files`, a bundle's files ordered by path                                           | `count`, `list`                                                                       |
 | `apps.bundles.pack`                                                                              | `upload`                                                                              |
-| `apps.bundles.deltas`                                                                            | `count`, `list`, `upload`                                                             |
-| `apps.bundles.pack.uploads`, `apps.bundles.deltas.uploads`, the multipart upload                 | `complete`, `create`, `delete`                                                        |
-| `apps.bundles.pack.uploads.parts`, `apps.bundles.deltas.uploads.parts`                           | `upload`                                                                              |
+| `apps.bundles.deltas`                                                                            | `count`, `list`                                                                       |
+| `apps.bundles.pack.uploads`, the multipart upload                                                | `complete`, `create`, `delete`                                                        |
+| `apps.bundles.pack.uploads.parts`                                                                | `upload`                                                                              |
 | `apps.channels`                                                                                  | `count`, `create`, `delete`, `deleteMany`, `get`, `list`, `pause`, `resume`, `update` |
 | `apps.channels.indexes`                                                                          | `get`                                                                                 |
 | `apps.channels.qr`, the channel's deep link as an image                                          | `get`                                                                                 |

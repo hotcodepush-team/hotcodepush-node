@@ -236,30 +236,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/organizations/{organizationId}/billing": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get the billing
-         * @description The organization's billing this month, the number derived from its devices: `monthlyActiveDeviceCount`, the devices the month counts so far. The plan, the spending cap, `cappedAt` and the subscription mirror are the organization's, which `GET /v1/organizations/{organizationId}` answers. Owner, Admin and Billing.
-         */
-        get: operations["getV1OrganizationsByOrganizationIdBilling"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Update the spending cap
-         * @description Sets the spending cap, in whole dollars from $5 to $10,000, applying now: a raise counts the devices waiting beyond the previous cap in the order they reported, a cap below the MAU the month counted stops counting further devices while the counted ones stay billed. Mails Owner and Billing and the caller. Answers the billing read; the organization read answers the new `spendingCapCents` and `cappedAt`. Owner, Admin and Billing, on a paying plan.
-         */
-        patch: operations["patchV1OrganizationsByOrganizationIdBilling"];
-        trace?: never;
-    };
     "/v1/organizations/{organizationId}/checkouts": {
         parameters: {
             query?: never;
@@ -661,7 +637,7 @@ export interface paths {
         };
         /**
          * Get an organization
-         * @description The organization, its row: the plan, `storageBytes`, the counter behind its storage limit, and the subscription mirror — `subscriptionStatus`, `subscriptionProvider`, `cancelAtPeriodEnd`, `currentPeriodEndsAt`, `pastDueAt`, `spendingCapCents`, `cappedAt` and `enterpriseMonthlyActiveDeviceCountLimit` — from which a client derives the month's device ceiling; any role of it.
+         * @description The organization, its row: the plan, `storageBytes`, the counter behind its storage limit, and the subscription mirror — `subscriptionStatus`, `subscriptionProvider`, `currentPeriodEndsAt`, `finalPeriodEndsAt`, `pastDueAt`, `spendingCapCents`, `cappedAt` and `enterpriseMonthlyActiveDeviceCountLimit` — from which a client derives the month's device ceiling; any role of it.
          */
         get: operations["getV1OrganizationsByOrganizationId"];
         put?: never;
@@ -675,7 +651,7 @@ export interface paths {
         head?: never;
         /**
          * Update an organization
-         * @description Changes the name and the security settings; the security settings need a paying plan, an allowlist leaving out the caller's own address or country answers `E_VALIDATION` with the rule `excludes_caller`, and the region is read-only after creation.
+         * @description Changes the name, the security settings and the spending cap. The security settings and the cap need a paying plan; an allowlist leaving out the caller's own address or country answers `E_VALIDATION` with the rule `excludes_caller`, and the region is read-only after creation. The cap, in whole dollars from $5 to $10,000, applies now: a raise counts the devices waiting beyond the previous cap in the order they reported, a cap below the MAU the month counted stops counting further devices while the counted ones stay billed; it mails Owner, Billing and the caller. Owner and Admin; Billing may send `spendingCapCents` alone.
          */
         patch: operations["patchV1OrganizationsByOrganizationId"];
         trace?: never;
@@ -867,106 +843,6 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Upload a delta pack
-         * @description The delta pack from a base bundle of the app, streamed under the bundle's prefix; `Content-Length` declares the bytes.
-         */
-        put: operations["putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleId"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}/uploads": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Start a multipart delta pack upload
-         * @description Starts a multipart upload of the delta pack from a base bundle of the app, for a delta pack above the request body limit; the parts follow, and the single PUT stays for small ones.
-         */
-        post: operations["postV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploads"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}/uploads/{uploadId}/parts/{partNumber}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Upload a delta pack part
-         * @description One part of a multipart upload, its bytes as the body and `Content-Length` their count; every part but the last is at least five mebibytes, all are of one size, and an upload has at most 10,000.
-         */
-        put: operations["putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadIdPartsByPartNumber"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}/uploads/{uploadId}/complete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Complete a multipart delta pack upload
-         * @description Assembles the parts into the delta pack and counts its bytes, as the single PUT does; a delta pack uploaded before is replaced, and one above the byte limit is deleted.
-         */
-        post: operations["postV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadIdComplete"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/apps/{appId}/bundles/{bundleId}/deltas/{baseBundleId}/uploads/{uploadId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Abort a multipart delta pack upload
-         * @description Aborts a multipart delta pack upload, discarding its parts.
-         */
-        delete: operations["deleteV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadId"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2038,11 +1914,6 @@ export interface operations {
                         id: string;
                         /** Format: uuid */
                         inviterId: string;
-                        organization?: {
-                            /** Format: uuid */
-                            id: string;
-                            name: string;
-                        };
                         /** Format: uuid */
                         organizationId: string;
                         /** @enum {string} */
@@ -2051,6 +1922,11 @@ export interface operations {
                         status: "accepted" | "canceled" | "pending" | "rejected";
                         /** Format: date-time */
                         updatedAt: string;
+                        organization?: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
                     }[];
                 };
             };
@@ -2093,6 +1969,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2181,6 +2059,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2245,29 +2125,6 @@ export interface operations {
                         role: "admin" | "billing" | "member" | "owner";
                         /** Format: date-time */
                         updatedAt: string;
-                        user?: {
-                            /** Format: date-time */
-                            createdAt: string;
-                            /** Format: email */
-                            email: string;
-                            emailVerified: boolean;
-                            /** Format: uuid */
-                            id: string;
-                            image: string | null;
-                            name: string;
-                            twoFactorEnabled: boolean;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            accounts?: {
-                                /** Format: date-time */
-                                createdAt: string;
-                                /** Format: uuid */
-                                id: string;
-                                providerId: string;
-                                /** Format: uuid */
-                                userId: string;
-                            }[];
-                        };
                         /** Format: uuid */
                         userId: string;
                     };
@@ -2330,6 +2187,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2425,6 +2284,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2539,6 +2400,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2644,6 +2507,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2735,6 +2600,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2825,6 +2692,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2935,6 +2804,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2996,6 +2867,7 @@ export interface operations {
                         /** Format: uuid */
                         id: string;
                         name: string;
+                        nextBundleNumber: number;
                         /** Format: uuid */
                         organizationId: string;
                         /** Format: date-time */
@@ -3042,6 +2914,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3109,6 +2983,7 @@ export interface operations {
                         /** Format: uuid */
                         id: string;
                         name: string;
+                        nextBundleNumber: number;
                         /** Format: uuid */
                         organizationId: string;
                         /** Format: date-time */
@@ -3173,6 +3048,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3265,6 +3142,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3416,6 +3295,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3522,201 +3403,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    getV1OrganizationsByOrganizationIdBilling: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                organizationId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The billing. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        monthlyActiveDeviceCount: number;
-                    };
-                };
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    patchV1OrganizationsByOrganizationIdBilling: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                organizationId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    spendingCapCents: number;
-                };
-            };
-        };
-        responses: {
-            /** @description The billing. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        monthlyActiveDeviceCount: number;
-                    };
-                };
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_PLAN_REQUIRED */
-            402: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3808,6 +3496,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3899,6 +3589,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3962,11 +3654,6 @@ export interface operations {
                         id: string;
                         /** Format: uuid */
                         inviterId: string;
-                        organization?: {
-                            /** Format: uuid */
-                            id: string;
-                            name: string;
-                        };
                         /** Format: uuid */
                         organizationId: string;
                         /** @enum {string} */
@@ -4017,6 +3704,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -4062,8 +3751,11 @@ export interface operations {
                 "application/json": {
                     /** Format: email */
                     email: string;
-                    /** @enum {string} */
-                    role: "admin" | "billing" | "member";
+                    /**
+                     * @default member
+                     * @enum {string}
+                     */
+                    role?: "admin" | "billing" | "member";
                 };
             };
         };
@@ -4085,11 +3777,6 @@ export interface operations {
                         id: string;
                         /** Format: uuid */
                         inviterId: string;
-                        organization?: {
-                            /** Format: uuid */
-                            id: string;
-                            name: string;
-                        };
                         /** Format: uuid */
                         organizationId: string;
                         /** @enum {string} */
@@ -4158,6 +3845,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -4246,6 +3935,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -4340,6 +4031,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -4427,6 +4120,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -4521,6 +4216,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -4586,6 +4283,8 @@ export interface operations {
                         role: "admin" | "billing" | "member" | "owner";
                         /** Format: date-time */
                         updatedAt: string;
+                        /** Format: uuid */
+                        userId: string;
                         user?: {
                             /** Format: date-time */
                             createdAt: string;
@@ -4609,8 +4308,6 @@ export interface operations {
                                 userId: string;
                             }[];
                         };
-                        /** Format: uuid */
-                        userId: string;
                     }[];
                 };
             };
@@ -4653,6 +4350,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -4741,6 +4440,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -4835,6 +4536,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -4896,6 +4599,8 @@ export interface operations {
                         role: "admin" | "billing" | "member" | "owner";
                         /** Format: date-time */
                         updatedAt: string;
+                        /** Format: uuid */
+                        userId: string;
                         user?: {
                             /** Format: date-time */
                             createdAt: string;
@@ -4919,8 +4624,6 @@ export interface operations {
                                 userId: string;
                             }[];
                         };
-                        /** Format: uuid */
-                        userId: string;
                     };
                 };
             };
@@ -4963,6 +4666,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -5059,6 +4764,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -5125,29 +4832,6 @@ export interface operations {
                         role: "admin" | "billing" | "member" | "owner";
                         /** Format: date-time */
                         updatedAt: string;
-                        user?: {
-                            /** Format: date-time */
-                            createdAt: string;
-                            /** Format: email */
-                            email: string;
-                            emailVerified: boolean;
-                            /** Format: uuid */
-                            id: string;
-                            image: string | null;
-                            name: string;
-                            twoFactorEnabled: boolean;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            accounts?: {
-                                /** Format: date-time */
-                                createdAt: string;
-                                /** Format: uuid */
-                                id: string;
-                                providerId: string;
-                                /** Format: uuid */
-                                userId: string;
-                            }[];
-                        };
                         /** Format: uuid */
                         userId: string;
                     };
@@ -5192,6 +4876,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -5297,6 +4983,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -5460,6 +5148,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -5546,6 +5236,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -5651,6 +5343,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -5754,6 +5448,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -5840,6 +5536,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -5934,6 +5632,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -6040,6 +5740,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -6132,6 +5834,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -6181,7 +5885,6 @@ export interface operations {
                 content: {
                     "application/json": {
                         appCountLimit: number | null;
-                        cancelAtPeriodEnd: boolean;
                         cappedAt: string | null;
                         channelCountPerAppLimit: number | null;
                         countryAllowlist: string[] | null;
@@ -6192,6 +5895,7 @@ export interface operations {
                         deletedAt: string | null;
                         enterpriseMonthlyActiveDeviceCountLimit: number | null;
                         fileCountPerBundleLimit: number | null;
+                        finalPeriodEndsAt: string | null;
                         /** Format: uuid */
                         id: string;
                         ipAllowlist: string[] | null;
@@ -6207,12 +5911,16 @@ export interface operations {
                         plan: "enterprise" | "free" | "pay_as_you_go";
                         region: string;
                         releaseCountPerAppPerDayLimit: number | null;
+                        reportedBillableDeviceCount: number;
+                        reportedBillableDeviceCountHour: string | null;
+                        reportedBillableDeviceCountMonth: string | null;
                         retentionDays: number | null;
                         spendingCapCents: number;
                         storageBytes: number;
                         storageBytesLimit: number | null;
                         subscriptionProvider: "polar" | null;
                         subscriptionStatus: string | null;
+                        unsentBillableDeviceCount: number;
                         /** Format: date-time */
                         updatedAt: string;
                     }[];
@@ -6257,6 +5965,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -6311,7 +6021,6 @@ export interface operations {
                 content: {
                     "application/json": {
                         appCountLimit: number | null;
-                        cancelAtPeriodEnd: boolean;
                         cappedAt: string | null;
                         channelCountPerAppLimit: number | null;
                         countryAllowlist: string[] | null;
@@ -6322,6 +6031,7 @@ export interface operations {
                         deletedAt: string | null;
                         enterpriseMonthlyActiveDeviceCountLimit: number | null;
                         fileCountPerBundleLimit: number | null;
+                        finalPeriodEndsAt: string | null;
                         /** Format: uuid */
                         id: string;
                         ipAllowlist: string[] | null;
@@ -6337,12 +6047,16 @@ export interface operations {
                         plan: "enterprise" | "free" | "pay_as_you_go";
                         region: string;
                         releaseCountPerAppPerDayLimit: number | null;
+                        reportedBillableDeviceCount: number;
+                        reportedBillableDeviceCountHour: string | null;
+                        reportedBillableDeviceCountMonth: string | null;
                         retentionDays: number | null;
                         spendingCapCents: number;
                         storageBytes: number;
                         storageBytesLimit: number | null;
                         subscriptionProvider: "polar" | null;
                         subscriptionStatus: string | null;
+                        unsentBillableDeviceCount: number;
                         /** Format: date-time */
                         updatedAt: string;
                     };
@@ -6396,6 +6110,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -6484,6 +6200,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -6532,7 +6250,6 @@ export interface operations {
                 content: {
                     "application/json": {
                         appCountLimit: number | null;
-                        cancelAtPeriodEnd: boolean;
                         cappedAt: string | null;
                         channelCountPerAppLimit: number | null;
                         countryAllowlist: string[] | null;
@@ -6543,6 +6260,7 @@ export interface operations {
                         deletedAt: string | null;
                         enterpriseMonthlyActiveDeviceCountLimit: number | null;
                         fileCountPerBundleLimit: number | null;
+                        finalPeriodEndsAt: string | null;
                         /** Format: uuid */
                         id: string;
                         ipAllowlist: string[] | null;
@@ -6558,12 +6276,16 @@ export interface operations {
                         plan: "enterprise" | "free" | "pay_as_you_go";
                         region: string;
                         releaseCountPerAppPerDayLimit: number | null;
+                        reportedBillableDeviceCount: number;
+                        reportedBillableDeviceCountHour: string | null;
+                        reportedBillableDeviceCountMonth: string | null;
                         retentionDays: number | null;
                         spendingCapCents: number;
                         storageBytes: number;
                         storageBytesLimit: number | null;
                         subscriptionProvider: "polar" | null;
                         subscriptionStatus: string | null;
+                        unsentBillableDeviceCount: number;
                         /** Format: date-time */
                         updatedAt: string;
                     };
@@ -6608,6 +6330,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -6694,6 +6418,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -6739,6 +6465,7 @@ export interface operations {
                     ipAllowlist?: string[] | null;
                     isTwoFactorRequired?: boolean;
                     name?: string;
+                    spendingCapCents?: number;
                 };
             };
         };
@@ -6751,7 +6478,6 @@ export interface operations {
                 content: {
                     "application/json": {
                         appCountLimit: number | null;
-                        cancelAtPeriodEnd: boolean;
                         cappedAt: string | null;
                         channelCountPerAppLimit: number | null;
                         countryAllowlist: string[] | null;
@@ -6762,6 +6488,7 @@ export interface operations {
                         deletedAt: string | null;
                         enterpriseMonthlyActiveDeviceCountLimit: number | null;
                         fileCountPerBundleLimit: number | null;
+                        finalPeriodEndsAt: string | null;
                         /** Format: uuid */
                         id: string;
                         ipAllowlist: string[] | null;
@@ -6777,12 +6504,16 @@ export interface operations {
                         plan: "enterprise" | "free" | "pay_as_you_go";
                         region: string;
                         releaseCountPerAppPerDayLimit: number | null;
+                        reportedBillableDeviceCount: number;
+                        reportedBillableDeviceCountHour: string | null;
+                        reportedBillableDeviceCountMonth: string | null;
                         retentionDays: number | null;
                         spendingCapCents: number;
                         storageBytes: number;
                         storageBytesLimit: number | null;
                         subscriptionProvider: "polar" | null;
                         subscriptionStatus: string | null;
+                        unsentBillableDeviceCount: number;
                         /** Format: date-time */
                         updatedAt: string;
                     };
@@ -6836,6 +6567,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -6945,6 +6678,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -7100,9 +6835,20 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description E_BUNDLE_TOO_LARGE */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -7196,6 +6942,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -7301,6 +7049,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -7429,6 +7179,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -7607,6 +7359,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -7705,6 +7459,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -7824,6 +7580,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -7920,6 +7678,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -8048,6 +7808,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -8187,6 +7949,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -8278,549 +8042,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleId: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                baseBundleId: string;
-                appId: string;
-                bundleId: string;
-            };
-            cookie?: never;
-        };
-        /** @description The delta pack bytes. */
-        requestBody?: {
-            content: {
-                "application/x-tar": unknown;
-            };
-        };
-        responses: {
-            /** @description The delta pack, stored. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        sizeBytes: number;
-                    };
-                };
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_BUNDLE_TOO_LARGE */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_STORAGE_LIMIT_REACHED */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    postV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploads: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                baseBundleId: string;
-                appId: string;
-                bundleId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The upload id the parts carry. */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        uploadId: string;
-                    };
-                };
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    putV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadIdPartsByPartNumber: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                baseBundleId: string;
-                uploadId: string;
-                partNumber: number;
-                appId: string;
-                bundleId: string;
-            };
-            cookie?: never;
-        };
-        /** @description The part's bytes. */
-        requestBody?: {
-            content: {
-                "application/x-tar": unknown;
-            };
-        };
-        responses: {
-            /** @description The part, to hand back at completion. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        etag: string;
-                        partNumber: number;
-                    };
-                };
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UPLOAD_INCOMPLETE */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_BUNDLE_TOO_LARGE */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_STORAGE_LIMIT_REACHED */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    postV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadIdComplete: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                baseBundleId: string;
-                uploadId: string;
-                appId: string;
-                bundleId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    parts: {
-                        etag: string;
-                        partNumber: number;
-                    }[];
-                };
-            };
-        };
-        responses: {
-            /** @description The delta pack, stored. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        sizeBytes: number;
-                    };
-                };
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UPLOAD_INCOMPLETE */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_BUNDLE_TOO_LARGE */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    deleteV1AppsByAppIdBundlesByBundleIdDeltasByBaseBundleIdUploadsByUploadId: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                baseBundleId: string;
-                uploadId: string;
-                appId: string;
-                bundleId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The upload is gone. */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -8925,6 +8148,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -9018,6 +8243,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -9132,6 +8359,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -9223,6 +8452,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -9349,6 +8580,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -9468,6 +8701,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -9556,6 +8791,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -9648,6 +8885,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -9709,9 +8948,11 @@ export interface operations {
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
+                        indexSequence: number;
                         isDiscoverable: boolean;
                         isProtected: boolean;
                         name: string;
+                        nextReleaseNumber: number;
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
@@ -9759,6 +9000,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -9830,9 +9073,11 @@ export interface operations {
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
+                        indexSequence: number;
                         isDiscoverable: boolean;
                         isProtected: boolean;
                         name: string;
+                        nextReleaseNumber: number;
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
@@ -9898,6 +9143,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -9995,6 +9242,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -10087,6 +9336,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -10145,9 +9396,11 @@ export interface operations {
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
+                        indexSequence: number;
                         isDiscoverable: boolean;
                         isProtected: boolean;
                         name: string;
+                        nextReleaseNumber: number;
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
@@ -10195,6 +9448,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -10291,6 +9546,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -10361,9 +9618,11 @@ export interface operations {
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
+                        indexSequence: number;
                         isDiscoverable: boolean;
                         isProtected: boolean;
                         name: string;
+                        nextReleaseNumber: number;
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
@@ -10420,6 +9679,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -10478,9 +9739,11 @@ export interface operations {
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
+                        indexSequence: number;
                         isDiscoverable: boolean;
                         isProtected: boolean;
                         name: string;
+                        nextReleaseNumber: number;
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
@@ -10528,6 +9791,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -10586,9 +9851,11 @@ export interface operations {
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
+                        indexSequence: number;
                         isDiscoverable: boolean;
                         isProtected: boolean;
                         name: string;
+                        nextReleaseNumber: number;
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
@@ -10636,6 +9903,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -10792,6 +10061,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -10844,59 +10115,9 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        bundle?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            fingerprint: string | null;
-                            /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
-                            gitMessage: string | null;
-                            gitRef: string | null;
-                            gitRemote: string | null;
-                            gitSha: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            isGitDirty: boolean | null;
-                            manifestSha256: string | null;
-                            number: number | null;
-                            platforms: ("android" | "ios")[];
-                            signature: string | null;
-                            signatureKeyId: string | null;
-                            sizeBytes: number;
-                            /** @enum {string} */
-                            source: "binary" | "upload";
-                            /** @enum {string} */
-                            status: "ready" | "uploading";
-                            unusedSince: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            version: string;
-                        };
+                        autoPausedAt: string | null;
                         /** Format: uuid */
                         bundleId: string;
-                        channel?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
-                            failureMinimumUpdateCount: number | null;
-                            failureThresholdPercent: number | null;
-                            /** Format: uuid */
-                            id: string;
-                            isDiscoverable: boolean;
-                            isProtected: boolean;
-                            name: string;
-                            pausedAt: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            verificationResult: ("drifted" | "matched") | null;
-                            verifiedAt: string | null;
-                        };
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -10942,6 +10163,68 @@ export interface operations {
                         } | null;
                         progressionStepStartedAt: string | null;
                         purgedAt: string | null;
+                        rolledBackFromReleaseId: string | null;
+                        rolloutPercentage: number;
+                        /** @enum {string} */
+                        status: "active" | "paused" | "revoked";
+                        stepStartAttemptedUpdateCount: number;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        windowStartAttemptedUpdateCount: number;
+                        windowStartFailureCount: number;
+                        bundle?: {
+                            /** Format: uuid */
+                            appId: string;
+                            /** Format: date-time */
+                            createdAt: string;
+                            expiresAt: string | null;
+                            fingerprint: string | null;
+                            /** @enum {string} */
+                            framework: "capacitor" | "cordova" | "expo" | "react-native";
+                            gitMessage: string | null;
+                            gitRef: string | null;
+                            gitRemote: string | null;
+                            gitSha: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            isGitDirty: boolean | null;
+                            manifestSha256: string | null;
+                            number: number | null;
+                            platforms: ("android" | "ios")[];
+                            signature: string | null;
+                            signatureKeyId: string | null;
+                            sizeBytes: number;
+                            /** @enum {string} */
+                            source: "binary" | "upload";
+                            /** @enum {string} */
+                            status: "ready" | "uploading";
+                            unusedSince: string | null;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            version: string;
+                        };
+                        channel?: {
+                            /** Format: uuid */
+                            appId: string;
+                            /** Format: date-time */
+                            createdAt: string;
+                            expiresAt: string | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
+                            failureMinimumUpdateCount: number | null;
+                            failureThresholdPercent: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            indexSequence: number;
+                            isDiscoverable: boolean;
+                            isProtected: boolean;
+                            name: string;
+                            nextReleaseNumber: number;
+                            pausedAt: string | null;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            verificationResult: ("drifted" | "matched") | null;
+                            verifiedAt: string | null;
+                        };
                         releaseCounters?: {
                             appliedUpdateCount: number;
                             attemptedUpdateCount: number;
@@ -10957,15 +10240,6 @@ export interface operations {
                             updatedAt: string;
                             verificationFailureCount: number;
                         };
-                        rolledBackFromReleaseId: string | null;
-                        rolloutPercentage: number;
-                        /** @enum {string} */
-                        status: "active" | "paused" | "revoked";
-                        stepStartAttemptedUpdateCount: number;
-                        /** Format: date-time */
-                        updatedAt: string;
-                        windowStartAttemptedUpdateCount: number;
-                        windowStartFailureCount: number;
                     }[];
                 };
             };
@@ -11008,6 +10282,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -11108,59 +10384,9 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        bundle?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            fingerprint: string | null;
-                            /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
-                            gitMessage: string | null;
-                            gitRef: string | null;
-                            gitRemote: string | null;
-                            gitSha: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            isGitDirty: boolean | null;
-                            manifestSha256: string | null;
-                            number: number | null;
-                            platforms: ("android" | "ios")[];
-                            signature: string | null;
-                            signatureKeyId: string | null;
-                            sizeBytes: number;
-                            /** @enum {string} */
-                            source: "binary" | "upload";
-                            /** @enum {string} */
-                            status: "ready" | "uploading";
-                            unusedSince: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            version: string;
-                        };
+                        autoPausedAt: string | null;
                         /** Format: uuid */
                         bundleId: string;
-                        channel?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
-                            failureMinimumUpdateCount: number | null;
-                            failureThresholdPercent: number | null;
-                            /** Format: uuid */
-                            id: string;
-                            isDiscoverable: boolean;
-                            isProtected: boolean;
-                            name: string;
-                            pausedAt: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            verificationResult: ("drifted" | "matched") | null;
-                            verifiedAt: string | null;
-                        };
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -11206,21 +10432,6 @@ export interface operations {
                         } | null;
                         progressionStepStartedAt: string | null;
                         purgedAt: string | null;
-                        releaseCounters?: {
-                            appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
-                            crashFailureCount: number;
-                            /** Format: date-time */
-                            createdAt: string;
-                            downloadFailureCount: number;
-                            readinessTimeoutFailureCount: number;
-                            /** Format: uuid */
-                            releaseId: string;
-                            reportedFailureCount: number;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            verificationFailureCount: number;
-                        };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
@@ -11290,6 +10501,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -11381,6 +10594,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -11440,59 +10655,9 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        bundle?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            fingerprint: string | null;
-                            /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
-                            gitMessage: string | null;
-                            gitRef: string | null;
-                            gitRemote: string | null;
-                            gitSha: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            isGitDirty: boolean | null;
-                            manifestSha256: string | null;
-                            number: number | null;
-                            platforms: ("android" | "ios")[];
-                            signature: string | null;
-                            signatureKeyId: string | null;
-                            sizeBytes: number;
-                            /** @enum {string} */
-                            source: "binary" | "upload";
-                            /** @enum {string} */
-                            status: "ready" | "uploading";
-                            unusedSince: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            version: string;
-                        };
+                        autoPausedAt: string | null;
                         /** Format: uuid */
                         bundleId: string;
-                        channel?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
-                            failureMinimumUpdateCount: number | null;
-                            failureThresholdPercent: number | null;
-                            /** Format: uuid */
-                            id: string;
-                            isDiscoverable: boolean;
-                            isProtected: boolean;
-                            name: string;
-                            pausedAt: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            verificationResult: ("drifted" | "matched") | null;
-                            verifiedAt: string | null;
-                        };
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -11538,21 +10703,6 @@ export interface operations {
                         } | null;
                         progressionStepStartedAt: string | null;
                         purgedAt: string | null;
-                        releaseCounters?: {
-                            appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
-                            crashFailureCount: number;
-                            /** Format: date-time */
-                            createdAt: string;
-                            downloadFailureCount: number;
-                            readinessTimeoutFailureCount: number;
-                            /** Format: uuid */
-                            releaseId: string;
-                            reportedFailureCount: number;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            verificationFailureCount: number;
-                        };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
@@ -11622,6 +10772,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -11677,59 +10829,9 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        bundle?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            fingerprint: string | null;
-                            /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
-                            gitMessage: string | null;
-                            gitRef: string | null;
-                            gitRemote: string | null;
-                            gitSha: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            isGitDirty: boolean | null;
-                            manifestSha256: string | null;
-                            number: number | null;
-                            platforms: ("android" | "ios")[];
-                            signature: string | null;
-                            signatureKeyId: string | null;
-                            sizeBytes: number;
-                            /** @enum {string} */
-                            source: "binary" | "upload";
-                            /** @enum {string} */
-                            status: "ready" | "uploading";
-                            unusedSince: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            version: string;
-                        };
+                        autoPausedAt: string | null;
                         /** Format: uuid */
                         bundleId: string;
-                        channel?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
-                            failureMinimumUpdateCount: number | null;
-                            failureThresholdPercent: number | null;
-                            /** Format: uuid */
-                            id: string;
-                            isDiscoverable: boolean;
-                            isProtected: boolean;
-                            name: string;
-                            pausedAt: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            verificationResult: ("drifted" | "matched") | null;
-                            verifiedAt: string | null;
-                        };
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -11775,21 +10877,6 @@ export interface operations {
                         } | null;
                         progressionStepStartedAt: string | null;
                         purgedAt: string | null;
-                        releaseCounters?: {
-                            appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
-                            crashFailureCount: number;
-                            /** Format: date-time */
-                            createdAt: string;
-                            downloadFailureCount: number;
-                            readinessTimeoutFailureCount: number;
-                            /** Format: uuid */
-                            releaseId: string;
-                            reportedFailureCount: number;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            verificationFailureCount: number;
-                        };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
@@ -11841,6 +10928,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -11957,6 +11046,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -12035,9 +11126,11 @@ export interface operations {
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
+                            indexSequence: number;
                             isDiscoverable: boolean;
                             isProtected: boolean;
                             name: string;
+                            nextReleaseNumber: number;
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
@@ -12051,59 +11144,9 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         currentRelease?: {
-                            bundle?: {
-                                /** Format: uuid */
-                                appId: string;
-                                /** Format: date-time */
-                                createdAt: string;
-                                expiresAt: string | null;
-                                fingerprint: string | null;
-                                /** @enum {string} */
-                                framework: "capacitor" | "cordova" | "expo" | "react-native";
-                                gitMessage: string | null;
-                                gitRef: string | null;
-                                gitRemote: string | null;
-                                gitSha: string | null;
-                                /** Format: uuid */
-                                id: string;
-                                isGitDirty: boolean | null;
-                                manifestSha256: string | null;
-                                number: number | null;
-                                platforms: ("android" | "ios")[];
-                                signature: string | null;
-                                signatureKeyId: string | null;
-                                sizeBytes: number;
-                                /** @enum {string} */
-                                source: "binary" | "upload";
-                                /** @enum {string} */
-                                status: "ready" | "uploading";
-                                unusedSince: string | null;
-                                /** Format: date-time */
-                                updatedAt: string;
-                                version: string;
-                            };
+                            autoPausedAt: string | null;
                             /** Format: uuid */
                             bundleId: string;
-                            channel?: {
-                                /** Format: uuid */
-                                appId: string;
-                                /** Format: date-time */
-                                createdAt: string;
-                                expiresAt: string | null;
-                                failureAction: ("none" | "notify" | "pause" | "revoke") | null;
-                                failureMinimumUpdateCount: number | null;
-                                failureThresholdPercent: number | null;
-                                /** Format: uuid */
-                                id: string;
-                                isDiscoverable: boolean;
-                                isProtected: boolean;
-                                name: string;
-                                pausedAt: string | null;
-                                /** Format: date-time */
-                                updatedAt: string;
-                                verificationResult: ("drifted" | "matched") | null;
-                                verifiedAt: string | null;
-                            };
                             /** Format: uuid */
                             channelId: string;
                             conditions: ({
@@ -12149,21 +11192,6 @@ export interface operations {
                             } | null;
                             progressionStepStartedAt: string | null;
                             purgedAt: string | null;
-                            releaseCounters?: {
-                                appliedUpdateCount: number;
-                                attemptedUpdateCount: number;
-                                crashFailureCount: number;
-                                /** Format: date-time */
-                                createdAt: string;
-                                downloadFailureCount: number;
-                                readinessTimeoutFailureCount: number;
-                                /** Format: uuid */
-                                releaseId: string;
-                                reportedFailureCount: number;
-                                /** Format: date-time */
-                                updatedAt: string;
-                                verificationFailureCount: number;
-                            };
                             rolledBackFromReleaseId: string | null;
                             rolloutPercentage: number;
                             /** @enum {string} */
@@ -12229,6 +11257,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -12317,6 +11347,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -12417,6 +11449,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -12485,9 +11519,11 @@ export interface operations {
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
+                            indexSequence: number;
                             isDiscoverable: boolean;
                             isProtected: boolean;
                             name: string;
+                            nextReleaseNumber: number;
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
@@ -12501,59 +11537,9 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         currentRelease?: {
-                            bundle?: {
-                                /** Format: uuid */
-                                appId: string;
-                                /** Format: date-time */
-                                createdAt: string;
-                                expiresAt: string | null;
-                                fingerprint: string | null;
-                                /** @enum {string} */
-                                framework: "capacitor" | "cordova" | "expo" | "react-native";
-                                gitMessage: string | null;
-                                gitRef: string | null;
-                                gitRemote: string | null;
-                                gitSha: string | null;
-                                /** Format: uuid */
-                                id: string;
-                                isGitDirty: boolean | null;
-                                manifestSha256: string | null;
-                                number: number | null;
-                                platforms: ("android" | "ios")[];
-                                signature: string | null;
-                                signatureKeyId: string | null;
-                                sizeBytes: number;
-                                /** @enum {string} */
-                                source: "binary" | "upload";
-                                /** @enum {string} */
-                                status: "ready" | "uploading";
-                                unusedSince: string | null;
-                                /** Format: date-time */
-                                updatedAt: string;
-                                version: string;
-                            };
+                            autoPausedAt: string | null;
                             /** Format: uuid */
                             bundleId: string;
-                            channel?: {
-                                /** Format: uuid */
-                                appId: string;
-                                /** Format: date-time */
-                                createdAt: string;
-                                expiresAt: string | null;
-                                failureAction: ("none" | "notify" | "pause" | "revoke") | null;
-                                failureMinimumUpdateCount: number | null;
-                                failureThresholdPercent: number | null;
-                                /** Format: uuid */
-                                id: string;
-                                isDiscoverable: boolean;
-                                isProtected: boolean;
-                                name: string;
-                                pausedAt: string | null;
-                                /** Format: date-time */
-                                updatedAt: string;
-                                verificationResult: ("drifted" | "matched") | null;
-                                verifiedAt: string | null;
-                            };
                             /** Format: uuid */
                             channelId: string;
                             conditions: ({
@@ -12599,21 +11585,6 @@ export interface operations {
                             } | null;
                             progressionStepStartedAt: string | null;
                             purgedAt: string | null;
-                            releaseCounters?: {
-                                appliedUpdateCount: number;
-                                attemptedUpdateCount: number;
-                                crashFailureCount: number;
-                                /** Format: date-time */
-                                createdAt: string;
-                                downloadFailureCount: number;
-                                readinessTimeoutFailureCount: number;
-                                /** Format: uuid */
-                                releaseId: string;
-                                reportedFailureCount: number;
-                                /** Format: date-time */
-                                updatedAt: string;
-                                verificationFailureCount: number;
-                            };
                             rolledBackFromReleaseId: string | null;
                             rolloutPercentage: number;
                             /** @enum {string} */
@@ -12679,6 +11650,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -12766,6 +11739,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -12871,6 +11846,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -12964,6 +11941,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -13103,6 +12082,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -13194,6 +12175,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -13320,6 +12303,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -13464,6 +12449,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -13552,6 +12539,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -13607,59 +12596,9 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        bundle?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            fingerprint: string | null;
-                            /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
-                            gitMessage: string | null;
-                            gitRef: string | null;
-                            gitRemote: string | null;
-                            gitSha: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            isGitDirty: boolean | null;
-                            manifestSha256: string | null;
-                            number: number | null;
-                            platforms: ("android" | "ios")[];
-                            signature: string | null;
-                            signatureKeyId: string | null;
-                            sizeBytes: number;
-                            /** @enum {string} */
-                            source: "binary" | "upload";
-                            /** @enum {string} */
-                            status: "ready" | "uploading";
-                            unusedSince: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            version: string;
-                        };
+                        autoPausedAt: string | null;
                         /** Format: uuid */
                         bundleId: string;
-                        channel?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
-                            failureMinimumUpdateCount: number | null;
-                            failureThresholdPercent: number | null;
-                            /** Format: uuid */
-                            id: string;
-                            isDiscoverable: boolean;
-                            isProtected: boolean;
-                            name: string;
-                            pausedAt: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            verificationResult: ("drifted" | "matched") | null;
-                            verifiedAt: string | null;
-                        };
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -13705,6 +12644,68 @@ export interface operations {
                         } | null;
                         progressionStepStartedAt: string | null;
                         purgedAt: string | null;
+                        rolledBackFromReleaseId: string | null;
+                        rolloutPercentage: number;
+                        /** @enum {string} */
+                        status: "active" | "paused" | "revoked";
+                        stepStartAttemptedUpdateCount: number;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        windowStartAttemptedUpdateCount: number;
+                        windowStartFailureCount: number;
+                        bundle?: {
+                            /** Format: uuid */
+                            appId: string;
+                            /** Format: date-time */
+                            createdAt: string;
+                            expiresAt: string | null;
+                            fingerprint: string | null;
+                            /** @enum {string} */
+                            framework: "capacitor" | "cordova" | "expo" | "react-native";
+                            gitMessage: string | null;
+                            gitRef: string | null;
+                            gitRemote: string | null;
+                            gitSha: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            isGitDirty: boolean | null;
+                            manifestSha256: string | null;
+                            number: number | null;
+                            platforms: ("android" | "ios")[];
+                            signature: string | null;
+                            signatureKeyId: string | null;
+                            sizeBytes: number;
+                            /** @enum {string} */
+                            source: "binary" | "upload";
+                            /** @enum {string} */
+                            status: "ready" | "uploading";
+                            unusedSince: string | null;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            version: string;
+                        };
+                        channel?: {
+                            /** Format: uuid */
+                            appId: string;
+                            /** Format: date-time */
+                            createdAt: string;
+                            expiresAt: string | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
+                            failureMinimumUpdateCount: number | null;
+                            failureThresholdPercent: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            indexSequence: number;
+                            isDiscoverable: boolean;
+                            isProtected: boolean;
+                            name: string;
+                            nextReleaseNumber: number;
+                            pausedAt: string | null;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            verificationResult: ("drifted" | "matched") | null;
+                            verifiedAt: string | null;
+                        };
                         releaseCounters?: {
                             appliedUpdateCount: number;
                             attemptedUpdateCount: number;
@@ -13720,15 +12721,6 @@ export interface operations {
                             updatedAt: string;
                             verificationFailureCount: number;
                         };
-                        rolledBackFromReleaseId: string | null;
-                        rolloutPercentage: number;
-                        /** @enum {string} */
-                        status: "active" | "paused" | "revoked";
-                        stepStartAttemptedUpdateCount: number;
-                        /** Format: date-time */
-                        updatedAt: string;
-                        windowStartAttemptedUpdateCount: number;
-                        windowStartFailureCount: number;
                     }[];
                 };
             };
@@ -13771,6 +12763,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -13866,6 +12860,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -13916,59 +12912,9 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        bundle?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            fingerprint: string | null;
-                            /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
-                            gitMessage: string | null;
-                            gitRef: string | null;
-                            gitRemote: string | null;
-                            gitSha: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            isGitDirty: boolean | null;
-                            manifestSha256: string | null;
-                            number: number | null;
-                            platforms: ("android" | "ios")[];
-                            signature: string | null;
-                            signatureKeyId: string | null;
-                            sizeBytes: number;
-                            /** @enum {string} */
-                            source: "binary" | "upload";
-                            /** @enum {string} */
-                            status: "ready" | "uploading";
-                            unusedSince: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            version: string;
-                        };
+                        autoPausedAt: string | null;
                         /** Format: uuid */
                         bundleId: string;
-                        channel?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
-                            failureMinimumUpdateCount: number | null;
-                            failureThresholdPercent: number | null;
-                            /** Format: uuid */
-                            id: string;
-                            isDiscoverable: boolean;
-                            isProtected: boolean;
-                            name: string;
-                            pausedAt: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            verificationResult: ("drifted" | "matched") | null;
-                            verifiedAt: string | null;
-                        };
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -14014,6 +12960,68 @@ export interface operations {
                         } | null;
                         progressionStepStartedAt: string | null;
                         purgedAt: string | null;
+                        rolledBackFromReleaseId: string | null;
+                        rolloutPercentage: number;
+                        /** @enum {string} */
+                        status: "active" | "paused" | "revoked";
+                        stepStartAttemptedUpdateCount: number;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        windowStartAttemptedUpdateCount: number;
+                        windowStartFailureCount: number;
+                        bundle?: {
+                            /** Format: uuid */
+                            appId: string;
+                            /** Format: date-time */
+                            createdAt: string;
+                            expiresAt: string | null;
+                            fingerprint: string | null;
+                            /** @enum {string} */
+                            framework: "capacitor" | "cordova" | "expo" | "react-native";
+                            gitMessage: string | null;
+                            gitRef: string | null;
+                            gitRemote: string | null;
+                            gitSha: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            isGitDirty: boolean | null;
+                            manifestSha256: string | null;
+                            number: number | null;
+                            platforms: ("android" | "ios")[];
+                            signature: string | null;
+                            signatureKeyId: string | null;
+                            sizeBytes: number;
+                            /** @enum {string} */
+                            source: "binary" | "upload";
+                            /** @enum {string} */
+                            status: "ready" | "uploading";
+                            unusedSince: string | null;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            version: string;
+                        };
+                        channel?: {
+                            /** Format: uuid */
+                            appId: string;
+                            /** Format: date-time */
+                            createdAt: string;
+                            expiresAt: string | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
+                            failureMinimumUpdateCount: number | null;
+                            failureThresholdPercent: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            indexSequence: number;
+                            isDiscoverable: boolean;
+                            isProtected: boolean;
+                            name: string;
+                            nextReleaseNumber: number;
+                            pausedAt: string | null;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            verificationResult: ("drifted" | "matched") | null;
+                            verifiedAt: string | null;
+                        };
                         releaseCounters?: {
                             appliedUpdateCount: number;
                             attemptedUpdateCount: number;
@@ -14029,15 +13037,6 @@ export interface operations {
                             updatedAt: string;
                             verificationFailureCount: number;
                         };
-                        rolledBackFromReleaseId: string | null;
-                        rolloutPercentage: number;
-                        /** @enum {string} */
-                        status: "active" | "paused" | "revoked";
-                        stepStartAttemptedUpdateCount: number;
-                        /** Format: date-time */
-                        updatedAt: string;
-                        windowStartAttemptedUpdateCount: number;
-                        windowStartFailureCount: number;
                     };
                 };
             };
@@ -14080,6 +13079,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -14144,59 +13145,9 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        bundle?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            fingerprint: string | null;
-                            /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
-                            gitMessage: string | null;
-                            gitRef: string | null;
-                            gitRemote: string | null;
-                            gitSha: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            isGitDirty: boolean | null;
-                            manifestSha256: string | null;
-                            number: number | null;
-                            platforms: ("android" | "ios")[];
-                            signature: string | null;
-                            signatureKeyId: string | null;
-                            sizeBytes: number;
-                            /** @enum {string} */
-                            source: "binary" | "upload";
-                            /** @enum {string} */
-                            status: "ready" | "uploading";
-                            unusedSince: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            version: string;
-                        };
+                        autoPausedAt: string | null;
                         /** Format: uuid */
                         bundleId: string;
-                        channel?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
-                            failureMinimumUpdateCount: number | null;
-                            failureThresholdPercent: number | null;
-                            /** Format: uuid */
-                            id: string;
-                            isDiscoverable: boolean;
-                            isProtected: boolean;
-                            name: string;
-                            pausedAt: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            verificationResult: ("drifted" | "matched") | null;
-                            verifiedAt: string | null;
-                        };
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -14242,21 +13193,6 @@ export interface operations {
                         } | null;
                         progressionStepStartedAt: string | null;
                         purgedAt: string | null;
-                        releaseCounters?: {
-                            appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
-                            crashFailureCount: number;
-                            /** Format: date-time */
-                            createdAt: string;
-                            downloadFailureCount: number;
-                            readinessTimeoutFailureCount: number;
-                            /** Format: uuid */
-                            releaseId: string;
-                            reportedFailureCount: number;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            verificationFailureCount: number;
-                        };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
@@ -14317,6 +13253,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -14426,6 +13364,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -14474,59 +13414,9 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        bundle?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            fingerprint: string | null;
-                            /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
-                            gitMessage: string | null;
-                            gitRef: string | null;
-                            gitRemote: string | null;
-                            gitSha: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            isGitDirty: boolean | null;
-                            manifestSha256: string | null;
-                            number: number | null;
-                            platforms: ("android" | "ios")[];
-                            signature: string | null;
-                            signatureKeyId: string | null;
-                            sizeBytes: number;
-                            /** @enum {string} */
-                            source: "binary" | "upload";
-                            /** @enum {string} */
-                            status: "ready" | "uploading";
-                            unusedSince: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            version: string;
-                        };
+                        autoPausedAt: string | null;
                         /** Format: uuid */
                         bundleId: string;
-                        channel?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
-                            failureMinimumUpdateCount: number | null;
-                            failureThresholdPercent: number | null;
-                            /** Format: uuid */
-                            id: string;
-                            isDiscoverable: boolean;
-                            isProtected: boolean;
-                            name: string;
-                            pausedAt: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            verificationResult: ("drifted" | "matched") | null;
-                            verifiedAt: string | null;
-                        };
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -14572,21 +13462,6 @@ export interface operations {
                         } | null;
                         progressionStepStartedAt: string | null;
                         purgedAt: string | null;
-                        releaseCounters?: {
-                            appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
-                            crashFailureCount: number;
-                            /** Format: date-time */
-                            createdAt: string;
-                            downloadFailureCount: number;
-                            readinessTimeoutFailureCount: number;
-                            /** Format: uuid */
-                            releaseId: string;
-                            reportedFailureCount: number;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            verificationFailureCount: number;
-                        };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
@@ -14647,6 +13522,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -14695,59 +13572,9 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        bundle?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            fingerprint: string | null;
-                            /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
-                            gitMessage: string | null;
-                            gitRef: string | null;
-                            gitRemote: string | null;
-                            gitSha: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            isGitDirty: boolean | null;
-                            manifestSha256: string | null;
-                            number: number | null;
-                            platforms: ("android" | "ios")[];
-                            signature: string | null;
-                            signatureKeyId: string | null;
-                            sizeBytes: number;
-                            /** @enum {string} */
-                            source: "binary" | "upload";
-                            /** @enum {string} */
-                            status: "ready" | "uploading";
-                            unusedSince: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            version: string;
-                        };
+                        autoPausedAt: string | null;
                         /** Format: uuid */
                         bundleId: string;
-                        channel?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
-                            failureMinimumUpdateCount: number | null;
-                            failureThresholdPercent: number | null;
-                            /** Format: uuid */
-                            id: string;
-                            isDiscoverable: boolean;
-                            isProtected: boolean;
-                            name: string;
-                            pausedAt: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            verificationResult: ("drifted" | "matched") | null;
-                            verifiedAt: string | null;
-                        };
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -14793,21 +13620,6 @@ export interface operations {
                         } | null;
                         progressionStepStartedAt: string | null;
                         purgedAt: string | null;
-                        releaseCounters?: {
-                            appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
-                            crashFailureCount: number;
-                            /** Format: date-time */
-                            createdAt: string;
-                            downloadFailureCount: number;
-                            readinessTimeoutFailureCount: number;
-                            /** Format: uuid */
-                            releaseId: string;
-                            reportedFailureCount: number;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            verificationFailureCount: number;
-                        };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
@@ -14868,6 +13680,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -14916,59 +13730,9 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        bundle?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            fingerprint: string | null;
-                            /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
-                            gitMessage: string | null;
-                            gitRef: string | null;
-                            gitRemote: string | null;
-                            gitSha: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            isGitDirty: boolean | null;
-                            manifestSha256: string | null;
-                            number: number | null;
-                            platforms: ("android" | "ios")[];
-                            signature: string | null;
-                            signatureKeyId: string | null;
-                            sizeBytes: number;
-                            /** @enum {string} */
-                            source: "binary" | "upload";
-                            /** @enum {string} */
-                            status: "ready" | "uploading";
-                            unusedSince: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            version: string;
-                        };
+                        autoPausedAt: string | null;
                         /** Format: uuid */
                         bundleId: string;
-                        channel?: {
-                            /** Format: uuid */
-                            appId: string;
-                            /** Format: date-time */
-                            createdAt: string;
-                            expiresAt: string | null;
-                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
-                            failureMinimumUpdateCount: number | null;
-                            failureThresholdPercent: number | null;
-                            /** Format: uuid */
-                            id: string;
-                            isDiscoverable: boolean;
-                            isProtected: boolean;
-                            name: string;
-                            pausedAt: string | null;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            verificationResult: ("drifted" | "matched") | null;
-                            verifiedAt: string | null;
-                        };
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -15014,21 +13778,6 @@ export interface operations {
                         } | null;
                         progressionStepStartedAt: string | null;
                         purgedAt: string | null;
-                        releaseCounters?: {
-                            appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
-                            crashFailureCount: number;
-                            /** Format: date-time */
-                            createdAt: string;
-                            downloadFailureCount: number;
-                            readinessTimeoutFailureCount: number;
-                            /** Format: uuid */
-                            releaseId: string;
-                            reportedFailureCount: number;
-                            /** Format: date-time */
-                            updatedAt: string;
-                            verificationFailureCount: number;
-                        };
                         rolledBackFromReleaseId: string | null;
                         rolloutPercentage: number;
                         /** @enum {string} */
@@ -15089,6 +13838,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -15191,6 +13942,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -15316,6 +14069,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -15406,6 +14161,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -15493,6 +14250,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -15622,6 +14381,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -15750,6 +14511,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -15855,6 +14618,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -15912,6 +14677,7 @@ export interface operations {
                         /** Format: uuid */
                         id: string;
                         name: string;
+                        nextBundleNumber: number;
                         /** Format: uuid */
                         organizationId: string;
                         /** Format: date-time */
@@ -15958,6 +14724,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -16044,6 +14812,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -16112,6 +14882,7 @@ export interface operations {
                         /** Format: uuid */
                         id: string;
                         name: string;
+                        nextBundleNumber: number;
                         /** Format: uuid */
                         organizationId: string;
                         /** Format: date-time */
@@ -16167,6 +14938,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -16231,6 +15004,7 @@ export interface operations {
                         /** Format: uuid */
                         id: string;
                         name: string;
+                        nextBundleNumber: number;
                         /** Format: uuid */
                         organizationId: string;
                         /** Format: date-time */
@@ -16295,6 +15069,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -16383,6 +15159,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -16471,6 +15249,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -16567,7 +15347,6 @@ export interface operations {
                             userId: string;
                             organization?: {
                                 appCountLimit: number | null;
-                                cancelAtPeriodEnd: boolean;
                                 cappedAt: string | null;
                                 channelCountPerAppLimit: number | null;
                                 countryAllowlist: string[] | null;
@@ -16578,6 +15357,7 @@ export interface operations {
                                 deletedAt: string | null;
                                 enterpriseMonthlyActiveDeviceCountLimit: number | null;
                                 fileCountPerBundleLimit: number | null;
+                                finalPeriodEndsAt: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 ipAllowlist: string[] | null;
@@ -16593,12 +15373,16 @@ export interface operations {
                                 plan: "enterprise" | "free" | "pay_as_you_go";
                                 region: string;
                                 releaseCountPerAppPerDayLimit: number | null;
+                                reportedBillableDeviceCount: number;
+                                reportedBillableDeviceCountHour: string | null;
+                                reportedBillableDeviceCountMonth: string | null;
                                 retentionDays: number | null;
                                 spendingCapCents: number;
                                 storageBytes: number;
                                 storageBytesLimit: number | null;
                                 subscriptionProvider: "polar" | null;
                                 subscriptionStatus: string | null;
+                                unsentBillableDeviceCount: number;
                                 /** Format: date-time */
                                 updatedAt: string;
                             };
@@ -16645,6 +15429,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -16746,6 +15532,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {
@@ -16847,6 +15635,8 @@ export interface operations {
             /** @description E_RATE_LIMITED */
             429: {
                 headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
                     [name: string]: unknown;
                 };
                 content: {

@@ -12,7 +12,7 @@ export const PART_SIZE_BYTES = 10 * 1024 * 1024;
 export const SINGLE_UPLOAD_LIMIT_BYTES = 64 * 1024 * 1024;
 
 /**
- * The multipart upload the files, the pack and the delta pack share, each addressed by its own path parameters.
+ * The multipart upload the files and the pack share, each addressed by its own path parameters.
  */
 export interface MultipartUploadsResource<TPathParameters, TCompleted> {
   complete(

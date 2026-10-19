@@ -6,7 +6,6 @@ import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { HotCodePush } from './client';
 import { HotCodePushError } from './errors';
 import type { App } from './resources/apps';
-import type { Bundle } from './resources/bundles';
 import type { Channel } from './resources/channels';
 import type { Organization } from './resources/organizations';
 
@@ -21,7 +20,6 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
   const createdOrganizations: Organization[] = [];
   let app: App;
   let channel: Channel;
-  let completedBundle: Bundle;
   let organization: Organization;
 
   beforeAll(() => {
@@ -228,7 +226,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
       body: new Blob([PACK_PLACEHOLDER]),
       bundleId: createdBundle.id,
     });
-    completedBundle = await hotCodePush.apps.bundles.complete({
+    const completedBundle = await hotCodePush.apps.bundles.complete({
       appId: app.id,
       bundleId: createdBundle.id,
     });
@@ -286,7 +284,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     ).resolves.toBeUndefined();
   });
 
-  test('should upload a delta pack against a base bundle and delete the bundle', async () => {
+  test('should complete a bundle whose files are stored, list it as ready and delete it', async () => {
     const mainFile = resolveTestFile('main.js', 'console.log("parts");');
     const createdBundle = await hotCodePush.apps.bundles.create({
       appId: app.id,
@@ -304,12 +302,6 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
       body: new Blob([PACK_PLACEHOLDER]),
       bundleId: createdBundle.id,
     });
-    const uploadedDelta = await hotCodePush.apps.bundles.deltas.upload({
-      appId: app.id,
-      baseBundleId: completedBundle.id,
-      body: new Blob([PACK_PLACEHOLDER]),
-      bundleId: createdBundle.id,
-    });
     await hotCodePush.apps.bundles.complete({
       appId: app.id,
       bundleId: createdBundle.id,
@@ -324,7 +316,6 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     });
 
     expect(fetchedUnstoredFiles).toEqual([]);
-    expect(uploadedDelta.sizeBytes).toBe(PACK_PLACEHOLDER.byteLength);
     expect(readyBundles.map(({ id }) => id)).toContain(createdBundle.id);
     await expect(
       hotCodePush.apps.bundles.get({

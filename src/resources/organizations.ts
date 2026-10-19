@@ -9,7 +9,6 @@ import type {
   QueryParameters,
 } from '../types';
 import { AuditLogsResource } from './audit-logs';
-import { BillingResource } from './billing';
 import { CheckoutsResource } from './checkouts';
 import { CustomerPortalSessionsResource } from './customer-portal-sessions';
 import { LimitsResource } from './limits';
@@ -56,7 +55,6 @@ export type UpdateOrganizationOptions = PathParameters<
 export class OrganizationsResource {
   public readonly apps: OrganizationAppsResource;
   public readonly auditLogs: AuditLogsResource;
-  public readonly billing: BillingResource;
   public readonly checkouts: CheckoutsResource;
   public readonly customerPortalSessions: CustomerPortalSessionsResource;
   public readonly invitations: OrganizationInvitationsResource;
@@ -69,7 +67,6 @@ export class OrganizationsResource {
   constructor(private readonly httpClient: HttpClient) {
     this.apps = new OrganizationAppsResource(httpClient);
     this.auditLogs = new AuditLogsResource(httpClient);
-    this.billing = new BillingResource(httpClient);
     this.checkouts = new CheckoutsResource(httpClient);
     this.customerPortalSessions = new CustomerPortalSessionsResource(
       httpClient,

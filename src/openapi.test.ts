@@ -17,7 +17,6 @@ interface OpenApiDocument {
 }
 
 const APP_ID = '7c0f3a52-1d8e-4b6a-9f21-5e3c8a0d4b17';
-const BASE_BUNDLE_ID = '8e2d6b1f-5a47-4c93-b0e8-7f1a3d5c9e20';
 const BINARY_ID = '3f6a9c2e-7b14-4d58-9e03-b2c8d6f1a475';
 const BUNDLE_ID = '2a9e6c14-8b3f-4d70-a5e2-91c7f0b3d864';
 const CHANNEL_ID = 'e41b7d09-3c6a-4f85-b2d1-6a8f0c9e3b52';
@@ -104,43 +103,6 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       limit: 10,
       offset: 10,
       relations: ['baseBundle'],
-    }),
-  'apps.bundles.deltas.upload': hotCodePush =>
-    hotCodePush.apps.bundles.deltas.upload({
-      appId: APP_ID,
-      baseBundleId: BASE_BUNDLE_ID,
-      body: new Blob(['delta']),
-      bundleId: BUNDLE_ID,
-    }),
-  'apps.bundles.deltas.uploads.complete': hotCodePush =>
-    hotCodePush.apps.bundles.deltas.uploads.complete({
-      appId: APP_ID,
-      baseBundleId: BASE_BUNDLE_ID,
-      bundleId: BUNDLE_ID,
-      parts: [{ etag: 'etag', partNumber: 1 }],
-      uploadId: UPLOAD_ID,
-    }),
-  'apps.bundles.deltas.uploads.create': hotCodePush =>
-    hotCodePush.apps.bundles.deltas.uploads.create({
-      appId: APP_ID,
-      baseBundleId: BASE_BUNDLE_ID,
-      bundleId: BUNDLE_ID,
-    }),
-  'apps.bundles.deltas.uploads.delete': hotCodePush =>
-    hotCodePush.apps.bundles.deltas.uploads.delete({
-      appId: APP_ID,
-      baseBundleId: BASE_BUNDLE_ID,
-      bundleId: BUNDLE_ID,
-      uploadId: UPLOAD_ID,
-    }),
-  'apps.bundles.deltas.uploads.parts.upload': hotCodePush =>
-    hotCodePush.apps.bundles.deltas.uploads.parts.upload({
-      appId: APP_ID,
-      baseBundleId: BASE_BUNDLE_ID,
-      body: new Blob(['part']),
-      bundleId: BUNDLE_ID,
-      partNumber: 1,
-      uploadId: UPLOAD_ID,
     }),
   'apps.bundles.files.count': hotCodePush =>
     hotCodePush.apps.bundles.files.count({
@@ -564,13 +526,6 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       type: 'channel.*',
       userId: USER_ID,
     }),
-  'organizations.billing.get': hotCodePush =>
-    hotCodePush.organizations.billing.get({ organizationId: ORGANIZATION_ID }),
-  'organizations.billing.update': hotCodePush =>
-    hotCodePush.organizations.billing.update({
-      organizationId: ORGANIZATION_ID,
-      spendingCapCents: 5000,
-    }),
   'organizations.checkouts.create': hotCodePush =>
     hotCodePush.organizations.checkouts.create({
       organizationId: ORGANIZATION_ID,
@@ -765,8 +720,6 @@ const SESSION_ONLY_METHODS: readonly string[] = [
   'organizations.auditLogs.count',
   'organizations.auditLogs.downloadCsv',
   'organizations.auditLogs.list',
-  'organizations.billing.get',
-  'organizations.billing.update',
   'organizations.checkouts.create',
   'organizations.create',
   'organizations.customerPortalSessions.create',

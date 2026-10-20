@@ -20,6 +20,7 @@ const APP_ID = '7c0f3a52-1d8e-4b6a-9f21-5e3c8a0d4b17';
 const BINARY_ID = '3f6a9c2e-7b14-4d58-9e03-b2c8d6f1a475';
 const BUNDLE_ID = '2a9e6c14-8b3f-4d70-a5e2-91c7f0b3d864';
 const CHANNEL_ID = 'e41b7d09-3c6a-4f85-b2d1-6a8f0c9e3b52';
+const DELIVERY_ID = '8f2c6a41-5d9e-4b73-a1c8-0e7b3d5f9a26';
 const DEVICE_ID = '6b1e9d37-2f5c-4a80-9c46-d8e3a1f7b259';
 const FILE = { path: 'index.html', sha256: 'a'.repeat(64), sizeBytes: 5 };
 const HTTP_METHODS = ['delete', 'get', 'patch', 'post', 'put'];
@@ -34,6 +35,7 @@ const SIGNING_KEY_ID = '1c4f8a6d-3e92-4b57-a0d8-5f2b7c9e1a34';
 const TOKEN_ID = '8a3f1c6e-2d94-4b70-9e15-c7b4a2d8f063';
 const UPLOAD_ID = 'upload';
 const USER_ID = '2d5c8f1a-7b36-4e09-a4c2-6f1e9b3d7a58';
+const WEBHOOK_ID = '3b9e1d74-6a2f-4c58-8d03-f5a7c2e9b416';
 
 /**
  * One call per resource method with every option it can send, so a path, method,
@@ -466,7 +468,12 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
   'notifications.count': hotCodePush =>
     hotCodePush.notifications.count({ isRead: 'false' }),
   'notifications.list': hotCodePush =>
-    hotCodePush.notifications.list({ isRead: 'false', limit: 10, offset: 10 }),
+    hotCodePush.notifications.list({
+      isRead: 'false',
+      limit: 10,
+      offset: 10,
+      relations: ['app', 'channel', 'memberUser', 'release'],
+    }),
   'notifications.update': hotCodePush =>
     hotCodePush.notifications.update({
       isRead: true,
@@ -680,6 +687,74 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       organizationId: ORGANIZATION_ID,
       relations: ['app'],
     }),
+  'organizations.webhooks.count': hotCodePush =>
+    hotCodePush.organizations.webhooks.count({
+      organizationId: ORGANIZATION_ID,
+    }),
+  'organizations.webhooks.create': hotCodePush =>
+    hotCodePush.organizations.webhooks.create({
+      appId: APP_ID,
+      events: ['release.created'],
+      format: 'raw',
+      name: 'Deploys',
+      organizationId: ORGANIZATION_ID,
+      url: 'https://example.com/hooks/hotcodepush',
+    }),
+  'organizations.webhooks.delete': hotCodePush =>
+    hotCodePush.organizations.webhooks.delete({
+      organizationId: ORGANIZATION_ID,
+      webhookId: WEBHOOK_ID,
+    }),
+  'organizations.webhooks.deliveries.count': hotCodePush =>
+    hotCodePush.organizations.webhooks.deliveries.count({
+      createdSince: '2026-01-01T00:00:00.000Z',
+      createdUntil: '2026-02-01T00:00:00.000Z',
+      organizationId: ORGANIZATION_ID,
+      status: 'failed',
+      webhookId: WEBHOOK_ID,
+    }),
+  'organizations.webhooks.deliveries.list': hotCodePush =>
+    hotCodePush.organizations.webhooks.deliveries.list({
+      createdSince: '2026-01-01T00:00:00.000Z',
+      createdUntil: '2026-02-01T00:00:00.000Z',
+      limit: 10,
+      offset: 10,
+      organizationId: ORGANIZATION_ID,
+      status: 'failed',
+      webhookId: WEBHOOK_ID,
+    }),
+  'organizations.webhooks.deliveries.redeliver': hotCodePush =>
+    hotCodePush.organizations.webhooks.deliveries.redeliver({
+      deliveryId: DELIVERY_ID,
+      organizationId: ORGANIZATION_ID,
+      webhookId: WEBHOOK_ID,
+    }),
+  'organizations.webhooks.get': hotCodePush =>
+    hotCodePush.organizations.webhooks.get({
+      organizationId: ORGANIZATION_ID,
+      webhookId: WEBHOOK_ID,
+    }),
+  'organizations.webhooks.list': hotCodePush =>
+    hotCodePush.organizations.webhooks.list({
+      limit: 10,
+      offset: 10,
+      organizationId: ORGANIZATION_ID,
+    }),
+  'organizations.webhooks.test': hotCodePush =>
+    hotCodePush.organizations.webhooks.test({
+      organizationId: ORGANIZATION_ID,
+      webhookId: WEBHOOK_ID,
+    }),
+  'organizations.webhooks.update': hotCodePush =>
+    hotCodePush.organizations.webhooks.update({
+      appId: null,
+      events: ['release.created', 'release.paused'],
+      isEnabled: true,
+      name: 'Releases',
+      organizationId: ORGANIZATION_ID,
+      url: 'https://example.com/hooks/releases',
+      webhookId: WEBHOOK_ID,
+    }),
   'users.delete': hotCodePush =>
     hotCodePush.users.delete({
       password: 'correct horse battery staple',
@@ -740,6 +815,16 @@ const SESSION_ONLY_METHODS: readonly string[] = [
   'organizations.subscription.cancel',
   'organizations.subscription.uncancel',
   'organizations.update',
+  'organizations.webhooks.count',
+  'organizations.webhooks.create',
+  'organizations.webhooks.delete',
+  'organizations.webhooks.deliveries.count',
+  'organizations.webhooks.deliveries.list',
+  'organizations.webhooks.deliveries.redeliver',
+  'organizations.webhooks.get',
+  'organizations.webhooks.list',
+  'organizations.webhooks.test',
+  'organizations.webhooks.update',
   'users.delete',
   'users.password.create',
   'users.sessions.deleteMany',

@@ -47,6 +47,8 @@ export type * from './resources/user-password';
 export type * from './resources/user-sessions';
 export type * from './resources/user-tokens';
 export type * from './resources/users';
+export type * from './resources/webhook-deliveries';
+export type * from './resources/webhooks';
 export type {
   BlobUploadBody,
   Count,

@@ -97,7 +97,7 @@ export interface paths {
         };
         /**
          * List notifications
-         * @description The caller's in-app notifications across every organization, newest first, filtered by `isRead`.
+         * @description The caller's in-app notifications across every organization, newest first, filtered by `isRead`. Each row carries the ids of the app, channel, release and member user it is about, null where its type is about none or the row is gone; `?relations=app,channel,memberUser,release` embeds each one's id and name, the release's id and number, null once it is deleted.
          */
         get: operations["getV1Notifications"];
         put?: never;
@@ -578,6 +578,158 @@ export interface paths {
         get: operations["getV1OrganizationsByOrganizationIdUsageAppsCount"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/webhooks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the webhooks
+         * @description The organization's webhooks, newest first. Paying plans only.
+         */
+        get: operations["getV1OrganizationsByOrganizationIdWebhooks"];
+        put?: never;
+        /**
+         * Create a webhook
+         * @description Creates a webhook: a name unique per organization case-insensitively, `E_WEBHOOK_NAME_TAKEN` otherwise; the `format`, `raw` for our JSON payload or `slack`, `discord` or `teams` for a message posted to that target's incoming-webhook URL; an https URL, never a loopback, private or HotCodePush host, refused under `https_required`, `host_forbidden` or `credentials_forbidden`; the audit `events` subscribed to, by type; and an optional app filter, one of the organization's live apps, refused under `invalid_value` otherwise. A `raw` webhook answers its signing `secret` this once, never again. Paying plans only.
+         */
+        post: operations["postV1OrganizationsByOrganizationIdWebhooks"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/webhooks/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Count the webhooks
+         * @description The number of the organization's webhooks, which the list pages through. Paying plans only.
+         */
+        get: operations["getV1OrganizationsByOrganizationIdWebhooksCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/webhooks/{webhookId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a webhook
+         * @description The webhook, its row; the secret is never answered again.
+         */
+        get: operations["getV1OrganizationsByOrganizationIdWebhooksByWebhookId"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a webhook
+         * @description Deletes the webhook with its delivery log.
+         */
+        delete: operations["deleteV1OrganizationsByOrganizationIdWebhooksByWebhookId"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a webhook
+         * @description Changes the name, the URL, the subscribed `events`, the app filter or `isEnabled`; the format and the secret never change. Setting `isEnabled` on a webhook disabled after fifty consecutive failed deliveries starts its count again. A body equal to the row is a no-op that answers the row and writes nothing.
+         */
+        patch: operations["patchV1OrganizationsByOrganizationIdWebhooksByWebhookId"];
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/webhooks/{webhookId}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test a webhook
+         * @description Sends one sample event of the type `webhook.test`, outside the subscribable catalog, through the webhook's delivery path — the body in its format, the signature on a `raw` one, the ten-second timeout — once, within the request, and answers the delivery with the receiver's answer. A disabled webhook is tested all the same; the outcome counts like any delivery's.
+         */
+        post: operations["postV1OrganizationsByOrganizationIdWebhooksByWebhookIdTest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/webhooks/{webhookId}/deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the deliveries
+         * @description The webhook's delivery log, newest first, each delivery one event with its attempts, the receiver's last answer cut at 4,096 characters, and `nextAttemptAt` while the queue retries it; filtered by `status` and by `createdSince` and `createdUntil`, both inclusive. Rows are kept for 30 days.
+         */
+        get: operations["getV1OrganizationsByOrganizationIdWebhooksByWebhookIdDeliveries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/webhooks/{webhookId}/deliveries/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Count the deliveries
+         * @description The number of the webhook's deliveries under the list's filters, which the list pages through.
+         */
+        get: operations["getV1OrganizationsByOrganizationIdWebhooksByWebhookIdDeliveriesCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/webhooks/{webhookId}/deliveries/{deliveryId}/redeliver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Redeliver a delivery
+         * @description Delivers the event again, once, within the request — a failed delivery, or any other — and answers the delivery with the receiver's answer, its attempt count carried on; audit `webhook_delivery.redelivered`.
+         */
+        post: operations["postV1OrganizationsByOrganizationIdWebhooksByWebhookIdDeliveriesByDeliveryIdRedeliver"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2434,6 +2586,7 @@ export interface operations {
                 limit?: number;
                 offset?: number;
                 isRead?: "false" | "true";
+                relations?: ("app" | "channel" | "memberUser" | "release")[];
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
@@ -2451,20 +2604,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        appId: string | null;
+                        channelId: string | null;
                         /** Format: date-time */
                         createdAt: string;
                         /** Format: uuid */
                         id: string;
+                        memberUserId: string | null;
                         organizationId: string | null;
-                        payload: {
-                            [key: string]: unknown;
-                        };
                         readAt: string | null;
+                        releaseId: string | null;
                         type: string;
                         /** Format: date-time */
                         updatedAt: string;
                         /** Format: uuid */
                         userId: string;
+                        app?: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        } | null;
+                        channel?: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        } | null;
+                        memberUser?: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        } | null;
+                        release?: {
+                            /** Format: uuid */
+                            id: string;
+                            number: number;
+                        } | null;
                     }[];
                 };
             };
@@ -2748,15 +2922,16 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        appId: string | null;
+                        channelId: string | null;
                         /** Format: date-time */
                         createdAt: string;
                         /** Format: uuid */
                         id: string;
+                        memberUserId: string | null;
                         organizationId: string | null;
-                        payload: {
-                            [key: string]: unknown;
-                        };
                         readAt: string | null;
+                        releaseId: string | null;
                         type: string;
                         /** Format: date-time */
                         updatedAt: string;
@@ -5806,6 +5981,1181 @@ export interface operations {
             };
             /** @description E_UNAUTHENTICATED */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1OrganizationsByOrganizationIdWebhooks: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The webhooks. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        appId: string | null;
+                        consecutiveFailureCount: number;
+                        /** Format: date-time */
+                        createdAt: string;
+                        events: string[];
+                        /** @enum {string} */
+                        format: "discord" | "raw" | "slack" | "teams";
+                        isEnabled: boolean;
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                        /** Format: uuid */
+                        organizationId: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        url: string;
+                    }[];
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_PLAN_REQUIRED */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1OrganizationsByOrganizationIdWebhooks: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @default null */
+                    appId?: string | null;
+                    events: ("app.created" | "app.deleted" | "app.restored" | "app.transferred" | "app.updated" | "binary.created" | "binary.expired" | "bundle.deleted" | "bundle.expired" | "bundle.uploaded" | "channel.created" | "channel.deleted" | "channel.expired" | "channel.paused" | "channel.resumed" | "channel.updated" | "device.deleted" | "invitation.accepted" | "invitation.created" | "invitation.revoked" | "member.joined" | "member.removed" | "member.role_changed" | "organization.deleted" | "organization.dormancy_noticed" | "organization.fair_use_warning" | "organization.restored" | "organization.spending_cap_changed" | "organization.spending_cap_reached" | "organization.spending_cap_warning" | "organization.storage_limit_reached" | "organization.storage_limit_warning" | "organization.updated" | "release.created" | "release.failure_rate_exceeded" | "release.paused" | "release.resumed" | "release.revoked" | "release.rollout_changed" | "release.updated" | "signing_key.created" | "signing_key.deleted" | "subscription.cancellation_scheduled" | "subscription.ended" | "subscription.uncanceled")[];
+                    /** @enum {string} */
+                    format: "discord" | "raw" | "slack" | "teams";
+                    name: string;
+                    /** Format: uri */
+                    url: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The webhook, with its secret. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        appId: string | null;
+                        consecutiveFailureCount: number;
+                        /** Format: date-time */
+                        createdAt: string;
+                        events: string[];
+                        /** @enum {string} */
+                        format: "discord" | "raw" | "slack" | "teams";
+                        isEnabled: boolean;
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                        /** Format: uuid */
+                        organizationId: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        url: string;
+                        secret: string | null;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_PLAN_REQUIRED */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_WEBHOOK_NAME_TAKEN */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1OrganizationsByOrganizationIdWebhooksCount: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The number of rows the list's filters match. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        count: number;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_PLAN_REQUIRED */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1OrganizationsByOrganizationIdWebhooksByWebhookId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                webhookId: string;
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The webhook. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        appId: string | null;
+                        consecutiveFailureCount: number;
+                        /** Format: date-time */
+                        createdAt: string;
+                        events: string[];
+                        /** @enum {string} */
+                        format: "discord" | "raw" | "slack" | "teams";
+                        isEnabled: boolean;
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                        /** Format: uuid */
+                        organizationId: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        url: string;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_PLAN_REQUIRED */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    deleteV1OrganizationsByOrganizationIdWebhooksByWebhookId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                webhookId: string;
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The webhook is gone. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_PLAN_REQUIRED */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    patchV1OrganizationsByOrganizationIdWebhooksByWebhookId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                webhookId: string;
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    appId?: string | null;
+                    events?: ("app.created" | "app.deleted" | "app.restored" | "app.transferred" | "app.updated" | "binary.created" | "binary.expired" | "bundle.deleted" | "bundle.expired" | "bundle.uploaded" | "channel.created" | "channel.deleted" | "channel.expired" | "channel.paused" | "channel.resumed" | "channel.updated" | "device.deleted" | "invitation.accepted" | "invitation.created" | "invitation.revoked" | "member.joined" | "member.removed" | "member.role_changed" | "organization.deleted" | "organization.dormancy_noticed" | "organization.fair_use_warning" | "organization.restored" | "organization.spending_cap_changed" | "organization.spending_cap_reached" | "organization.spending_cap_warning" | "organization.storage_limit_reached" | "organization.storage_limit_warning" | "organization.updated" | "release.created" | "release.failure_rate_exceeded" | "release.paused" | "release.resumed" | "release.revoked" | "release.rollout_changed" | "release.updated" | "signing_key.created" | "signing_key.deleted" | "subscription.cancellation_scheduled" | "subscription.ended" | "subscription.uncanceled")[];
+                    isEnabled?: boolean;
+                    name?: string;
+                    /** Format: uri */
+                    url?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The webhook. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        appId: string | null;
+                        consecutiveFailureCount: number;
+                        /** Format: date-time */
+                        createdAt: string;
+                        events: string[];
+                        /** @enum {string} */
+                        format: "discord" | "raw" | "slack" | "teams";
+                        isEnabled: boolean;
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                        /** Format: uuid */
+                        organizationId: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        url: string;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_PLAN_REQUIRED */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_WEBHOOK_NAME_TAKEN */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1OrganizationsByOrganizationIdWebhooksByWebhookIdTest: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                webhookId: string;
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The delivery of the sample event, settled. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        attemptCount: number;
+                        auditRowId: string | null;
+                        /** Format: date-time */
+                        createdAt: string;
+                        /** Format: uuid */
+                        id: string;
+                        nextAttemptAt: string | null;
+                        responseBody: string | null;
+                        responseCode: number | null;
+                        /** @enum {string} */
+                        status: "failed" | "pending" | "succeeded";
+                        type: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        /** Format: uuid */
+                        webhookId: string;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_PLAN_REQUIRED */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1OrganizationsByOrganizationIdWebhooksByWebhookIdDeliveries: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                createdSince?: string;
+                createdUntil?: string;
+                status?: "failed" | "pending" | "succeeded";
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                webhookId: string;
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The deliveries. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        attemptCount: number;
+                        auditRowId: string | null;
+                        /** Format: date-time */
+                        createdAt: string;
+                        /** Format: uuid */
+                        id: string;
+                        nextAttemptAt: string | null;
+                        responseBody: string | null;
+                        responseCode: number | null;
+                        /** @enum {string} */
+                        status: "failed" | "pending" | "succeeded";
+                        type: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        /** Format: uuid */
+                        webhookId: string;
+                    }[];
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_PLAN_REQUIRED */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1OrganizationsByOrganizationIdWebhooksByWebhookIdDeliveriesCount: {
+        parameters: {
+            query?: {
+                createdSince?: string;
+                createdUntil?: string;
+                status?: "failed" | "pending" | "succeeded";
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                webhookId: string;
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The number of rows the list's filters match. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        count: number;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_PLAN_REQUIRED */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_RATE_LIMITED */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_INTERNAL */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_MAINTENANCE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1OrganizationsByOrganizationIdWebhooksByWebhookIdDeliveriesByDeliveryIdRedeliver: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                webhookId: string;
+                deliveryId: string;
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The delivery, settled again. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        attemptCount: number;
+                        auditRowId: string | null;
+                        /** Format: date-time */
+                        createdAt: string;
+                        /** Format: uuid */
+                        id: string;
+                        nextAttemptAt: string | null;
+                        responseBody: string | null;
+                        responseCode: number | null;
+                        /** @enum {string} */
+                        status: "failed" | "pending" | "succeeded";
+                        type: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        /** Format: uuid */
+                        webhookId: string;
+                    };
+                };
+            };
+            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_UNAUTHENTICATED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description E_PLAN_REQUIRED */
+            402: {
                 headers: {
                     [name: string]: unknown;
                 };

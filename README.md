@@ -51,6 +51,8 @@ The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.ch
 | `organizations.usage`, an organization's MAU and data transfer for a month, in total and per app | `countApps`, `downloadAppsCsv`, `get`, `listApps`                                     |
 | `organizations.ssoProvider`, one per organization                                                | `delete`, `get`, `put`                                                                |
 | `organizations.ssoProvider.verifications`                                                        | `create`                                                                              |
+| `organizations.webhooks`                                                                         | `count`, `create`, `delete`, `get`, `list`, `test`, `update`                          |
+| `organizations.webhooks.deliveries`                                                              | `count`, `list`, `redeliver`                                                          |
 | `invitations`, the caller's                                                                      | `accept`, `count`, `list`                                                             |
 | `apps`                                                                                           | `delete`, `get`, `transfer`, `update`                                                 |
 | `apps.bundles`                                                                                   | `complete`, `count`, `create`, `delete`, `get`, `list`                                |
@@ -101,7 +103,7 @@ await hotCodePush.apps.files.upload({
 An upload attempt may take ten minutes, `UPLOAD_TIMEOUT_MS`, enough for a 512 MB body at one megabyte a second; every other call gets sixty seconds.
 A `Blob` is read again when a retry needs it; a stream is read once, so a failed stream upload is not retried.
 
-Every creating call but a checkout and a customer portal session sends an `Idempotency-Key`, a UUID per call kept across the client's own retries; pass `idempotencyKey` to reuse one when you retry the call yourself, and the API answers the first result again for 24 hours. A checkout and a portal session carry no key and are never retried, since each call opens another Polar object; a click repeats them.
+Every creating call but a checkout, a customer portal session and a webhook sends an `Idempotency-Key`, a UUID per call kept across the client's own retries; pass `idempotencyKey` to reuse one when you retry the call yourself, and the API answers the first result again for 24 hours. A checkout and a portal session carry no key and are never retried, since each call opens another Polar object; a click repeats them.
 
 A failed request throws a `HotCodePushError` carrying the API's `code`, `message` and `details` and the HTTP `status`.
 

@@ -44,6 +44,20 @@ describe('NotificationsResource', () => {
     });
   });
 
+  test('should list the notifications with their release when the release relation is set', async () => {
+    const fetchMock = stubFetch(() =>
+      Response.json([
+        { ...NOTIFICATION, release: { id: 'release', number: 3 } },
+      ]),
+    );
+
+    await new HotCodePush().notifications.list({ relations: ['release'] });
+
+    expect(resolveSentRequest(fetchMock).url).toBe(
+      `${NOTIFICATIONS_URL}?relations=release`,
+    );
+  });
+
   test('should patch the notification read', async () => {
     const fetchMock = stubFetch(() =>
       Response.json({ ...NOTIFICATION, readAt: '2026-10-18T00:00:00.000Z' }),

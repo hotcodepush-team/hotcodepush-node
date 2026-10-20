@@ -18,6 +18,7 @@ import { OrganizationInvitationsResource } from './organization-invitations';
 import { SsoProviderResource } from './sso-provider';
 import { SubscriptionResource } from './subscription';
 import { UsageResource } from './usage';
+import { WebhooksResource } from './webhooks';
 
 export type CreateOrganizationOptions = JsonRequestBody<
   '/v1/organizations',
@@ -63,6 +64,7 @@ export class OrganizationsResource {
   public readonly ssoProvider: SsoProviderResource;
   public readonly subscription: SubscriptionResource;
   public readonly usage: UsageResource;
+  public readonly webhooks: WebhooksResource;
 
   constructor(private readonly httpClient: HttpClient) {
     this.apps = new OrganizationAppsResource(httpClient);
@@ -77,6 +79,7 @@ export class OrganizationsResource {
     this.ssoProvider = new SsoProviderResource(httpClient);
     this.subscription = new SubscriptionResource(httpClient);
     this.usage = new UsageResource(httpClient);
+    this.webhooks = new WebhooksResource(httpClient);
   }
 
   /**

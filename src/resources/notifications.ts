@@ -22,6 +22,15 @@ export type ListNotificationsOptions = QueryParameters<
  * An in-app notification of the caller, its `organizationId` null for one about the account.
  */
 export type Notification = JsonResponseBody<
+  '/v1/notifications',
+  'get',
+  200
+>[number];
+
+/**
+ * A notification without its relations, as an update answers it.
+ */
+export type NotificationRow = JsonResponseBody<
   '/v1/notifications/{notificationId}',
   'patch',
   200
@@ -76,7 +85,7 @@ export class NotificationsResource {
    */
   public async update(
     options: UpdateNotificationOptions,
-  ): Promise<Notification> {
+  ): Promise<NotificationRow> {
     const { notificationId, ...body } = options;
     return this.httpClient.fetchJson({
       body,

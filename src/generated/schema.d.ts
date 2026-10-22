@@ -667,7 +667,7 @@ export interface paths {
         put?: never;
         /**
          * Test a webhook
-         * @description Sends one sample event of the type `webhook.test`, outside the subscribable catalog, through the webhook's delivery path — the body in its format, the signature on a `raw` one, the ten-second timeout — once, within the request, and answers the delivery with the receiver's answer. A disabled webhook is tested all the same; the outcome counts like any delivery's.
+         * @description Sends one sample event of the type `webhook.test`, outside the subscribable catalog, through the webhook's delivery path — the body in its format, the signature on a `raw` one, the ten-second timeout, a redirect answered as a failure — once, within the request, and answers the delivery with the receiver's answer. A disabled webhook is tested all the same; the outcome never counts toward the fifty consecutive failures.
          */
         post: operations["postV1OrganizationsByOrganizationIdWebhooksByWebhookIdTest"];
         delete?: never;
@@ -685,7 +685,7 @@ export interface paths {
         };
         /**
          * List the deliveries
-         * @description The webhook's delivery log, newest first, each delivery one event with its attempts, the receiver's last answer cut at 4,096 characters, and `nextAttemptAt` while the queue retries it; filtered by `status` and by `createdSince` and `createdUntil`, both inclusive. Rows are kept for 30 days.
+         * @description The webhook's delivery log, newest first, each delivery one event with its attempts, the receiver's last answer, its first 4 KB, and `nextAttemptAt` while the queue retries it; filtered by `status` and by `createdSince` and `createdUntil`, both inclusive. Rows are kept for 30 days.
          */
         get: operations["getV1OrganizationsByOrganizationIdWebhooksByWebhookIdDeliveries"];
         put?: never;
@@ -727,7 +727,7 @@ export interface paths {
         put?: never;
         /**
          * Redeliver a delivery
-         * @description Delivers the event again, once, within the request — a failed delivery, or any other — and answers the delivery with the receiver's answer, its attempt count carried on; audit `webhook_delivery.redelivered`.
+         * @description Delivers the event again, once, within the request — a failed delivery, or any other, a pending one taken from the queue's retries — and answers the delivery settled with the receiver's answer, its attempt count carried on; the outcome never counts toward the fifty consecutive failures; audit `webhook_delivery.redelivered`.
          */
         post: operations["postV1OrganizationsByOrganizationIdWebhooksByWebhookIdDeliveriesByDeliveryIdRedeliver"];
         delete?: never;
@@ -1276,26 +1276,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/apps/{appId}/channels/{channelId}/indexes/{platform}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get a channel index
-         * @description The channel's index for a platform as the database sees it, for the probe and the verifier to compare with the copy the CDN serves; its `sequence` is the last materialization's time in milliseconds, each materialization strictly above the one before, so an index rebuilt after a database restore still supersedes every copy a device holds.
-         */
-        get: operations["getV1AppsByAppIdChannelsByChannelIdIndexesByPlatform"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/v1/apps/{appId}/channels/{channelId}/releases": {
         parameters: {
             query?: never;
@@ -1305,7 +1285,7 @@ export interface paths {
         };
         /**
          * List the releases of a channel
-         * @description The channel's release log, newest first; `?relations=channel,bundle,releaseCounters` embeds the linked rows.
+         * @description The channel's release log, newest first, filtered by `number`, a release's number in the channel; `?relations=channel,bundle,releaseCounters` embeds the linked rows.
          */
         get: operations["getV1AppsByAppIdChannelsByChannelIdReleases"];
         put?: never;
@@ -1329,7 +1309,7 @@ export interface paths {
         };
         /**
          * Count the releases of a channel
-         * @description The number of releases in the channel's release log, which the list pages through.
+         * @description The number of releases in the channel's release log under the list's filter, `number`, which the list pages through.
          */
         get: operations["getV1AppsByAppIdChannelsByChannelIdReleasesCount"];
         put?: never;
@@ -1657,7 +1637,7 @@ export interface paths {
         };
         /**
          * Get a release
-         * @description One release with its status — when it went live in the index and when the purge completed; `?relations=channel,bundle,releaseCounters` embeds the linked rows, the channel with the verifier's last result.
+         * @description One release with its status — when it went live in the index and when the purge completed; `?relations=channel,bundle,releaseCounters` embeds the linked rows.
          */
         get: operations["getV1AppsByAppIdReleasesByReleaseId"];
         put?: never;
@@ -1825,7 +1805,7 @@ export interface paths {
         };
         /**
          * Get the device statistics
-         * @description The registry's snapshot of the devices seen in the last thirty days: their count, the ones running the newest active release of their channel, and their counts per binary with its platform, version and newest report, per release with its number and channel and the embedded bundles as `null`, binary version, SDK version, platform, OS version and country, each the most common first and each summing to the count; `channelId` narrows it to one channel's devices.
+         * @description The registry's snapshot of the devices seen in the last thirty days: their count, the ones running the newest active release of their channel, and their counts per binary with its platform, version and newest report, per release with its number and channel and the embedded bundles as `null`, per channel by id, binary version, SDK version, platform, OS version and country, each the most common first and each summing to the count; `channelId` narrows it to one channel's devices.
          */
         get: operations["getV1AppsByAppIdStatisticsFleet"];
         put?: never;
@@ -1845,7 +1825,7 @@ export interface paths {
         };
         /**
          * Get the update statistics
-         * @description What the devices did per day over the period — updates applied, failed and rolled back, counted as the devices report them, beside the channel's active devices of the day, the adoption rate's denominator — the adoption curve of the newest live releases since each went live with the moments it reached half and nine tenths of the channel's active devices, and the failure and skip reasons the devices reported in the period; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default and at most 366, `channelId` narrows it to one channel, and `releaseId`, a release of the app, narrows the curves to that one release whatever its age.
+         * @description What the devices did per day over the period — updates confirmed, failed and rolled back, counted as the devices report them, beside the channel's active devices of the day, the adoption rate's denominator — the adoption curve of the newest live releases since each went live with the moments it reached half and nine tenths of the channel's active devices, and the failure and skip reasons the devices reported in the period; `periodSince` and `periodUntil` are UTC days, inclusive, the last thirty by default and at most 366, `channelId` narrows it to one channel, and `releaseId`, a release of the app, narrows the curves to that one release whatever its age.
          */
         get: operations["getV1AppsByAppIdStatisticsUpdates"];
         put?: never;
@@ -1999,7 +1979,7 @@ export interface paths {
         put?: never;
         /**
          * Set the password
-         * @description Sets the first password of an account that signed up through GitHub, Google or SSO, so it signs in with its email too; the account's other sessions end and the password-changed mail follows. An account with a password changes it through the auth slice, and a member behind a verified SSO domain answers `E_SSO_REQUIRED`. `me` or the caller's own id, any other user answering `E_FORBIDDEN`.
+         * @description Sets the first password of an account that signed up through GitHub, Google or SSO, so it signs in with its email too; the account's other sessions and its OAuth grants end and the password-changed mail follows. An account with a password changes it through the auth slice, and a member behind a verified SSO domain answers `E_SSO_REQUIRED`. `me` or the caller's own id, any other user answering `E_FORBIDDEN`.
          */
         post: operations["postV1UsersByUserIdPassword"];
         delete?: never;
@@ -2015,7 +1995,7 @@ export interface components {
         /** @description The one error shape: a context-free code from the catalog, one sentence of what happened and what to do, and the field, rule and target of a failed validation in `details`. */
         Error: {
             /** @enum {string} */
-            code: "E_ACCOUNT_BANNED" | "E_APP_NAME_TAKEN" | "E_APPS_LIMIT_REACHED" | "E_AUTH_FLOW_FAILED" | "E_BINARY_CONFLICT" | "E_BUNDLE_IN_USE" | "E_BUNDLE_NOT_READY" | "E_BUNDLE_TOO_LARGE" | "E_CHANNEL_NAME_TAKEN" | "E_CHANNEL_PROTECTED" | "E_CHANNELS_PER_APP_LIMIT_REACHED" | "E_CLIENT_UPDATE_REQUIRED" | "E_COUNTRY_NOT_ALLOWED" | "E_DEFAULT_CHANNEL" | "E_DNS_LOOKUP_FAILED" | "E_FILES_PER_BUNDLE_LIMIT_REACHED" | "E_FORBIDDEN" | "E_HASH_MISMATCH" | "E_IDEMPOTENCY_KEY_REUSED" | "E_INTERNAL" | "E_INVITATION_INVALID" | "E_INVITATIONS_PER_DAY_LIMIT_REACHED" | "E_IP_NOT_ALLOWED" | "E_MAINTENANCE" | "E_MEMBERS_LIMIT_REACHED" | "E_NOT_FOUND" | "E_NOTIFICATION_MANDATORY" | "E_ORIGIN_UNTRUSTED" | "E_PASSWORD_ALREADY_SET" | "E_PLAN_REQUIRED" | "E_RATE_LIMITED" | "E_RELEASE_REVOKED" | "E_RELEASES_PER_DAY_LIMIT_REACHED" | "E_SIGNATURE_INVALID" | "E_SIGNATURE_REQUIRED" | "E_SOLE_OWNER" | "E_SSO_REQUIRED" | "E_STORAGE_LIMIT_REACHED" | "E_TOKENS_LIMIT_REACHED" | "E_TURNSTILE_FAILED" | "E_TWO_FACTOR_REQUIRED" | "E_UNAUTHENTICATED" | "E_UPLOAD_INCOMPLETE" | "E_VALIDATION" | "E_WEBHOOK_NAME_TAKEN";
+            code: "E_ACCOUNT_BANNED" | "E_APP_NAME_TAKEN" | "E_APPS_LIMIT_REACHED" | "E_AUTH_FLOW_FAILED" | "E_BINARY_CONFLICT" | "E_BUNDLE_IN_USE" | "E_BUNDLE_NOT_READY" | "E_BUNDLE_TOO_LARGE" | "E_CHANNEL_NAME_TAKEN" | "E_CHANNEL_PROTECTED" | "E_CHANNELS_PER_APP_LIMIT_REACHED" | "E_CLIENT_UPDATE_REQUIRED" | "E_COUNTRY_NOT_ALLOWED" | "E_DEFAULT_CHANNEL" | "E_DNS_LOOKUP_FAILED" | "E_FILES_PER_BUNDLE_LIMIT_REACHED" | "E_FORBIDDEN" | "E_HASH_MISMATCH" | "E_IDEMPOTENCY_KEY_REUSED" | "E_INTERNAL" | "E_INVITATION_INVALID" | "E_INVITATIONS_PER_DAY_LIMIT_REACHED" | "E_IP_NOT_ALLOWED" | "E_MAINTENANCE" | "E_MEMBERS_LIMIT_REACHED" | "E_NOT_FOUND" | "E_NOTIFICATION_MANDATORY" | "E_ORIGIN_UNTRUSTED" | "E_PASSWORD_ALREADY_SET" | "E_PLAN_REQUIRED" | "E_RATE_LIMITED" | "E_RELEASE_REVOKED" | "E_RELEASES_PER_DAY_LIMIT_REACHED" | "E_SIGNATURE_INVALID" | "E_SIGNATURE_REQUIRED" | "E_SOLE_OWNER" | "E_SSO_REQUIRED" | "E_STORAGE_LIMIT_REACHED" | "E_TOKENS_LIMIT_REACHED" | "E_TWO_FACTOR_REQUIRED" | "E_UNAUTHENTICATED" | "E_UPLOAD_INCOMPLETE" | "E_VALIDATION" | "E_WEBHOOK_NAME_TAKEN";
             details: {
                 [key: string]: unknown;
             } | null;
@@ -6068,9 +6048,9 @@ export interface operations {
                         events: string[];
                         /** @enum {string} */
                         format: "discord" | "raw" | "slack" | "teams";
-                        isEnabled: boolean;
                         /** Format: uuid */
                         id: string;
+                        isEnabled: boolean;
                         name: string;
                         /** Format: uuid */
                         organizationId: string;
@@ -6197,9 +6177,9 @@ export interface operations {
                         events: string[];
                         /** @enum {string} */
                         format: "discord" | "raw" | "slack" | "teams";
-                        isEnabled: boolean;
                         /** Format: uuid */
                         id: string;
+                        isEnabled: boolean;
                         name: string;
                         /** Format: uuid */
                         organizationId: string;
@@ -6425,9 +6405,9 @@ export interface operations {
                         events: string[];
                         /** @enum {string} */
                         format: "discord" | "raw" | "slack" | "teams";
-                        isEnabled: boolean;
                         /** Format: uuid */
                         id: string;
+                        isEnabled: boolean;
                         name: string;
                         /** Format: uuid */
                         organizationId: string;
@@ -6651,9 +6631,9 @@ export interface operations {
                         events: string[];
                         /** @enum {string} */
                         format: "discord" | "raw" | "slack" | "teams";
-                        isEnabled: boolean;
                         /** Format: uuid */
                         id: string;
+                        isEnabled: boolean;
                         name: string;
                         /** Format: uuid */
                         organizationId: string;
@@ -10298,7 +10278,6 @@ export interface operations {
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
-                        indexSequence: number;
                         isDiscoverable: boolean;
                         isProtected: boolean;
                         name: string;
@@ -10306,8 +10285,6 @@ export interface operations {
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
-                        verificationResult: ("drifted" | "matched") | null;
-                        verifiedAt: string | null;
                     }[];
                 };
             };
@@ -10423,7 +10400,6 @@ export interface operations {
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
-                        indexSequence: number;
                         isDiscoverable: boolean;
                         isProtected: boolean;
                         name: string;
@@ -10431,8 +10407,6 @@ export interface operations {
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
-                        verificationResult: ("drifted" | "matched") | null;
-                        verifiedAt: string | null;
                     };
                 };
             };
@@ -10746,7 +10720,6 @@ export interface operations {
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
-                        indexSequence: number;
                         isDiscoverable: boolean;
                         isProtected: boolean;
                         name: string;
@@ -10754,8 +10727,6 @@ export interface operations {
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
-                        verificationResult: ("drifted" | "matched") | null;
-                        verifiedAt: string | null;
                     };
                 };
             };
@@ -10968,7 +10939,6 @@ export interface operations {
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
-                        indexSequence: number;
                         isDiscoverable: boolean;
                         isProtected: boolean;
                         name: string;
@@ -10976,8 +10946,6 @@ export interface operations {
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
-                        verificationResult: ("drifted" | "matched") | null;
-                        verifiedAt: string | null;
                     };
                 };
             };
@@ -11089,7 +11057,6 @@ export interface operations {
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
-                        indexSequence: number;
                         isDiscoverable: boolean;
                         isProtected: boolean;
                         name: string;
@@ -11097,8 +11064,6 @@ export interface operations {
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
-                        verificationResult: ("drifted" | "matched") | null;
-                        verifiedAt: string | null;
                     };
                 };
             };
@@ -11201,7 +11166,6 @@ export interface operations {
                         failureThresholdPercent: number | null;
                         /** Format: uuid */
                         id: string;
-                        indexSequence: number;
                         isDiscoverable: boolean;
                         isProtected: boolean;
                         name: string;
@@ -11209,8 +11173,6 @@ export interface operations {
                         pausedAt: string | null;
                         /** Format: date-time */
                         updatedAt: string;
-                        verificationResult: ("drifted" | "matched") | null;
-                        verifiedAt: string | null;
                     };
                 };
             };
@@ -11281,169 +11243,12 @@ export interface operations {
             };
         };
     };
-    getV1AppsByAppIdChannelsByChannelIdIndexesByPlatform: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
-                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
-            };
-            path: {
-                platform: "android" | "ios";
-                appId: string;
-                channelId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The channel index, the wire shape the device reads. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        appId: string;
-                        cappedAt: string | null;
-                        channelId: string;
-                        isPaused: boolean;
-                        /** @enum {string} */
-                        platform: "android" | "ios";
-                        releases: ({
-                            bundleId: string;
-                            bundleVersion: string;
-                            conditions: ((({
-                                key: string;
-                                /** @constant */
-                                type: "attribute";
-                                valueSha256: string;
-                            } & {
-                                [key: string]: unknown;
-                            }) | ({
-                                range: string;
-                                /** @constant */
-                                type: "binary";
-                            } & {
-                                [key: string]: unknown;
-                            }) | ({
-                                hashedIds: string[];
-                                /** @constant */
-                                type: "device";
-                            } & {
-                                [key: string]: unknown;
-                            }) | ({
-                                fingerprint: string;
-                                /** @constant */
-                                type: "fingerprint";
-                            } & {
-                                [key: string]: unknown;
-                            }) | ({
-                                range: string;
-                                /** @constant */
-                                type: "os";
-                            } & {
-                                [key: string]: unknown;
-                            })) | ({
-                                type: string;
-                            } & {
-                                [key: string]: unknown;
-                            }))[];
-                            /** Format: date-time */
-                            createdAt: string;
-                            id: string;
-                            isMandatory: boolean;
-                            manifestSha256: string;
-                            /** Format: uri */
-                            manifestUrl: string;
-                            notes: string | null;
-                            number: number;
-                            rolloutPercentage: number;
-                            sizeBytes: number;
-                        } & {
-                            [key: string]: unknown;
-                        })[];
-                        revokedReleaseIds: string[];
-                        /** @constant */
-                        schema: 1;
-                        sequence: number;
-                    } & {
-                        [key: string]: unknown;
-                    };
-                };
-            };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_UNAUTHENTICATED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_RATE_LIMITED */
-            429: {
-                headers: {
-                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
-                    "Retry-After"?: number;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_INTERNAL */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description E_MAINTENANCE */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
     getV1AppsByAppIdChannelsByChannelIdReleases: {
         parameters: {
             query?: {
                 limit?: number;
                 offset?: number;
+                number?: number;
                 relations?: ("bundle" | "channel" | "releaseCounters")[];
             };
             header?: {
@@ -11517,10 +11322,10 @@ export interface operations {
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
-                        stepStartAttemptedUpdateCount: number;
+                        stepStartAppliedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
-                        windowStartAttemptedUpdateCount: number;
+                        windowStartAppliedUpdateCount: number;
                         windowStartFailureCount: number;
                         bundle?: {
                             /** Format: uuid */
@@ -11564,7 +11369,6 @@ export interface operations {
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
-                            indexSequence: number;
                             isDiscoverable: boolean;
                             isProtected: boolean;
                             name: string;
@@ -11572,12 +11376,10 @@ export interface operations {
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
-                            verificationResult: ("drifted" | "matched") | null;
-                            verifiedAt: string | null;
                         };
                         releaseCounters?: {
                             appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
+                            confirmedUpdateCount: number;
                             crashFailureCount: number;
                             /** Format: date-time */
                             createdAt: string;
@@ -11786,10 +11588,10 @@ export interface operations {
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
-                        stepStartAttemptedUpdateCount: number;
+                        stepStartAppliedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
-                        windowStartAttemptedUpdateCount: number;
+                        windowStartAppliedUpdateCount: number;
                         windowStartFailureCount: number;
                     };
                 };
@@ -11881,7 +11683,9 @@ export interface operations {
     };
     getV1AppsByAppIdChannelsByChannelIdReleasesCount: {
         parameters: {
-            query?: never;
+            query?: {
+                number?: number;
+            };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
@@ -12057,10 +11861,10 @@ export interface operations {
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
-                        stepStartAttemptedUpdateCount: number;
+                        stepStartAppliedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
-                        windowStartAttemptedUpdateCount: number;
+                        windowStartAppliedUpdateCount: number;
                         windowStartFailureCount: number;
                     };
                 };
@@ -12231,10 +12035,10 @@ export interface operations {
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
-                        stepStartAttemptedUpdateCount: number;
+                        stepStartAppliedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
-                        windowStartAttemptedUpdateCount: number;
+                        windowStartAppliedUpdateCount: number;
                         windowStartFailureCount: number;
                     }[];
                 };
@@ -12476,7 +12280,6 @@ export interface operations {
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
-                            indexSequence: number;
                             isDiscoverable: boolean;
                             isProtected: boolean;
                             name: string;
@@ -12484,8 +12287,6 @@ export interface operations {
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
-                            verificationResult: ("drifted" | "matched") | null;
-                            verifiedAt: string | null;
                         };
                         channelId: string | null;
                         /** @enum {string} */
@@ -12546,10 +12347,10 @@ export interface operations {
                             rolloutPercentage: number;
                             /** @enum {string} */
                             status: "active" | "paused" | "revoked";
-                            stepStartAttemptedUpdateCount: number;
+                            stepStartAppliedUpdateCount: number;
                             /** Format: date-time */
                             updatedAt: string;
-                            windowStartAttemptedUpdateCount: number;
+                            windowStartAppliedUpdateCount: number;
                             windowStartFailureCount: number;
                         };
                         currentReleaseId: string | null;
@@ -12869,7 +12670,6 @@ export interface operations {
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
-                            indexSequence: number;
                             isDiscoverable: boolean;
                             isProtected: boolean;
                             name: string;
@@ -12877,8 +12677,6 @@ export interface operations {
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
-                            verificationResult: ("drifted" | "matched") | null;
-                            verifiedAt: string | null;
                         };
                         channelId: string | null;
                         /** @enum {string} */
@@ -12939,10 +12737,10 @@ export interface operations {
                             rolloutPercentage: number;
                             /** @enum {string} */
                             status: "active" | "paused" | "revoked";
-                            stepStartAttemptedUpdateCount: number;
+                            stepStartAppliedUpdateCount: number;
                             /** Format: date-time */
                             updatedAt: string;
-                            windowStartAttemptedUpdateCount: number;
+                            windowStartAppliedUpdateCount: number;
                             windowStartFailureCount: number;
                         };
                         currentReleaseId: string | null;
@@ -13151,7 +12949,7 @@ export interface operations {
                         /** Format: uuid */
                         releaseId: string;
                         /** @enum {string} */
-                        type: "applied" | "attempted" | "checked" | "failed";
+                        type: "applied" | "checked" | "confirmed" | "failed";
                         /** Format: date-time */
                         updatedAt: string;
                     }[];
@@ -13998,10 +13796,10 @@ export interface operations {
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
-                        stepStartAttemptedUpdateCount: number;
+                        stepStartAppliedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
-                        windowStartAttemptedUpdateCount: number;
+                        windowStartAppliedUpdateCount: number;
                         windowStartFailureCount: number;
                         bundle?: {
                             /** Format: uuid */
@@ -14045,7 +13843,6 @@ export interface operations {
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
-                            indexSequence: number;
                             isDiscoverable: boolean;
                             isProtected: boolean;
                             name: string;
@@ -14053,12 +13850,10 @@ export interface operations {
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
-                            verificationResult: ("drifted" | "matched") | null;
-                            verifiedAt: string | null;
                         };
                         releaseCounters?: {
                             appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
+                            confirmedUpdateCount: number;
                             crashFailureCount: number;
                             /** Format: date-time */
                             createdAt: string;
@@ -14314,10 +14109,10 @@ export interface operations {
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
-                        stepStartAttemptedUpdateCount: number;
+                        stepStartAppliedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
-                        windowStartAttemptedUpdateCount: number;
+                        windowStartAppliedUpdateCount: number;
                         windowStartFailureCount: number;
                         bundle?: {
                             /** Format: uuid */
@@ -14361,7 +14156,6 @@ export interface operations {
                             failureThresholdPercent: number | null;
                             /** Format: uuid */
                             id: string;
-                            indexSequence: number;
                             isDiscoverable: boolean;
                             isProtected: boolean;
                             name: string;
@@ -14369,12 +14163,10 @@ export interface operations {
                             pausedAt: string | null;
                             /** Format: date-time */
                             updatedAt: string;
-                            verificationResult: ("drifted" | "matched") | null;
-                            verifiedAt: string | null;
                         };
                         releaseCounters?: {
                             appliedUpdateCount: number;
-                            attemptedUpdateCount: number;
+                            confirmedUpdateCount: number;
                             crashFailureCount: number;
                             /** Format: date-time */
                             createdAt: string;
@@ -14547,10 +14339,10 @@ export interface operations {
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
-                        stepStartAttemptedUpdateCount: number;
+                        stepStartAppliedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
-                        windowStartAttemptedUpdateCount: number;
+                        windowStartAppliedUpdateCount: number;
                         windowStartFailureCount: number;
                     };
                 };
@@ -14816,10 +14608,10 @@ export interface operations {
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
-                        stepStartAttemptedUpdateCount: number;
+                        stepStartAppliedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
-                        windowStartAttemptedUpdateCount: number;
+                        windowStartAppliedUpdateCount: number;
                         windowStartFailureCount: number;
                     };
                 };
@@ -14974,10 +14766,10 @@ export interface operations {
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
-                        stepStartAttemptedUpdateCount: number;
+                        stepStartAppliedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
-                        windowStartAttemptedUpdateCount: number;
+                        windowStartAppliedUpdateCount: number;
                         windowStartFailureCount: number;
                     };
                 };
@@ -15132,10 +14924,10 @@ export interface operations {
                         rolloutPercentage: number;
                         /** @enum {string} */
                         status: "active" | "paused" | "revoked";
-                        stepStartAttemptedUpdateCount: number;
+                        stepStartAppliedUpdateCount: number;
                         /** Format: date-time */
                         updatedAt: string;
-                        windowStartAttemptedUpdateCount: number;
+                        windowStartAppliedUpdateCount: number;
                         windowStartFailureCount: number;
                     };
                 };
@@ -15663,6 +15455,10 @@ export interface operations {
                             deviceCount: number;
                             value: string | null;
                         }[];
+                        channel: {
+                            deviceCount: number;
+                            value: string | null;
+                        }[];
                         country: {
                             deviceCount: number;
                             value: string | null;
@@ -15787,7 +15583,7 @@ export interface operations {
                     "application/json": {
                         days: {
                             activeDeviceCount: number | null;
-                            appliedUpdateCount: number;
+                            confirmedUpdateCount: number;
                             /** Format: date */
                             day: string;
                             failureCount: number;
@@ -15799,9 +15595,9 @@ export interface operations {
                         }[];
                         releases: {
                             adoption: {
-                                appliedUpdateCount: number;
                                 /** Format: date-time */
                                 at: string;
+                                confirmedUpdateCount: number;
                             }[];
                             /** Format: uuid */
                             channelId: string;

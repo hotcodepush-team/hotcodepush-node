@@ -11,7 +11,6 @@ export type * from './resources/bundle-pack-upload-parts';
 export type * from './resources/bundle-pack-uploads';
 export type * from './resources/bundles';
 export type * from './resources/channel-audience';
-export type * from './resources/channel-indexes';
 export type * from './resources/channel-qr';
 export type * from './resources/channel-releases';
 export type * from './resources/channels';

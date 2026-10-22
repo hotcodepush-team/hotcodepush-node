@@ -194,12 +194,6 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.apps.channels.deleteMany({ appId: APP_ID, ids: [CHANNEL_ID] }),
   'apps.channels.get': hotCodePush =>
     hotCodePush.apps.channels.get({ appId: APP_ID, channelId: CHANNEL_ID }),
-  'apps.channels.indexes.get': hotCodePush =>
-    hotCodePush.apps.channels.indexes.get({
-      appId: APP_ID,
-      channelId: CHANNEL_ID,
-      platform: 'android',
-    }),
   'apps.channels.list': hotCodePush =>
     hotCodePush.apps.channels.list({
       appId: APP_ID,
@@ -219,6 +213,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.apps.channels.releases.count({
       appId: APP_ID,
       channelId: CHANNEL_ID,
+      number: 1,
     }),
   'apps.channels.releases.create': hotCodePush =>
     hotCodePush.apps.channels.releases.create({
@@ -243,6 +238,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       appId: APP_ID,
       channelId: CHANNEL_ID,
       limit: 10,
+      number: 1,
       offset: 10,
       relations: ['bundle'],
     }),

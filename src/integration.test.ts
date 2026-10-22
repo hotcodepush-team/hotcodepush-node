@@ -162,16 +162,6 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     expect(resumedChannel.pausedAt).toBeNull();
   });
 
-  test("should get the channel's index", async () => {
-    const fetchedChannelIndex = await hotCodePush.apps.channels.indexes.get({
-      appId: app.id,
-      channelId: channel.id,
-      platform: 'android',
-    });
-
-    expect(fetchedChannelIndex).toEqual(expect.any(Object));
-  });
-
   test('should list no releases for a new channel', async () => {
     const fetchedChannelReleases =
       await hotCodePush.apps.channels.releases.list({

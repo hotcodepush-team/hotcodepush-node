@@ -62,7 +62,6 @@ The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.ch
 | `apps.bundles.pack.uploads`, the multipart upload                                                | `complete`, `create`, `delete`                                                        |
 | `apps.bundles.pack.uploads.parts`                                                                | `upload`                                                                              |
 | `apps.channels`                                                                                  | `count`, `create`, `delete`, `deleteMany`, `get`, `list`, `pause`, `resume`, `update` |
-| `apps.channels.indexes`                                                                          | `get`                                                                                 |
 | `apps.channels.qr`, the channel's deep link as an image                                          | `get`                                                                                 |
 | `apps.channels.releases`, the release log                                                        | `count`, `create`, `list`, `revoke`                                                   |
 | `apps.channels.rollbacks`                                                                        | `create`                                                                              |

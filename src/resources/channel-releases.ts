@@ -12,7 +12,11 @@ import type { Release, ReleaseRow } from './releases';
 export type CountChannelReleasesOptions = PathParameters<
   '/v1/apps/{appId}/channels/{channelId}/releases/count',
   'get'
->;
+> &
+  QueryParameters<
+    '/v1/apps/{appId}/channels/{channelId}/releases/count',
+    'get'
+  >;
 
 export type CreateReleaseOptions = PathParameters<
   '/v1/apps/{appId}/channels/{channelId}/releases',
@@ -40,15 +44,17 @@ export class ChannelReleasesResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The number of releases in the channel's log.
+   * The number of releases in the channel's log under the list's filter.
    */
   public async count(options: CountChannelReleasesOptions): Promise<Count> {
+    const { appId, channelId, ...query } = options;
     return this.httpClient.fetchJson({
       method: 'GET',
       path: resolvePath(
         '/v1/apps/{appId}/channels/{channelId}/releases/count',
-        options,
+        { appId, channelId },
       ),
+      query,
     });
   }
 
@@ -68,7 +74,7 @@ export class ChannelReleasesResource {
   }
 
   /**
-   * The channel's release log, newest first.
+   * The channel's release log, newest first, or the one release `number` names.
    */
   public async list(options: ListChannelReleasesOptions): Promise<Release[]> {
     const { appId, channelId, ...query } = options;

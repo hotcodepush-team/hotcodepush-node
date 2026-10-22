@@ -31,6 +31,22 @@ describe('ChannelReleasesResource', () => {
     });
   });
 
+  test('should count the releases of one number', async () => {
+    const fetchMock = stubFetch(() => Response.json({ count: 1 }));
+
+    const fetchedCount = await new HotCodePush().apps.channels.releases.count({
+      appId: 'app',
+      channelId: 'channel',
+      number: 3,
+    });
+
+    expect(fetchedCount).toEqual({ count: 1 });
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: `${RELEASES_URL}/count?number=3`,
+    });
+  });
+
   test('should post the release to its channel with its idempotency key', async () => {
     const fetchMock = stubFetch(() => Response.json(RELEASE, { status: 201 }));
 

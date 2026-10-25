@@ -73,7 +73,7 @@ export class AuditLogsResource {
 
   /**
    * The organization's audit log, newest first; `type` takes `channel.*` for every action on an object.
-   * Paying plans only, `plan_required` otherwise.
+   * On a plan that includes the audit log, `plan_required` otherwise.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async list(options: ListAuditLogsOptions): Promise<AuditLog[]> {

@@ -72,7 +72,7 @@ export type Webhook = JsonResponseBody<
 >;
 
 /**
- * The organization's webhooks, for Admins and Owners on a paying plan; any other plan answers `plan_required`.
+ * The organization's webhooks, for Admins and Owners on a plan that includes webhooks; any other plan answers `plan_required`.
  */
 export class WebhooksResource {
   public readonly deliveries: WebhookDeliveriesResource;

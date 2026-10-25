@@ -78,7 +78,7 @@ The integration test runs by hand against that API, started with `ENVIRONMENT=de
 - Result variables carry the past participle of their operation: `fetchedChannel`, `resolvedError`.
 - Alphabetical ordering within a scope: imports, object keys, interface members, declarations of one kind.
 - Booleans carry `is` or `has`; a state with a moment is a timestamp such as `pausedAt`, never a boolean.
-- Every catalog value is lowercase snake_case with no prefix, error codes included: `not_found`, the client's own `unexpected_response`; a code is passed through verbatim, never renamed. Field, resource and method names stay camelCase.
+- Every catalog value is lowercase snake_case with no prefix, error codes included: `not_found`, the client's own `unexpected_response`; a code is passed through verbatim, never renamed. Field, resource and method names stay camelCase, and so does a field name used as a value, `relations: ['currentRelease']`.
 - Never the non-null assertion; nullish coalescing or a real check.
 - Test titles read `should <verb> …`, lowercase, conditions starting with `when`; one test per request and branch.
 

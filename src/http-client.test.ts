@@ -9,6 +9,7 @@ import {
   runCallAfterBadGateway,
   stubFetch,
 } from './test-helpers';
+import type { ErrorBody } from './types';
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -200,7 +201,7 @@ describe('HttpClient', () => {
     expect(fetchedChannel).toEqual({ id: 'channel' });
   });
 
-  test('should throw E_UNEXPECTED_RESPONSE with the status when a rate limit in front of the api answers html', async () => {
+  test('should throw unexpected_response with the status when a rate limit in front of the api answers html', async () => {
     stubFetch(
       () => new Response('<html>Too Many Requests</html>', { status: 429 }),
     );
@@ -212,7 +213,7 @@ describe('HttpClient', () => {
 
     await expect(fetchPromise).rejects.toBeInstanceOf(HotCodePushError);
     await expect(fetchPromise).rejects.toMatchObject({
-      code: 'E_UNEXPECTED_RESPONSE',
+      code: 'unexpected_response',
       status: 429,
     });
   });
@@ -254,7 +255,10 @@ describe('HttpClient', () => {
   test('should throw a HotCodePushError when the response is not ok', async () => {
     stubFetch(() =>
       Response.json(
-        { code: 'E_UNAUTHENTICATED', message: 'The token is invalid.' },
+        {
+          code: 'unauthenticated',
+          message: 'The token is invalid.',
+        } satisfies ErrorBody,
         { status: 401 },
       ),
     );
@@ -266,7 +270,7 @@ describe('HttpClient', () => {
 
     await expect(fetchPromise).rejects.toBeInstanceOf(HotCodePushError);
     await expect(fetchPromise).rejects.toMatchObject({
-      code: 'E_UNAUTHENTICATED',
+      code: 'unauthenticated',
       status: 401,
     });
   });

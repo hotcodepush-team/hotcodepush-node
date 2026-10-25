@@ -25,7 +25,7 @@ export class SubscriptionResource {
   /**
    * Schedules the end of the subscription at the end of its period, with the reason and the comment of the retention dialog.
    * A cancel already scheduled stays as it is, so the call is retried.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async cancel(options: CancelSubscriptionOptions): Promise<void> {
     const { organizationId, ...body } = options;
@@ -43,7 +43,7 @@ export class SubscriptionResource {
   /**
    * Clears the scheduled end of the subscription, so it renews as before.
    * A subscription with no end scheduled stays as it is, so the call is retried.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async uncancel(options: UncancelSubscriptionOptions): Promise<void> {
     await this.httpClient.fetchJson({

@@ -186,7 +186,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
 
     await expect(rollbackPromise).rejects.toBeInstanceOf(HotCodePushError);
     await expect(rollbackPromise).rejects.toMatchObject({
-      code: 'E_VALIDATION',
+      code: 'validation',
       details: { field: 'toReleaseId' },
       status: 400,
     });
@@ -312,7 +312,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
         appId: app.id,
         bundleId: createdBundle.id,
       }),
-    ).rejects.toMatchObject({ code: 'E_NOT_FOUND', status: 404 });
+    ).rejects.toMatchObject({ code: 'not_found', status: 404 });
   });
 
   test('should create a binary and read it with its bundle', async () => {
@@ -363,7 +363,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
 
     await expect(
       hotCodePush.apps.channels.get({ appId: app.id, channelId: channel.id }),
-    ).rejects.toMatchObject({ code: 'E_NOT_FOUND', status: 404 });
+    ).rejects.toMatchObject({ code: 'not_found', status: 404 });
   });
 
   test('should transfer the app to another organization', async () => {
@@ -384,7 +384,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     await hotCodePush.apps.delete({ appId: app.id });
 
     await expect(hotCodePush.apps.get({ appId: app.id })).rejects.toMatchObject(
-      { code: 'E_NOT_FOUND', status: 404 },
+      { code: 'not_found', status: 404 },
     );
   });
 });

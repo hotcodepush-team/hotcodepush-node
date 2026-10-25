@@ -42,7 +42,7 @@ export class SsoProviderResource {
 
   /**
    * Removes the SSO provider: password sign-in works again for its members, and the domain is forgotten.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async delete(options: DeleteSsoProviderOptions): Promise<void> {
     await this.httpClient.fetchJson({
@@ -55,7 +55,7 @@ export class SsoProviderResource {
   }
 
   /**
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async get(options: GetSsoProviderOptions): Promise<SsoProvider> {
     return this.httpClient.fetchJson({
@@ -69,7 +69,7 @@ export class SsoProviderResource {
 
   /**
    * Sets the OIDC or SAML provider and its domain, replacing the one before; a new or changed domain starts unverified, with a new token for its TXT record.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async put(options: PutSsoProviderOptions): Promise<SsoProvider> {
     const { organizationId, ...body } = options;

@@ -23,11 +23,11 @@ export interface BlobUploadBody {
 export type Count = JsonResponseBody<'/v1/organizations/count', 'get', 200>;
 
 /**
- * A code of the API's error catalog, or the client's own `E_UNEXPECTED_RESPONSE` for a response outside the API's error shape,
- * such as a page of the platform in front of the API; the catalog's `E_INTERNAL` is the API's own failure.
+ * A code of the API's error catalog, or the client's own `unexpected_response` for a response outside the API's error shape,
+ * such as a page of the platform in front of the API; the catalog's `internal` is the API's own failure.
  */
 export type HotCodePushErrorCode =
-  components['schemas']['Error']['code'] | 'E_UNEXPECTED_RESPONSE';
+  components['schemas']['Error']['code'] | 'unexpected_response';
 
 export interface IdempotencyOptions {
   /**

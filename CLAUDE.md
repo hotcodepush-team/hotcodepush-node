@@ -48,10 +48,10 @@ Run `npm run fmt` before every commit; lint, typecheck, test and build must pass
 
 - Auth is `Authorization: Bearer <token>`; the token is optional, since `/health` needs none.
 - Every request sends `X-HotCodePush-Client: <name>/<version>`, `node/<this package's version>` unless the caller passes its own, as the CLI and the MCP server do; `User-Agent` goes out only when the caller sets `userAgent`, since a session keeps it and the sessions page names the client by it.
-- Every error is one JSON shape, `code`, `message`, `details`; `HotCodePushError` carries them and the status verbatim, and a body without the shape becomes `E_UNEXPECTED_RESPONSE`.
+- Every error is one JSON shape, `code`, `message`, `details`; `HotCodePushError` carries them and the status verbatim, and a body without the shape becomes `unexpected_response`.
 - Every call goes through `withTimeout` and `withRetry`, never a bare `fetch`: sixty seconds per attempt, `JSON_TIMEOUT_MS`, and ten minutes for a binary upload, `UPLOAD_TIMEOUT_MS`, three attempts, exponential backoff from 500 ms, retrying a thrown fetch, 408, 429 and 5xx; a 429 or a 503 waits its `Retry-After` instead, at most sixty seconds, the rate-limit window.
 - Every creating `POST` — the eight operations whose OpenAPI document lists the `Idempotency-Key` header: organizations, invitations, apps, channels, releases, rollbacks, bundles and binaries — goes through `fetchCreatingPost`, which sends the caller's `idempotencyKey` or a UUID generated per call and kept across its retries. A checkout and a customer portal session carry no key and are never retried, since each call creates another Polar object.
-- Any other `POST` is retried only where a repeat is safe: `pause`, `resume`, the subscription's `cancel` and `uncancel`, a bundle's `complete`, a channel's bulk `revoke`, a signing key's `create`, the SSO verification, the two multipart starts and a file upload's completion; a pack's completion is never retried, since a repeat answers `E_NOT_FOUND` for an upload R2 already closed.
+- Any other `POST` is retried only where a repeat is safe: `pause`, `resume`, the subscription's `cancel` and `uncancel`, a bundle's `complete`, a channel's bulk `revoke`, a signing key's `create`, the SSO verification, the two multipart starts and a file upload's completion; a pack's completion is never retried, since a repeat answers `not_found` for an upload R2 already closed.
 - Lists take `limit` and `offset`; `relations` and `ids` are typed lists sent as comma lists, `?relations=user`, `?ids=a,b`, and any other list repeats its parameter, `?attribute=a&attribute=b`.
 - `me` is accepted wherever a `{userId}` appears; the client passes it through.
 - The `/v1/auth/*` slice is Better Auth's and outside the document; its client lives in the CLI and the console, never here.
@@ -78,7 +78,7 @@ The integration test runs by hand against that API, started with `ENVIRONMENT=de
 - Result variables carry the past participle of their operation: `fetchedChannel`, `resolvedError`.
 - Alphabetical ordering within a scope: imports, object keys, interface members, declarations of one kind.
 - Booleans carry `is` or `has`; a state with a moment is a timestamp such as `pausedAt`, never a boolean.
-- Error codes are `E_` plus SCREAMING_SNAKE, passed through verbatim, never renamed.
+- Every catalog value is lowercase snake_case with no prefix, error codes included: `not_found`, the client's own `unexpected_response`; a code is passed through verbatim, never renamed. Field, resource and method names stay camelCase.
 - Never the non-null assertion; nullish coalescing or a real check.
 - Test titles read `should <verb> …`, lowercase, conditions starting with `when`; one test per request and branch.
 

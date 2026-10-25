@@ -34,7 +34,7 @@ export class NotificationPreferencesResource {
   /**
    * One preference per category and each medium its notifications reach, the defaults included, in the catalog's order
    * and email first: the categories set for the account, or with `organizationId` those set per membership.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async list(
     options: ListNotificationPreferencesOptions = {},
@@ -48,7 +48,7 @@ export class NotificationPreferencesResource {
 
   /**
    * Sets one preference, the category and the medium, and answers it; a mandatory category's email is always on.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async update(
     options: UpdateNotificationPreferenceOptions,

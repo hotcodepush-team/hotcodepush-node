@@ -22,7 +22,7 @@ export class CustomerPortalSessionsResource {
   /**
    * A session of Polar's customer portal for the organization's invoices and payment method; an organization that never subscribed has none.
    * Each call creates another session and the API keeps no `Idempotency-Key` for it, so the call is never retried.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async create(
     options: CreateCustomerPortalSessionOptions,

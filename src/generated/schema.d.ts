@@ -205,7 +205,7 @@ export interface paths {
         };
         /**
          * List the audit log
-         * @description The organization's audit log, newest first; each row's `actorType`, written with the row, is `user` when a user acted and `system` when none did, its `userId` null. Filtered by `type` — `channel.created`, or `channel.*` for every action on the object — `actorType`, `userId`, `appId`, and `createdSince` and `createdUntil`, both inclusive; `?relations=app,user` embeds each row's app while the app is live and its user while the user is live. `?format=csv` answers every matching row as `text/csv`, unpaginated. Paying plans only.
+         * @description The organization's audit log, newest first, on a plan that includes it; each row's `actorType`, written with the row, is `user` when a user acted and `system` when none did, its `userId` null. Filtered by `type` — `channel.created`, or `channel.*` for every action on the object — `actorType`, `userId`, `appId`, and `createdSince` and `createdUntil`, both inclusive; `?relations=app,user` embeds each row's app while the app is live and its user while the user is live. `?format=csv` answers every matching row as `text/csv`, unpaginated.
          */
         get: operations["getV1OrganizationsByOrganizationIdAuditLogs"];
         put?: never;
@@ -225,7 +225,7 @@ export interface paths {
         };
         /**
          * Count the audit log
-         * @description The number of the organization's audit rows under the list's filters, which the list pages through. Paying plans only.
+         * @description On a plan that includes audit logs, the number of the organization's audit rows under the list's filters, which the list pages through.
          */
         get: operations["getV1OrganizationsByOrganizationIdAuditLogsCount"];
         put?: never;
@@ -450,7 +450,7 @@ export interface paths {
         get: operations["getV1OrganizationsByOrganizationIdSsoProvider"];
         /**
          * Set the SSO provider
-         * @description Sets the OIDC or SAML provider and its domain, replacing the one before; one per organization, paying plans only. A new or changed domain starts unverified, with a new token for its TXT record.
+         * @description Sets the OIDC or SAML provider and its domain, replacing the one before; one per organization, on a plan that includes single sign-on. A new or changed domain starts unverified, with a new token for its TXT record.
          */
         put: operations["putV1OrganizationsByOrganizationIdSsoProvider"];
         post?: never;
@@ -593,13 +593,13 @@ export interface paths {
         };
         /**
          * List the webhooks
-         * @description The organization's webhooks, newest first. Paying plans only.
+         * @description The organization's webhooks, newest first, on a plan that includes them.
          */
         get: operations["getV1OrganizationsByOrganizationIdWebhooks"];
         put?: never;
         /**
          * Create a webhook
-         * @description Creates a webhook: a name unique per organization case-insensitively, `E_WEBHOOK_NAME_TAKEN` otherwise; the `format`, `raw` for our JSON payload or `slack`, `discord` or `teams` for a message posted to that target's incoming-webhook URL; an https URL, never a loopback, private or HotCodePush host, refused under `https_required`, `host_forbidden` or `credentials_forbidden`; the audit `events` subscribed to, by type; and an optional app filter, one of the organization's live apps, refused under `invalid_value` otherwise. A `raw` webhook answers its signing `secret` this once, never again. Paying plans only.
+         * @description On a plan that includes webhooks, creates a webhook: a name unique per organization case-insensitively, `webhook_name_taken` otherwise; the `format`, `raw` for our JSON payload or `slack`, `discord` or `teams` for a message posted to that target's incoming-webhook URL; an https URL, never a loopback, private or HotCodePush host, refused under `https_required`, `host_forbidden` or `credentials_forbidden`; the audit `events` subscribed to, by type; and an optional app filter, one of the organization's live apps, refused under `invalid_value` otherwise. A `raw` webhook answers its signing `secret` this once, never again.
          */
         post: operations["postV1OrganizationsByOrganizationIdWebhooks"];
         delete?: never;
@@ -617,7 +617,7 @@ export interface paths {
         };
         /**
          * Count the webhooks
-         * @description The number of the organization's webhooks, which the list pages through. Paying plans only.
+         * @description On a plan that includes webhooks, the number of the organization's webhooks, which the list pages through.
          */
         get: operations["getV1OrganizationsByOrganizationIdWebhooksCount"];
         put?: never;
@@ -803,7 +803,7 @@ export interface paths {
         head?: never;
         /**
          * Update an organization
-         * @description Changes the name, the security settings and the spending cap. The security settings and the cap need a paying plan; an allowlist leaving out the caller's own address or country answers `E_VALIDATION` with the rule `excludes_caller`, and the region is read-only after creation. The cap, in whole dollars from $5 to $10,000, applies now: a raise counts the devices waiting beyond the previous cap in the order they reported, a cap below the MAU the month counted stops counting further devices while the counted ones stay billed; it mails Owner, Billing and the caller. Owner and Admin; Billing may send `spendingCapCents` alone.
+         * @description Changes the name, the security settings and the spending cap. The security settings and the cap need a plan that includes them; an allowlist leaving out the caller's own address or country answers `validation` with the rule `excludes_caller`, and the region is read-only after creation. The cap, in whole dollars from $5 to $10,000, applies now: a raise counts the devices waiting beyond the previous cap in the order they reported, a cap below the MAU the month counted stops counting further devices while the counted ones stay billed; it mails Owner, Billing and the caller. Owner and Admin; Billing may send `spendingCapCents` alone.
          */
         patch: operations["patchV1OrganizationsByOrganizationId"];
         trace?: never;
@@ -887,7 +887,7 @@ export interface paths {
         put?: never;
         /**
          * Create a bundle
-         * @description Creates the bundle from its manifest — platforms, version label, files with path, hash and size, fingerprint, git provenance — and answers the bundle row, `uploading` until completed; its files list with `isStored=false` names the hashes the app lacks, each put at `/v1/apps/{appId}/files/{sha256}`, and the pack goes to `…/bundles/{bundleId}/pack`. The signed content is the manifest the CLI builds from those fields with the signing key’s fingerprint as `keyId` — the files sorted by path and the platforms sorted, each by UTF-16 code units — as canonical JSON; `signature` covers those bytes and is verified here against the app’s keys, `E_SIGNATURE_INVALID` otherwise, and required once the app has a key, `E_SIGNATURE_REQUIRED`.
+         * @description Creates the bundle from its manifest — platforms, version label, files with path, hash and size, fingerprint, git provenance — and answers the bundle row, `uploading` until completed; its files list with `isStored=false` names the hashes the app lacks, each put at `/v1/apps/{appId}/files/{sha256}`, and the pack goes to `…/bundles/{bundleId}/pack`. The signed content is the manifest the CLI builds from those fields with the signing key’s fingerprint as `keyId` — the files sorted by path and the platforms sorted, each by UTF-16 code units — as canonical JSON; `signature` covers those bytes and is verified here against the app’s keys, `signature_invalid` otherwise, and required once the app has a key, `signature_required`.
          */
         post: operations["postV1AppsByAppIdBundles"];
         delete?: never;
@@ -1149,7 +1149,7 @@ export interface paths {
         };
         /**
          * Get a channel QR code
-         * @description The channel's deep link, the app's `channelLinkTemplate` with the channel id substituted, rendered as a QR image — SVG by default, PNG with `format=png` — cached an hour. No auth: the channel id is the capability and the content is never caller-chosen. `E_NOT_FOUND` while the template is unset.
+         * @description The channel's deep link, the app's `channelLinkTemplate` with the channel id substituted, rendered as a QR image — SVG by default, PNG with `format=png` — cached an hour. No auth: the channel id is the capability and the content is never caller-chosen. `not_found` while the template is unset.
          */
         get: operations["getV1AppsByAppIdChannelsByChannelIdQr"];
         put?: never;
@@ -1369,7 +1369,7 @@ export interface paths {
         };
         /**
          * Preview the audience of a release
-         * @description The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `fingerprint` values, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; `rolloutPercentage`, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` with the share of the channel's active devices whose SDK does not know a condition type asked for, and `FINGERPRINT_UNKNOWN` for each `fingerprint` no binary of the app carries once the app has a binary.
+         * @description The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `fingerprint` values, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; `rolloutPercentage`, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `unsupported_condition_share` with the share of the channel's active devices whose SDK does not know a condition type asked for, and `fingerprint_unknown` for each `fingerprint` no binary of the app carries once the app has a binary.
          */
         get: operations["getV1AppsByAppIdChannelsByChannelIdAudience"];
         put?: never;
@@ -1661,7 +1661,7 @@ export interface paths {
         };
         /**
          * Read the audience of a release
-         * @description The channel's devices seen in the last thirty days that the release's own conditions reach, evaluated over the registry the way the device evaluates the index — the stored attribute hashes and device-id hashes against the devices' values hashed the same way — and the release's rollout percentage as its estimated share; the release detail's audience, where the channel's preview takes the raw values the create dialog has. `warnings` carries `UNSUPPORTED_CONDITION_SHARE` for the condition types the channel's SDKs do not know, and `FINGERPRINT_UNKNOWN` for each fingerprint condition no binary of the app carries once the app has a binary.
+         * @description The channel's devices seen in the last thirty days that the release's own conditions reach, evaluated over the registry the way the device evaluates the index — the stored attribute hashes and device-id hashes against the devices' values hashed the same way — and the release's rollout percentage as its estimated share; the release detail's audience, where the channel's preview takes the raw values the create dialog has. `warnings` carries `unsupported_condition_share` for the condition types the channel's SDKs do not know, and `fingerprint_unknown` for each fingerprint condition no binary of the app carries once the app has a binary.
          */
         get: operations["getV1AppsByAppIdReleasesByReleaseIdAudience"];
         put?: never;
@@ -1916,7 +1916,7 @@ export interface paths {
         post?: never;
         /**
          * Delete sessions in bulk
-         * @description Ends the caller's sessions named by `ids`, the current one included, as revoking each one does; an id that is not one of the caller's sessions is skipped, so a retried call answers the same. `me` or the caller's own id, any other user answering `E_FORBIDDEN`.
+         * @description Ends the caller's sessions named by `ids`, the current one included, as revoking each one does; an id that is not one of the caller's sessions is skipped, so a retried call answers the same. `me` or the caller's own id, any other user answering `forbidden`.
          */
         delete: operations["deleteV1UsersByUserIdSessions"];
         options?: never;
@@ -1936,7 +1936,7 @@ export interface paths {
         post?: never;
         /**
          * Delete tokens in bulk
-         * @description Deletes the caller's API tokens named by `ids`, as deleting each one does; an id that is not one of the caller's tokens is skipped, so a retried call answers the same. `me` or the caller's own id, any other user answering `E_FORBIDDEN`.
+         * @description Deletes the caller's API tokens named by `ids`, as deleting each one does; an id that is not one of the caller's tokens is skipped, so a retried call answers the same. `me` or the caller's own id, any other user answering `forbidden`.
          */
         delete: operations["deleteV1UsersByUserIdTokens"];
         options?: never;
@@ -1953,14 +1953,14 @@ export interface paths {
         };
         /**
          * Get the user
-         * @description The caller behind the session or the API token. Profiles are private: `me` or the caller's own id, any other user answers `E_FORBIDDEN`. `?relations=accounts` embeds the caller's sign-in identities, `members` their member rows of live organizations, newest first, and `members,members.organization` each row's organization.
+         * @description The caller behind the session or the API token. Profiles are private: `me` or the caller's own id, any other user answers `forbidden`. `?relations=accounts` embeds the caller's sign-in identities, `members` their member rows of live organizations, newest first, and `members,members.organization` each row's organization.
          */
         get: operations["getV1UsersByUserId"];
         put?: never;
         post?: never;
         /**
          * Delete the account
-         * @description Soft-deletes the account: gone at once, hard-deleted after seven days by a job, restorable only by support within the window. The body carries the account's password, the one re-authentication of the API: a wrong one answers `E_FORBIDDEN`, and so does an account without a password, which sets one first. Refused while the user is the only Owner of an organization with other members; an organization with no other member is soft-deleted with the account.
+         * @description Soft-deletes the account: gone at once, hard-deleted after seven days by a job, restorable only by support within the window. The body carries the account's password, the one re-authentication of the API: a wrong one answers `forbidden`, and so does an account without a password, which sets one first. Refused while the user is the only Owner of an organization with other members; an organization with no other member is soft-deleted with the account.
          */
         delete: operations["deleteV1UsersByUserId"];
         options?: never;
@@ -1979,7 +1979,7 @@ export interface paths {
         put?: never;
         /**
          * Set the password
-         * @description Sets the first password of an account that signed up through GitHub, Google or SSO, so it signs in with its email too; the account's other sessions and its OAuth grants end and the password-changed mail follows. An account with a password changes it through the auth slice, and a member behind a verified SSO domain answers `E_SSO_REQUIRED`. `me` or the caller's own id, any other user answering `E_FORBIDDEN`.
+         * @description Sets the first password of an account that signed up through GitHub, Google or SSO, so it signs in with its email too; the account's other sessions and its OAuth grants end and the password-changed mail follows. An account with a password changes it through the auth slice, and a member behind a verified SSO domain answers `sso_required`. `me` or the caller's own id, any other user answering `forbidden`.
          */
         post: operations["postV1UsersByUserIdPassword"];
         delete?: never;
@@ -1995,7 +1995,7 @@ export interface components {
         /** @description The one error shape: a context-free code from the catalog, one sentence of what happened and what to do, and the field, rule and target of a failed validation in `details`. */
         Error: {
             /** @enum {string} */
-            code: "E_ACCOUNT_BANNED" | "E_APP_NAME_TAKEN" | "E_APPS_LIMIT_REACHED" | "E_AUTH_FLOW_FAILED" | "E_BINARY_CONFLICT" | "E_BUNDLE_IN_USE" | "E_BUNDLE_NOT_READY" | "E_BUNDLE_TOO_LARGE" | "E_CHANNEL_NAME_TAKEN" | "E_CHANNEL_PROTECTED" | "E_CHANNELS_PER_APP_LIMIT_REACHED" | "E_CLIENT_UPDATE_REQUIRED" | "E_COUNTRY_NOT_ALLOWED" | "E_DEFAULT_CHANNEL" | "E_DNS_LOOKUP_FAILED" | "E_FILES_PER_BUNDLE_LIMIT_REACHED" | "E_FORBIDDEN" | "E_HASH_MISMATCH" | "E_IDEMPOTENCY_KEY_REUSED" | "E_INTERNAL" | "E_INVITATION_INVALID" | "E_INVITATIONS_PER_DAY_LIMIT_REACHED" | "E_IP_NOT_ALLOWED" | "E_MAINTENANCE" | "E_MEMBERS_LIMIT_REACHED" | "E_NOT_FOUND" | "E_NOTIFICATION_MANDATORY" | "E_ORIGIN_UNTRUSTED" | "E_PASSWORD_ALREADY_SET" | "E_PLAN_REQUIRED" | "E_RATE_LIMITED" | "E_RELEASE_REVOKED" | "E_RELEASES_PER_DAY_LIMIT_REACHED" | "E_SIGNATURE_INVALID" | "E_SIGNATURE_REQUIRED" | "E_SOLE_OWNER" | "E_SSO_REQUIRED" | "E_STORAGE_LIMIT_REACHED" | "E_TOKENS_LIMIT_REACHED" | "E_TWO_FACTOR_REQUIRED" | "E_UNAUTHENTICATED" | "E_UPLOAD_INCOMPLETE" | "E_VALIDATION" | "E_WEBHOOK_NAME_TAKEN";
+            code: "account_banned" | "app_name_taken" | "apps_limit_reached" | "auth_flow_failed" | "binary_conflict" | "bundle_in_use" | "bundle_not_ready" | "bundle_too_large" | "channel_name_taken" | "channel_protected" | "channels_per_app_limit_reached" | "client_update_required" | "country_not_allowed" | "default_channel" | "dns_lookup_failed" | "files_per_bundle_limit_reached" | "forbidden" | "hash_mismatch" | "idempotency_key_reused" | "internal" | "invitation_invalid" | "invitations_per_day_limit_reached" | "ip_not_allowed" | "maintenance" | "members_limit_reached" | "not_found" | "notification_mandatory" | "origin_untrusted" | "password_already_set" | "plan_required" | "rate_limited" | "release_revoked" | "releases_per_day_limit_reached" | "signature_invalid" | "signature_required" | "sole_owner" | "sso_required" | "storage_limit_reached" | "tokens_limit_reached" | "two_factor_required" | "unauthenticated" | "upload_incomplete" | "validation" | "webhook_name_taken";
             details: {
                 [key: string]: unknown;
             } | null;
@@ -2004,7 +2004,7 @@ export interface components {
     };
     responses: never;
     parameters: {
-        /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+        /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
         ClientHeader: string;
     };
     requestBodies: never;
@@ -2021,7 +2021,7 @@ export interface operations {
                 relations?: "organization"[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -2062,7 +2062,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2071,7 +2071,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2080,7 +2080,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2089,7 +2089,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2098,7 +2098,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -2109,7 +2109,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -2118,7 +2118,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -2133,7 +2133,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -2152,7 +2152,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2161,7 +2161,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2170,7 +2170,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2179,7 +2179,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2188,7 +2188,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -2199,7 +2199,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -2208,7 +2208,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -2223,7 +2223,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -2262,7 +2262,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2271,7 +2271,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2280,7 +2280,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2289,7 +2289,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2298,7 +2298,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INVITATION_INVALID */
+            /** @description `invitation_invalid` */
             410: {
                 headers: {
                     [name: string]: unknown;
@@ -2307,7 +2307,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MEMBERS_LIMIT_REACHED */
+            /** @description `members_limit_reached` */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -2316,7 +2316,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -2327,7 +2327,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -2336,7 +2336,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -2353,7 +2353,7 @@ export interface operations {
                 organizationId?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -2377,7 +2377,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2386,7 +2386,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2395,7 +2395,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2404,7 +2404,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2413,7 +2413,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -2424,7 +2424,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -2433,7 +2433,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -2448,7 +2448,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -2484,7 +2484,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2493,7 +2493,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2502,7 +2502,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2511,7 +2511,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2520,7 +2520,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOTIFICATION_MANDATORY */
+            /** @description `notification_mandatory` */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -2529,7 +2529,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -2540,7 +2540,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -2549,7 +2549,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -2569,7 +2569,7 @@ export interface operations {
                 relations?: ("app" | "channel" | "memberUser" | "release")[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -2622,7 +2622,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2631,7 +2631,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2640,7 +2640,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2649,7 +2649,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2658,7 +2658,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -2669,7 +2669,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -2678,7 +2678,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -2693,7 +2693,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -2715,7 +2715,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2724,7 +2724,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2733,7 +2733,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2742,7 +2742,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2751,7 +2751,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -2762,7 +2762,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -2771,7 +2771,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -2788,7 +2788,7 @@ export interface operations {
                 isRead?: "false" | "true";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -2807,7 +2807,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2816,7 +2816,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2825,7 +2825,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2834,7 +2834,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2843,7 +2843,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -2854,7 +2854,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -2863,7 +2863,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -2878,7 +2878,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -2920,7 +2920,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2929,7 +2929,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2938,7 +2938,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2947,7 +2947,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2956,7 +2956,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -2967,7 +2967,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -2976,7 +2976,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -2995,7 +2995,7 @@ export interface operations {
                 query?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -3018,7 +3018,7 @@ export interface operations {
                         defaultChannelId: string | null;
                         deletedAt: string | null;
                         /** @enum {string} */
-                        framework: "capacitor" | "cordova" | "expo" | "react-native";
+                        framework: "capacitor" | "cordova" | "expo" | "react_native";
                         /** Format: uuid */
                         id: string;
                         name: string;
@@ -3030,7 +3030,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3039,7 +3039,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3048,7 +3048,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3057,7 +3057,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3066,7 +3066,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -3077,7 +3077,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -3086,7 +3086,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -3101,9 +3101,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
+                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `idempotency_key_reused`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -3115,7 +3115,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string} */
-                    framework: "capacitor" | "cordova" | "expo" | "react-native";
+                    framework: "capacitor" | "cordova" | "expo" | "react_native";
                     name: string;
                 };
             };
@@ -3134,7 +3134,7 @@ export interface operations {
                         defaultChannelId: string | null;
                         deletedAt: string | null;
                         /** @enum {string} */
-                        framework: "capacitor" | "cordova" | "expo" | "react-native";
+                        framework: "capacitor" | "cordova" | "expo" | "react_native";
                         /** Format: uuid */
                         id: string;
                         name: string;
@@ -3146,7 +3146,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3155,7 +3155,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3164,7 +3164,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3173,7 +3173,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3182,7 +3182,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_APP_NAME_TAKEN or E_IDEMPOTENCY_KEY_REUSED */
+            /** @description `app_name_taken` or `idempotency_key_reused` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -3191,7 +3191,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_APPS_LIMIT_REACHED */
+            /** @description `apps_limit_reached` */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -3200,7 +3200,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -3211,7 +3211,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -3220,7 +3220,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -3237,7 +3237,7 @@ export interface operations {
                 query?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -3258,7 +3258,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3267,7 +3267,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3276,7 +3276,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3285,7 +3285,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3294,7 +3294,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -3305,7 +3305,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -3314,7 +3314,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -3340,7 +3340,7 @@ export interface operations {
                 format?: "csv";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -3402,7 +3402,7 @@ export interface operations {
                     "text/csv": string;
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3411,7 +3411,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3420,7 +3420,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_PLAN_REQUIRED */
+            /** @description `plan_required` */
             402: {
                 headers: {
                     [name: string]: unknown;
@@ -3429,7 +3429,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3438,7 +3438,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3447,7 +3447,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -3458,7 +3458,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -3467,7 +3467,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -3489,7 +3489,7 @@ export interface operations {
                 userId?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -3510,7 +3510,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3519,7 +3519,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3528,7 +3528,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_PLAN_REQUIRED */
+            /** @description `plan_required` */
             402: {
                 headers: {
                     [name: string]: unknown;
@@ -3537,7 +3537,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3546,7 +3546,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3555,7 +3555,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -3566,7 +3566,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -3575,7 +3575,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -3590,7 +3590,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -3612,7 +3612,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3621,7 +3621,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3630,7 +3630,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3639,7 +3639,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3648,7 +3648,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -3659,7 +3659,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -3668,7 +3668,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -3683,7 +3683,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -3705,7 +3705,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3714,7 +3714,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3723,7 +3723,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3732,7 +3732,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3741,7 +3741,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -3752,7 +3752,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -3761,7 +3761,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -3782,7 +3782,7 @@ export interface operations {
                 status?: "pending";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -3820,7 +3820,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3829,7 +3829,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3838,7 +3838,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3847,7 +3847,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3856,7 +3856,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -3867,7 +3867,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -3876,7 +3876,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -3891,9 +3891,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
+                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `idempotency_key_reused`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -3943,7 +3943,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3952,7 +3952,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3961,7 +3961,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3970,7 +3970,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3979,7 +3979,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_IDEMPOTENCY_KEY_REUSED */
+            /** @description `idempotency_key_reused` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -3988,7 +3988,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INVITATIONS_PER_DAY_LIMIT_REACHED */
+            /** @description `invitations_per_day_limit_reached` */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -3997,7 +3997,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -4008,7 +4008,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -4017,7 +4017,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -4034,7 +4034,7 @@ export interface operations {
                 ids: string[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4051,7 +4051,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4060,7 +4060,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4069,7 +4069,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4078,7 +4078,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4087,7 +4087,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -4098,7 +4098,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -4107,7 +4107,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -4126,7 +4126,7 @@ export interface operations {
                 status?: "pending";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4147,7 +4147,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4156,7 +4156,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4165,7 +4165,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4174,7 +4174,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4183,7 +4183,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -4194,7 +4194,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -4203,7 +4203,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -4218,7 +4218,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4236,7 +4236,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4245,7 +4245,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4254,7 +4254,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4263,7 +4263,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4272,7 +4272,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -4283,7 +4283,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -4292,7 +4292,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -4307,7 +4307,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4332,7 +4332,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4341,7 +4341,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4350,7 +4350,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4359,7 +4359,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4368,7 +4368,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -4379,7 +4379,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -4388,7 +4388,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -4410,7 +4410,7 @@ export interface operations {
                 relations?: ("user" | "user.accounts")[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4466,7 +4466,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4475,7 +4475,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4484,7 +4484,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4493,7 +4493,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4502,7 +4502,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -4513,7 +4513,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -4522,7 +4522,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -4539,7 +4539,7 @@ export interface operations {
                 ids: string[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4556,7 +4556,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4565,7 +4565,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4574,7 +4574,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4583,7 +4583,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4592,7 +4592,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -4603,7 +4603,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -4612,7 +4612,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -4631,7 +4631,7 @@ export interface operations {
                 userId?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4652,7 +4652,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4661,7 +4661,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4670,7 +4670,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4679,7 +4679,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4688,7 +4688,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -4699,7 +4699,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -4708,7 +4708,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -4725,7 +4725,7 @@ export interface operations {
                 relations?: ("user" | "user.accounts")[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4782,7 +4782,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4791,7 +4791,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4800,7 +4800,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4809,7 +4809,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4818,7 +4818,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -4829,7 +4829,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -4838,7 +4838,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -4853,7 +4853,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4871,7 +4871,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4880,7 +4880,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4889,7 +4889,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4898,7 +4898,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4907,7 +4907,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_SOLE_OWNER */
+            /** @description `sole_owner` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -4916,7 +4916,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -4927,7 +4927,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -4936,7 +4936,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -4951,7 +4951,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4992,7 +4992,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5001,7 +5001,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5010,7 +5010,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5019,7 +5019,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5028,7 +5028,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -5039,7 +5039,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -5048,7 +5048,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -5063,7 +5063,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5099,7 +5099,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5108,7 +5108,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5117,7 +5117,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5126,7 +5126,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5135,7 +5135,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -5146,7 +5146,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -5155,7 +5155,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -5170,7 +5170,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5255,7 +5255,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5264,7 +5264,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5273,7 +5273,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_PLAN_REQUIRED */
+            /** @description `plan_required` */
             402: {
                 headers: {
                     [name: string]: unknown;
@@ -5282,7 +5282,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5291,7 +5291,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5300,7 +5300,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -5311,7 +5311,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -5320,7 +5320,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -5335,7 +5335,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5352,7 +5352,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5361,7 +5361,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5370,7 +5370,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5379,7 +5379,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5388,7 +5388,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -5399,7 +5399,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -5408,7 +5408,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -5423,7 +5423,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5459,7 +5459,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5468,7 +5468,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5477,7 +5477,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5486,7 +5486,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5495,7 +5495,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -5506,7 +5506,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -5515,7 +5515,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_DNS_LOOKUP_FAILED */
+            /** @description `dns_lookup_failed` */
             502: {
                 headers: {
                     [name: string]: unknown;
@@ -5524,7 +5524,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -5539,7 +5539,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5564,7 +5564,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5573,7 +5573,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5582,7 +5582,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5591,7 +5591,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5600,7 +5600,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -5611,7 +5611,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -5620,7 +5620,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -5635,7 +5635,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5652,7 +5652,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5661,7 +5661,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5670,7 +5670,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5679,7 +5679,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5688,7 +5688,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -5699,7 +5699,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -5708,7 +5708,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -5725,7 +5725,7 @@ export interface operations {
                 month?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5748,7 +5748,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5757,7 +5757,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5766,7 +5766,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5775,7 +5775,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5784,7 +5784,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -5795,7 +5795,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -5804,7 +5804,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -5825,7 +5825,7 @@ export interface operations {
                 format?: "csv";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5856,7 +5856,7 @@ export interface operations {
                     "text/csv": string;
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5865,7 +5865,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5874,7 +5874,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5883,7 +5883,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5892,7 +5892,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -5903,7 +5903,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -5912,7 +5912,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -5929,7 +5929,7 @@ export interface operations {
                 month?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5950,7 +5950,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5959,7 +5959,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5968,7 +5968,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5977,7 +5977,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5986,7 +5986,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -5997,7 +5997,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -6006,7 +6006,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -6024,7 +6024,7 @@ export interface operations {
                 offset?: number;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6060,7 +6060,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6069,7 +6069,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6078,7 +6078,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_PLAN_REQUIRED */
+            /** @description `plan_required` */
             402: {
                 headers: {
                     [name: string]: unknown;
@@ -6087,7 +6087,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6096,7 +6096,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -6105,7 +6105,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -6116,7 +6116,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -6125,7 +6125,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -6140,7 +6140,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6190,7 +6190,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6199,7 +6199,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6208,7 +6208,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_PLAN_REQUIRED */
+            /** @description `plan_required` */
             402: {
                 headers: {
                     [name: string]: unknown;
@@ -6217,7 +6217,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6226,7 +6226,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -6235,7 +6235,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_WEBHOOK_NAME_TAKEN */
+            /** @description `webhook_name_taken` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -6244,7 +6244,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -6255,7 +6255,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -6264,7 +6264,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -6279,7 +6279,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6300,7 +6300,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6309,7 +6309,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6318,7 +6318,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_PLAN_REQUIRED */
+            /** @description `plan_required` */
             402: {
                 headers: {
                     [name: string]: unknown;
@@ -6327,7 +6327,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6336,7 +6336,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -6345,7 +6345,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -6356,7 +6356,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -6365,7 +6365,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -6380,7 +6380,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6417,7 +6417,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6426,7 +6426,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6435,7 +6435,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_PLAN_REQUIRED */
+            /** @description `plan_required` */
             402: {
                 headers: {
                     [name: string]: unknown;
@@ -6444,7 +6444,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6453,7 +6453,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -6462,7 +6462,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -6473,7 +6473,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -6482,7 +6482,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -6497,7 +6497,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6515,7 +6515,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6524,7 +6524,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6533,7 +6533,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_PLAN_REQUIRED */
+            /** @description `plan_required` */
             402: {
                 headers: {
                     [name: string]: unknown;
@@ -6542,7 +6542,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6551,7 +6551,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -6560,7 +6560,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -6571,7 +6571,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -6580,7 +6580,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -6595,7 +6595,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6643,7 +6643,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6652,7 +6652,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6661,7 +6661,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_PLAN_REQUIRED */
+            /** @description `plan_required` */
             402: {
                 headers: {
                     [name: string]: unknown;
@@ -6670,7 +6670,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6679,7 +6679,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -6688,7 +6688,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_WEBHOOK_NAME_TAKEN */
+            /** @description `webhook_name_taken` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -6697,7 +6697,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -6708,7 +6708,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -6717,7 +6717,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -6732,7 +6732,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6769,7 +6769,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6778,7 +6778,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6787,7 +6787,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_PLAN_REQUIRED */
+            /** @description `plan_required` */
             402: {
                 headers: {
                     [name: string]: unknown;
@@ -6796,7 +6796,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6805,7 +6805,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -6814,7 +6814,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -6825,7 +6825,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -6834,7 +6834,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -6855,7 +6855,7 @@ export interface operations {
                 status?: "failed" | "pending" | "succeeded";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6892,7 +6892,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6901,7 +6901,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6910,7 +6910,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_PLAN_REQUIRED */
+            /** @description `plan_required` */
             402: {
                 headers: {
                     [name: string]: unknown;
@@ -6919,7 +6919,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6928,7 +6928,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -6937,7 +6937,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -6948,7 +6948,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -6957,7 +6957,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -6976,7 +6976,7 @@ export interface operations {
                 status?: "failed" | "pending" | "succeeded";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6998,7 +6998,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7007,7 +7007,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7016,7 +7016,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_PLAN_REQUIRED */
+            /** @description `plan_required` */
             402: {
                 headers: {
                     [name: string]: unknown;
@@ -7025,7 +7025,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7034,7 +7034,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7043,7 +7043,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -7054,7 +7054,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -7063,7 +7063,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -7078,7 +7078,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -7116,7 +7116,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7125,7 +7125,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7134,7 +7134,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_PLAN_REQUIRED */
+            /** @description `plan_required` */
             402: {
                 headers: {
                     [name: string]: unknown;
@@ -7143,7 +7143,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7152,7 +7152,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7161,7 +7161,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -7172,7 +7172,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -7181,7 +7181,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -7199,7 +7199,7 @@ export interface operations {
                 offset?: number;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -7256,7 +7256,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7265,7 +7265,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7274,7 +7274,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7283,7 +7283,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7292,7 +7292,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -7303,7 +7303,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -7312,7 +7312,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -7327,9 +7327,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
+                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `idempotency_key_reused`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -7392,7 +7392,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7401,7 +7401,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7410,7 +7410,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7419,7 +7419,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7428,7 +7428,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_IDEMPOTENCY_KEY_REUSED */
+            /** @description `idempotency_key_reused` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -7437,7 +7437,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -7448,7 +7448,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -7457,7 +7457,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -7472,7 +7472,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -7491,7 +7491,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7500,7 +7500,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7509,7 +7509,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7518,7 +7518,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7527,7 +7527,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -7538,7 +7538,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -7547,7 +7547,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -7562,7 +7562,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -7621,7 +7621,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7630,7 +7630,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7639,7 +7639,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7648,7 +7648,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7657,7 +7657,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -7668,7 +7668,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -7677,7 +7677,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -7692,7 +7692,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -7709,7 +7709,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7718,7 +7718,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7727,7 +7727,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7736,7 +7736,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7745,7 +7745,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -7756,7 +7756,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -7765,7 +7765,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -7780,7 +7780,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -7849,7 +7849,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7858,7 +7858,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7867,7 +7867,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_PLAN_REQUIRED */
+            /** @description `plan_required` */
             402: {
                 headers: {
                     [name: string]: unknown;
@@ -7876,7 +7876,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7885,7 +7885,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7894,7 +7894,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -7905,7 +7905,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -7914,7 +7914,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -7934,7 +7934,7 @@ export interface operations {
                 platform?: "android" | "ios";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -7969,7 +7969,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7978,7 +7978,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7987,7 +7987,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7996,7 +7996,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -8005,7 +8005,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -8016,7 +8016,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -8025,7 +8025,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -8040,9 +8040,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
+                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `idempotency_key_reused`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -8120,7 +8120,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -8129,7 +8129,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -8138,7 +8138,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8147,7 +8147,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -8156,7 +8156,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_BINARY_CONFLICT, E_UPLOAD_INCOMPLETE or E_IDEMPOTENCY_KEY_REUSED */
+            /** @description `binary_conflict`, `upload_incomplete` or `idempotency_key_reused` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -8165,7 +8165,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_BUNDLE_TOO_LARGE */
+            /** @description `bundle_too_large` */
             413: {
                 headers: {
                     [name: string]: unknown;
@@ -8174,7 +8174,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -8185,7 +8185,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -8194,7 +8194,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -8212,7 +8212,7 @@ export interface operations {
                 platform?: "android" | "ios";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -8233,7 +8233,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -8242,7 +8242,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -8251,7 +8251,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8260,7 +8260,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -8269,7 +8269,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -8280,7 +8280,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -8289,7 +8289,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -8304,7 +8304,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -8340,7 +8340,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -8349,7 +8349,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -8358,7 +8358,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8367,7 +8367,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -8376,7 +8376,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -8387,7 +8387,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -8396,7 +8396,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -8421,7 +8421,7 @@ export interface operations {
                 version?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -8445,7 +8445,7 @@ export interface operations {
                         expiresAt: string | null;
                         fingerprint: string | null;
                         /** @enum {string} */
-                        framework: "capacitor" | "cordova" | "expo" | "react-native";
+                        framework: "capacitor" | "cordova" | "expo" | "react_native";
                         gitMessage: string | null;
                         gitRef: string | null;
                         gitRemote: string | null;
@@ -8470,7 +8470,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -8479,7 +8479,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -8488,7 +8488,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8497,7 +8497,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -8506,7 +8506,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -8517,7 +8517,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -8526,7 +8526,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -8541,9 +8541,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
+                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `idempotency_key_reused`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -8598,7 +8598,7 @@ export interface operations {
                         expiresAt: string | null;
                         fingerprint: string | null;
                         /** @enum {string} */
-                        framework: "capacitor" | "cordova" | "expo" | "react-native";
+                        framework: "capacitor" | "cordova" | "expo" | "react_native";
                         gitMessage: string | null;
                         gitRef: string | null;
                         gitRemote: string | null;
@@ -8623,7 +8623,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_SIGNATURE_INVALID or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `signature_invalid` or `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -8632,7 +8632,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -8641,7 +8641,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8650,7 +8650,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -8659,7 +8659,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_IDEMPOTENCY_KEY_REUSED */
+            /** @description `idempotency_key_reused` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -8668,7 +8668,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_BUNDLE_TOO_LARGE */
+            /** @description `bundle_too_large` */
             413: {
                 headers: {
                     [name: string]: unknown;
@@ -8677,7 +8677,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_STORAGE_LIMIT_REACHED, E_FILES_PER_BUNDLE_LIMIT_REACHED or E_SIGNATURE_REQUIRED */
+            /** @description `storage_limit_reached`, `files_per_bundle_limit_reached` or `signature_required` */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -8686,7 +8686,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -8697,7 +8697,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -8706,7 +8706,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -8729,7 +8729,7 @@ export interface operations {
                 version?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -8750,7 +8750,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -8759,7 +8759,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -8768,7 +8768,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8777,7 +8777,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -8786,7 +8786,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -8797,7 +8797,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -8806,7 +8806,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -8821,7 +8821,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -8846,7 +8846,7 @@ export interface operations {
                         expiresAt: string | null;
                         fingerprint: string | null;
                         /** @enum {string} */
-                        framework: "capacitor" | "cordova" | "expo" | "react-native";
+                        framework: "capacitor" | "cordova" | "expo" | "react_native";
                         gitMessage: string | null;
                         gitRef: string | null;
                         gitRemote: string | null;
@@ -8871,7 +8871,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -8880,7 +8880,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -8889,7 +8889,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8898,7 +8898,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -8907,7 +8907,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -8918,7 +8918,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -8927,7 +8927,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -8942,7 +8942,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -8960,7 +8960,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -8969,7 +8969,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -8978,7 +8978,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8987,7 +8987,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -8996,7 +8996,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_BUNDLE_IN_USE */
+            /** @description `bundle_in_use` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -9005,7 +9005,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -9016,7 +9016,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -9025,7 +9025,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -9040,7 +9040,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -9065,7 +9065,7 @@ export interface operations {
                         expiresAt: string | null;
                         fingerprint: string | null;
                         /** @enum {string} */
-                        framework: "capacitor" | "cordova" | "expo" | "react-native";
+                        framework: "capacitor" | "cordova" | "expo" | "react_native";
                         gitMessage: string | null;
                         gitRef: string | null;
                         gitRemote: string | null;
@@ -9090,7 +9090,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_SIGNATURE_INVALID or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `signature_invalid` or `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -9099,7 +9099,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -9108,7 +9108,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9117,7 +9117,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -9126,7 +9126,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UPLOAD_INCOMPLETE */
+            /** @description `upload_incomplete` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -9135,7 +9135,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -9146,7 +9146,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -9155,7 +9155,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -9174,7 +9174,7 @@ export interface operations {
                 relations?: "baseBundle"[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -9200,7 +9200,7 @@ export interface operations {
                             expiresAt: string | null;
                             fingerprint: string | null;
                             /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
+                            framework: "capacitor" | "cordova" | "expo" | "react_native";
                             gitMessage: string | null;
                             gitRef: string | null;
                             gitRemote: string | null;
@@ -9240,7 +9240,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -9249,7 +9249,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -9258,7 +9258,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9267,7 +9267,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -9276,7 +9276,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -9287,7 +9287,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -9296,7 +9296,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -9311,7 +9311,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -9333,7 +9333,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -9342,7 +9342,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -9351,7 +9351,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9360,7 +9360,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -9369,7 +9369,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -9380,7 +9380,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -9389,7 +9389,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -9408,7 +9408,7 @@ export interface operations {
                 isStored?: "false" | "true";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -9439,7 +9439,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -9448,7 +9448,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -9457,7 +9457,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9466,7 +9466,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -9475,7 +9475,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -9486,7 +9486,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -9495,7 +9495,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -9512,7 +9512,7 @@ export interface operations {
                 isStored?: "false" | "true";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -9534,7 +9534,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -9543,7 +9543,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -9552,7 +9552,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9561,7 +9561,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -9570,7 +9570,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -9581,7 +9581,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -9590,7 +9590,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -9605,7 +9605,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -9632,7 +9632,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -9641,7 +9641,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -9650,7 +9650,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9659,7 +9659,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -9668,7 +9668,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_BUNDLE_TOO_LARGE */
+            /** @description `bundle_too_large` */
             413: {
                 headers: {
                     [name: string]: unknown;
@@ -9677,7 +9677,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_STORAGE_LIMIT_REACHED */
+            /** @description `storage_limit_reached` */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -9686,7 +9686,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -9697,7 +9697,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -9706,7 +9706,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -9721,7 +9721,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -9743,7 +9743,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -9752,7 +9752,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -9761,7 +9761,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9770,7 +9770,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -9779,7 +9779,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -9790,7 +9790,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -9799,7 +9799,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -9814,7 +9814,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -9844,7 +9844,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -9853,7 +9853,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -9862,7 +9862,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9871,7 +9871,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -9880,7 +9880,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UPLOAD_INCOMPLETE */
+            /** @description `upload_incomplete` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -9889,7 +9889,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_BUNDLE_TOO_LARGE */
+            /** @description `bundle_too_large` */
             413: {
                 headers: {
                     [name: string]: unknown;
@@ -9898,7 +9898,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_STORAGE_LIMIT_REACHED */
+            /** @description `storage_limit_reached` */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -9907,7 +9907,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -9918,7 +9918,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -9927,7 +9927,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -9942,7 +9942,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -9974,7 +9974,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -9983,7 +9983,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -9992,7 +9992,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10001,7 +10001,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -10010,7 +10010,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UPLOAD_INCOMPLETE */
+            /** @description `upload_incomplete` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -10019,7 +10019,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_BUNDLE_TOO_LARGE */
+            /** @description `bundle_too_large` */
             413: {
                 headers: {
                     [name: string]: unknown;
@@ -10028,7 +10028,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -10039,7 +10039,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -10048,7 +10048,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -10063,7 +10063,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10082,7 +10082,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -10091,7 +10091,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -10100,7 +10100,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10109,7 +10109,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -10118,7 +10118,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -10129,7 +10129,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -10138,7 +10138,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -10155,7 +10155,7 @@ export interface operations {
                 format?: "png" | "svg";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10176,7 +10176,7 @@ export interface operations {
                     "image/svg+xml": string;
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -10185,7 +10185,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -10194,7 +10194,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10203,7 +10203,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -10212,7 +10212,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -10223,7 +10223,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -10232,7 +10232,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -10251,7 +10251,7 @@ export interface operations {
                 query?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10288,7 +10288,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -10297,7 +10297,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -10306,7 +10306,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10315,7 +10315,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -10324,7 +10324,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -10335,7 +10335,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -10344,7 +10344,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -10359,9 +10359,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
+                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `idempotency_key_reused`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10410,7 +10410,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -10419,7 +10419,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -10428,7 +10428,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10437,7 +10437,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -10446,7 +10446,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_NAME_TAKEN or E_IDEMPOTENCY_KEY_REUSED */
+            /** @description `channel_name_taken` or `idempotency_key_reused` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -10455,7 +10455,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNELS_PER_APP_LIMIT_REACHED */
+            /** @description `channels_per_app_limit_reached` */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -10464,7 +10464,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -10475,7 +10475,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -10484,7 +10484,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -10501,7 +10501,7 @@ export interface operations {
                 ids: string[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10518,7 +10518,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -10527,7 +10527,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -10536,7 +10536,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `channel_protected` or `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10545,7 +10545,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -10554,7 +10554,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_DEFAULT_CHANNEL */
+            /** @description `default_channel` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -10563,7 +10563,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -10574,7 +10574,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -10583,7 +10583,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -10600,7 +10600,7 @@ export interface operations {
                 query?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10621,7 +10621,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -10630,7 +10630,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -10639,7 +10639,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10648,7 +10648,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -10657,7 +10657,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -10668,7 +10668,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -10677,7 +10677,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -10692,7 +10692,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10730,7 +10730,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -10739,7 +10739,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -10748,7 +10748,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10757,7 +10757,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -10766,7 +10766,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -10777,7 +10777,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -10786,7 +10786,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -10801,7 +10801,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10819,7 +10819,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -10828,7 +10828,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -10837,7 +10837,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `channel_protected` or `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10846,7 +10846,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -10855,7 +10855,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_DEFAULT_CHANNEL */
+            /** @description `default_channel` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -10864,7 +10864,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -10875,7 +10875,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -10884,7 +10884,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -10899,7 +10899,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10949,7 +10949,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -10958,7 +10958,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -10967,7 +10967,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `channel_protected` or `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -10976,7 +10976,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -10985,7 +10985,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_NAME_TAKEN or E_DEFAULT_CHANNEL */
+            /** @description `channel_name_taken` or `default_channel` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -10994,7 +10994,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -11005,7 +11005,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -11014,7 +11014,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -11029,7 +11029,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -11067,7 +11067,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -11076,7 +11076,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -11085,7 +11085,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `channel_protected` or `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11094,7 +11094,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -11103,7 +11103,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -11114,7 +11114,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -11123,7 +11123,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -11138,7 +11138,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -11176,7 +11176,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -11185,7 +11185,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -11194,7 +11194,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `channel_protected` or `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11203,7 +11203,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -11212,7 +11212,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -11223,7 +11223,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -11232,7 +11232,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -11252,7 +11252,7 @@ export interface operations {
                 relations?: ("bundle" | "channel" | "releaseCounters")[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -11335,7 +11335,7 @@ export interface operations {
                             expiresAt: string | null;
                             fingerprint: string | null;
                             /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
+                            framework: "capacitor" | "cordova" | "expo" | "react_native";
                             gitMessage: string | null;
                             gitRef: string | null;
                             gitRemote: string | null;
@@ -11395,7 +11395,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -11404,7 +11404,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -11413,7 +11413,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11422,7 +11422,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -11431,7 +11431,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -11442,7 +11442,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -11451,7 +11451,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -11466,9 +11466,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
+                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `idempotency_key_reused`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -11596,7 +11596,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -11605,7 +11605,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -11614,7 +11614,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `channel_protected` or `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11623,7 +11623,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -11632,7 +11632,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_BUNDLE_NOT_READY or E_IDEMPOTENCY_KEY_REUSED */
+            /** @description `bundle_not_ready` or `idempotency_key_reused` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -11641,7 +11641,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RELEASES_PER_DAY_LIMIT_REACHED or E_SIGNATURE_REQUIRED */
+            /** @description `releases_per_day_limit_reached` or `signature_required` */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -11650,7 +11650,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -11661,7 +11661,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -11670,7 +11670,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -11687,7 +11687,7 @@ export interface operations {
                 number?: number;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -11709,7 +11709,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -11718,7 +11718,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -11727,7 +11727,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11736,7 +11736,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -11745,7 +11745,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -11756,7 +11756,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -11765,7 +11765,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -11780,9 +11780,9 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `E_IDEMPOTENCY_KEY_REUSED`. A key is scoped to the caller. */
+                /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `idempotency_key_reused`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -11869,7 +11869,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -11878,7 +11878,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -11887,7 +11887,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `channel_protected` or `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -11896,7 +11896,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -11905,7 +11905,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RELEASE_REVOKED or E_IDEMPOTENCY_KEY_REUSED */
+            /** @description `release_revoked` or `idempotency_key_reused` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -11914,7 +11914,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RELEASES_PER_DAY_LIMIT_REACHED or E_SIGNATURE_REQUIRED */
+            /** @description `releases_per_day_limit_reached` or `signature_required` */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -11923,7 +11923,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -11934,7 +11934,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -11943,7 +11943,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -11958,7 +11958,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -12043,7 +12043,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -12052,7 +12052,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -12061,7 +12061,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `channel_protected` or `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12070,7 +12070,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -12079,7 +12079,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -12090,7 +12090,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -12099,7 +12099,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -12121,7 +12121,7 @@ export interface operations {
                 rolloutPercentage?: number;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -12152,7 +12152,7 @@ export interface operations {
                         reachedDeviceCount: number;
                         warnings: {
                             /** @enum {string} */
-                            code: "FINGERPRINT_UNKNOWN" | "UNSUPPORTED_CONDITION_SHARE";
+                            code: "fingerprint_unknown" | "unsupported_condition_share";
                             details: {
                                 [key: string]: unknown;
                             } | null;
@@ -12161,7 +12161,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -12170,7 +12170,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -12179,7 +12179,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12188,7 +12188,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -12197,7 +12197,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -12208,7 +12208,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -12217,7 +12217,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -12245,7 +12245,7 @@ export interface operations {
                 relations?: ("channel" | "currentRelease")[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -12369,7 +12369,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -12378,7 +12378,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -12387,7 +12387,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12396,7 +12396,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -12405,7 +12405,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -12416,7 +12416,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -12425,7 +12425,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -12442,7 +12442,7 @@ export interface operations {
                 ids: string[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -12459,7 +12459,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -12468,7 +12468,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -12477,7 +12477,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12486,7 +12486,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -12495,7 +12495,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -12506,7 +12506,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -12515,7 +12515,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -12540,7 +12540,7 @@ export interface operations {
                 sdkVersion?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -12561,7 +12561,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -12570,7 +12570,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -12579,7 +12579,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12588,7 +12588,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -12597,7 +12597,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -12608,7 +12608,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -12617,7 +12617,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -12634,7 +12634,7 @@ export interface operations {
                 relations?: ("channel" | "currentRelease")[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -12759,7 +12759,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -12768,7 +12768,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -12777,7 +12777,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12786,7 +12786,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -12795,7 +12795,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -12806,7 +12806,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -12815,7 +12815,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -12830,7 +12830,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -12848,7 +12848,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -12857,7 +12857,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -12866,7 +12866,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12875,7 +12875,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -12884,7 +12884,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -12895,7 +12895,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -12904,7 +12904,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -12923,7 +12923,7 @@ export interface operations {
                 releaseId?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -12955,7 +12955,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -12964,7 +12964,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -12973,7 +12973,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -12982,7 +12982,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -12991,7 +12991,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -13002,7 +13002,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -13011,7 +13011,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -13028,7 +13028,7 @@ export interface operations {
                 releaseId?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -13050,7 +13050,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -13059,7 +13059,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -13068,7 +13068,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13077,7 +13077,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -13086,7 +13086,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -13097,7 +13097,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -13106,7 +13106,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -13121,7 +13121,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -13173,7 +13173,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_HASH_MISMATCH or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `hash_mismatch` or `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -13182,7 +13182,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -13191,7 +13191,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13200,7 +13200,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -13209,7 +13209,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_BUNDLE_TOO_LARGE */
+            /** @description `bundle_too_large` */
             413: {
                 headers: {
                     [name: string]: unknown;
@@ -13218,7 +13218,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_STORAGE_LIMIT_REACHED */
+            /** @description `storage_limit_reached` */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -13227,7 +13227,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -13238,7 +13238,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -13247,7 +13247,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -13262,7 +13262,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -13284,7 +13284,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -13293,7 +13293,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -13302,7 +13302,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13311,7 +13311,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -13320,7 +13320,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -13331,7 +13331,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -13340,7 +13340,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -13355,7 +13355,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -13385,7 +13385,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -13394,7 +13394,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -13403,7 +13403,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13412,7 +13412,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -13421,7 +13421,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UPLOAD_INCOMPLETE */
+            /** @description `upload_incomplete` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -13430,7 +13430,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_BUNDLE_TOO_LARGE */
+            /** @description `bundle_too_large` */
             413: {
                 headers: {
                     [name: string]: unknown;
@@ -13439,7 +13439,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_STORAGE_LIMIT_REACHED */
+            /** @description `storage_limit_reached` */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -13448,7 +13448,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -13459,7 +13459,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -13468,7 +13468,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -13483,7 +13483,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -13540,7 +13540,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_HASH_MISMATCH or E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `hash_mismatch` or `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -13549,7 +13549,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -13558,7 +13558,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13567,7 +13567,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -13576,7 +13576,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UPLOAD_INCOMPLETE */
+            /** @description `upload_incomplete` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -13585,7 +13585,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_BUNDLE_TOO_LARGE */
+            /** @description `bundle_too_large` */
             413: {
                 headers: {
                     [name: string]: unknown;
@@ -13594,7 +13594,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -13605,7 +13605,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -13614,7 +13614,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -13629,7 +13629,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -13648,7 +13648,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -13657,7 +13657,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -13666,7 +13666,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13675,7 +13675,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -13684,7 +13684,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -13695,7 +13695,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -13704,7 +13704,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -13727,7 +13727,7 @@ export interface operations {
                 relations?: ("bundle" | "channel" | "releaseCounters")[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -13809,7 +13809,7 @@ export interface operations {
                             expiresAt: string | null;
                             fingerprint: string | null;
                             /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
+                            framework: "capacitor" | "cordova" | "expo" | "react_native";
                             gitMessage: string | null;
                             gitRef: string | null;
                             gitRemote: string | null;
@@ -13869,7 +13869,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -13878,7 +13878,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -13887,7 +13887,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13896,7 +13896,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -13905,7 +13905,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -13916,7 +13916,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -13925,7 +13925,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -13945,7 +13945,7 @@ export interface operations {
                 status?: "active" | "paused" | "revoked";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -13966,7 +13966,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -13975,7 +13975,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -13984,7 +13984,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -13993,7 +13993,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -14002,7 +14002,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -14013,7 +14013,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -14022,7 +14022,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -14039,7 +14039,7 @@ export interface operations {
                 relations?: ("bundle" | "channel" | "releaseCounters")[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -14122,7 +14122,7 @@ export interface operations {
                             expiresAt: string | null;
                             fingerprint: string | null;
                             /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react-native";
+                            framework: "capacitor" | "cordova" | "expo" | "react_native";
                             gitMessage: string | null;
                             gitRef: string | null;
                             gitRemote: string | null;
@@ -14182,7 +14182,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -14191,7 +14191,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -14200,7 +14200,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14209,7 +14209,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -14218,7 +14218,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -14229,7 +14229,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -14238,7 +14238,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -14253,7 +14253,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -14347,7 +14347,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -14356,7 +14356,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -14365,7 +14365,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `channel_protected` or `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14374,7 +14374,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -14383,7 +14383,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RELEASE_REVOKED */
+            /** @description `release_revoked` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -14392,7 +14392,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -14403,7 +14403,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -14412,7 +14412,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -14427,7 +14427,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -14458,7 +14458,7 @@ export interface operations {
                         reachedDeviceCount: number;
                         warnings: {
                             /** @enum {string} */
-                            code: "FINGERPRINT_UNKNOWN" | "UNSUPPORTED_CONDITION_SHARE";
+                            code: "fingerprint_unknown" | "unsupported_condition_share";
                             details: {
                                 [key: string]: unknown;
                             } | null;
@@ -14467,7 +14467,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -14476,7 +14476,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -14485,7 +14485,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14494,7 +14494,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -14503,7 +14503,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -14514,7 +14514,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -14523,7 +14523,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -14538,7 +14538,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -14616,7 +14616,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -14625,7 +14625,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -14634,7 +14634,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `channel_protected` or `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14643,7 +14643,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -14652,7 +14652,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RELEASE_REVOKED */
+            /** @description `release_revoked` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -14661,7 +14661,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -14672,7 +14672,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -14681,7 +14681,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -14696,7 +14696,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -14774,7 +14774,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -14783,7 +14783,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -14792,7 +14792,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `channel_protected` or `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14801,7 +14801,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -14810,7 +14810,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RELEASE_REVOKED */
+            /** @description `release_revoked` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -14819,7 +14819,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -14830,7 +14830,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -14839,7 +14839,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -14854,7 +14854,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -14932,7 +14932,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -14941,7 +14941,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -14950,7 +14950,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_CHANNEL_PROTECTED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `channel_protected` or `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14959,7 +14959,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -14968,7 +14968,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RELEASE_REVOKED */
+            /** @description `release_revoked` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -14977,7 +14977,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -14988,7 +14988,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -14997,7 +14997,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -15015,7 +15015,7 @@ export interface operations {
                 offset?: number;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -15045,7 +15045,7 @@ export interface operations {
                     }[];
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -15054,7 +15054,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -15063,7 +15063,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -15072,7 +15072,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -15081,7 +15081,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -15092,7 +15092,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -15101,7 +15101,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -15116,7 +15116,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -15172,7 +15172,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -15181,7 +15181,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -15190,7 +15190,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -15199,7 +15199,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -15208,7 +15208,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -15219,7 +15219,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -15228,7 +15228,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -15243,7 +15243,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -15264,7 +15264,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -15273,7 +15273,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -15282,7 +15282,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -15291,7 +15291,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -15300,7 +15300,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -15311,7 +15311,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -15320,7 +15320,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -15335,7 +15335,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -15353,7 +15353,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -15362,7 +15362,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -15371,7 +15371,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -15380,7 +15380,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -15389,7 +15389,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -15400,7 +15400,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -15409,7 +15409,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -15426,7 +15426,7 @@ export interface operations {
                 channelId?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -15488,7 +15488,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -15497,7 +15497,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -15506,7 +15506,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -15515,7 +15515,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -15524,7 +15524,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -15535,7 +15535,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -15544,7 +15544,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -15564,7 +15564,7 @@ export interface operations {
                 releaseId?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -15618,7 +15618,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -15627,7 +15627,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -15636,7 +15636,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -15645,7 +15645,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -15654,7 +15654,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -15665,7 +15665,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -15674,7 +15674,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -15692,7 +15692,7 @@ export interface operations {
                 periodUntil?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -15725,7 +15725,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -15734,7 +15734,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -15743,7 +15743,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -15752,7 +15752,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -15761,7 +15761,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -15772,7 +15772,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -15781,7 +15781,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -15796,7 +15796,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -15819,7 +15819,7 @@ export interface operations {
                         defaultChannelId: string | null;
                         deletedAt: string | null;
                         /** @enum {string} */
-                        framework: "capacitor" | "cordova" | "expo" | "react-native";
+                        framework: "capacitor" | "cordova" | "expo" | "react_native";
                         /** Format: uuid */
                         id: string;
                         name: string;
@@ -15831,7 +15831,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -15840,7 +15840,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -15849,7 +15849,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -15858,7 +15858,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -15867,7 +15867,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -15878,7 +15878,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -15887,7 +15887,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -15902,7 +15902,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -15919,7 +15919,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -15928,7 +15928,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -15937,7 +15937,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -15946,7 +15946,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -15955,7 +15955,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -15966,7 +15966,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -15975,7 +15975,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -15990,7 +15990,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -16005,7 +16005,7 @@ export interface operations {
                     /** Format: uuid */
                     defaultChannelId?: string;
                     /** @enum {string} */
-                    framework?: "capacitor" | "cordova" | "expo" | "react-native";
+                    framework?: "capacitor" | "cordova" | "expo" | "react_native";
                     name?: string;
                 };
             };
@@ -16024,7 +16024,7 @@ export interface operations {
                         defaultChannelId: string | null;
                         deletedAt: string | null;
                         /** @enum {string} */
-                        framework: "capacitor" | "cordova" | "expo" | "react-native";
+                        framework: "capacitor" | "cordova" | "expo" | "react_native";
                         /** Format: uuid */
                         id: string;
                         name: string;
@@ -16036,7 +16036,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -16045,7 +16045,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -16054,7 +16054,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -16063,7 +16063,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -16072,7 +16072,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_APP_NAME_TAKEN */
+            /** @description `app_name_taken` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -16081,7 +16081,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -16092,7 +16092,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -16101,7 +16101,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -16116,7 +16116,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -16146,7 +16146,7 @@ export interface operations {
                         defaultChannelId: string | null;
                         deletedAt: string | null;
                         /** @enum {string} */
-                        framework: "capacitor" | "cordova" | "expo" | "react-native";
+                        framework: "capacitor" | "cordova" | "expo" | "react_native";
                         /** Format: uuid */
                         id: string;
                         name: string;
@@ -16158,7 +16158,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -16167,7 +16167,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -16176,7 +16176,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -16185,7 +16185,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -16194,7 +16194,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_APP_NAME_TAKEN */
+            /** @description `app_name_taken` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -16203,7 +16203,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_APPS_LIMIT_REACHED or E_STORAGE_LIMIT_REACHED */
+            /** @description `apps_limit_reached` or `storage_limit_reached` */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -16212,7 +16212,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -16223,7 +16223,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -16232,7 +16232,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -16249,7 +16249,7 @@ export interface operations {
                 ids: string[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -16266,7 +16266,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -16275,7 +16275,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -16284,7 +16284,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -16293,7 +16293,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -16302,7 +16302,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -16313,7 +16313,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -16322,7 +16322,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -16339,7 +16339,7 @@ export interface operations {
                 ids: string[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -16356,7 +16356,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -16365,7 +16365,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -16374,7 +16374,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -16383,7 +16383,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -16392,7 +16392,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -16403,7 +16403,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -16412,7 +16412,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -16429,7 +16429,7 @@ export interface operations {
                 relations?: ("accounts" | "members" | "members.organization")[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -16536,7 +16536,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -16545,7 +16545,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -16554,7 +16554,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -16563,7 +16563,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -16572,7 +16572,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -16583,7 +16583,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -16592,7 +16592,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -16607,7 +16607,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -16630,7 +16630,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -16639,7 +16639,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -16648,7 +16648,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -16657,7 +16657,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -16666,7 +16666,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_SOLE_OWNER */
+            /** @description `sole_owner` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -16675,7 +16675,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -16686,7 +16686,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -16695,7 +16695,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -16710,7 +16710,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `E_CLIENT_UPDATE_REQUIRED`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -16733,7 +16733,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description E_VALIDATION, with the field, the rule and the target in `details`, or E_CLIENT_UPDATE_REQUIRED */
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -16742,7 +16742,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_UNAUTHENTICATED */
+            /** @description `unauthenticated` */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -16751,7 +16751,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_SSO_REQUIRED or E_FORBIDDEN, E_ACCOUNT_BANNED, E_ORIGIN_UNTRUSTED on a cookie-authenticated write from an untrusted origin, or E_IP_NOT_ALLOWED, E_COUNTRY_NOT_ALLOWED or E_TWO_FACTOR_REQUIRED inside an organization whose security settings refuse the request */
+            /** @description `sso_required` or `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -16760,7 +16760,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_NOT_FOUND */
+            /** @description `not_found` */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -16769,7 +16769,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_PASSWORD_ALREADY_SET */
+            /** @description `password_already_set` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -16778,7 +16778,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_RATE_LIMITED */
+            /** @description `rate_limited` */
             429: {
                 headers: {
                     /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
@@ -16789,7 +16789,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_INTERNAL */
+            /** @description `internal` */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -16798,7 +16798,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description E_MAINTENANCE */
+            /** @description `maintenance` */
             503: {
                 headers: {
                     [name: string]: unknown;

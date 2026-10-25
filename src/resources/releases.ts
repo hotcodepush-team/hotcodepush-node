@@ -138,7 +138,7 @@ export class ReleasesResource {
 
   /**
    * Revokes a release for good: devices on it move to the newest eligible older release or the embedded bundle.
-   * A repeat answers `E_RELEASE_REVOKED`, so the call is never retried.
+   * A repeat answers `release_revoked`, so the call is never retried.
    */
   public async revoke(options: RevokeReleaseOptions): Promise<ReleaseRow> {
     return this.httpClient.fetchJson({

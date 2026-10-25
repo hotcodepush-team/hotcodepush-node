@@ -83,7 +83,7 @@ export class MembersResource {
 
   /**
    * Removes a member; any member may remove themselves, which is leaving the organization.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async delete(options: DeleteMemberOptions): Promise<void> {
     await this.httpClient.fetchJson({
@@ -98,7 +98,7 @@ export class MembersResource {
   /**
    * Removes the organization's members named by `ids`, one to 100; an id of another organization is skipped,
    * and the Owner refuses the whole set.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async deleteMany(options: DeleteManyMembersOptions): Promise<void> {
     const { organizationId, ...query } = options;
@@ -139,7 +139,7 @@ export class MembersResource {
 
   /**
    * Changes a member's role; setting `owner` transfers the ownership.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async update(options: UpdateMemberOptions): Promise<MemberRow> {
     const { memberId, organizationId, ...body } = options;

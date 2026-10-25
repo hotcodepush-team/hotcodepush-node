@@ -13,7 +13,7 @@ export class ChannelQrResource {
 
   /**
    * The channel's deep link from the app's `channelLinkTemplate` as a QR image, SVG unless `format` is `png`;
-   * `E_NOT_FOUND` while the template is unset.
+   * `not_found` while the template is unset.
    */
   public async get(options: GetChannelQrOptions): Promise<Blob> {
     const { appId, channelId, ...query } = options;

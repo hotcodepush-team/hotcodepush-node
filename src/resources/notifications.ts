@@ -55,7 +55,7 @@ export class NotificationsResource {
 
   /**
    * The number of the caller's notifications under the list's filters; `isRead: 'false'` is the bell's badge.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async count(options: CountNotificationsOptions = {}): Promise<Count> {
     return this.httpClient.fetchJson({
@@ -67,7 +67,7 @@ export class NotificationsResource {
 
   /**
    * The caller's notifications, newest first.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async list(
     options: ListNotificationsOptions = {},
@@ -81,7 +81,7 @@ export class NotificationsResource {
 
   /**
    * Marks one of the caller's notifications read.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async update(
     options: UpdateNotificationOptions,
@@ -98,7 +98,7 @@ export class NotificationsResource {
 
   /**
    * Marks every unread notification of the caller read.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async updateMany(
     options: UpdateManyNotificationsOptions,

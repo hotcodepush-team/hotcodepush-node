@@ -94,7 +94,7 @@ export class OrganizationsResource {
 
   /**
    * Creates an organization with the caller as its Owner.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async create(
     options: CreateOrganizationOptions,
@@ -109,7 +109,7 @@ export class OrganizationsResource {
 
   /**
    * Soft-deletes an organization with everything under it: gone at once, hard-deleted after seven days.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async delete(options: DeleteOrganizationOptions): Promise<void> {
     await this.httpClient.fetchJson({
@@ -139,7 +139,7 @@ export class OrganizationsResource {
   }
 
   /**
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async update(
     options: UpdateOrganizationOptions,

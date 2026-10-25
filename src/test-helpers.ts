@@ -1,6 +1,8 @@
 import { vi } from 'vitest';
 import type { Mock } from 'vitest';
 
+import type { ErrorBody } from './types';
+
 export interface SentRequest {
   body: unknown;
   headers: Record<string, string>;
@@ -87,7 +89,7 @@ export function stubFetch(
 
 /**
  * Replaces the global `fetch` with the API's side of a multipart upload: the upload id on its start, each part's number
- * in its etag, `E_UPLOAD_INCOMPLETE` for the failed part, `E_NOT_FOUND` on its deletion and the completed body on its completion.
+ * in its etag, `upload_incomplete` for the failed part, `not_found` on its deletion and the completed body on its completion.
  */
 export function stubMultipartUploadFetch(
   completedBody: unknown,
@@ -98,13 +100,19 @@ export function stubMultipartUploadFetch(
     const partNumber = Number(/\/parts\/(\d+)$/.exec(pathname)?.[1]);
     if (init?.method === 'DELETE') {
       return Response.json(
-        { code: 'E_NOT_FOUND', message: 'The upload does not exist.' },
+        {
+          code: 'not_found',
+          message: 'The upload does not exist.',
+        } satisfies ErrorBody,
         { status: 404 },
       );
     }
     if (init?.method === 'PUT' && partNumber === failedPartNumber) {
       return Response.json(
-        { code: 'E_UPLOAD_INCOMPLETE', message: 'The part was refused.' },
+        {
+          code: 'upload_incomplete',
+          message: 'The part was refused.',
+        } satisfies ErrorBody,
         { status: 409 },
       );
     }

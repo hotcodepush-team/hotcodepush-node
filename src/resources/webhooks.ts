@@ -72,7 +72,7 @@ export type Webhook = JsonResponseBody<
 >;
 
 /**
- * The organization's webhooks, for Admins and Owners on a paying plan; any other plan answers `E_PLAN_REQUIRED`.
+ * The organization's webhooks, for Admins and Owners on a paying plan; any other plan answers `plan_required`.
  */
 export class WebhooksResource {
   public readonly deliveries: WebhookDeliveriesResource;
@@ -83,7 +83,7 @@ export class WebhooksResource {
 
   /**
    * The number of the organization's webhooks.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async count(options: CountWebhooksOptions): Promise<Count> {
     return this.httpClient.fetchJson({
@@ -96,9 +96,9 @@ export class WebhooksResource {
   }
 
   /**
-   * Creates a webhook, its name unique in the organization, `E_WEBHOOK_NAME_TAKEN` otherwise; a `raw` webhook answers its secret this once.
-   * The API keeps no `Idempotency-Key` for it and a repeat answers `E_WEBHOOK_NAME_TAKEN`, so the call is never retried.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * Creates a webhook, its name unique in the organization, `webhook_name_taken` otherwise; a `raw` webhook answers its secret this once.
+   * The API keeps no `Idempotency-Key` for it and a repeat answers `webhook_name_taken`, so the call is never retried.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async create(options: CreateWebhookOptions): Promise<CreatedWebhook> {
     const { organizationId, ...body } = options;
@@ -113,7 +113,7 @@ export class WebhooksResource {
 
   /**
    * Deletes the webhook with its delivery log.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async delete(options: DeleteWebhookOptions): Promise<void> {
     await this.httpClient.fetchJson({
@@ -126,7 +126,7 @@ export class WebhooksResource {
   }
 
   /**
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async get(options: GetWebhookOptions): Promise<Webhook> {
     return this.httpClient.fetchJson({
@@ -140,7 +140,7 @@ export class WebhooksResource {
 
   /**
    * The organization's webhooks, newest first.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async list(options: ListWebhooksOptions): Promise<Webhook[]> {
     const { organizationId, ...query } = options;
@@ -156,7 +156,7 @@ export class WebhooksResource {
   /**
    * Sends one sample event, `webhook.test`, through the webhook's delivery path within the request and answers the settled delivery.
    * Each call sends another sample event, so the call is never retried.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async test(options: TestWebhookOptions): Promise<WebhookDelivery> {
     return this.httpClient.fetchJson({
@@ -171,7 +171,7 @@ export class WebhooksResource {
   /**
    * Changes the name, the URL, the subscribed `events`, the app filter or `isEnabled`; the format and the secret never change.
    * Setting `isEnabled` on a webhook disabled after fifty consecutive failed deliveries starts its count again.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async update(options: UpdateWebhookOptions): Promise<Webhook> {
     const { organizationId, webhookId, ...body } = options;

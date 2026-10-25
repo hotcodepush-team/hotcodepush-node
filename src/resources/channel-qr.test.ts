@@ -2,6 +2,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { HotCodePush } from '../client';
 import { resolveSentRequest, stubFetch } from '../test-helpers';
+import type { ErrorBody } from '../types';
 
 const QR_URL = 'https://api.hotcodepush.com/v1/apps/app/channels/channel/qr';
 
@@ -29,10 +30,13 @@ describe('ChannelQrResource', () => {
     });
   });
 
-  test('should throw E_NOT_FOUND when the app has no channel link template', async () => {
+  test('should throw not_found when the app has no channel link template', async () => {
     stubFetch(() =>
       Response.json(
-        { code: 'E_NOT_FOUND', message: 'The channel link is not set.' },
+        {
+          code: 'not_found',
+          message: 'The channel link is not set.',
+        } satisfies ErrorBody,
         { status: 404 },
       ),
     );
@@ -42,6 +46,6 @@ describe('ChannelQrResource', () => {
         appId: 'app',
         channelId: 'channel',
       }),
-    ).rejects.toMatchObject({ code: 'E_NOT_FOUND', status: 404 });
+    ).rejects.toMatchObject({ code: 'not_found', status: 404 });
   });
 });

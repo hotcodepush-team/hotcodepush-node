@@ -56,7 +56,7 @@ export class OrganizationInvitationsResource {
 
   /**
    * The number of the organization's invitations under the list's filters.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async count(options: CountInvitationsOptions): Promise<Count> {
     const { organizationId, ...query } = options;
@@ -72,7 +72,7 @@ export class OrganizationInvitationsResource {
 
   /**
    * Invites an address to the organization; the invitation mail carries the token.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async create(
     options: CreateInvitationOptions,
@@ -89,7 +89,7 @@ export class OrganizationInvitationsResource {
 
   /**
    * Withdraws an invitation.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async delete(options: DeleteInvitationOptions): Promise<void> {
     await this.httpClient.fetchJson({
@@ -103,7 +103,7 @@ export class OrganizationInvitationsResource {
 
   /**
    * Withdraws the organization's invitations named by `ids`, one to 100; an id of another organization is skipped.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async deleteMany(
     options: DeleteManyInvitationsOptions,
@@ -120,7 +120,7 @@ export class OrganizationInvitationsResource {
 
   /**
    * The organization's invitations, newest first.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async list(options: ListInvitationsOptions): Promise<InvitationRow[]> {
     const { organizationId, ...query } = options;

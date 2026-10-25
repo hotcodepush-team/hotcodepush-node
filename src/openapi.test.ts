@@ -828,7 +828,7 @@ const SESSION_ONLY_METHODS: readonly string[] = [
 ];
 
 const SESSION_ONLY_NOTE =
-  'An API token answers `E_FORBIDDEN`; sign in with a session.';
+  'An API token answers `forbidden`; sign in with a session.';
 
 /**
  * `/health` is outside the document by the path rule.

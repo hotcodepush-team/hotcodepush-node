@@ -20,7 +20,7 @@ export class LimitsResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async get(options: GetLimitsOptions): Promise<Limits> {
     return this.httpClient.fetchJson({

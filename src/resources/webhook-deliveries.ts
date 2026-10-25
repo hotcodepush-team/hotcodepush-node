@@ -48,7 +48,7 @@ export class WebhookDeliveriesResource {
 
   /**
    * The number of the webhook's deliveries under the list's filters.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async count(options: CountWebhookDeliveriesOptions): Promise<Count> {
     const { organizationId, webhookId, ...query } = options;
@@ -64,7 +64,7 @@ export class WebhookDeliveriesResource {
 
   /**
    * The webhook's deliveries, newest first, filtered by `status` and by `createdSince` and `createdUntil`, both inclusive.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async list(
     options: ListWebhookDeliveriesOptions,
@@ -83,7 +83,7 @@ export class WebhookDeliveriesResource {
   /**
    * Delivers the event again, once, within the request, and answers the settled delivery, its attempt count carried on.
    * Each call makes another attempt, so the call is never retried.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async redeliver(
     options: RedeliverWebhookDeliveryOptions,

@@ -24,7 +24,7 @@ export class CheckoutsResource {
    * editable on Polar's page; the subscription arrives once it is paid, names the organization, and starts at the $5
    * minimum spending cap, which the customer raises afterwards.
    * Each call creates another checkout and the API keeps no `Idempotency-Key` for it, so the call is never retried.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async create(options: CreateCheckoutOptions): Promise<Checkout> {
     return this.httpClient.fetchJson({

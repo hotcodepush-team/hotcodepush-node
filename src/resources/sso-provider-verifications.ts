@@ -13,9 +13,9 @@ export class SsoProviderVerificationsResource {
 
   /**
    * Looks up the domain's TXT record for the provider's `domainVerificationToken` and sets `domainVerified` when the record carries it;
-   * the answer is the provider, verified or still waiting for the record, and a resolver that cannot be asked answers `E_DNS_LOOKUP_FAILED`.
+   * the answer is the provider, verified or still waiting for the record, and a resolver that cannot be asked answers `dns_lookup_failed`.
    * A verified provider answers unchanged without a lookup, so the call is retried.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async create(
     options: CreateSsoProviderVerificationOptions,

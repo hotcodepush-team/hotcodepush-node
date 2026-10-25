@@ -31,8 +31,8 @@ export class InvitationsResource {
 
   /**
    * Accepts an invitation addressed to the caller with the token from its mail.
-   * A repeat answers `E_INVITATION_INVALID`, so the call is never retried.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * A repeat answers `invitation_invalid`, so the call is never retried.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async accept(options: AcceptInvitationOptions): Promise<MemberRow> {
     const { invitationId, ...body } = options;
@@ -47,7 +47,7 @@ export class InvitationsResource {
 
   /**
    * The number of the caller's pending invitations across organizations.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async count(): Promise<Count> {
     return this.httpClient.fetchJson({
@@ -58,7 +58,7 @@ export class InvitationsResource {
 
   /**
    * The caller's pending invitations across organizations, newest first; `relations: ['organization']` embeds each one's organization as its id and name.
-   * An API token answers `E_FORBIDDEN`; sign in with a session.
+   * An API token answers `forbidden`; sign in with a session.
    */
   public async list(
     options: ListCallerInvitationsOptions = {},

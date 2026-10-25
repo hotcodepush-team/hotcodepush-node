@@ -100,7 +100,7 @@ describe('FilesResource', () => {
     });
 
     await expect(uploadPromise).rejects.toMatchObject({
-      code: 'E_UPLOAD_INCOMPLETE',
+      code: 'upload_incomplete',
       status: 409,
     });
     expect(resolveSentMethodsAndUrls(fetchMock)).toEqual([

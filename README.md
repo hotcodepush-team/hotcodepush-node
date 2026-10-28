@@ -24,7 +24,10 @@ const app = await hotCodePush.organizations.apps.create({
   name: 'Demo',
   organizationId: '<organization id>',
 });
-const channel = await hotCodePush.apps.channels.create({ appId: app.id, name: 'staging' });
+const channel = await hotCodePush.apps.channels.create({
+  appId: app.id,
+  name: 'staging',
+});
 await hotCodePush.apps.channels.pause({ appId: app.id, channelId: channel.id });
 ```
 

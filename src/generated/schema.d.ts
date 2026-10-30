@@ -925,14 +925,14 @@ export interface paths {
         };
         /**
          * Get a bundle
-         * @description One bundle; while it is in use nowhere, `expiresAt` is `unusedSince` plus the organization's retention, written with it; its delta packs are the `deltas` list beside it.
+         * @description One bundle; while it is in use nowhere, `expiresAt` is `unusedSince` plus the organization's retention, written with it; its deltas are the `deltas` list beside it.
          */
         get: operations["getV1AppsByAppIdBundlesByBundleId"];
         put?: never;
         post?: never;
         /**
          * Delete a bundle
-         * @description Deletes the bundle now, not by retention: refused while a release serves it or a binary ships it; its manifest, pack and delta packs go with it, and the files no other bundle of the app lists.
+         * @description Deletes the bundle now, not by retention: refused while a release serves it or a binary ships it; its manifest, pack and deltas go with it, and the files no other bundle of the app lists.
          */
         delete: operations["deleteV1AppsByAppIdBundlesByBundleId"];
         options?: never;
@@ -951,7 +951,7 @@ export interface paths {
         put?: never;
         /**
          * Complete a bundle
-         * @description Verifies every listed file is stored and the pack is present, rebuilds the signed manifest from the rows and checks its signature against the app's keys again, writes the envelope at the bundle's key — the manifest, the signature and, unsigned beside them, the bundle's id and creation time and the pack with its URL and stored size, the delta list empty since the platform builds the delta packs and devices reach them through the delta route — and sets `ready`; a completed bundle answers itself again.
+         * @description Verifies every listed file is stored and the pack is present, rebuilds the signed manifest from the rows and checks its signature against the app's keys again, writes the envelope at the bundle's key — the manifest, the signature and, unsigned beside them, the bundle's id and creation time and the pack with its URL and stored size, the delta list empty since the platform builds the deltas and devices reach them through the delta route — and sets `ready`; a completed bundle answers itself again.
          */
         post: operations["postV1AppsByAppIdBundlesByBundleIdComplete"];
         delete?: never;
@@ -968,8 +968,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List the delta packs of a bundle
-         * @description The bundle's delta packs, one per base its devices run, newest first, each with its status — `requested`, `built` or `failed` — and, once built, its size and its patch count; `?relations=baseBundle` embeds the base, whose number is null for a binary's bundle.
+         * List the deltas of a bundle
+         * @description The bundle's deltas, one per base its devices run, newest first, each with its status — `requested`, `built` or `failed` — and, once built, its size and its patch count; `?relations=baseBundle` embeds the base, whose number is null for a binary's bundle.
          */
         get: operations["getV1AppsByAppIdBundlesByBundleIdDeltas"];
         put?: never;
@@ -988,8 +988,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Count the delta packs of a bundle
-         * @description The number of the bundle's delta packs, which the list pages through.
+         * Count the deltas of a bundle
+         * @description The number of the bundle's deltas, which the list pages through.
          */
         get: operations["getV1AppsByAppIdBundlesByBundleIdDeltasCount"];
         put?: never;
@@ -1009,7 +1009,7 @@ export interface paths {
         };
         /**
          * List the files of a bundle
-         * @description The bundle's files, ordered by path, each with its content hash, its uncompressed size and `storedAt`, when the app's store held the hash; an embedded bundle answers the files its binary was created with. `isStored=false` selects the files still to upload after the bundle's create. `limit` goes up to 1000, beyond every other list's 100, since a tool reads the whole list of each base bundle it builds a delta pack against.
+         * @description The bundle's files, ordered by path, each with its content hash, its uncompressed size and `storedAt`, when the app's store held the hash; an embedded bundle answers the files its binary was created with. `isStored=false` selects the files still to upload after the bundle's create. `limit` goes up to 1000, beyond every other list's 100, since a tool reads the whole list of each base bundle it builds a delta against.
          */
         get: operations["getV1AppsByAppIdBundlesByBundleIdFiles"];
         put?: never;
@@ -9185,7 +9185,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description The delta packs. */
+            /** @description The deltas. */
             200: {
                 headers: {
                     [name: string]: unknown;

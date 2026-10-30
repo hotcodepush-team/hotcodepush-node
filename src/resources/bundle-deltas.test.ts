@@ -11,7 +11,7 @@ afterEach(() => {
 });
 
 describe('BundleDeltasResource', () => {
-  test("should count the bundle's delta packs", async () => {
+  test("should count the bundle's deltas", async () => {
     const fetchMock = stubFetch(() => Response.json({ count: 2 }));
 
     const fetchedCount = await new HotCodePush().apps.bundles.deltas.count({
@@ -26,21 +26,21 @@ describe('BundleDeltasResource', () => {
     });
   });
 
-  test("should list the bundle's delta packs with their base bundles", async () => {
-    const deltaPack = {
+  test("should list the bundle's deltas with their base bundles", async () => {
+    const delta = {
       baseBundle: { id: 'base', number: 16 },
       baseBundleId: 'base',
       status: 'built',
     };
-    const fetchMock = stubFetch(() => Response.json([deltaPack]));
+    const fetchMock = stubFetch(() => Response.json([delta]));
 
-    const fetchedDeltaPacks = await new HotCodePush().apps.bundles.deltas.list({
+    const fetchedDeltas = await new HotCodePush().apps.bundles.deltas.list({
       appId: 'app',
       bundleId: 'bundle',
       relations: ['baseBundle'],
     });
 
-    expect(fetchedDeltaPacks).toEqual([deltaPack]);
+    expect(fetchedDeltas).toEqual([delta]);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${DELTAS_URL}?relations=baseBundle`,

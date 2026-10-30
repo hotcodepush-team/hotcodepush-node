@@ -13853,7 +13853,7 @@
     "/v1/apps/{appId}/bundles/{bundleId}": {
       "get": {
         "operationId": "getV1AppsByAppIdBundlesByBundleId",
-        "description": "One bundle; while it is in use nowhere, `expiresAt` is `unusedSince` plus the organization's retention, written with it; its delta packs are the `deltas` list beside it.",
+        "description": "One bundle; while it is in use nowhere, `expiresAt` is `unusedSince` plus the organization's retention, written with it; its deltas are the `deltas` list beside it.",
         "responses": {
           "200": {
             "content": {
@@ -14151,7 +14151,7 @@
       },
       "delete": {
         "operationId": "deleteV1AppsByAppIdBundlesByBundleId",
-        "description": "Deletes the bundle now, not by retention: refused while a release serves it or a binary ships it; its manifest, pack and delta packs go with it, and the files no other bundle of the app lists.",
+        "description": "Deletes the bundle now, not by retention: refused while a release serves it or a binary ships it; its manifest, pack and deltas go with it, and the files no other bundle of the app lists.",
         "responses": {
           "204": {
             "description": "The bundle is gone."
@@ -14277,7 +14277,7 @@
     "/v1/apps/{appId}/bundles/{bundleId}/complete": {
       "post": {
         "operationId": "postV1AppsByAppIdBundlesByBundleIdComplete",
-        "description": "Verifies every listed file is stored and the pack is present, rebuilds the signed manifest from the rows and checks its signature against the app's keys again, writes the envelope at the bundle's key — the manifest, the signature and, unsigned beside them, the bundle's id and creation time and the pack with its URL and stored size, the delta list empty since the platform builds the delta packs and devices reach them through the delta route — and sets `ready`; a completed bundle answers itself again.",
+        "description": "Verifies every listed file is stored and the pack is present, rebuilds the signed manifest from the rows and checks its signature against the app's keys again, writes the envelope at the bundle's key — the manifest, the signature and, unsigned beside them, the bundle's id and creation time and the pack with its URL and stored size, the delta list empty since the platform builds the deltas and devices reach them through the delta route — and sets `ready`; a completed bundle answers itself again.",
         "responses": {
           "200": {
             "content": {
@@ -14587,7 +14587,7 @@
     "/v1/apps/{appId}/bundles/{bundleId}/deltas": {
       "get": {
         "operationId": "getV1AppsByAppIdBundlesByBundleIdDeltas",
-        "description": "The bundle's delta packs, one per base its devices run, newest first, each with its status — `requested`, `built` or `failed` — and, once built, its size and its patch count; `?relations=baseBundle` embeds the base, whose number is null for a binary's bundle.",
+        "description": "The bundle's deltas, one per base its devices run, newest first, each with its status — `requested`, `built` or `failed` — and, once built, its size and its patch count; `?relations=baseBundle` embeds the base, whose number is null for a binary's bundle.",
         "responses": {
           "200": {
             "content": {
@@ -14849,7 +14849,7 @@
                 }
               }
             },
-            "description": "The delta packs."
+            "description": "The deltas."
           },
           "400": {
             "content": {
@@ -14930,7 +14930,7 @@
             "description": "`maintenance`"
           }
         },
-        "summary": "List the delta packs of a bundle",
+        "summary": "List the deltas of a bundle",
         "tags": [
           "Bundles"
         ],
@@ -14995,7 +14995,7 @@
     "/v1/apps/{appId}/bundles/{bundleId}/deltas/count": {
       "get": {
         "operationId": "getV1AppsByAppIdBundlesByBundleIdDeltasCount",
-        "description": "The number of the bundle's delta packs, which the list pages through.",
+        "description": "The number of the bundle's deltas, which the list pages through.",
         "responses": {
           "200": {
             "content": {
@@ -15096,7 +15096,7 @@
             "description": "`maintenance`"
           }
         },
-        "summary": "Count the delta packs of a bundle",
+        "summary": "Count the deltas of a bundle",
         "tags": [
           "Bundles"
         ],
@@ -15128,7 +15128,7 @@
     "/v1/apps/{appId}/bundles/{bundleId}/files": {
       "get": {
         "operationId": "getV1AppsByAppIdBundlesByBundleIdFiles",
-        "description": "The bundle's files, ordered by path, each with its content hash, its uncompressed size and `storedAt`, when the app's store held the hash; an embedded bundle answers the files its binary was created with. `isStored=false` selects the files still to upload after the bundle's create. `limit` goes up to 1000, beyond every other list's 100, since a tool reads the whole list of each base bundle it builds a delta pack against.",
+        "description": "The bundle's files, ordered by path, each with its content hash, its uncompressed size and `storedAt`, when the app's store held the hash; an embedded bundle answers the files its binary was created with. `isStored=false` selects the files still to upload after the bundle's create. `limit` goes up to 1000, beyond every other list's 100, since a tool reads the whole list of each base bundle it builds a delta against.",
         "responses": {
           "200": {
             "content": {

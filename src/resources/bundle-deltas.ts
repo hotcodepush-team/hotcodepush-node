@@ -8,7 +8,7 @@ import type {
 } from '../types';
 
 /**
- * A delta pack of a bundle against one base, its size and patch count known once built.
+ * A delta of a bundle against one base, its size and patch count known once built.
  */
 export type BundleDelta = JsonResponseBody<
   '/v1/apps/{appId}/bundles/{bundleId}/deltas',
@@ -31,7 +31,7 @@ export class BundleDeltasResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The number of the bundle's delta packs.
+   * The number of the bundle's deltas.
    */
   public async count(options: CountBundleDeltasOptions): Promise<Count> {
     return this.httpClient.fetchJson({
@@ -44,7 +44,7 @@ export class BundleDeltasResource {
   }
 
   /**
-   * The bundle's delta packs, one per base its devices run, newest first; `relations: ['baseBundle']` embeds the base.
+   * The bundle's deltas, one per base its devices run, newest first; `relations: ['baseBundle']` embeds the base.
    */
   public async list(options: ListBundleDeltasOptions): Promise<BundleDelta[]> {
     const { appId, bundleId, ...query } = options;

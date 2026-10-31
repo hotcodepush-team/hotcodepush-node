@@ -23,7 +23,7 @@ describe('BundleFilesResource', () => {
     const fetchedCount = await new HotCodePush().apps.bundles.files.count({
       appId: 'app',
       bundleId: 'bundle',
-      isStored: 'false',
+      isStored: false,
     });
 
     expect(fetchedCount).toEqual({ count: 3 });
@@ -39,7 +39,7 @@ describe('BundleFilesResource', () => {
     const fetchedFiles = await new HotCodePush().apps.bundles.files.list({
       appId: 'app',
       bundleId: 'bundle',
-      isStored: 'false',
+      isStored: false,
       limit: 100,
       offset: 100,
     });

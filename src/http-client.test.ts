@@ -11,18 +11,36 @@ import {
 } from './test-helpers';
 import type { ErrorBody } from './types';
 
+beforeEach(() => {
+  vi.stubEnv('HOTCODEPUSH_TOKEN', '');
+});
+
 afterEach(() => {
+  vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
 
 describe('HttpClient', () => {
-  test('should give each attempt sixty seconds', async () => {
+  test('should give each attempt sixty seconds when no timeout is set', async () => {
     stubFetch(() => new Response(null));
     const timeoutSpy = vi.spyOn(AbortSignal, 'timeout');
 
     await new HttpClient({}).fetchJson({ method: 'GET', path: '/health' });
 
     expect(timeoutSpy).toHaveBeenCalledWith(60_000);
+    timeoutSpy.mockRestore();
+  });
+
+  test('should give each attempt the given timeout when a timeout is set', async () => {
+    stubFetch(() => new Response(null));
+    const timeoutSpy = vi.spyOn(AbortSignal, 'timeout');
+
+    await new HttpClient({ timeout: 5000 }).fetchJson({
+      method: 'GET',
+      path: '/health',
+    });
+
+    expect(timeoutSpy).toHaveBeenCalledWith(5000);
     timeoutSpy.mockRestore();
   });
 
@@ -49,7 +67,45 @@ describe('HttpClient', () => {
     );
   });
 
+  test('should keep the path of the base url when the base url has one', async () => {
+    const fetchMock = stubFetch(() => new Response(null));
+
+    await new HttpClient({ baseUrl: 'https://proxy.example/hcp/' }).fetchJson({
+      method: 'GET',
+      path: '/v1/organizations',
+    });
+
+    expect(String(fetchMock.mock.lastCall?.[0])).toBe(
+      'https://proxy.example/hcp/v1/organizations',
+    );
+  });
+
   test('should send the token as a bearer when a token is set', async () => {
+    const fetchMock = stubFetch(() => new Response(null));
+
+    await new HttpClient({ token: 'token' }).fetchJson({
+      method: 'GET',
+      path: '/health',
+    });
+
+    expect(fetchMock.mock.lastCall?.[1]?.headers).toMatchObject({
+      Authorization: 'Bearer token',
+    });
+  });
+
+  test('should send the token of the environment when no token is set', async () => {
+    vi.stubEnv('HOTCODEPUSH_TOKEN', 'environment-token');
+    const fetchMock = stubFetch(() => new Response(null));
+
+    await new HttpClient({}).fetchJson({ method: 'GET', path: '/health' });
+
+    expect(fetchMock.mock.lastCall?.[1]?.headers).toMatchObject({
+      Authorization: 'Bearer environment-token',
+    });
+  });
+
+  test('should send the given token over the token of the environment when a token is set', async () => {
+    vi.stubEnv('HOTCODEPUSH_TOKEN', 'environment-token');
     const fetchMock = stubFetch(() => new Response(null));
 
     await new HttpClient({ token: 'token' }).fetchJson({
@@ -145,6 +201,20 @@ describe('HttpClient', () => {
 
     expect(resolveSentRequest(fetchMock).url).toBe(
       'https://api.hotcodepush.com/v1/organizations/organization/members?limit=10&offset=0',
+    );
+  });
+
+  test('should send a boolean in the query as its text', async () => {
+    const fetchMock = stubFetch();
+
+    await new HttpClient({}).fetchJson({
+      method: 'GET',
+      path: '/v1/notifications/count',
+      query: { isRead: false },
+    });
+
+    expect(resolveSentRequest(fetchMock).url).toBe(
+      'https://api.hotcodepush.com/v1/notifications/count?isRead=false',
     );
   });
 
@@ -350,6 +420,20 @@ describe('HttpClient.fetchUpload', () => {
     });
   });
 
+  test('should keep the path of the base url when the base url has one', async () => {
+    const fetchMock = stubFetch();
+
+    await new HttpClient({ baseUrl: 'https://proxy.example/hcp' }).fetchUpload({
+      body: new Blob(['gzip bytes']),
+      contentType: 'application/gzip',
+      path: '/v1/apps/app/files/sha256',
+    });
+
+    expect(String(fetchMock.mock.lastCall?.[0])).toBe(
+      'https://proxy.example/hcp/v1/apps/app/files/sha256',
+    );
+  });
+
   test('should put a stream half-duplex with the given content length', async () => {
     const fetchMock = stubFetch();
     const stream = new Blob(['tar bytes']).stream();
@@ -369,11 +453,11 @@ describe('HttpClient.fetchUpload', () => {
     });
   });
 
-  test('should give each attempt ten minutes', async () => {
+  test('should give each attempt ten minutes when a timeout is set for json calls', async () => {
     stubFetch();
     const timeoutSpy = vi.spyOn(AbortSignal, 'timeout');
 
-    await new HttpClient({}).fetchUpload({
+    await new HttpClient({ timeout: 5000 }).fetchUpload({
       body: new Blob(['tar bytes']),
       contentType: 'application/x-tar',
       path: '/v1/apps/app/bundles/bundle/pack',

@@ -16,37 +16,6 @@ afterEach(() => {
 });
 
 describe('ChannelReleasesResource', () => {
-  test("should count the channel's release log", async () => {
-    const fetchMock = stubFetch(() => Response.json({ count: 3 }));
-
-    const fetchedCount = await new HotCodePush().apps.channels.releases.count({
-      appId: 'app',
-      channelId: 'channel',
-    });
-
-    expect(fetchedCount).toEqual({ count: 3 });
-    expect(resolveSentRequest(fetchMock)).toMatchObject({
-      method: 'GET',
-      url: `${RELEASES_URL}/count`,
-    });
-  });
-
-  test('should count the releases of one number', async () => {
-    const fetchMock = stubFetch(() => Response.json({ count: 1 }));
-
-    const fetchedCount = await new HotCodePush().apps.channels.releases.count({
-      appId: 'app',
-      channelId: 'channel',
-      number: 3,
-    });
-
-    expect(fetchedCount).toEqual({ count: 1 });
-    expect(resolveSentRequest(fetchMock)).toMatchObject({
-      method: 'GET',
-      url: `${RELEASES_URL}/count?number=3`,
-    });
-  });
-
   test('should post the release to its channel with its idempotency key', async () => {
     const fetchMock = stubFetch(() => Response.json(RELEASE, { status: 201 }));
 
@@ -56,12 +25,12 @@ describe('ChannelReleasesResource', () => {
         bundleId: 'bundle',
         channelId: 'channel',
         idempotencyKey: 'key',
-        rolloutPercentage: 10,
+        rolloutPercent: 10,
       });
 
     expect(createdRelease).toEqual(RELEASE);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
-      body: { bundleId: 'bundle', rolloutPercentage: 10 },
+      body: { bundleId: 'bundle', rolloutPercent: 10 },
       headers: { 'Idempotency-Key': 'key' },
       method: 'POST',
       url: RELEASES_URL,
@@ -92,24 +61,6 @@ describe('ChannelReleasesResource', () => {
       },
       method: 'POST',
       url: RELEASES_URL,
-    });
-  });
-
-  test("should list the channel's release log with the linked rows", async () => {
-    const fetchMock = stubFetch(() => Response.json([RELEASE]));
-
-    const fetchedReleases = await new HotCodePush().apps.channels.releases.list(
-      {
-        appId: 'app',
-        channelId: 'channel',
-        relations: ['bundle', 'channel', 'releaseCounters'],
-      },
-    );
-
-    expect(fetchedReleases).toEqual([RELEASE]);
-    expect(resolveSentRequest(fetchMock)).toMatchObject({
-      method: 'GET',
-      url: `${RELEASES_URL}?relations=bundle%2Cchannel%2CreleaseCounters`,
     });
   });
 

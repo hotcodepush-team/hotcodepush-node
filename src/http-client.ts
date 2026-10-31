@@ -20,6 +20,7 @@ const MAX_ATTEMPTS = 3;
 // The API rate limits use sixty-second windows, so a longer wait is never needed.
 const MAX_RETRY_AFTER_MS = 60_000;
 const RETRY_AFTER_STATUSES: ReadonlySet<number> = new Set([429, 503]);
+const TOKEN_ENVIRONMENT_VARIABLE = 'HOTCODEPUSH_TOKEN';
 // Enough for a Blob of SINGLE_UPLOAD_LIMIT_BYTES at about 100 KB per second.
 const UPLOAD_TIMEOUT_MS = 10 * 60_000;
 
@@ -36,7 +37,7 @@ export interface FetchJsonOptions {
   isRetryable?: boolean;
   method: 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
   path: string;
-  query?: Record<string, number | readonly string[] | string | undefined>;
+  query?: Record<string, QueryValue>;
 }
 
 export type FetchUploadOptions = UploadBody & {
@@ -46,7 +47,7 @@ export type FetchUploadOptions = UploadBody & {
 
 export interface HttpClientOptions {
   /**
-   * The base URL of the API.
+   * The base URL of the API. A path in it, such as that of a proxy, prefixes every route.
    *
    * @default 'https://api.hotcodepush.com'
    */
@@ -58,7 +59,15 @@ export interface HttpClientOptions {
    */
   client?: string;
   /**
+   * The milliseconds each attempt of a JSON call may take. A binary upload gets ten minutes per attempt.
+   *
+   * @default 60_000
+   */
+  timeout?: number;
+  /**
    * The API token, sent as `Authorization: Bearer <token>`.
+   *
+   * @default the `HOTCODEPUSH_TOKEN` environment variable
    */
   token?: string;
   /**
@@ -70,13 +79,17 @@ export interface HttpClientOptions {
   userAgent?: string;
 }
 
+type QueryValue = boolean | number | readonly string[] | string | undefined;
+
 export class HttpClient {
   private readonly baseUrl: string;
   private readonly headers: Record<string, string>;
+  private readonly timeoutMs: number;
 
   constructor(options: HttpClientOptions) {
-    this.baseUrl = options.baseUrl ?? DEFAULT_BASE_URL;
+    this.baseUrl = (options.baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, '');
     this.headers = resolveHeaders(options);
+    this.timeoutMs = options.timeout ?? JSON_TIMEOUT_MS;
   }
 
   public async fetchBlob(options: FetchJsonOptions): Promise<Blob> {
@@ -120,7 +133,7 @@ export class HttpClient {
     const contentLength = isBlobUploadBody(options)
       ? options.body.size
       : options.contentLength;
-    const response = await fetchFunction(new URL(options.path, this.baseUrl), {
+    const response = await fetchFunction(this.resolveRouteUrl(options.path), {
       body: options.body,
       duplex: 'half',
       headers: {
@@ -134,7 +147,7 @@ export class HttpClient {
   }
 
   private async fetchResponse(options: FetchJsonOptions): Promise<Response> {
-    const fetchWithTimeout = withTimeout(fetch, JSON_TIMEOUT_MS);
+    const fetchWithTimeout = withTimeout(fetch, this.timeoutMs);
     const isRetryable =
       options.isRetryable ?? IDEMPOTENT_METHODS.has(options.method);
     const fetchFunction = isRetryable
@@ -157,8 +170,13 @@ export class HttpClient {
     };
   }
 
+  // Concatenated, since `new URL('/v1/…', base)` would drop the path of the base URL.
+  private resolveRouteUrl(path: string): URL {
+    return new URL(this.baseUrl + path);
+  }
+
   private resolveUrl(options: FetchJsonOptions): URL {
-    const url = new URL(options.path, this.baseUrl);
+    const url = this.resolveRouteUrl(options.path);
     for (const [name, value] of Object.entries(options.query ?? {})) {
       for (const queryValue of resolveQueryValues(name, value)) {
         url.searchParams.append(name, queryValue);
@@ -195,8 +213,9 @@ function resolveHeaders(options: HttpClientOptions): Record<string, string> {
     'Accept': 'application/json',
     'X-HotCodePush-Client': options.client ?? DEFAULT_CLIENT,
   };
-  if (options.token) {
-    headers.Authorization = `Bearer ${options.token}`;
+  const token = options.token || process.env[TOKEN_ENVIRONMENT_VARIABLE];
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
   }
   if (options.userAgent) {
     headers['User-Agent'] = options.userAgent;
@@ -219,10 +238,7 @@ export function resolvePath(
 
 // The API reads `ids` and `relations` as comma lists. Other lists repeat their parameter,
 // since their values may hold a comma.
-function resolveQueryValues(
-  name: string,
-  value: number | readonly string[] | string | undefined,
-): string[] {
+function resolveQueryValues(name: string, value: QueryValue): string[] {
   if (value === undefined || value === '') {
     return [];
   }

@@ -161,18 +161,12 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
   });
 
   test('should list no releases for a new channel', async () => {
-    const fetchedChannelReleases =
-      await hotCodePush.apps.channels.releases.list({
-        appId: app.id,
-        channelId: channel.id,
-        relations: ['bundle'],
-      });
     const fetchedReleases = await hotCodePush.apps.releases.list({
       appId: app.id,
       channelId: channel.id,
+      relations: ['bundle'],
     });
 
-    expect(fetchedChannelReleases).toEqual([]);
     expect(fetchedReleases).toEqual([]);
   });
 
@@ -201,7 +195,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     const fetchedUnstoredFiles = await hotCodePush.apps.bundles.files.list({
       appId: app.id,
       bundleId: createdBundle.id,
-      isStored: 'false',
+      isStored: false,
     });
     const uploadedFile = await hotCodePush.apps.files.upload({
       appId: app.id,
@@ -283,7 +277,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     const fetchedUnstoredFiles = await hotCodePush.apps.bundles.files.list({
       appId: app.id,
       bundleId: createdBundle.id,
-      isStored: 'false',
+      isStored: false,
     });
     await hotCodePush.apps.bundles.pack.upload({
       appId: app.id,

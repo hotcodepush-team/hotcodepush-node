@@ -43,7 +43,7 @@ describe('SsoProviderResource', () => {
     });
   });
 
-  test('should put the domain and the oidc provider', async () => {
+  test('should set the domain and the oidc provider with a put', async () => {
     const oidc = {
       clientId: 'client',
       clientSecret: 'secret',
@@ -53,14 +53,14 @@ describe('SsoProviderResource', () => {
       Response.json(SSO_PROVIDER, { status: 201 }),
     );
 
-    const putSsoProvider =
-      await new HotCodePush().organizations.ssoProvider.put({
+    const setSsoProvider =
+      await new HotCodePush().organizations.ssoProvider.set({
         domain: 'example.com',
         oidc,
         organizationId: 'organization',
       });
 
-    expect(putSsoProvider).toEqual(SSO_PROVIDER);
+    expect(setSsoProvider).toEqual(SSO_PROVIDER);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       body: { domain: 'example.com', oidc },
       headers: { 'Content-Type': 'application/json' },

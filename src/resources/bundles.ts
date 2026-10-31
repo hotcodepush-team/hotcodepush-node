@@ -92,7 +92,7 @@ export class BundlesResource {
 
   /**
    * Creates a bundle from its manifest. It stays `uploading` until completed.
-   * Find the files the app lacks with `apps.bundles.files.list` and `isStored: 'false'`, and upload each through `apps.files.upload`.
+   * Find the files the app lacks with `apps.bundles.files.list` and `isStored: false`, and upload each through `apps.files.upload`.
    * Upload the pack through `apps.bundles.pack.upload`.
    */
   public async create(options: CreateBundleOptions): Promise<Bundle> {

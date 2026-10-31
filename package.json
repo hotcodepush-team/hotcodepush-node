@@ -3,6 +3,21 @@
   "description": "The typed Node client for the HotCodePush REST API",
   "version": "0.0.0",
   "private": false,
+  "keywords": [
+    "hotcodepush",
+    "over-the-air",
+    "ota",
+    "react-native",
+    "expo",
+    "capacitor",
+    "cordova",
+    "api",
+    "sdk"
+  ],
+  "homepage": "https://hotcodepush.com/docs/api/node",
+  "bugs": {
+    "url": "https://github.com/hotcodepush-team/hotcodepush-node/issues"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -25,6 +40,7 @@
   },
   "scripts": {
     "build": "tsdown",
+    "check-openapi-drift": "node scripts/check-openapi-drift.ts",
     "fmt": "eslint --fix . && prettier --write .",
     "generate": "openapi-typescript openapi.json --output src/generated/schema.d.ts --empty-objects-unknown",
     "lint": "eslint . && prettier --check .",

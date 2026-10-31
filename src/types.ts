@@ -49,6 +49,8 @@ export interface StreamUploadBody {
  */
 export type UploadBody = BlobUploadBody | StreamUploadBody;
 
+type BooleanQueryValue = 'false' | 'true';
+
 type HttpMethod = 'delete' | 'get' | 'patch' | 'post' | 'put';
 
 type Operation<
@@ -83,7 +85,22 @@ export type PathParameters<
   TMethod extends HttpMethod,
 > = Operation<TPath, TMethod>['parameters']['path'];
 
+/**
+ * The query of an operation, with each `'false' | 'true'` filter typed `boolean`; the client sends it as that text.
+ */
 export type QueryParameters<
   TPath extends keyof paths,
   TMethod extends HttpMethod,
-> = NonNullable<Operation<TPath, TMethod>['parameters']['query']>;
+> = ResolveBooleanQueryParameters<
+  NonNullable<Operation<TPath, TMethod>['parameters']['query']>
+>;
+
+type ResolveBooleanQueryParameters<TQuery> = {
+  [TName in keyof TQuery]: [Exclude<TQuery[TName], undefined>] extends [
+    BooleanQueryValue,
+  ]
+    ? [BooleanQueryValue] extends [Exclude<TQuery[TName], undefined>]
+      ? boolean
+      : TQuery[TName]
+    : TQuery[TName];
+};

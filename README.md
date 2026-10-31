@@ -17,7 +17,8 @@ It requires Node.js 22 or later.
 ```ts
 import { HotCodePush } from '@hotcodepush/node';
 
-const hotCodePush = new HotCodePush({ token: process.env.HOTCODEPUSH_TOKEN });
+// Reads the token from HOTCODEPUSH_TOKEN; pass `token` to set it yourself.
+const hotCodePush = new HotCodePush();
 
 const app = await hotCodePush.organizations.apps.create({
   framework: 'capacitor',
@@ -29,16 +30,25 @@ const channel = await hotCodePush.apps.channels.create({
   name: 'staging',
 });
 await hotCodePush.apps.channels.pause({ appId: app.id, channelId: channel.id });
+
+const [release] = await hotCodePush.apps.releases.list({
+  appId: app.id,
+  channelId: channel.id,
+  number: 1,
+});
 ```
 
 The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.channels`, and every paginated list has a `count` beside it.
+A boolean filter such as `isRead` takes a `boolean`.
+Each attempt of a call may take 60 seconds; pass `timeout` in milliseconds to change it. A binary upload gets ten minutes per attempt.
+A `baseUrl` with a path, such as `https://proxy.example/hcp`, keeps it in front of every route.
 Uploads stream their body, a `Blob` or a `ReadableStream` with its `contentLength`.
 Creating calls send an `Idempotency-Key` and are retried; pass `idempotencyKey` to reuse one across your own retries.
 A failed request throws a `HotCodePushError` with the API's `code`, `message`, `details` and the HTTP `status`.
 
 ## Documentation
 
-See [hotcodepush.com/docs](https://hotcodepush.com/docs).
+See [hotcodepush.com/docs/api/node](https://hotcodepush.com/docs/api/node) for this client and [hotcodepush.com/docs](https://hotcodepush.com/docs) for HotCodePush.
 
 ## Development
 
@@ -52,6 +62,7 @@ npm run fmt          # ESLint's fixes and Prettier, run before every commit
 ```
 
 `npm run sync-openapi` fetches the API's OpenAPI document into `openapi.json`, and `npm run generate` regenerates the types from it.
+`npm run check-openapi-drift` compares the operations of `openapi.json` with the live API's; CI runs it after the tests.
 `CLAUDE.md` holds the layout and the rules.
 
 ## License

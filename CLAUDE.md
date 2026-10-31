@@ -11,17 +11,18 @@ The client is validated against the API's OpenAPI document, the contract; see [T
 ## Layout
 
 ```
-openapi.json               the snapshot of the API's OpenAPI document, committed
-scripts/sync-openapi.ts    fetches the document into openapi.json
-src/index.ts               the public exports
-src/client.ts              HotCodePush: the options and one property per top-level resource
-src/http-client.ts         the one place that calls fetch: the headers, withTimeout, withRetry, JSON in and out
-src/errors.ts              HotCodePushError and the parsing of the one error shape
-src/types.ts               the shapes every resource shares and the helpers deriving types from the snapshot
-src/generated/schema.d.ts  openapi-typescript's types of the snapshot, committed, never edited
-src/resources/             one file per resource, its types beside it
-src/openapi.test.ts        the contract test: every resource method against the snapshot
-src/integration.test.ts    the client against a running API, skipped unless HOTCODEPUSH_API_BASE_URL is set
+openapi.json                    the snapshot of the API's OpenAPI document, committed
+scripts/sync-openapi.ts         fetches the document into openapi.json
+scripts/check-openapi-drift.ts  fails when the live API's operations differ from openapi.json's
+src/index.ts                    the public exports
+src/client.ts                   HotCodePush: the options and one property per top-level resource
+src/http-client.ts              the one place that calls fetch: the headers, withTimeout, withRetry, JSON in and out
+src/errors.ts                   HotCodePushError and the parsing of the one error shape
+src/types.ts                    the shapes every resource shares and the helpers deriving types from the snapshot
+src/generated/schema.d.ts       openapi-typescript's types of the snapshot, committed, never edited
+src/resources/                  one file per resource, its types beside it
+src/openapi.test.ts             the contract test: every resource method against the snapshot
+src/integration.test.ts         the client against a running API, skipped unless HOTCODEPUSH_API_BASE_URL is set
 ```
 
 Resources mirror the paths: `/v1/organizations/{organizationId}/apps` is `organizations.apps`, `/v1/apps/{appId}/channels/{channelId}/releases` is `apps.channels.releases`; a resource nests on the one its path sits under, and a path collection is one class.
@@ -31,28 +32,30 @@ Tests live beside the code they test, `*.test.ts` next to the file, and stub the
 
 ## Commands
 
-| Command                | Does                                                         |
-| ---------------------- | ------------------------------------------------------------ |
-| `npm run build`        | tsdown into `dist/`                                          |
-| `npm run lint`         | ESLint and Prettier's check                                  |
-| `npm run fmt`          | ESLint's fixes and Prettier                                  |
-| `npm test`             | Vitest                                                       |
-| `npm run typecheck`    | the generated types' freshness check, then `tsc --noEmit`    |
-| `npm run generate`     | openapi-typescript from `openapi.json` into `src/generated/` |
-| `npm run sync-openapi` | `<HOTCODEPUSH_API_BASE_URL>/openapi` into `openapi.json`     |
+| Command                       | Does                                                                                          |
+| ----------------------------- | --------------------------------------------------------------------------------------------- |
+| `npm run build`               | tsdown into `dist/`                                                                           |
+| `npm run lint`                | ESLint and Prettier's check                                                                   |
+| `npm run fmt`                 | ESLint's fixes and Prettier                                                                   |
+| `npm test`                    | Vitest                                                                                        |
+| `npm run typecheck`           | the generated types' freshness check, then `tsc --noEmit`                                     |
+| `npm run generate`            | openapi-typescript from `openapi.json` into `src/generated/`                                  |
+| `npm run sync-openapi`        | `<HOTCODEPUSH_API_BASE_URL>/openapi` into `openapi.json`                                      |
+| `npm run check-openapi-drift` | the live API's paths and methods against `openapi.json`'s; an unreachable API warns and skips |
 
-Run `npm run fmt` before every commit; lint, typecheck, test and build must pass, and CI runs the four on every pull request and push to `main`, then publishes the build to pkg.pr.new.
+Run `npm run fmt` before every commit; lint, typecheck, test and build must pass, and CI runs the four and the drift check on every pull request and push to `main`, then publishes the build to pkg.pr.new.
 `.prettierignore` keeps the files copied from the monorepo and `.github` verbatim, and the snapshot and its generated types as they were written.
 
 ## The API contract
 
-- Auth is `Authorization: Bearer <token>`; the token is optional, since `/health` needs none.
+- Auth is `Authorization: Bearer <token>`, the `token` option or else the `HOTCODEPUSH_TOKEN` environment variable; the token is optional, since `/health` needs none.
 - Every request sends `X-HotCodePush-Client: <name>/<version>`, `node/<this package's version>` unless the caller passes its own, as the CLI and the MCP server do; `User-Agent` goes out only when the caller sets `userAgent`, since a session keeps it and the sessions page names the client by it.
 - Every error is one JSON shape, `code`, `message`, `details`; `HotCodePushError` carries them and the status verbatim, and a body without the shape becomes `unexpected_response`.
-- Every call goes through `withTimeout` and `withRetry`, never a bare `fetch`: sixty seconds per attempt, `JSON_TIMEOUT_MS`, and ten minutes for a binary upload, `UPLOAD_TIMEOUT_MS`, three attempts, exponential backoff from 500 ms, retrying a thrown fetch, 408, 429 and 5xx; a 429 or a 503 waits its `Retry-After` instead, at most sixty seconds, the rate-limit window.
+- Every call goes through `withTimeout` and `withRetry`, never a bare `fetch`: sixty seconds per attempt, `JSON_TIMEOUT_MS`, or the caller's `timeout`, and ten minutes for a binary upload, `UPLOAD_TIMEOUT_MS`, three attempts, exponential backoff from 500 ms, retrying a thrown fetch, 408, 429 and 5xx; a 429 or a 503 waits its `Retry-After` instead, at most sixty seconds, the rate-limit window.
 - Every creating `POST` — the eight operations whose OpenAPI document lists the `Idempotency-Key` header: organizations, invitations, apps, channels, releases, rollbacks, bundles and binaries — goes through `fetchCreatingPost`, which sends the caller's `idempotencyKey` or a UUID generated per call and kept across its retries. A checkout and a customer portal session carry no key and are never retried, since each call creates another Polar object.
 - Any other `POST` is retried only where a repeat is safe: `pause`, `resume`, the subscription's `cancel` and `uncancel`, a bundle's `complete`, a channel's bulk `revoke`, a signing key's `create`, the SSO verification, the two multipart starts and a file upload's completion; a pack's completion is never retried, since a repeat answers `not_found` for an upload R2 already closed.
 - Lists take `limit` and `offset`; `relations` and `ids` are typed lists sent as comma lists, `?relations=user`, `?ids=a,b`, and any other list repeats its parameter, `?attribute=a&attribute=b`.
+- A query filter the document types `'false' | 'true'`, such as `isRead`, is a `boolean` through `QueryParameters` and goes out as `true` or `false`.
 - `me` is accepted wherever a `{userId}` appears; the client passes it through.
 - The `/v1/auth/*` slice is Better Auth's and outside the document; its client lives in the CLI and the console, never here.
 - Every binary `PUT` goes through `fetchUpload`: the body is a `Blob` or a `ReadableStream` with its `contentLength`, streamed with `Content-Length` and the documented `Content-Type`, never a buffered string; a `Blob` is retried, a stream is read once and never retried.
@@ -68,6 +71,8 @@ When the API changes:
 2. `HOTCODEPUSH_API_BASE_URL=http://localhost:8787 npm run sync-openapi`, then `npm run generate`.
 3. Fix what no longer compiles or passes, add the resource methods for new endpoints and their calls in `src/openapi.test.ts`.
 4. Commit `openapi.json` and `src/generated/` with the change; both are never edited by hand.
+
+CI's drift check fetches `https://api.hotcodepush.com/openapi` and fails while its operations differ from the snapshot's, so a stale snapshot shows the day the API moves.
 
 The integration test runs by hand against that API, started with `ENVIRONMENT=dev` and `DEV_DATABASE_URL` in its `.dev.vars` so the mail lands in its log: sign up through `POST /v1/auth/sign-up/email`, send the logged link's token to `GET /v1/auth/verify-email?token=`, sign in through `POST /v1/auth/sign-in/email` and take the `set-auth-token` header, then `HOTCODEPUSH_API_BASE_URL=http://localhost:8787 HOTCODEPUSH_API_TOKEN=<bearer> npx vitest run src/integration.test.ts`.
 

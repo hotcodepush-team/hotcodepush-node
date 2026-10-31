@@ -51,7 +51,7 @@ describe('BundlesResource', () => {
 
     const fetchedCount = await new HotCodePush().apps.bundles.count({
       appId: 'app',
-      isInUse: 'true',
+      isInUse: true,
       platform: 'ios',
     });
 
@@ -121,7 +121,7 @@ describe('BundlesResource', () => {
     const fetchedBundles = await new HotCodePush().apps.bundles.list({
       appId: 'app',
       fingerprint: FINGERPRINT,
-      isInUse: 'false',
+      isInUse: false,
       platform: 'ios',
       source: 'upload',
     });

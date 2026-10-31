@@ -3,7 +3,7 @@ import { resolvePath } from '../http-client';
 import type { JsonResponseBody, PathParameters } from '../types';
 
 /**
- * The channel's active devices the release's own conditions reach and the estimate at its rollout percentage.
+ * The active devices of the channel that the conditions of the release reach, and the estimate at its rollout percentage.
  */
 export type ReleaseAudience = JsonResponseBody<
   '/v1/apps/{appId}/releases/{releaseId}/audience',
@@ -20,7 +20,8 @@ export class ReleaseAudienceResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The devices a release reaches, evaluated over the registry the way the device evaluates the index.
+   * Gets the devices a release reaches.
+   * The API evaluates the registry the same way a device evaluates the index.
    */
   public async get(
     options: GetReleaseAudienceOptions,

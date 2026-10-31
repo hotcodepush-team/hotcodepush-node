@@ -8,7 +8,8 @@ import type {
 } from '../types';
 
 /**
- * A file a bundle lists: its path, the sha256 of its content, its uncompressed size and `storedAt`, when the app's store held the hash.
+ * A file listed in a bundle: its path, the SHA-256 of its content and its uncompressed size.
+ * `storedAt` is when the app stored that hash.
  */
 export type BundleFile = JsonResponseBody<
   '/v1/apps/{appId}/bundles/{bundleId}/files',
@@ -32,7 +33,7 @@ export class BundleFilesResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The number of the bundle's files under the list's filters.
+   * Counts the files of the bundle that match the filters.
    */
   public async count(options: CountBundleFilesOptions): Promise<Count> {
     const { appId, bundleId, ...query } = options;
@@ -47,8 +48,9 @@ export class BundleFilesResource {
   }
 
   /**
-   * The bundle's files, ordered by path; an embedded bundle answers the files its binary was created with.
-   * `isStored: 'false'` selects the files still to upload after the bundle's create.
+   * Lists the files of the bundle, ordered by path.
+   * An embedded bundle answers the files its binary was created with.
+   * After creating a bundle, `isStored: 'false'` selects the files still to upload.
    */
   public async list(options: ListBundleFilesOptions): Promise<BundleFile[]> {
     const { appId, bundleId, ...query } = options;

@@ -32,7 +32,7 @@ export class OrganizationAppsResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The number of the organization's apps under the list's filters.
+   * Counts the apps of the organization that match the filters.
    */
   public async count(options: CountAppsOptions): Promise<Count> {
     const { organizationId, ...query } = options;
@@ -60,7 +60,7 @@ export class OrganizationAppsResource {
   }
 
   /**
-   * The organization's apps, newest first.
+   * Lists the apps of the organization, newest first.
    */
   public async list(options: ListAppsOptions): Promise<App[]> {
     const { organizationId, ...query } = options;

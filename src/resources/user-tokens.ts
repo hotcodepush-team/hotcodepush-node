@@ -12,7 +12,8 @@ export class UserTokensResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * Deletes the caller's API tokens named by `ids`, one to 100; an id that is not the caller's is skipped.
+   * Deletes the API tokens of the caller named by `ids`, one to 100.
+   * An id that is not the caller's is skipped.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async deleteMany(options: DeleteManyTokensOptions): Promise<void> {

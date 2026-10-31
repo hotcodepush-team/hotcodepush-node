@@ -16,7 +16,8 @@ export type CountWebhooksOptions = PathParameters<
 >;
 
 /**
- * The created webhook with its signing `secret`, answered this once; null for a chat format, whose URL carries the token.
+ * The created webhook with its signing `secret`, answered only this once.
+ * The secret is null for a chat format, whose URL carries the token.
  */
 export type CreatedWebhook = JsonResponseBody<
   '/v1/organizations/{organizationId}/webhooks',
@@ -61,9 +62,9 @@ export type UpdateWebhookOptions = PathParameters<
   >;
 
 /**
- * An outbound webhook, its row: the `format`, `raw` for the JSON payload or `slack`, `discord` or `teams` for a chat message,
- * the subscribed audit `events`, the app filter, null for every app's events and the organization's, and `isEnabled`,
- * off after fifty consecutive failed deliveries.
+ * An outbound webhook.
+ * `format` is `raw` for the JSON payload, or `slack`, `discord` or `teams` for a chat message. `events` lists the subscribed audit events.
+ * The app filter is null for the events of every app and of the organization. `isEnabled` turns off after fifty failed deliveries in a row.
  */
 export type Webhook = JsonResponseBody<
   '/v1/organizations/{organizationId}/webhooks/{webhookId}',
@@ -72,7 +73,8 @@ export type Webhook = JsonResponseBody<
 >;
 
 /**
- * The organization's webhooks, for Admins and Owners on a plan that includes webhooks; any other plan answers `plan_required`.
+ * The webhooks of the organization, for Admins and Owners.
+ * Needs a plan that includes webhooks; any other plan answers `plan_required`.
  */
 export class WebhooksResource {
   public readonly deliveries: WebhookDeliveriesResource;
@@ -82,7 +84,7 @@ export class WebhooksResource {
   }
 
   /**
-   * The number of the organization's webhooks.
+   * Counts the webhooks of the organization.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async count(options: CountWebhooksOptions): Promise<Count> {
@@ -96,8 +98,9 @@ export class WebhooksResource {
   }
 
   /**
-   * Creates a webhook, its name unique in the organization, `webhook_name_taken` otherwise; a `raw` webhook answers its secret this once.
-   * The API keeps no `Idempotency-Key` for it and a repeat answers `webhook_name_taken`, so the call is never retried.
+   * Creates a webhook. Its name must be unique in the organization, or the call answers `webhook_name_taken`.
+   * A `raw` webhook answers its secret only this once.
+   * The API keeps no `Idempotency-Key` for it and a repeat answers `webhook_name_taken`, so the client never retries the call.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async create(options: CreateWebhookOptions): Promise<CreatedWebhook> {
@@ -112,7 +115,7 @@ export class WebhooksResource {
   }
 
   /**
-   * Deletes the webhook with its delivery log.
+   * Deletes the webhook and its delivery log.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async delete(options: DeleteWebhookOptions): Promise<void> {
@@ -126,6 +129,7 @@ export class WebhooksResource {
   }
 
   /**
+   * Gets a webhook.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async get(options: GetWebhookOptions): Promise<Webhook> {
@@ -139,7 +143,7 @@ export class WebhooksResource {
   }
 
   /**
-   * The organization's webhooks, newest first.
+   * Lists the webhooks of the organization, newest first.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async list(options: ListWebhooksOptions): Promise<Webhook[]> {
@@ -154,8 +158,8 @@ export class WebhooksResource {
   }
 
   /**
-   * Sends one sample event, `webhook.test`, through the webhook's delivery path within the request and answers the settled delivery.
-   * Each call sends another sample event, so the call is never retried.
+   * Sends one sample event, `webhook.test`, through the normal delivery path within the request, and answers the settled delivery.
+   * Each call sends another sample event, so the client never retries the call.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async test(options: TestWebhookOptions): Promise<WebhookDelivery> {
@@ -169,8 +173,8 @@ export class WebhooksResource {
   }
 
   /**
-   * Changes the name, the URL, the subscribed `events`, the app filter or `isEnabled`; the format and the secret never change.
-   * Setting `isEnabled` on a webhook disabled after fifty consecutive failed deliveries starts its count again.
+   * Changes the name, the URL, the subscribed `events`, the app filter or `isEnabled`. The format and the secret never change.
+   * Enabling a webhook that was disabled after fifty failed deliveries in a row resets that count.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async update(options: UpdateWebhookOptions): Promise<Webhook> {

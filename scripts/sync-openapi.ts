@@ -1,5 +1,3 @@
-// Fetches the API's OpenAPI document into `openapi.json`, the snapshot the
-// client's types are generated from and its contract test reads.
 import { writeFile } from 'node:fs/promises';
 
 const apiBaseUrl =

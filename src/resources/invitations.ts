@@ -30,8 +30,8 @@ export class InvitationsResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * Accepts an invitation addressed to the caller with the token from its mail.
-   * A repeat answers `invitation_invalid`, so the call is never retried.
+   * Accepts an invitation addressed to the caller, with the token from the invitation mail.
+   * A repeat answers `invitation_invalid`, so the client never retries the call.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async accept(options: AcceptInvitationOptions): Promise<MemberRow> {
@@ -46,7 +46,7 @@ export class InvitationsResource {
   }
 
   /**
-   * The number of the caller's pending invitations across organizations.
+   * Counts the pending invitations of the caller across all organizations.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async count(): Promise<Count> {
@@ -57,7 +57,8 @@ export class InvitationsResource {
   }
 
   /**
-   * The caller's pending invitations across organizations, newest first; `relations: ['organization']` embeds each one's organization as its id and name.
+   * Lists the pending invitations of the caller across all organizations, newest first.
+   * `relations: ['organization']` embeds the id and name of each organization.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async list(

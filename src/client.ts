@@ -12,8 +12,7 @@ export type HotCodePushOptions = HttpClientOptions;
 
 /**
  * The client for the HotCodePush REST API.
- * Resources mirror the paths: `/v1/organizations/{organizationId}/apps` is `organizations.apps`,
- * `/v1/apps/{appId}/channels` is `apps.channels`.
+ * Resources mirror the API paths, so `/v1/apps/{appId}/channels` is `apps.channels`.
  */
 export class HotCodePush {
   public readonly apps: AppsResource;

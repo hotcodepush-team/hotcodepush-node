@@ -83,7 +83,7 @@ export class OrganizationsResource {
   }
 
   /**
-   * The number of the caller's organizations.
+   * Counts the organizations of the caller.
    */
   public async count(): Promise<Count> {
     return this.httpClient.fetchJson({
@@ -108,7 +108,8 @@ export class OrganizationsResource {
   }
 
   /**
-   * Soft-deletes an organization with everything under it: gone at once, hard-deleted after seven days.
+   * Soft-deletes an organization and everything under it.
+   * It is gone at once and hard-deleted after seven days.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async delete(options: DeleteOrganizationOptions): Promise<void> {
@@ -126,7 +127,8 @@ export class OrganizationsResource {
   }
 
   /**
-   * The caller's organizations, newest first; the caller's role in each is on their member rows, `users.get({ relations: ['members'], userId: 'me' })`.
+   * Lists the organizations of the caller, newest first.
+   * The role of the caller in each sits on their member rows: `users.get({ relations: ['members'], userId: 'me' })`.
    */
   public async list(
     options: ListOrganizationsOptions = {},
@@ -139,6 +141,7 @@ export class OrganizationsResource {
   }
 
   /**
+   * Updates an organization.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async update(

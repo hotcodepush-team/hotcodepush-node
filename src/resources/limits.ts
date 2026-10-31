@@ -8,7 +8,8 @@ export type GetLimitsOptions = PathParameters<
 >;
 
 /**
- * Every limit in effect for the organization, keyed by name: its value, the plan's default and whether it is overridden.
+ * Every limit in effect for the organization, keyed by name.
+ * Each holds its value, the plan default and whether it is overridden.
  */
 export type Limits = JsonResponseBody<
   '/v1/organizations/{organizationId}/limits',
@@ -20,6 +21,7 @@ export class LimitsResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
+   * Gets the limits in effect for the organization.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async get(options: GetLimitsOptions): Promise<Limits> {

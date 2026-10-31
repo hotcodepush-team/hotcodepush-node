@@ -20,10 +20,10 @@ export class CheckoutsResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * Enables billing on a free organization: the Polar checkout for pay-as-you-go, the caller's email pre-filled and
-   * editable on Polar's page; the subscription arrives once it is paid, names the organization, and starts at the $5
-   * minimum spending cap, which the customer raises afterwards.
-   * Each call creates another checkout and the API keeps no `Idempotency-Key` for it, so the call is never retried.
+   * Creates a Polar checkout that enables pay-as-you-go billing on a free organization.
+   * The email of the caller is pre-filled and can be changed on the Polar page.
+   * Once paid, the subscription names the organization and starts at the $5 minimum spending cap, which the customer can raise later.
+   * Each call creates another checkout and the API keeps no `Idempotency-Key` for it, so the client never retries the call.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async create(options: CreateCheckoutOptions): Promise<Checkout> {

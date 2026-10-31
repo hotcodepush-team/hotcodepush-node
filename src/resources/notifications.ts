@@ -19,7 +19,8 @@ export type ListNotificationsOptions = QueryParameters<
 >;
 
 /**
- * An in-app notification of the caller, its `organizationId` null for one about the account.
+ * An in-app notification of the caller.
+ * `organizationId` is null for a notification about the account.
  */
 export type Notification = JsonResponseBody<
   '/v1/notifications',
@@ -48,13 +49,14 @@ export type UpdateNotificationOptions = PathParameters<
   JsonRequestBody<'/v1/notifications/{notificationId}', 'patch'>;
 
 /**
- * The caller's in-app notifications across every organization.
+ * The in-app notifications of the caller across all organizations.
  */
 export class NotificationsResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The number of the caller's notifications under the list's filters; `isRead: 'false'` is the bell's badge.
+   * Counts the notifications of the caller that match the filters.
+   * `isRead: 'false'` gives the badge count of the bell.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async count(options: CountNotificationsOptions = {}): Promise<Count> {
@@ -66,7 +68,7 @@ export class NotificationsResource {
   }
 
   /**
-   * The caller's notifications, newest first.
+   * Lists the notifications of the caller, newest first.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async list(
@@ -80,7 +82,7 @@ export class NotificationsResource {
   }
 
   /**
-   * Marks one of the caller's notifications read.
+   * Marks one notification of the caller as read.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async update(
@@ -97,7 +99,7 @@ export class NotificationsResource {
   }
 
   /**
-   * Marks every unread notification of the caller read.
+   * Marks every unread notification of the caller as read.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async updateMany(

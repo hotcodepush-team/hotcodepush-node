@@ -2,8 +2,8 @@ import type { ErrorBody, HotCodePushErrorCode } from './types';
 
 /**
  * Thrown when the API answers with a status outside 2xx.
- * `code`, `message` and `details` are the API's, verbatim; a response outside the API's error shape
- * is `unexpected_response` with the status, its body left out.
+ * `code`, `message` and `details` come from the API verbatim.
+ * A response without the API error shape becomes `unexpected_response` with the status, and its body is dropped.
  */
 export class HotCodePushError extends Error {
   public readonly code: HotCodePushErrorCode;

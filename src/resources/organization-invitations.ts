@@ -37,7 +37,7 @@ export type DeleteManyInvitationsOptions = PathParameters<
   QueryParameters<'/v1/organizations/{organizationId}/invitations', 'delete'>;
 
 /**
- * An invitation without its organization, as the organization's list and a created invitation answer it.
+ * An invitation without its organization, as the list and a create answer it.
  */
 export type InvitationRow = JsonResponseBody<
   '/v1/organizations/{organizationId}/invitations',
@@ -55,7 +55,7 @@ export class OrganizationInvitationsResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The number of the organization's invitations under the list's filters.
+   * Counts the invitations of the organization that match the filters.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async count(options: CountInvitationsOptions): Promise<Count> {
@@ -71,7 +71,7 @@ export class OrganizationInvitationsResource {
   }
 
   /**
-   * Invites an address to the organization; the invitation mail carries the token.
+   * Invites an email address to the organization. The invitation mail carries the token.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async create(
@@ -102,7 +102,7 @@ export class OrganizationInvitationsResource {
   }
 
   /**
-   * Withdraws the organization's invitations named by `ids`, one to 100; an id of another organization is skipped.
+   * Withdraws the invitations of the organization named by `ids`, one to 100. An id of another organization is skipped.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async deleteMany(
@@ -119,7 +119,7 @@ export class OrganizationInvitationsResource {
   }
 
   /**
-   * The organization's invitations, newest first.
+   * Lists the invitations of the organization, newest first.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async list(options: ListInvitationsOptions): Promise<InvitationRow[]> {

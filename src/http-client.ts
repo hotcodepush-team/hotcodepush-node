@@ -17,14 +17,10 @@ const IDEMPOTENT_METHODS: ReadonlySet<FetchJsonOptions['method']> = new Set([
 const INITIAL_RETRY_DELAY_MS = 500;
 const JSON_TIMEOUT_MS = 60_000;
 const MAX_ATTEMPTS = 3;
-/**
- * The longest wait a `Retry-After` is followed for: the API's rate limits count in sixty-second windows.
- */
+// The API rate limits use sixty-second windows, so a longer wait is never needed.
 const MAX_RETRY_AFTER_MS = 60_000;
 const RETRY_AFTER_STATUSES: ReadonlySet<number> = new Set([429, 503]);
-/**
- * Ten minutes per attempt: `SINGLE_UPLOAD_LIMIT_BYTES`, the largest `Blob` sent in one request, at about a hundred kilobytes a second.
- */
+// Enough for a Blob of SINGLE_UPLOAD_LIMIT_BYTES at about 100 KB per second.
 const UPLOAD_TIMEOUT_MS = 10 * 60_000;
 
 export interface FetchCreatingPostOptions extends IdempotencyOptions {
@@ -35,18 +31,11 @@ export interface FetchCreatingPostOptions extends IdempotencyOptions {
 export interface FetchJsonOptions {
   body?: unknown;
   headers?: Record<string, string>;
-  /**
-   * Whether a failed attempt is sent again; a `POST` sets it where the API makes a repeat safe,
-   * through a stored idempotency key or a transition that answers a repeat unchanged.
-   *
-   * @default true for `DELETE`, `GET` and `PUT`, false for `PATCH` and `POST`
-   */
+  // Set on a POST only where a repeat is safe: through a stored idempotency key,
+  // or a transition that answers a repeat unchanged.
   isRetryable?: boolean;
   method: 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
   path: string;
-  /**
-   * Undefined values and empty lists are left out; `ids` and `relations` are sent as comma lists, any other list repeats its parameter.
-   */
   query?: Record<string, number | readonly string[] | string | undefined>;
 }
 
@@ -73,7 +62,8 @@ export interface HttpClientOptions {
    */
   token?: string;
   /**
-   * The `User-Agent` header, `<name>/<version>`, which a session keeps, so the sessions page and the new-sign-in mail name the client.
+   * The `User-Agent` header, `<name>/<version>`.
+   * Sessions keep it, so the sessions page and the new sign-in mail name the client by it.
    *
    * @default the one the runtime's `fetch` sends
    */
@@ -89,19 +79,13 @@ export class HttpClient {
     this.headers = resolveHeaders(options);
   }
 
-  /**
-   * A request answered with a binary body, such as a channel's QR image, read whole.
-   */
   public async fetchBlob(options: FetchJsonOptions): Promise<Blob> {
     const response = await this.fetchResponse(options);
     await assertResponseOk(response);
     return response.blob();
   }
 
-  /**
-   * A creating `POST`, sent with an `Idempotency-Key`: the caller's, or one generated for this call and kept across its retries,
-   * which the API answers with the first result.
-   */
+  // The key stays the same across retries, so the API answers a repeat with the first result.
   public async fetchCreatingPost<T>(
     options: FetchCreatingPostOptions,
   ): Promise<T> {
@@ -121,20 +105,15 @@ export class HttpClient {
     return parseResponseBody(response);
   }
 
-  /**
-   * A request whose status is the whole answer: the body, such as `/health`'s plain-text `ok`, is discarded.
-   */
   public async fetchStatus(options: FetchJsonOptions): Promise<void> {
     const response = await this.fetchResponse(options);
     await assertResponseOk(response);
     await response.body?.cancel();
   }
 
-  /**
-   * A binary `PUT`, streamed as it is read; a stream is read once, so only a `Blob` is retried.
-   */
   public async fetchUpload<T>(options: FetchUploadOptions): Promise<T> {
     const fetchWithTimeout = withTimeout(fetch, UPLOAD_TIMEOUT_MS);
+    // A stream is read once, so only a Blob upload is retried.
     const fetchFunction = isBlobUploadBody(options)
       ? withRetry(fetchWithTimeout)
       : fetchWithTimeout;
@@ -225,10 +204,6 @@ function resolveHeaders(options: HttpClientOptions): Record<string, string> {
   return headers;
 }
 
-/**
- * Fills a path template of the OpenAPI snapshot, `/v1/apps/{appId}`, with its encoded parameters;
- * a template the document lacks does not compile.
- */
 export function resolvePath(
   template: keyof paths,
   parameters: Record<string, number | string> = {},
@@ -242,10 +217,8 @@ export function resolvePath(
   });
 }
 
-/**
- * The values a query parameter is sent with: `ids` and `relations` are the API's comma lists,
- * and every other list repeats, `?binary=…&binary=…`, since its values may hold a comma.
- */
+// The API reads `ids` and `relations` as comma lists. Other lists repeat their parameter,
+// since their values may hold a comma.
 function resolveQueryValues(
   name: string,
   value: number | readonly string[] | string | undefined,
@@ -262,10 +235,7 @@ function resolveQueryValues(
   return [...value];
 }
 
-/**
- * The wait a 429 or a 503 asks for in `Retry-After`, delay seconds or an HTTP date, capped at `MAX_RETRY_AFTER_MS`;
- * undefined for any other status, a missing header or one that does not parse.
- */
+// `Retry-After` holds either delay seconds or an HTTP date (RFC 9110).
 function resolveRetryAfterMs(response: Response): number | undefined {
   const retryAfter = response.headers.get('Retry-After')?.trim();
   if (!RETRY_AFTER_STATUSES.has(response.status) || !retryAfter) {

@@ -13,7 +13,8 @@ export type GetUsageStatisticsOptions = PathParameters<
   QueryParameters<'/v1/apps/{appId}/statistics/usage', 'get'>;
 
 /**
- * The monthly active devices and data transfer per month the period touches and the checks, data transfer and device downloads per day.
+ * Monthly active devices and data transfer for each month the period touches.
+ * Also checks, data transfer and device downloads per day.
  */
 export type UsageStatistics = JsonResponseBody<
   '/v1/apps/{appId}/statistics/usage',
@@ -25,7 +26,7 @@ export class StatisticsUsageResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The usage statistics of the period, `periodSince` to `periodUntil` inclusive.
+   * Gets the usage statistics from `periodSince` to `periodUntil`, both inclusive.
    */
   public async get(
     options: GetUsageStatisticsOptions,

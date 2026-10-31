@@ -37,10 +37,8 @@ const UPLOAD_ID = 'upload';
 const USER_ID = '2d5c8f1a-7b36-4e09-a4c2-6f1e9b3d7a58';
 const WEBHOOK_ID = '3b9e1d74-6a2f-4c58-8d03-f5a7c2e9b416';
 
-/**
- * One call per resource method with every option it can send, so a path, method,
- * query parameter, body or content type the document lacks fails here.
- */
+// Each call sends every option of its method, so any path, method, query parameter,
+// body or content type missing from the document fails here.
 const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
   'apps.binaries.count': hotCodePush =>
     hotCodePush.apps.binaries.count({
@@ -772,10 +770,8 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.users.tokens.deleteMany({ ids: [TOKEN_ID], userId: 'me' }),
 };
 
-/**
- * The methods whose operation the document marks with `sessionAuth`, each
- * carrying `SESSION_ONLY_NOTE` in its JSDoc.
- */
+// The operations the document marks with `sessionAuth`.
+// The JSDoc of each of these methods must carry SESSION_ONLY_NOTE.
 const SESSION_ONLY_METHODS: readonly string[] = [
   'apps.delete',
   'apps.transfer',
@@ -830,9 +826,7 @@ const SESSION_ONLY_METHODS: readonly string[] = [
 const SESSION_ONLY_NOTE =
   'An API token answers `forbidden`; sign in with a session.';
 
-/**
- * `/health` is outside the document by the path rule.
- */
+// The document leaves out `/health` by its path rule.
 const UNDOCUMENTED_RESOURCES = ['health'];
 
 const openApiDocument = JSON.parse(

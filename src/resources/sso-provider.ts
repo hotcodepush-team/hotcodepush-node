@@ -24,8 +24,8 @@ export type PutSsoProviderOptions = PathParameters<
   JsonRequestBody<'/v1/organizations/{organizationId}/sso-provider', 'put'>;
 
 /**
- * The organization's one SSO provider, its row: the domain, the token its TXT record `_hotcodepush-sso-{providerId}.{domain}` must carry
- * until `domainVerified` is true, and the `type`, `oidc` or `saml`; the configs are write-only.
+ * The one SSO provider of the organization: its domain, its `type` (`oidc` or `saml`) and its `domainVerificationToken`.
+ * The TXT record `_hotcodepush-sso-{providerId}.{domain}` must carry the token until `domainVerified` is true. The configs are write-only.
  */
 export type SsoProvider = JsonResponseBody<
   '/v1/organizations/{organizationId}/sso-provider',
@@ -41,7 +41,7 @@ export class SsoProviderResource {
   }
 
   /**
-   * Removes the SSO provider: password sign-in works again for its members, and the domain is forgotten.
+   * Removes the SSO provider. Its members can sign in with a password again, and the domain is forgotten.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async delete(options: DeleteSsoProviderOptions): Promise<void> {
@@ -55,6 +55,7 @@ export class SsoProviderResource {
   }
 
   /**
+   * Gets the SSO provider of the organization.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async get(options: GetSsoProviderOptions): Promise<SsoProvider> {
@@ -68,7 +69,8 @@ export class SsoProviderResource {
   }
 
   /**
-   * Sets the OIDC or SAML provider and its domain, replacing the one before; a new or changed domain starts unverified, with a new token for its TXT record.
+   * Sets the OIDC or SAML provider and its domain, replacing the one before.
+   * A new or changed domain starts unverified, with a new token for its TXT record.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async put(options: PutSsoProviderOptions): Promise<SsoProvider> {

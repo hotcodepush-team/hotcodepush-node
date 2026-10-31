@@ -84,7 +84,7 @@ export class ChannelsResource {
   }
 
   /**
-   * The number of the app's channels under the list's filters.
+   * Counts the channels of the app that match the filters.
    */
   public async count(options: CountChannelsOptions): Promise<Count> {
     const { appId, ...query } = options;
@@ -105,7 +105,7 @@ export class ChannelsResource {
   }
 
   /**
-   * Deletes a channel at once; the app's default channel is refused.
+   * Deletes a channel at once. The default channel of the app is refused.
    */
   public async delete(options: DeleteChannelOptions): Promise<void> {
     await this.httpClient.fetchJson({
@@ -115,8 +115,8 @@ export class ChannelsResource {
   }
 
   /**
-   * Deletes the app's channels named by `ids`, one to 100; an id of another app is skipped.
-   * The app's default channel, or a protected channel when the caller is a Member, refuses the whole set.
+   * Deletes the channels of the app named by `ids`, one to 100. An id of another app is skipped.
+   * The default channel, or a protected channel when the caller is a Member, refuses the whole set.
    */
   public async deleteMany(options: DeleteManyChannelsOptions): Promise<void> {
     const { appId, ...query } = options;
@@ -128,7 +128,8 @@ export class ChannelsResource {
   }
 
   /**
-   * A channel; `apps.statistics.fleet.get` with its `channelId` counts its devices.
+   * Gets a channel.
+   * To count its devices, call `apps.statistics.fleet.get` with its `channelId`.
    */
   public async get(options: GetChannelOptions): Promise<Channel> {
     return this.httpClient.fetchJson({
@@ -138,7 +139,7 @@ export class ChannelsResource {
   }
 
   /**
-   * The app's channels, newest first.
+   * Lists the channels of the app, newest first.
    */
   public async list(options: ListChannelsOptions): Promise<Channel[]> {
     const { appId, ...query } = options;
@@ -151,7 +152,7 @@ export class ChannelsResource {
 
   /**
    * Pauses a channel: it serves nothing new, and devices keep what they have.
-   * Pausing a paused channel answers it unchanged, so the call is retried.
+   * Pausing a paused channel answers it unchanged, so the client retries the call.
    */
   public async pause(options: PauseChannelOptions): Promise<Channel> {
     return this.httpClient.fetchJson({
@@ -163,7 +164,7 @@ export class ChannelsResource {
 
   /**
    * Resumes a paused channel.
-   * Resuming a running channel answers it unchanged, so the call is retried.
+   * Resuming a running channel answers it unchanged, so the client retries the call.
    */
   public async resume(options: ResumeChannelOptions): Promise<Channel> {
     return this.httpClient.fetchJson({

@@ -7,8 +7,9 @@ import type {
 } from '../types';
 
 /**
- * The devices seen in the last thirty days: `deviceCount`, `currentDeviceCount` the ones running their channel's newest active release,
- * and their counts per dimension, the binaries' with their platform, version and newest report, each the most common first.
+ * The devices seen in the last thirty days.
+ * `deviceCount` counts them all, and `currentDeviceCount` counts those running the newest active release of their channel.
+ * The counts per dimension come most common first; binaries also carry their platform, version and newest report.
  */
 export type FleetStatistics = JsonResponseBody<
   '/v1/apps/{appId}/statistics/fleet',
@@ -26,7 +27,7 @@ export class StatisticsFleetResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The registry's snapshot of the fleet, of one channel when `channelId` names it.
+   * Gets a snapshot of the fleet from the registry, for one channel when `channelId` is set.
    */
   public async get(
     options: GetFleetStatisticsOptions,

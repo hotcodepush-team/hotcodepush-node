@@ -44,7 +44,7 @@ export class ChannelReleasesResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The number of releases in the channel's log under the list's filter.
+   * Counts the releases in the channel log that match the filter.
    */
   public async count(options: CountChannelReleasesOptions): Promise<Count> {
     const { appId, channelId, ...query } = options;
@@ -59,7 +59,8 @@ export class ChannelReleasesResource {
   }
 
   /**
-   * Releases a ready bundle, or what another channel serves, in the channel, numbered next in the channel.
+   * Releases a ready bundle, or what another channel serves, in this channel.
+   * The release gets the next number of the channel.
    */
   public async create(options: CreateReleaseOptions): Promise<ReleaseRow> {
     const { appId, channelId, idempotencyKey, ...body } = options;
@@ -74,7 +75,7 @@ export class ChannelReleasesResource {
   }
 
   /**
-   * The channel's release log, newest first, or the one release `number` names.
+   * Lists the release log of the channel, newest first, or the one release that `number` names.
    */
   public async list(options: ListChannelReleasesOptions): Promise<Release[]> {
     const { appId, channelId, ...query } = options;
@@ -89,8 +90,8 @@ export class ChannelReleasesResource {
   }
 
   /**
-   * Revokes several releases of the channel at once, the ones of `releaseIds` or every one numbered at or above `fromNumber`.
-   * A release already revoked is a no-op, so the call is retried.
+   * Revokes several releases of the channel at once: those in `releaseIds`, or every release numbered at or above `fromNumber`.
+   * Revoking a revoked release does nothing, so the client retries the call.
    */
   public async revoke(
     options: RevokeChannelReleasesOptions,

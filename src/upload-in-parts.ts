@@ -2,18 +2,18 @@ import type { UploadedPart } from './resources/file-upload-parts';
 import type { BlobUploadBody, UploadBody } from './types';
 
 /**
- * Every part but the last is this size: at least five mebibytes and all of one size, the bucket's rule.
+ * The size of every part but the last.
+ * The bucket requires at least five mebibytes, and the same size for all of them.
  */
 export const PART_SIZE_BYTES = 10 * 1024 * 1024;
 
 /**
- * A `Blob` goes up in one request up to this size and in parts above it, well under the request-body cap of the API's plan.
+ * The largest `Blob` sent in one request; a larger one goes up in parts.
+ * It stays well under the request body cap of the API hosting plan.
  */
 export const SINGLE_UPLOAD_LIMIT_BYTES = 64 * 1024 * 1024;
 
-/**
- * The multipart upload the files and the pack share, each addressed by its own path parameters.
- */
+// Files and packs share this upload flow, each with its own path parameters.
 export interface MultipartUploadsResource<TPathParameters, TCompleted> {
   complete(
     options: TPathParameters & { parts: UploadedPart[]; uploadId: string },
@@ -31,9 +31,7 @@ export interface MultipartUploadsResource<TPathParameters, TCompleted> {
   };
 }
 
-/**
- * A stream is read once and cannot be split, so only a `Blob` goes up in parts.
- */
+// A stream is read once and cannot be split, so only a Blob goes up in parts.
 export function isBlobAboveSingleUploadLimit(
   uploadBody: UploadBody,
 ): uploadBody is BlobUploadBody {
@@ -43,10 +41,6 @@ export function isBlobAboveSingleUploadLimit(
   );
 }
 
-/**
- * Uploads a `Blob` in parts of `PART_SIZE_BYTES`, numbered from 1, then completes the upload;
- * a failed part or completion deletes the upload and rethrows.
- */
 export async function uploadInParts<TPathParameters extends object, TCompleted>(
   uploads: MultipartUploadsResource<TPathParameters, TCompleted>,
   pathParameters: TPathParameters,

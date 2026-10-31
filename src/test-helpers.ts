@@ -10,9 +10,6 @@ export interface SentRequest {
   url: string;
 }
 
-/**
- * Runs a call against an API answering 503 on every attempt and counts the attempts the call makes.
- */
 export async function countAttemptsWhenUnavailable(
   call: () => Promise<unknown>,
 ): Promise<number> {
@@ -28,9 +25,6 @@ export async function countAttemptsWhenUnavailable(
   }
 }
 
-/**
- * The last request the stubbed `fetch` received, a JSON body parsed and any other body as it was passed.
- */
 export function resolveSentRequest(fetchMock: Mock<typeof fetch>): SentRequest {
   const [input, init] = fetchMock.mock.lastCall ?? [];
   if (input === undefined) {
@@ -44,9 +38,6 @@ export function resolveSentRequest(fetchMock: Mock<typeof fetch>): SentRequest {
   };
 }
 
-/**
- * Every request the stubbed `fetch` received, as its method and URL.
- */
 export function resolveSentMethodsAndUrls(
   fetchMock: Mock<typeof fetch>,
 ): string[] {
@@ -55,10 +46,6 @@ export function resolveSentMethodsAndUrls(
   );
 }
 
-/**
- * Runs a call against an API answering 502 on the first attempt and `createResponse` on every later one,
- * and answers the call's result with the attempts it made.
- */
 export async function runCallAfterBadGateway<T>(
   call: () => Promise<T>,
   createResponse: () => Response,
@@ -76,9 +63,7 @@ export async function runCallAfterBadGateway<T>(
   }
 }
 
-/**
- * Replaces the global `fetch`; undo with `vi.unstubAllGlobals()`.
- */
+// Undo with `vi.unstubAllGlobals()`.
 export function stubFetch(
   createResponse: () => Response = () => Response.json({}),
 ): Mock<typeof fetch> {
@@ -87,10 +72,6 @@ export function stubFetch(
   return fetchMock;
 }
 
-/**
- * Replaces the global `fetch` with the API's side of a multipart upload: the upload id on its start, each part's number
- * in its etag, `upload_incomplete` for the failed part, `not_found` on its deletion and the completed body on its completion.
- */
 export function stubMultipartUploadFetch(
   completedBody: unknown,
   failedPartNumber?: number,

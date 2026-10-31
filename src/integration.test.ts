@@ -12,9 +12,7 @@ import type { Organization } from './resources/organizations';
 const apiBaseUrl = process.env.HOTCODEPUSH_API_BASE_URL;
 const token = process.env.HOTCODEPUSH_API_TOKEN;
 
-/**
- * Runs against a live API, by hand; see CLAUDE.md for the local setup.
- */
+// Runs by hand against a live API. CLAUDE.md describes the local setup.
 describe.runIf(apiBaseUrl)('the client against a running API', () => {
   const hotCodePush = new HotCodePush({ baseUrl: apiBaseUrl, token });
   const createdOrganizations: Organization[] = [];
@@ -389,9 +387,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
   });
 });
 
-/**
- * The API stores a pack without reading it; a real pack is the CLI's tar of the bundle.
- */
+// The API stores a pack without reading it. A real pack is the tar of the bundle that the CLI builds.
 const PACK_PLACEHOLDER = new TextEncoder().encode('pack placeholder');
 
 function resolveTestFile(

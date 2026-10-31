@@ -34,7 +34,8 @@ export type FileUpload = JsonResponseBody<
 >;
 
 /**
- * The multipart upload of a larger file: create, upload the parts, complete, or delete to abort.
+ * Uploads a larger file in parts.
+ * Create the upload, upload the parts and complete it, or delete it to abort.
  */
 export class FileUploadsResource {
   public readonly parts: FileUploadPartsResource;
@@ -45,7 +46,7 @@ export class FileUploadsResource {
 
   /**
    * Assembles the parts into the file and checks its hash.
-   * A hash the app already holds answers the stored file before any assembly, so the call is retried.
+   * If the app already holds the hash, the stored file is answered without assembly, so the client retries the call.
    */
   public async complete(options: CompleteFileUploadOptions): Promise<AppFile> {
     const { appId, sha256, uploadId, ...body } = options;
@@ -61,8 +62,9 @@ export class FileUploadsResource {
   }
 
   /**
-   * Starts a multipart upload; every part but the last is at least five mebibytes, all of one size.
-   * The start holds no state, and an upload a repeat leaves unused expires by the bucket's default, so the call is retried.
+   * Starts a multipart file upload.
+   * Every part but the last must have the same size of at least five mebibytes.
+   * The start holds no state, and an unused upload expires on its own, so the client retries the call.
    */
   public async create(options: CreateFileUploadOptions): Promise<FileUpload> {
     return this.httpClient.fetchJson({
@@ -73,7 +75,7 @@ export class FileUploadsResource {
   }
 
   /**
-   * Aborts a multipart upload, discarding its parts.
+   * Aborts a multipart file upload and discards its parts.
    */
   public async delete(options: DeleteFileUploadOptions): Promise<void> {
     await this.httpClient.fetchJson({

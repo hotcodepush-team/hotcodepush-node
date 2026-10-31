@@ -7,7 +7,7 @@ import type {
 } from '../types';
 
 /**
- * The channel's active devices, the ones every condition reaches and the estimate at the rollout percentage.
+ * The active devices of the channel, the devices every condition reaches and the estimate at the rollout percentage.
  */
 export type Audience = JsonResponseBody<
   '/v1/apps/{appId}/channels/{channelId}/audience',
@@ -25,8 +25,8 @@ export class ChannelAudienceResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The devices a release's conditions would reach in the channel before it exists;
-   * each condition repeats, and repeated conditions combine with AND.
+   * Estimates which devices of the channel a release with these conditions would reach, before the release exists.
+   * Each condition is repeatable, and repeated conditions combine with AND.
    */
   public async get(options: GetAudienceOptions): Promise<Audience> {
     const { appId, channelId, ...query } = options;

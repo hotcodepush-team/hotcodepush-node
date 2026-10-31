@@ -71,7 +71,7 @@ export class ReleasesResource {
   }
 
   /**
-   * The number of the app's releases under the list's filters.
+   * Counts the releases of the app that match the filters.
    */
   public async count(options: CountReleasesOptions): Promise<Count> {
     const { appId, ...query } = options;
@@ -83,7 +83,7 @@ export class ReleasesResource {
   }
 
   /**
-   * A release with its status: when it went live in the index and when the purge completed.
+   * Gets a release with its status: when it went live in the index and when the purge completed.
    */
   public async get(options: GetReleaseOptions): Promise<Release> {
     const { appId, releaseId, ...query } = options;
@@ -98,7 +98,7 @@ export class ReleasesResource {
   }
 
   /**
-   * Every release of the app, newest first.
+   * Lists every release of the app, newest first.
    */
   public async list(options: ListReleasesOptions): Promise<Release[]> {
     const { appId, ...query } = options;
@@ -110,8 +110,8 @@ export class ReleasesResource {
   }
 
   /**
-   * Stops offering a release; devices on it keep it.
-   * Pausing a paused release answers it unchanged, so the call is retried.
+   * Pauses a release: it is no longer offered, and devices on it keep it.
+   * Pausing a paused release answers it unchanged, so the client retries the call.
    */
   public async pause(options: PauseReleaseOptions): Promise<ReleaseRow> {
     return this.httpClient.fetchJson({
@@ -122,8 +122,8 @@ export class ReleasesResource {
   }
 
   /**
-   * Offers a paused release again.
-   * Resuming an active release answers it unchanged, so the call is retried.
+   * Resumes a paused release, so it is offered again.
+   * Resuming an active release answers it unchanged, so the client retries the call.
    */
   public async resume(options: ResumeReleaseOptions): Promise<ReleaseRow> {
     return this.httpClient.fetchJson({
@@ -137,8 +137,9 @@ export class ReleasesResource {
   }
 
   /**
-   * Revokes a release for good: devices on it move to the newest eligible older release or the embedded bundle.
-   * A repeat answers `release_revoked`, so the call is never retried.
+   * Revokes a release for good.
+   * Devices on it move to the newest eligible older release or to the embedded bundle.
+   * A repeat answers `release_revoked`, so the client never retries the call.
    */
   public async revoke(options: RevokeReleaseOptions): Promise<ReleaseRow> {
     return this.httpClient.fetchJson({
@@ -151,7 +152,8 @@ export class ReleasesResource {
   }
 
   /**
-   * Changes the rollout percentage in both directions, the progression schedule, null stopping it, the mandatory flag or the notes.
+   * Changes the rollout percentage (up or down), the progression schedule, the mandatory flag or the notes.
+   * Setting the progression schedule to null stops it.
    */
   public async update(options: UpdateReleaseOptions): Promise<ReleaseRow> {
     const { appId, releaseId, ...body } = options;

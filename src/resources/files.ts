@@ -30,9 +30,9 @@ export class FilesResource {
   }
 
   /**
-   * Uploads one file: the body is the file gzip-compressed and `sha256` the hash of its uncompressed content.
-   * A hash the app already holds answers the existing file.
-   * A `Blob` above `SINGLE_UPLOAD_LIMIT_BYTES` goes up in parts; a stream goes up in one request, so it stays within the limit.
+   * Uploads one file.
+   * The body is the gzip-compressed file, and `sha256` is the hash of the uncompressed content. A hash the app already holds answers the existing file.
+   * A `Blob` above `SINGLE_UPLOAD_LIMIT_BYTES` goes up in parts. A stream goes up in one request, so it must stay within that limit.
    */
   public async upload(options: UploadFileOptions): Promise<AppFile> {
     const { appId, sha256, ...uploadBody } = options;

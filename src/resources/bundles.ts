@@ -64,8 +64,8 @@ export class BundlesResource {
   }
 
   /**
-   * Checks every listed file and the pack are uploaded, writes the manifest and sets the bundle `ready`.
-   * A completed bundle answers itself again, so the call is retried.
+   * Completes a bundle: checks that every listed file and the pack are uploaded, writes the manifest and sets the status to `ready`.
+   * A completed bundle answers itself again, so the client retries the call.
    */
   public async complete(options: CompleteBundleOptions): Promise<Bundle> {
     return this.httpClient.fetchJson({
@@ -79,7 +79,7 @@ export class BundlesResource {
   }
 
   /**
-   * The number of the app's bundles under the list's filters.
+   * Counts the bundles of the app that match the filters.
    */
   public async count(options: CountBundlesOptions): Promise<Count> {
     const { appId, ...query } = options;
@@ -91,9 +91,9 @@ export class BundlesResource {
   }
 
   /**
-   * Creates a bundle from its manifest; it stays `uploading` until completed.
-   * `apps.bundles.files.list` with `isStored: 'false'` names the files the app lacks, each uploaded through `apps.files.upload`;
-   * the pack goes up through `apps.bundles.pack.upload`.
+   * Creates a bundle from its manifest. It stays `uploading` until completed.
+   * Find the files the app lacks with `apps.bundles.files.list` and `isStored: 'false'`, and upload each through `apps.files.upload`.
+   * Upload the pack through `apps.bundles.pack.upload`.
    */
   public async create(options: CreateBundleOptions): Promise<Bundle> {
     const { appId, idempotencyKey, ...body } = options;
@@ -105,7 +105,8 @@ export class BundlesResource {
   }
 
   /**
-   * Deletes a bundle now; one a release serves or a store build embeds is refused.
+   * Deletes a bundle at once.
+   * A bundle that a release serves or a store build embeds is refused.
    */
   public async delete(options: DeleteBundleOptions): Promise<void> {
     await this.httpClient.fetchJson({
@@ -122,7 +123,7 @@ export class BundlesResource {
   }
 
   /**
-   * The app's uploaded bundles, newest first.
+   * Lists the uploaded bundles of the app, newest first.
    */
   public async list(options: ListBundlesOptions): Promise<Bundle[]> {
     const { appId, ...query } = options;

@@ -26,7 +26,7 @@ export type DeleteManyDevicesOptions = PathParameters<
   QueryParameters<'/v1/apps/{appId}/devices', 'delete'>;
 
 /**
- * A device of the registry, the facts of its last report.
+ * A device in the registry, with the facts of its last report.
  */
 export type Device = JsonResponseBody<
   '/v1/apps/{appId}/devices',
@@ -54,7 +54,7 @@ export class DevicesResource {
   }
 
   /**
-   * The number of the app's devices under the list's filters.
+   * Counts the devices of the app that match the filters.
    */
   public async count(options: CountDevicesOptions): Promise<Count> {
     const { appId, ...query } = options;
@@ -66,7 +66,7 @@ export class DevicesResource {
   }
 
   /**
-   * Deletes a device's registry row, the erasure request.
+   * Deletes a device from the registry, for an erasure request.
    */
   public async delete(options: DeleteDeviceOptions): Promise<void> {
     await this.httpClient.fetchJson({
@@ -76,7 +76,7 @@ export class DevicesResource {
   }
 
   /**
-   * Deletes the app's devices named by `ids`, one to 100; an id of another app is skipped.
+   * Deletes the devices of the app named by `ids`, one to 100. An id of another app is skipped.
    */
   public async deleteMany(options: DeleteManyDevicesOptions): Promise<void> {
     const { appId, ...query } = options;
@@ -100,7 +100,8 @@ export class DevicesResource {
   }
 
   /**
-   * The app's devices, the newest report first; `attribute` takes one `key=value`.
+   * Lists the devices of the app, newest report first.
+   * `attribute` takes one `key=value` pair.
    */
   public async list(options: ListDevicesOptions): Promise<Device[]> {
     const { appId, ...query } = options;

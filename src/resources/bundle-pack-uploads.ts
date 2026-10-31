@@ -34,7 +34,8 @@ export type DeleteBundlePackUploadOptions = PathParameters<
 >;
 
 /**
- * The multipart upload of a pack above the request body limit: create, upload the parts, complete, or delete to abort.
+ * Uploads a pack above the request body limit in parts.
+ * Create the upload, upload the parts and complete it, or delete it to abort.
  */
 export class BundlePackUploadsResource {
   public readonly parts: BundlePackUploadPartsResource;
@@ -44,8 +45,8 @@ export class BundlePackUploadsResource {
   }
 
   /**
-   * Assembles the parts into the pack, replacing one uploaded before.
-   * R2 refuses a second completion, so the call is never retried.
+   * Assembles the parts into the pack and replaces any pack uploaded before.
+   * R2 refuses a second completion, so the client never retries the call.
    */
   public async complete(
     options: CompleteBundlePackUploadOptions,
@@ -62,8 +63,9 @@ export class BundlePackUploadsResource {
   }
 
   /**
-   * Starts a multipart upload of the pack; every part but the last is at least five mebibytes, all of one size.
-   * The start holds no state, and an upload a repeat leaves unused expires by the bucket's default, so the call is retried.
+   * Starts a multipart upload of the pack.
+   * Every part but the last must have the same size of at least five mebibytes.
+   * The start holds no state, and an unused upload expires on its own, so the client retries the call.
    */
   public async create(
     options: CreateBundlePackUploadOptions,
@@ -79,7 +81,7 @@ export class BundlePackUploadsResource {
   }
 
   /**
-   * Aborts a multipart pack upload, discarding its parts.
+   * Aborts a multipart pack upload and discards its parts.
    */
   public async delete(options: DeleteBundlePackUploadOptions): Promise<void> {
     await this.httpClient.fetchJson({

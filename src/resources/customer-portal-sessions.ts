@@ -20,8 +20,9 @@ export class CustomerPortalSessionsResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * A session of Polar's customer portal for the organization's invoices and payment method; an organization that never subscribed has none.
-   * Each call creates another session and the API keeps no `Idempotency-Key` for it, so the call is never retried.
+   * Creates a Polar customer portal session for the invoices and payment method of the organization.
+   * An organization that never subscribed has no portal.
+   * Each call creates another session and the API keeps no `Idempotency-Key` for it, so the client never retries the call.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async create(

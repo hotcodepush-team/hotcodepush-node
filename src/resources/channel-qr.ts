@@ -12,8 +12,8 @@ export class ChannelQrResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The channel's deep link from the app's `channelLinkTemplate` as a QR image, SVG unless `format` is `png`;
-   * `not_found` while the template is unset.
+   * Gets the deep link of the channel as a QR image, built from the `channelLinkTemplate` of the app.
+   * The image is SVG unless `format` is `png`. Answers `not_found` while the template is unset.
    */
   public async get(options: GetChannelQrOptions): Promise<Blob> {
     const { appId, channelId, ...query } = options;

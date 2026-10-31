@@ -12,7 +12,8 @@ export type ListNotificationPreferencesOptions = QueryParameters<
 >;
 
 /**
- * Whether the caller receives one category's notifications through one medium, for the account or one membership.
+ * Whether the caller receives the notifications of one category through one medium.
+ * It applies to the account or to one membership.
  */
 export type NotificationPreference = JsonResponseBody<
   '/v1/notification-preferences',
@@ -26,14 +27,16 @@ export type UpdateNotificationPreferenceOptions = JsonRequestBody<
 >;
 
 /**
- * The caller's notification preferences, one per category and medium, for the account or, with `organizationId`, for that membership.
+ * The notification preferences of the caller, one per category and medium.
+ * They apply to the account or, with `organizationId`, to that membership.
  */
 export class NotificationPreferencesResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * One preference per category and each medium its notifications reach, the defaults included, in the catalog's order
-   * and email first: the categories set for the account, or with `organizationId` those set per membership.
+   * Lists the preferences of the caller, one per category and medium, defaults included.
+   * The order follows the catalog, with email first.
+   * Without `organizationId` it lists the account categories, with it the categories set per membership.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async list(
@@ -47,7 +50,8 @@ export class NotificationPreferencesResource {
   }
 
   /**
-   * Sets one preference, the category and the medium, and answers it; a mandatory category's email is always on.
+   * Sets one preference, given by category and medium, and answers it.
+   * Email for a mandatory category is always on.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async update(

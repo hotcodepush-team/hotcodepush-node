@@ -13,7 +13,7 @@ export class UserPasswordResource {
 
   /**
    * Sets the first password of an account that signed up through GitHub, Google or SSO, and ends its other sessions.
-   * An account with a password answers `password_already_set`, as a repeat would, so the call is never retried.
+   * An account with a password answers `password_already_set`, as a repeat would, so the client never retries the call.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async create(options: CreateUserPasswordOptions): Promise<void> {

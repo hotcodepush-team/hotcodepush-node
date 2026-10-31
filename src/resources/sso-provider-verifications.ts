@@ -12,9 +12,9 @@ export class SsoProviderVerificationsResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * Looks up the domain's TXT record for the provider's `domainVerificationToken` and sets `domainVerified` when the record carries it;
-   * the answer is the provider, verified or still waiting for the record, and a resolver that cannot be asked answers `dns_lookup_failed`.
-   * A verified provider answers unchanged without a lookup, so the call is retried.
+   * Verifies the SSO domain: looks for `domainVerificationToken` in the TXT record of the domain and sets `domainVerified` when found.
+   * Answers the provider, verified or still waiting for the record. A DNS resolver that cannot be reached answers `dns_lookup_failed`.
+   * A verified provider answers unchanged without a lookup, so the client retries the call.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async create(

@@ -1,8 +1,5 @@
 import type { components, paths } from './generated/schema';
 
-/**
- * The one error shape every API error answers with, and the one the client fills for a response outside it.
- */
 export interface ErrorBody {
   code: HotCodePushErrorCode;
   details?: unknown;
@@ -10,7 +7,7 @@ export interface ErrorBody {
 }
 
 /**
- * A body a retry can read again; its size is the `Content-Length`.
+ * An upload body that a retry can read again. Its size is sent as `Content-Length`.
  * `fs.openAsBlob(path)` streams a file from disk this way.
  */
 export interface BlobUploadBody {
@@ -18,20 +15,20 @@ export interface BlobUploadBody {
 }
 
 /**
- * What every list's `/count` answers: `count`, the rows the list's filters match.
+ * The answer of every `count` method: the number of rows that match the filters.
  */
 export type Count = JsonResponseBody<'/v1/organizations/count', 'get', 200>;
 
 /**
- * A code of the API's error catalog, or the client's own `unexpected_response` for a response outside the API's error shape,
- * such as a page of the platform in front of the API; the catalog's `internal` is the API's own failure.
+ * A code from the API error catalog, or `unexpected_response` for a response without the API error shape.
+ * Such a response can come from the platform in front of the API. `internal` means the API itself failed.
  */
 export type HotCodePushErrorCode =
   components['schemas']['Error']['code'] | 'unexpected_response';
 
 export interface IdempotencyOptions {
   /**
-   * The `Idempotency-Key` header, kept by the API for 24 hours, so a retried call gets the same result back instead of a second one.
+   * The `Idempotency-Key` header. The API keeps it for 24 hours, so a retried call gets the first result back instead of creating a second one.
    *
    * @default a UUID generated per call and sent on each of its attempts
    */
@@ -39,7 +36,8 @@ export interface IdempotencyOptions {
 }
 
 /**
- * A body read once and sent as it streams, never retried; the API requires its `Content-Length`.
+ * An upload body that is read once as it streams and never retried.
+ * The API requires its `contentLength`.
  */
 export interface StreamUploadBody {
   body: ReadableStream<Uint8Array>;
@@ -53,9 +51,6 @@ export type UploadBody = BlobUploadBody | StreamUploadBody;
 
 type HttpMethod = 'delete' | 'get' | 'patch' | 'post' | 'put';
 
-/**
- * An operation of the OpenAPI snapshot: a path or a method the document lacks does not compile.
- */
 type Operation<
   TPath extends keyof paths,
   TMethod extends HttpMethod,

@@ -23,8 +23,8 @@ export class SubscriptionResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * Schedules the end of the subscription at the end of its period, with the reason and the comment of the retention dialog.
-   * A cancel already scheduled stays as it is, so the call is retried.
+   * Cancels the subscription at the end of its period, with the reason and comment from the retention dialog.
+   * A cancel already scheduled stays as it is, so the client retries the call.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async cancel(options: CancelSubscriptionOptions): Promise<void> {
@@ -41,8 +41,8 @@ export class SubscriptionResource {
   }
 
   /**
-   * Clears the scheduled end of the subscription, so it renews as before.
-   * A subscription with no end scheduled stays as it is, so the call is retried.
+   * Undoes a scheduled cancel, so the subscription renews as before.
+   * A subscription with no cancel scheduled stays as it is, so the client retries the call.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async uncancel(options: UncancelSubscriptionOptions): Promise<void> {

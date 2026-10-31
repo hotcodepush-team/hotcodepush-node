@@ -31,8 +31,9 @@ export type RedeliverWebhookDeliveryOptions = PathParameters<
 >;
 
 /**
- * One event sent to a webhook with its attempts: the `type`, the audit type or `webhook.test`, the `status`, `pending`, `succeeded` or `failed`,
- * the receiver's last `responseCode` and `responseBody`, cut at 4,096 characters, and `nextAttemptAt` while the queue retries it.
+ * One event sent to a webhook, with its attempts.
+ * `type` is the audit type or `webhook.test`, and `status` is `pending`, `succeeded` or `failed`.
+ * `responseCode` and `responseBody` come from the last attempt, the body cut at 4,096 characters. `nextAttemptAt` is set while the queue retries.
  */
 export type WebhookDelivery = JsonResponseBody<
   '/v1/organizations/{organizationId}/webhooks/{webhookId}/deliveries',
@@ -41,13 +42,13 @@ export type WebhookDelivery = JsonResponseBody<
 >[number];
 
 /**
- * A webhook's delivery log, each delivery kept for 30 days.
+ * The delivery log of a webhook. Each delivery is kept for 30 days.
  */
 export class WebhookDeliveriesResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The number of the webhook's deliveries under the list's filters.
+   * Counts the deliveries of the webhook that match the filters.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async count(options: CountWebhookDeliveriesOptions): Promise<Count> {
@@ -63,7 +64,8 @@ export class WebhookDeliveriesResource {
   }
 
   /**
-   * The webhook's deliveries, newest first, filtered by `status` and by `createdSince` and `createdUntil`, both inclusive.
+   * Lists the deliveries of the webhook, newest first.
+   * Filter by `status`, and by `createdSince` and `createdUntil`, both inclusive.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async list(
@@ -81,8 +83,8 @@ export class WebhookDeliveriesResource {
   }
 
   /**
-   * Delivers the event again, once, within the request, and answers the settled delivery, its attempt count carried on.
-   * Each call makes another attempt, so the call is never retried.
+   * Delivers the event again, once, within the request, and answers the settled delivery with its attempt count carried on.
+   * Each call makes another attempt, so the client never retries the call.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async redeliver(

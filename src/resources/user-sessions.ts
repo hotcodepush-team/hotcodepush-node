@@ -12,7 +12,8 @@ export class UserSessionsResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * Ends the caller's sessions named by `ids`, one to 100, the current one included; an id that is not the caller's is skipped.
+   * Ends the sessions of the caller named by `ids`, one to 100, the current session included.
+   * An id that is not the caller's is skipped.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async deleteMany(options: DeleteManySessionsOptions): Promise<void> {

@@ -18,7 +18,8 @@ export class FileUploadPartsResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * Uploads one part of a multipart upload; its `etag` and `partNumber` complete the upload.
+   * Uploads one part of a multipart file upload.
+   * Pass the answered `etag` and `partNumber` to `complete`.
    */
   public async upload(options: UploadPartOptions): Promise<UploadedPart> {
     const { appId, partNumber, sha256, uploadId, ...uploadBody } = options;

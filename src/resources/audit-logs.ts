@@ -8,7 +8,7 @@ import type {
 } from '../types';
 
 /**
- * A row of the audit log: who did what to which object, and when.
+ * One audit log entry: who did what to which object, and when.
  */
 export type AuditLog = JsonResponseBody<
   '/v1/organizations/{organizationId}/audit-logs',
@@ -23,7 +23,7 @@ export type CountAuditLogsOptions = PathParameters<
   QueryParameters<'/v1/organizations/{organizationId}/audit-logs/count', 'get'>;
 
 /**
- * The list's filters; the CSV holds every matching row, unpaginated.
+ * The same filters as `list`. The CSV holds every matching entry, without pages.
  */
 export type DownloadAuditLogsCsvOptions = CountAuditLogsOptions;
 
@@ -40,7 +40,7 @@ export class AuditLogsResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The number of the audit log's rows under the list's filters.
+   * Counts the audit log entries that match the filters.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async count(options: CountAuditLogsOptions): Promise<Count> {
@@ -55,7 +55,7 @@ export class AuditLogsResource {
   }
 
   /**
-   * The audit log under the list's filters as `text/csv`, read whole.
+   * Downloads the audit log entries that match the filters as a `text/csv` `Blob`.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async downloadCsv(
@@ -72,8 +72,9 @@ export class AuditLogsResource {
   }
 
   /**
-   * The organization's audit log, newest first; `type` takes `channel.*` for every action on an object.
-   * On a plan that includes the audit log, `plan_required` otherwise.
+   * Lists the audit log of the organization, newest first.
+   * `type` takes a wildcard such as `channel.*` to match every action on one kind of object.
+   * Needs a plan that includes the audit log; any other plan answers `plan_required`.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async list(options: ListAuditLogsOptions): Promise<AuditLog[]> {

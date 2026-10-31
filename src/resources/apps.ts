@@ -51,7 +51,7 @@ export class AppsResource {
   }
 
   /**
-   * Soft-deletes an app: gone at once, hard-deleted after seven days.
+   * Soft-deletes an app. It is gone at once and hard-deleted after seven days.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async delete(options: DeleteAppOptions): Promise<void> {
@@ -69,8 +69,8 @@ export class AppsResource {
   }
 
   /**
-   * Moves an app to another organization the caller is an Admin of.
-   * A repeat answers `validation`, the app being in the target already, so the call is never retried.
+   * Moves an app to another organization in which the caller is an Admin.
+   * A repeat answers `validation` because the app is already there, so the client never retries the call.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async transfer(options: TransferAppOptions): Promise<App> {

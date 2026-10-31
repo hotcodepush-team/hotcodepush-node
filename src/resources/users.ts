@@ -30,9 +30,9 @@ export class UsersResource {
   }
 
   /**
-   * Soft-deletes the caller's account: gone at once, hard-deleted after seven days.
-   * `userId` takes `me` for the caller; `password` is the account's own, and a wrong one answers `forbidden`,
-   * as does an account without a password, which sets one first through `users.password.create`.
+   * Soft-deletes the account of the caller. It is gone at once and hard-deleted after seven days.
+   * `userId` takes `me`. `password` is the account password; a wrong one answers `forbidden`.
+   * An account without a password also answers `forbidden` and must set one first through `users.password.create`.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async delete(options: DeleteUserOptions): Promise<void> {
@@ -45,10 +45,9 @@ export class UsersResource {
   }
 
   /**
-   * The caller behind the token.
-   * `userId` takes `me` for the caller; another user answers `forbidden`.
-   * `relations` embeds the caller's `accounts`, their sign-in identities, their `members` rows of live organizations
-   * and, with `members.organization`, each row's organization.
+   * Gets the caller behind the token.
+   * `userId` takes `me`; another user answers `forbidden`.
+   * `relations` embeds `accounts` (the sign-in identities) and `members` (the member rows of live organizations). With `members.organization`, each member row embeds its organization.
    */
   public async get(options: GetUserOptions): Promise<User> {
     const { userId, ...query } = options;

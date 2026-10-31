@@ -20,7 +20,8 @@ export type ListDeviceEventsOptions = PathParameters<
   QueryParameters<'/v1/apps/{appId}/devices/{deviceId}/events', 'get'>;
 
 /**
- * A device's first event of each type on a release: applied, checked, confirmed or failed, with the reason a failure gave.
+ * The first event of each type that a device sent for a release: applied, checked, confirmed or failed.
+ * A failed event carries its reason.
  */
 export type ReleaseDeviceEvent = JsonResponseBody<
   '/v1/apps/{appId}/devices/{deviceId}/events',
@@ -32,7 +33,7 @@ export class DeviceEventsResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The number of the device's events under the list's filter.
+   * Counts the events of the device that match the filter.
    */
   public async count(options: CountDeviceEventsOptions): Promise<Count> {
     const { appId, deviceId, ...query } = options;
@@ -47,7 +48,7 @@ export class DeviceEventsResource {
   }
 
   /**
-   * The device's events across the app's releases, newest first, filtered by `releaseId`.
+   * Lists the events of the device across all releases of the app, newest first, filtered by `releaseId`.
    */
   public async list(
     options: ListDeviceEventsOptions,

@@ -68,7 +68,7 @@ export class MembersResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The number of the organization's members under the list's filters.
+   * Counts the members of the organization that match the filters.
    */
   public async count(options: CountMembersOptions): Promise<Count> {
     const { organizationId, ...query } = options;
@@ -82,7 +82,7 @@ export class MembersResource {
   }
 
   /**
-   * Removes a member; any member may remove themselves, which is leaving the organization.
+   * Removes a member. Any member may remove themselves to leave the organization.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async delete(options: DeleteMemberOptions): Promise<void> {
@@ -96,8 +96,8 @@ export class MembersResource {
   }
 
   /**
-   * Removes the organization's members named by `ids`, one to 100; an id of another organization is skipped,
-   * and the Owner refuses the whole set.
+   * Removes the members of the organization named by `ids`, one to 100. An id of another organization is skipped.
+   * If the set holds the Owner, the whole set is refused.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async deleteMany(options: DeleteManyMembersOptions): Promise<void> {
@@ -124,7 +124,7 @@ export class MembersResource {
   }
 
   /**
-   * The organization's members, newest first.
+   * Lists the members of the organization, newest first.
    */
   public async list(options: ListMembersOptions): Promise<Member[]> {
     const { organizationId, ...query } = options;
@@ -138,7 +138,7 @@ export class MembersResource {
   }
 
   /**
-   * Changes a member's role; setting `owner` transfers the ownership.
+   * Changes the role of a member. Setting `owner` transfers the ownership.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async update(options: UpdateMemberOptions): Promise<MemberRow> {

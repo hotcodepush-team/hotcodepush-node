@@ -27,8 +27,8 @@ export class BundlePackResource {
   }
 
   /**
-   * Uploads the bundle's full pack, a tar, before the bundle is completed.
-   * A `Blob` above `SINGLE_UPLOAD_LIMIT_BYTES` goes up in parts; a stream goes up in one request, so it stays within the limit.
+   * Uploads the full pack of the bundle, a tar, before the bundle is completed.
+   * A `Blob` above `SINGLE_UPLOAD_LIMIT_BYTES` goes up in parts. A stream goes up in one request, so it must stay within that limit.
    */
   public async upload(
     options: UploadBundlePackOptions,

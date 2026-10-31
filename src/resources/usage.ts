@@ -8,7 +8,8 @@ import type {
 } from '../types';
 
 /**
- * One live app's usage in a month: its monthly active devices and its data transfer, with the app as `relations: ['app']` embeds it.
+ * The usage of one live app in a month: its monthly active devices and data transfer.
+ * `relations: ['app']` embeds the app.
  */
 export type AppUsageMonth = JsonResponseBody<
   '/v1/organizations/{organizationId}/usage/apps',
@@ -23,7 +24,7 @@ export type CountUsageAppsOptions = PathParameters<
   QueryParameters<'/v1/organizations/{organizationId}/usage/apps/count', 'get'>;
 
 /**
- * The month the CSV holds every app's row of.
+ * The month to export. The CSV holds one row per app.
  */
 export type DownloadUsageAppsCsvOptions = CountUsageAppsOptions;
 
@@ -43,7 +44,7 @@ export type ListUsageAppsOptions = PathParameters<
   >;
 
 /**
- * The organization's monthly active devices and data transfer in `month`, `YYYY-MM`, summed over its apps' rows.
+ * The monthly active devices and data transfer of the organization in `month` (`YYYY-MM`), summed over its apps.
  */
 export type Usage = JsonResponseBody<
   '/v1/organizations/{organizationId}/usage',
@@ -55,7 +56,7 @@ export class UsageResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * The number of apps with usage in `month`, which `listApps` pages through.
+   * Counts the apps with usage in `month`, for paging through `listApps`.
    */
   public async countApps(options: CountUsageAppsOptions): Promise<Count> {
     const { organizationId, ...query } = options;
@@ -69,7 +70,7 @@ export class UsageResource {
   }
 
   /**
-   * Every app's usage in `month` as `text/csv` with the app's name, read whole.
+   * Downloads the usage of every app in `month`, with the app name, as a `text/csv` `Blob`.
    */
   public async downloadAppsCsv(
     options: DownloadUsageAppsCsvOptions,
@@ -85,7 +86,7 @@ export class UsageResource {
   }
 
   /**
-   * The organization's usage in `month`, the current one by default, read from the stored months.
+   * Gets the usage of the organization in `month`, the current month by default, from the stored months.
    */
   public async get(options: GetUsageOptions): Promise<Usage> {
     const { organizationId, ...query } = options;
@@ -99,7 +100,8 @@ export class UsageResource {
   }
 
   /**
-   * The usage of each live app in `month`, the most monthly active devices first; `relations: ['app']` embeds the app's id and name.
+   * Lists the usage of each live app in `month`, most monthly active devices first.
+   * `relations: ['app']` embeds the id and name of the app.
    */
   public async listApps(
     options: ListUsageAppsOptions,

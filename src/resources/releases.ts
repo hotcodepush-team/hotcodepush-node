@@ -72,6 +72,7 @@ export class ReleasesResource {
 
   /**
    * Counts the releases of the app that match the filters.
+   * `number` is valid only beside `channelId`, since release numbers count per channel.
    */
   public async count(options: CountReleasesOptions): Promise<Count> {
     const { appId, ...query } = options;
@@ -99,6 +100,7 @@ export class ReleasesResource {
 
   /**
    * Lists every release of the app, newest first.
+   * `channelId` selects the release log of one channel, and `number` beside it one release of that log.
    */
   public async list(options: ListReleasesOptions): Promise<Release[]> {
     const { appId, ...query } = options;

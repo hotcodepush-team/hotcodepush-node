@@ -17,7 +17,7 @@ export type GetSsoProviderOptions = PathParameters<
   'get'
 >;
 
-export type PutSsoProviderOptions = PathParameters<
+export type SetSsoProviderOptions = PathParameters<
   '/v1/organizations/{organizationId}/sso-provider',
   'put'
 > &
@@ -73,7 +73,7 @@ export class SsoProviderResource {
    * A new or changed domain starts unverified, with a new token for its TXT record.
    * An API token answers `forbidden`; sign in with a session.
    */
-  public async put(options: PutSsoProviderOptions): Promise<SsoProvider> {
+  public async set(options: SetSsoProviderOptions): Promise<SsoProvider> {
     const { organizationId, ...body } = options;
     return this.httpClient.fetchJson({
       body,

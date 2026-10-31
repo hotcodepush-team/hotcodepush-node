@@ -50,7 +50,7 @@ export class BundleFilesResource {
   /**
    * Lists the files of the bundle, ordered by path.
    * An embedded bundle answers the files its binary was created with.
-   * After creating a bundle, `isStored: 'false'` selects the files still to upload.
+   * After creating a bundle, `isStored: false` selects the files still to upload.
    */
   public async list(options: ListBundleFilesOptions): Promise<BundleFile[]> {
     const { appId, bundleId, ...query } = options;

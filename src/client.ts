@@ -6,6 +6,7 @@ import { InvitationsResource } from './resources/invitations';
 import { NotificationPreferencesResource } from './resources/notification-preferences';
 import { NotificationsResource } from './resources/notifications';
 import { OrganizationsResource } from './resources/organizations';
+import { QrCodesResource } from './resources/qr-codes';
 import { UsersResource } from './resources/users';
 
 export type HotCodePushOptions = HttpClientOptions;
@@ -21,6 +22,7 @@ export class HotCodePush {
   public readonly notificationPreferences: NotificationPreferencesResource;
   public readonly notifications: NotificationsResource;
   public readonly organizations: OrganizationsResource;
+  public readonly qrCodes: QrCodesResource;
   public readonly users: UsersResource;
 
   constructor(options: HotCodePushOptions = {}) {
@@ -33,6 +35,7 @@ export class HotCodePush {
     );
     this.notifications = new NotificationsResource(httpClient);
     this.organizations = new OrganizationsResource(httpClient);
+    this.qrCodes = new QrCodesResource(httpClient);
     this.users = new UsersResource(httpClient);
   }
 }

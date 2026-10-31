@@ -31,6 +31,22 @@ describe('ReleasesResource', () => {
     });
   });
 
+  test('should count the releases of one number in a channel', async () => {
+    const fetchMock = stubFetch(() => Response.json({ count: 1 }));
+
+    const fetchedCount = await new HotCodePush().apps.releases.count({
+      appId: 'app',
+      channelId: 'channel',
+      number: 3,
+    });
+
+    expect(fetchedCount).toEqual({ count: 1 });
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: `${RELEASES_URL}/count?channelId=channel&number=3`,
+    });
+  });
+
   test('should get the release with the linked rows', async () => {
     const fetchMock = stubFetch(() => Response.json(RELEASE));
 
@@ -60,6 +76,23 @@ describe('ReleasesResource', () => {
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
       url: `${RELEASES_URL}?channelId=channel&status=paused`,
+    });
+  });
+
+  test('should list the release of one number in a channel with the linked rows', async () => {
+    const fetchMock = stubFetch(() => Response.json([RELEASE]));
+
+    const fetchedReleases = await new HotCodePush().apps.releases.list({
+      appId: 'app',
+      channelId: 'channel',
+      number: 1,
+      relations: ['bundle', 'channel', 'releaseCounters'],
+    });
+
+    expect(fetchedReleases).toEqual([RELEASE]);
+    expect(resolveSentRequest(fetchMock)).toMatchObject({
+      method: 'GET',
+      url: `${RELEASES_URL}?channelId=channel&number=1&relations=bundle%2Cchannel%2CreleaseCounters`,
     });
   });
 
@@ -147,11 +180,11 @@ describe('ReleasesResource', () => {
     await new HotCodePush().apps.releases.update({
       appId: 'app',
       releaseId: 'release',
-      rolloutPercentage: 50,
+      rolloutPercent: 50,
     });
 
     expect(resolveSentRequest(fetchMock)).toMatchObject({
-      body: { rolloutPercentage: 50 },
+      body: { rolloutPercent: 50 },
       method: 'PATCH',
       url: `${RELEASES_URL}/release`,
     });

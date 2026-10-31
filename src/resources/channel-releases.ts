@@ -1,22 +1,11 @@
 import type { HttpClient } from '../http-client';
 import { resolvePath } from '../http-client';
 import type {
-  Count,
   IdempotencyOptions,
   JsonRequestBody,
   PathParameters,
-  QueryParameters,
 } from '../types';
-import type { Release, ReleaseRow } from './releases';
-
-export type CountChannelReleasesOptions = PathParameters<
-  '/v1/apps/{appId}/channels/{channelId}/releases/count',
-  'get'
-> &
-  QueryParameters<
-    '/v1/apps/{appId}/channels/{channelId}/releases/count',
-    'get'
-  >;
+import type { ReleaseRow } from './releases';
 
 export type CreateReleaseOptions = PathParameters<
   '/v1/apps/{appId}/channels/{channelId}/releases',
@@ -24,12 +13,6 @@ export type CreateReleaseOptions = PathParameters<
 > &
   JsonRequestBody<'/v1/apps/{appId}/channels/{channelId}/releases', 'post'> &
   IdempotencyOptions;
-
-export type ListChannelReleasesOptions = PathParameters<
-  '/v1/apps/{appId}/channels/{channelId}/releases',
-  'get'
-> &
-  QueryParameters<'/v1/apps/{appId}/channels/{channelId}/releases', 'get'>;
 
 export type RevokeChannelReleasesOptions = PathParameters<
   '/v1/apps/{appId}/channels/{channelId}/releases/revoke',
@@ -44,21 +27,6 @@ export class ChannelReleasesResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * Counts the releases in the channel log that match the filter.
-   */
-  public async count(options: CountChannelReleasesOptions): Promise<Count> {
-    const { appId, channelId, ...query } = options;
-    return this.httpClient.fetchJson({
-      method: 'GET',
-      path: resolvePath(
-        '/v1/apps/{appId}/channels/{channelId}/releases/count',
-        { appId, channelId },
-      ),
-      query,
-    });
-  }
-
-  /**
    * Releases a ready bundle, or what another channel serves, in this channel.
    * The release gets the next number of the channel.
    */
@@ -71,21 +39,6 @@ export class ChannelReleasesResource {
         appId,
         channelId,
       }),
-    });
-  }
-
-  /**
-   * Lists the release log of the channel, newest first, or the one release that `number` names.
-   */
-  public async list(options: ListChannelReleasesOptions): Promise<Release[]> {
-    const { appId, channelId, ...query } = options;
-    return this.httpClient.fetchJson({
-      method: 'GET',
-      path: resolvePath('/v1/apps/{appId}/channels/{channelId}/releases', {
-        appId,
-        channelId,
-      }),
-      query,
     });
   }
 

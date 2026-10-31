@@ -56,7 +56,7 @@ export class NotificationsResource {
 
   /**
    * Counts the notifications of the caller that match the filters.
-   * `isRead: 'false'` gives the badge count of the bell.
+   * `isRead: false` gives the badge count of the bell.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async count(options: CountNotificationsOptions = {}): Promise<Count> {

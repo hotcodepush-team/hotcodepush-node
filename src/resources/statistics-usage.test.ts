@@ -15,7 +15,7 @@ const USAGE_STATISTICS = {
   months: [
     {
       dataTransferBytes: 2048,
-      month: '2026-09-01',
+      month: '2026-09',
       monthlyActiveDeviceCount: 12,
     },
   ],

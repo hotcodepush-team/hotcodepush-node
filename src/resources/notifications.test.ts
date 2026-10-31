@@ -7,7 +7,7 @@ const NOTIFICATIONS_URL = 'https://api.hotcodepush.com/v1/notifications';
 const NOTIFICATION = {
   id: 'notification',
   readAt: null,
-  type: 'release-paused',
+  type: 'release_paused',
 };
 
 afterEach(() => {
@@ -19,7 +19,7 @@ describe('NotificationsResource', () => {
     const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount = await new HotCodePush().notifications.count({
-      isRead: 'false',
+      isRead: false,
     });
 
     expect(fetchedCount).toEqual({ count: 3 });
@@ -33,7 +33,7 @@ describe('NotificationsResource', () => {
     const fetchMock = stubFetch(() => Response.json([NOTIFICATION]));
 
     const fetchedNotifications = await new HotCodePush().notifications.list({
-      isRead: 'false',
+      isRead: false,
       limit: 10,
     });
 

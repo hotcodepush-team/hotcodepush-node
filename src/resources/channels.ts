@@ -9,7 +9,7 @@ import type {
   QueryParameters,
 } from '../types';
 import { ChannelAudienceResource } from './channel-audience';
-import { ChannelQrResource } from './channel-qr';
+import { ChannelQrCodeResource } from './channel-qr-code';
 import { ChannelReleasesResource } from './channel-releases';
 import { RollbacksResource } from './rollbacks';
 
@@ -72,13 +72,13 @@ export type UpdateChannelOptions = PathParameters<
 
 export class ChannelsResource {
   public readonly audience: ChannelAudienceResource;
-  public readonly qr: ChannelQrResource;
+  public readonly qrCode: ChannelQrCodeResource;
   public readonly releases: ChannelReleasesResource;
   public readonly rollbacks: RollbacksResource;
 
   constructor(private readonly httpClient: HttpClient) {
     this.audience = new ChannelAudienceResource(httpClient);
-    this.qr = new ChannelQrResource(httpClient);
+    this.qrCode = new ChannelQrCodeResource(httpClient);
     this.releases = new ChannelReleasesResource(httpClient);
     this.rollbacks = new RollbacksResource(httpClient);
   }

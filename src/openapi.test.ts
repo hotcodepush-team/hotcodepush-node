@@ -73,7 +73,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.apps.bundles.count({
       appId: APP_ID,
       fingerprint: `fp1:${SHA256}`,
-      isInUse: 'true',
+      isInUse: true,
       platform: 'ios',
       query: '12',
       source: 'upload',
@@ -108,13 +108,13 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.apps.bundles.files.count({
       appId: APP_ID,
       bundleId: BUNDLE_ID,
-      isStored: 'false',
+      isStored: false,
     }),
   'apps.bundles.files.list': hotCodePush =>
     hotCodePush.apps.bundles.files.list({
       appId: APP_ID,
       bundleId: BUNDLE_ID,
-      isStored: 'false',
+      isStored: false,
       limit: 10,
       offset: 10,
     }),
@@ -124,7 +124,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.apps.bundles.list({
       appId: APP_ID,
       fingerprint: `fp1:${SHA256}`,
-      isInUse: 'true',
+      isInUse: true,
       limit: 10,
       offset: 10,
       platform: 'ios',
@@ -175,7 +175,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       device: [DEVICE_ID],
       fingerprint: [`fp1:${SHA256}`],
       os: ['>=17'],
-      rolloutPercentage: 10,
+      rolloutPercent: 10,
     }),
   'apps.channels.count': hotCodePush =>
     hotCodePush.apps.channels.count({ appId: APP_ID, query: 'stag' }),
@@ -201,17 +201,11 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     }),
   'apps.channels.pause': hotCodePush =>
     hotCodePush.apps.channels.pause({ appId: APP_ID, channelId: CHANNEL_ID }),
-  'apps.channels.qr.get': hotCodePush =>
-    hotCodePush.apps.channels.qr.get({
+  'apps.channels.qrCode.get': hotCodePush =>
+    hotCodePush.apps.channels.qrCode.get({
       appId: APP_ID,
       channelId: CHANNEL_ID,
       format: 'png',
-    }),
-  'apps.channels.releases.count': hotCodePush =>
-    hotCodePush.apps.channels.releases.count({
-      appId: APP_ID,
-      channelId: CHANNEL_ID,
-      number: 1,
     }),
   'apps.channels.releases.create': hotCodePush =>
     hotCodePush.apps.channels.releases.create({
@@ -225,20 +219,11 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       idempotencyKey: 'key',
       isMandatory: true,
       progression: {
-        percentages: [25, 50],
+        rolloutPercents: [25, 50],
         stepMinimumSeconds: 3600,
         stepMinimumUpdateCount: 100,
       },
-      rolloutPercentage: 10,
-    }),
-  'apps.channels.releases.list': hotCodePush =>
-    hotCodePush.apps.channels.releases.list({
-      appId: APP_ID,
-      channelId: CHANNEL_ID,
-      limit: 10,
-      number: 1,
-      offset: 10,
-      relations: ['bundle'],
+      rolloutPercent: 10,
     }),
   'apps.channels.releases.revoke': hotCodePush =>
     hotCodePush.apps.channels.releases.revoke({
@@ -360,6 +345,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       bundleId: BUNDLE_ID,
       channelId: CHANNEL_ID,
       gitCommit: 'main',
+      number: 1,
       status: 'active',
     }),
   'apps.releases.get': hotCodePush =>
@@ -375,6 +361,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       channelId: CHANNEL_ID,
       gitCommit: 'main',
       limit: 10,
+      number: 1,
       offset: 10,
       relations: ['channel'],
       status: 'active',
@@ -389,12 +376,12 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.apps.releases.update({
       appId: APP_ID,
       progression: {
-        percentages: [75, 100],
+        rolloutPercents: [75, 100],
         stepMinimumSeconds: 3600,
         stepMinimumUpdateCount: 100,
       },
       releaseId: RELEASE_ID,
-      rolloutPercentage: 50,
+      rolloutPercent: 50,
     }),
   'apps.signingKeys.count': hotCodePush =>
     hotCodePush.apps.signingKeys.count({ appId: APP_ID }),
@@ -460,10 +447,10 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       organizationId: ORGANIZATION_ID,
     }),
   'notifications.count': hotCodePush =>
-    hotCodePush.notifications.count({ isRead: 'false' }),
+    hotCodePush.notifications.count({ isRead: false }),
   'notifications.list': hotCodePush =>
     hotCodePush.notifications.list({
-      isRead: 'false',
+      isRead: false,
       limit: 10,
       offset: 10,
       relations: ['app', 'channel', 'memberUser', 'release'],
@@ -631,8 +618,8 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.organizations.ssoProvider.get({
       organizationId: ORGANIZATION_ID,
     }),
-  'organizations.ssoProvider.put': hotCodePush =>
-    hotCodePush.organizations.ssoProvider.put({
+  'organizations.ssoProvider.set': hotCodePush =>
+    hotCodePush.organizations.ssoProvider.set({
       domain: 'example.com',
       oidc: {
         clientId: 'client',
@@ -658,28 +645,28 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.organizations.subscription.uncancel({
       organizationId: ORGANIZATION_ID,
     }),
-  'organizations.usage.countApps': hotCodePush =>
-    hotCodePush.organizations.usage.countApps({
+  'organizations.usage.apps.count': hotCodePush =>
+    hotCodePush.organizations.usage.apps.count({
       month: '2026-09',
       organizationId: ORGANIZATION_ID,
     }),
-  'organizations.usage.downloadAppsCsv': hotCodePush =>
-    hotCodePush.organizations.usage.downloadAppsCsv({
+  'organizations.usage.apps.downloadCsv': hotCodePush =>
+    hotCodePush.organizations.usage.apps.downloadCsv({
       month: '2026-09',
       organizationId: ORGANIZATION_ID,
     }),
-  'organizations.usage.get': hotCodePush =>
-    hotCodePush.organizations.usage.get({
-      month: '2026-09',
-      organizationId: ORGANIZATION_ID,
-    }),
-  'organizations.usage.listApps': hotCodePush =>
-    hotCodePush.organizations.usage.listApps({
+  'organizations.usage.apps.list': hotCodePush =>
+    hotCodePush.organizations.usage.apps.list({
       limit: 10,
       month: '2026-09',
       offset: 10,
       organizationId: ORGANIZATION_ID,
       relations: ['app'],
+    }),
+  'organizations.usage.get': hotCodePush =>
+    hotCodePush.organizations.usage.get({
+      month: '2026-09',
+      organizationId: ORGANIZATION_ID,
     }),
   'organizations.webhooks.count': hotCodePush =>
     hotCodePush.organizations.webhooks.count({
@@ -749,6 +736,12 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       url: 'https://example.com/hooks/releases',
       webhookId: WEBHOOK_ID,
     }),
+  'qrCodes.get': hotCodePush =>
+    hotCodePush.qrCodes.get({
+      format: 'png',
+      size: 256,
+      url: 'https://preview.hotcodepush.com',
+    }),
   'users.delete': hotCodePush =>
     hotCodePush.users.delete({
       password: 'correct horse battery staple',
@@ -802,7 +795,7 @@ const SESSION_ONLY_METHODS: readonly string[] = [
   'organizations.members.update',
   'organizations.ssoProvider.delete',
   'organizations.ssoProvider.get',
-  'organizations.ssoProvider.put',
+  'organizations.ssoProvider.set',
   'organizations.ssoProvider.verifications.create',
   'organizations.subscription.cancel',
   'organizations.subscription.uncancel',

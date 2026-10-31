@@ -25,6 +25,8 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+      - name: Check openapi.json against the live API's operations
+        run: npm run check-openapi-drift
       - run: npm run build
 
   preview:

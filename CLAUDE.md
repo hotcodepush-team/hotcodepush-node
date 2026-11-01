@@ -86,6 +86,8 @@ The integration test runs by hand against that API, started with `ENVIRONMENT=de
 - Every catalog value is lowercase snake_case with no prefix, error codes included: `not_found`, the client's own `unexpected_response`; a code is passed through verbatim, never renamed. Field, resource and method names stay camelCase, and so does a field name used as a value, `relations: ['currentRelease']`.
 - Never the non-null assertion; nullish coalescing or a real check.
 - Test titles read `should <verb> …`, lowercase, conditions starting with `when`; one test per request and branch.
+- A test earns its place by catching a bug nothing else catches, at the lowest layer that can prove it; one test per branch, never per value, and nothing for what the types, the framework or a library guarantee.
+- A new test names the behaviour or the bug it proves; if deleting the production code would not fail it, it does not get in.
 
 ## Releases
 

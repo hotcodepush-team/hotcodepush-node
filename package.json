@@ -1,7 +1,7 @@
 {
   "name": "@hotcodepush/node",
   "description": "The typed Node client for the HotCodePush REST API",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": false,
   "keywords": [
     "hotcodepush",

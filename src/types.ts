@@ -1,7 +1,7 @@
 import type { components, paths } from './generated/schema';
 
 export interface ErrorBody {
-  code: HotCodePushErrorCode;
+  code: HotCodePushErrorCode | (string & {});
   details?: unknown;
   message: string;
 }

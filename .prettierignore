@@ -6,3 +6,7 @@
 # Generated from the API's OpenAPI document, verbatim
 openapi.json
 src/generated
+
+# Written by release-please
+.release-please-manifest.json
+CHANGELOG.md

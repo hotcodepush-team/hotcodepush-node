@@ -48,7 +48,7 @@ export function resolveSentMethodsAndUrls(
 
 export async function runCallAfterBadGateway<T>(
   call: () => Promise<T>,
-  createResponse: () => Response,
+  { createResponse }: { createResponse: () => Response },
 ): Promise<{ attemptCount: number; result: T }> {
   vi.useFakeTimers();
   try {
@@ -74,7 +74,7 @@ export function stubFetch(
 
 export function stubMultipartUploadFetch(
   completedBody: unknown,
-  failedPartNumber?: number,
+  { failedPartNumber }: { failedPartNumber?: number } = {},
 ): Mock<typeof fetch> {
   const fetchMock = vi.fn<typeof fetch>(async (input, init) => {
     const { pathname } = new URL(String(input));

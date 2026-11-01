@@ -40,11 +40,14 @@ function resolveErrorBody(text: string): ErrorBody | undefined {
   }
 }
 
-export function resolveHotCodePushError(
-  status: number,
-  text: string,
-): HotCodePushError {
-  const errorBody = resolveErrorBody(text) ?? {
+export function resolveHotCodePushError({
+  responseText,
+  status,
+}: {
+  responseText: string;
+  status: number;
+}): HotCodePushError {
+  const errorBody = resolveErrorBody(responseText) ?? {
     code: 'unexpected_response',
     message: `Request failed with status ${status}.`,
   };

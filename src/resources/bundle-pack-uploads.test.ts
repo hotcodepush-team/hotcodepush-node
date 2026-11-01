@@ -77,7 +77,10 @@ describe('BundlePackUploadsResource', () => {
           appId: 'app',
           bundleId: 'bundle',
         }),
-      () => Response.json({ uploadId: 'upload' }, { status: 201 }),
+      {
+        createResponse: () =>
+          Response.json({ uploadId: 'upload' }, { status: 201 }),
+      },
     );
 
     expect(result).toEqual({ uploadId: 'upload' });

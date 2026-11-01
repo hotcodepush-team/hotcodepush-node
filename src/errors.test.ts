@@ -11,7 +11,10 @@ describe('resolveHotCodePushError', () => {
       message: 'The name is required.',
     } satisfies ErrorBody);
 
-    const resolvedError = resolveHotCodePushError(400, body);
+    const resolvedError = resolveHotCodePushError({
+      responseText: body,
+      status: 400,
+    });
 
     expect(resolvedError).toBeInstanceOf(HotCodePushError);
     expect(resolvedError).toMatchObject({
@@ -29,7 +32,10 @@ describe('resolveHotCodePushError', () => {
   ])(
     'should answer unexpected_response with the status and without the body when the body $condition',
     ({ body }) => {
-      const resolvedError = resolveHotCodePushError(429, body);
+      const resolvedError = resolveHotCodePushError({
+        responseText: body,
+        status: 429,
+      });
 
       expect(resolvedError).toMatchObject({
         code: 'unexpected_response',

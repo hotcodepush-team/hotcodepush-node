@@ -35,7 +35,10 @@ export class BundlePackResource {
   ): Promise<UploadedBundlePack> {
     const { appId, bundleId, ...uploadBody } = options;
     if (isBlobAboveSingleUploadLimit(uploadBody)) {
-      return uploadInParts(this.uploads, { appId, bundleId }, uploadBody.body);
+      return uploadInParts(this.uploads, {
+        blob: uploadBody.body,
+        pathParameters: { appId, bundleId },
+      });
     }
     return this.httpClient.fetchUpload({
       ...uploadBody,

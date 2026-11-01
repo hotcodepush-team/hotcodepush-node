@@ -91,7 +91,7 @@ describe('FilesResource', () => {
   });
 
   test('should delete the upload and rethrow the error when a part fails', async () => {
-    const fetchMock = stubMultipartUploadFetch({}, 2);
+    const fetchMock = stubMultipartUploadFetch({}, { failedPartNumber: 2 });
 
     const uploadPromise = new HotCodePush().apps.files.upload({
       appId: 'app',

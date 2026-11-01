@@ -1,7 +1,7 @@
 {
   "name": "@hotcodepush/node",
   "description": "The typed Node client for the HotCodePush REST API",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": false,
   "keywords": [
     "hotcodepush",
@@ -44,6 +44,7 @@
     "fmt": "eslint --fix . && prettier --write .",
     "generate": "openapi-typescript openapi.json --output src/generated/schema.d.ts --empty-objects-unknown",
     "lint": "eslint . && prettier --check .",
+    "prepublishOnly": "npm run build",
     "sync-openapi": "node scripts/sync-openapi.ts",
     "test": "vitest run",
     "typecheck": "npm run generate -- --check && tsc --noEmit"

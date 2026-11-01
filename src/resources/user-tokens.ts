@@ -18,7 +18,7 @@ export class UserTokensResource {
    */
   public async deleteMany(options: DeleteManyTokensOptions): Promise<void> {
     const { userId, ...query } = options;
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       method: 'DELETE',
       path: resolvePath('/v1/users/{userId}/tokens', { userId }),
       query,

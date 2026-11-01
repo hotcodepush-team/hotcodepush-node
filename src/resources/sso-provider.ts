@@ -45,7 +45,7 @@ export class SsoProviderResource {
    * An API token answers `forbidden`; sign in with a session.
    */
   public async delete(options: DeleteSsoProviderOptions): Promise<void> {
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       method: 'DELETE',
       path: resolvePath(
         '/v1/organizations/{organizationId}/sso-provider',

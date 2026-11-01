@@ -84,7 +84,7 @@ export class BundlePackUploadsResource {
    * Aborts a multipart pack upload and discards its parts.
    */
   public async delete(options: DeleteBundlePackUploadOptions): Promise<void> {
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       method: 'DELETE',
       path: resolvePath(
         '/v1/apps/{appId}/bundles/{bundleId}/pack/uploads/{uploadId}',

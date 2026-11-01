@@ -92,7 +92,7 @@ export class OrganizationInvitationsResource {
    * An API token answers `forbidden`; sign in with a session.
    */
   public async delete(options: DeleteInvitationOptions): Promise<void> {
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       method: 'DELETE',
       path: resolvePath(
         '/v1/organizations/{organizationId}/invitations/{invitationId}',
@@ -109,7 +109,7 @@ export class OrganizationInvitationsResource {
     options: DeleteManyInvitationsOptions,
   ): Promise<void> {
     const { organizationId, ...query } = options;
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       method: 'DELETE',
       path: resolvePath('/v1/organizations/{organizationId}/invitations', {
         organizationId,

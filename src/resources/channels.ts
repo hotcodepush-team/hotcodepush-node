@@ -108,7 +108,7 @@ export class ChannelsResource {
    * Deletes a channel at once. The default channel of the app is refused.
    */
   public async delete(options: DeleteChannelOptions): Promise<void> {
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       method: 'DELETE',
       path: resolvePath('/v1/apps/{appId}/channels/{channelId}', options),
     });
@@ -120,7 +120,7 @@ export class ChannelsResource {
    */
   public async deleteMany(options: DeleteManyChannelsOptions): Promise<void> {
     const { appId, ...query } = options;
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       method: 'DELETE',
       path: resolvePath('/v1/apps/{appId}/channels', { appId }),
       query,

@@ -105,7 +105,7 @@ export class NotificationsResource {
   public async updateMany(
     options: UpdateManyNotificationsOptions,
   ): Promise<void> {
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       body: options,
       method: 'PATCH',
       path: resolvePath('/v1/notifications'),

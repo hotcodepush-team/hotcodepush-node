@@ -69,7 +69,7 @@ export class DevicesResource {
    * Deletes a device from the registry, for an erasure request.
    */
   public async delete(options: DeleteDeviceOptions): Promise<void> {
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       method: 'DELETE',
       path: resolvePath('/v1/apps/{appId}/devices/{deviceId}', options),
     });
@@ -80,7 +80,7 @@ export class DevicesResource {
    */
   public async deleteMany(options: DeleteManyDevicesOptions): Promise<void> {
     const { appId, ...query } = options;
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       method: 'DELETE',
       path: resolvePath('/v1/apps/{appId}/devices', { appId }),
       query,

@@ -37,7 +37,7 @@ export class UsersResource {
    */
   public async delete(options: DeleteUserOptions): Promise<void> {
     const { userId, ...body } = options;
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       body,
       method: 'DELETE',
       path: resolvePath('/v1/users/{userId}', { userId }),

@@ -18,7 +18,7 @@ export class UserSessionsResource {
    */
   public async deleteMany(options: DeleteManySessionsOptions): Promise<void> {
     const { userId, ...query } = options;
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       method: 'DELETE',
       path: resolvePath('/v1/users/{userId}/sessions', { userId }),
       query,

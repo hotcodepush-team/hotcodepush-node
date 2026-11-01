@@ -68,7 +68,7 @@ export class SigningKeysResource {
   }
 
   public async delete(options: DeleteSigningKeyOptions): Promise<void> {
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       method: 'DELETE',
       path: resolvePath(
         '/v1/apps/{appId}/signing-keys/{signingKeyId}',

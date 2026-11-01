@@ -29,7 +29,7 @@ export class SubscriptionResource {
    */
   public async cancel(options: CancelSubscriptionOptions): Promise<void> {
     const { organizationId, ...body } = options;
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       body,
       isRetryable: true,
       method: 'POST',
@@ -46,7 +46,7 @@ export class SubscriptionResource {
    * An API token answers `forbidden`; sign in with a session.
    */
   public async uncancel(options: UncancelSubscriptionOptions): Promise<void> {
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       isRetryable: true,
       method: 'POST',
       path: resolvePath(

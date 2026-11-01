@@ -8,24 +8,15 @@ const HTTP_METHODS = ['delete', 'get', 'patch', 'post', 'put'];
 const LIVE_DOCUMENT_URL = 'https://api.hotcodepush.com/openapi';
 const TIMEOUT_MS = 10_000;
 
-const snapshotOperations = resolveOperations(
-  JSON.parse(
-    await readFile(new URL('../openapi.json', import.meta.url), 'utf8'),
-  ) as OpenApiDocument,
-);
+const snapshotOperations = resolveOperations(await readSnapshotDocument());
 const liveDocument = await fetchLiveDocument();
 if (liveDocument === undefined) {
   process.exit(0);
 }
-const liveOperations = resolveOperations(liveDocument);
-const differences = [
-  ...[...liveOperations]
-    .filter(operation => !snapshotOperations.has(operation))
-    .map(operation => `+ ${operation} (live only)`),
-  ...[...snapshotOperations]
-    .filter(operation => !liveOperations.has(operation))
-    .map(operation => `- ${operation} (openapi.json only)`),
-];
+const differences = resolveDifferences({
+  liveOperations: resolveOperations(liveDocument),
+  snapshotOperations,
+});
 if (differences.length > 0) {
   console.error(
     `The operations of openapi.json differ from ${LIVE_DOCUMENT_URL}:\n${differences.join('\n')}`,
@@ -55,6 +46,28 @@ async function fetchLiveDocument(): Promise<OpenApiDocument | undefined> {
     process.exit(1);
   }
   return (await response.json()) as OpenApiDocument;
+}
+
+async function readSnapshotDocument(): Promise<OpenApiDocument> {
+  const snapshotUrl = new URL('../openapi.json', import.meta.url);
+  return JSON.parse(await readFile(snapshotUrl, 'utf8')) as OpenApiDocument;
+}
+
+function resolveDifferences({
+  liveOperations,
+  snapshotOperations,
+}: {
+  liveOperations: Set<string>;
+  snapshotOperations: Set<string>;
+}): string[] {
+  return [
+    ...[...liveOperations]
+      .filter(operation => !snapshotOperations.has(operation))
+      .map(operation => `+ ${operation} (live only)`),
+    ...[...snapshotOperations]
+      .filter(operation => !liveOperations.has(operation))
+      .map(operation => `- ${operation} (openapi.json only)`),
+  ];
 }
 
 function resolveOperations(document: OpenApiDocument): Set<string> {

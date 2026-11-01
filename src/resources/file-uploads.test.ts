@@ -45,7 +45,7 @@ describe('FileUploadsResource', () => {
           sha256: SHA256,
           uploadId: 'upload',
         }),
-      () => Response.json(file),
+      { createResponse: () => Response.json(file) },
     );
 
     expect(result).toEqual(file);
@@ -80,7 +80,10 @@ describe('FileUploadsResource', () => {
           appId: 'app',
           sha256: SHA256,
         }),
-      () => Response.json({ uploadId: 'upload' }, { status: 201 }),
+      {
+        createResponse: () =>
+          Response.json({ uploadId: 'upload' }, { status: 201 }),
+      },
     );
 
     expect(result).toEqual({ uploadId: 'upload' });

@@ -444,7 +444,7 @@ describe('HttpClient.fetchUpload', () => {
           contentType: 'application/x-tar',
           path: '/v1/apps/app/bundles/bundle/pack',
         }),
-      () => Response.json({ sizeBytes: 9 }),
+      { createResponse: () => Response.json({ sizeBytes: 9 }) },
     );
 
     expect(result).toEqual({ sizeBytes: 9 });
@@ -654,7 +654,7 @@ describe('withTimeout', () => {
     );
 
     await expect(
-      withTimeout(fetchMock, 1)('https://example.com'),
+      withTimeout(fetchMock, { timeoutMs: 1 })('https://example.com'),
     ).rejects.toMatchObject({ name: 'TimeoutError' });
   });
 });

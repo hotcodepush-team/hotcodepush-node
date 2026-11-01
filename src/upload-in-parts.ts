@@ -43,25 +43,15 @@ export function isBlobAboveSingleUploadLimit(
 
 export async function uploadInParts<TPathParameters extends object, TCompleted>(
   uploads: MultipartUploadsResource<TPathParameters, TCompleted>,
-  pathParameters: TPathParameters,
-  blob: Blob,
+  { blob, pathParameters }: { blob: Blob; pathParameters: TPathParameters },
 ): Promise<TCompleted> {
   const { uploadId } = await uploads.create(pathParameters);
   try {
-    const parts: UploadedPart[] = [];
-    for (
-      let start = 0, partNumber = 1;
-      start < blob.size;
-      start += PART_SIZE_BYTES, partNumber += 1
-    ) {
-      const uploadedPart = await uploads.parts.upload({
-        ...pathParameters,
-        body: blob.slice(start, start + PART_SIZE_BYTES),
-        partNumber,
-        uploadId,
-      });
-      parts.push(uploadedPart);
-    }
+    const parts = await uploadEveryPart(uploads, {
+      blob,
+      pathParameters,
+      uploadId,
+    });
     return await uploads.complete({ ...pathParameters, parts, uploadId });
   } catch (error) {
     await uploads
@@ -69,4 +59,29 @@ export async function uploadInParts<TPathParameters extends object, TCompleted>(
       .catch(() => undefined);
     throw error;
   }
+}
+
+async function uploadEveryPart<TPathParameters extends object, TCompleted>(
+  uploads: MultipartUploadsResource<TPathParameters, TCompleted>,
+  {
+    blob,
+    pathParameters,
+    uploadId,
+  }: { blob: Blob; pathParameters: TPathParameters; uploadId: string },
+): Promise<UploadedPart[]> {
+  const parts: UploadedPart[] = [];
+  for (
+    let start = 0, partNumber = 1;
+    start < blob.size;
+    start += PART_SIZE_BYTES, partNumber += 1
+  ) {
+    const uploadedPart = await uploads.parts.upload({
+      ...pathParameters,
+      body: blob.slice(start, start + PART_SIZE_BYTES),
+      partNumber,
+      uploadId,
+    });
+    parts.push(uploadedPart);
+  }
+  return parts;
 }

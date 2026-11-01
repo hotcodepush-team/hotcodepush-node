@@ -37,7 +37,10 @@ export class FilesResource {
   public async upload(options: UploadFileOptions): Promise<AppFile> {
     const { appId, sha256, ...uploadBody } = options;
     if (isBlobAboveSingleUploadLimit(uploadBody)) {
-      return uploadInParts(this.uploads, { appId, sha256 }, uploadBody.body);
+      return uploadInParts(this.uploads, {
+        blob: uploadBody.body,
+        pathParameters: { appId, sha256 },
+      });
     }
     return this.httpClient.fetchUpload({
       ...uploadBody,

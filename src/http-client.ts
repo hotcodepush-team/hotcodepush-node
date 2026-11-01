@@ -125,7 +125,9 @@ export class HttpClient {
   }
 
   public async fetchUpload<T>(options: FetchUploadOptions): Promise<T> {
-    const fetchWithTimeout = withTimeout(fetch, UPLOAD_TIMEOUT_MS);
+    const fetchWithTimeout = withTimeout(fetch, {
+      timeoutMs: UPLOAD_TIMEOUT_MS,
+    });
     // A stream is read once, so only a Blob upload is retried.
     const fetchFunction = isBlobUploadBody(options)
       ? withRetry(fetchWithTimeout)
@@ -147,7 +149,7 @@ export class HttpClient {
   }
 
   private async fetchResponse(options: FetchJsonOptions): Promise<Response> {
-    const fetchWithTimeout = withTimeout(fetch, this.timeoutMs);
+    const fetchWithTimeout = withTimeout(fetch, { timeoutMs: this.timeoutMs });
     const isRetryable =
       options.isRetryable ?? IDEMPOTENT_METHODS.has(options.method);
     const fetchFunction = isRetryable
@@ -188,7 +190,10 @@ export class HttpClient {
 
 async function assertResponseOk(response: Response): Promise<void> {
   if (!response.ok) {
-    throw resolveHotCodePushError(response.status, await response.text());
+    throw resolveHotCodePushError({
+      responseText: await response.text(),
+      status: response.status,
+    });
   }
 }
 
@@ -294,7 +299,7 @@ export function withRetry(fetchFunction: typeof fetch): typeof fetch {
 
 export function withTimeout(
   fetchFunction: typeof fetch,
-  timeoutMs: number,
+  { timeoutMs }: { timeoutMs: number },
 ): typeof fetch {
   return (input, init) =>
     fetchFunction(input, { ...init, signal: AbortSignal.timeout(timeoutMs) });

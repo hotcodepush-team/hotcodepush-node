@@ -74,7 +74,7 @@ When the API changes:
 
 CI's drift check fetches `https://api.hotcodepush.com/openapi` and fails while its operations differ from the snapshot's, so a stale snapshot shows the day the API moves.
 
-The integration test runs by hand against that API, started with `ENVIRONMENT=dev` and `DEV_DATABASE_URL` in its `.dev.vars` so the mail lands in its log: sign up through `POST /v1/auth/sign-up/email`, send the logged link's token to `GET /v1/auth/verify-email?token=`, sign in through `POST /v1/auth/sign-in/email` and take the `set-auth-token` header, then `HOTCODEPUSH_API_BASE_URL=http://localhost:8787 HOTCODEPUSH_API_TOKEN=<bearer> npx vitest run src/integration.test.ts`.
+The integration test runs by hand against that API, started with `ENVIRONMENT=development` and `DEVELOPMENT_DATABASE_URL` in its `.dev.vars` so the mail lands in its log: sign up through `POST /v1/auth/sign-up/email`, send the logged link's token to `GET /v1/auth/verify-email?token=`, sign in through `POST /v1/auth/sign-in/email` and take the `set-auth-token` header, then `HOTCODEPUSH_API_BASE_URL=http://localhost:8787 HOTCODEPUSH_API_TOKEN=<bearer> npx vitest run src/integration.test.ts`.
 
 ## Naming
 

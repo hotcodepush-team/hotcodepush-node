@@ -20,12 +20,25 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
   let channel: Channel;
   let organization: Organization;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     if (!token) {
       throw new Error(
         'HOTCODEPUSH_API_TOKEN must hold the bearer of a verified user.',
       );
     }
+    organization = await hotCodePush.organizations.create({
+      name: 'Node Client Test',
+    });
+    createdOrganizations.push(organization);
+    app = await hotCodePush.organizations.apps.create({
+      framework: 'capacitor',
+      name: 'Node Client Demo',
+      organizationId: organization.id,
+    });
+    channel = await hotCodePush.apps.channels.create({
+      appId: app.id,
+      name: 'staging',
+    });
   });
 
   afterAll(async () => {
@@ -36,12 +49,11 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     }
   });
 
-  test('should create, get, list and update an organization', async () => {
-    organization = await hotCodePush.organizations.create({
-      name: 'Node Client Test',
-    });
-    createdOrganizations.push(organization);
+  test('should answer the health check', async () => {
+    await expect(hotCodePush.health.get()).resolves.toBeUndefined();
+  });
 
+  test('should get, list and update the created organization', async () => {
     const fetchedOrganization = await hotCodePush.organizations.get({
       organizationId: organization.id,
     });
@@ -102,13 +114,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     expect(pendingInvitations).toEqual(expect.any(Array));
   });
 
-  test('should create, get, list and update an app', async () => {
-    app = await hotCodePush.organizations.apps.create({
-      framework: 'capacitor',
-      name: 'Node Client Demo',
-      organizationId: organization.id,
-    });
-
+  test('should get, list and update the created app', async () => {
     const fetchedApp = await hotCodePush.apps.get({ appId: app.id });
     const fetchedApps = await hotCodePush.organizations.apps.list({
       organizationId: organization.id,
@@ -123,12 +129,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     expect(updatedApp.channelLinkTemplate).toBe('demo://channels/{channelId}');
   });
 
-  test('should create, get, list, update, pause and resume a channel', async () => {
-    channel = await hotCodePush.apps.channels.create({
-      appId: app.id,
-      name: 'staging',
-    });
-
+  test('should get, list, update, pause and resume the created channel', async () => {
     const fetchedChannel = await hotCodePush.apps.channels.get({
       appId: app.id,
       channelId: channel.id,

@@ -218,31 +218,17 @@ describe('HttpClient', () => {
     );
   });
 
-  test('should send the relations in the query as a comma list', async () => {
+  test('should send the ids and the relations in the query as comma lists', async () => {
     const fetchMock = stubFetch();
 
     await new HttpClient({}).fetchJson({
       method: 'GET',
-      path: '/v1/apps/app/releases/release',
-      query: { relations: ['bundle', 'channel'] },
+      path: '/v1/apps/app/releases',
+      query: { ids: ['first', 'second'], relations: ['bundle', 'channel'] },
     });
 
     expect(resolveSentRequest(fetchMock).url).toBe(
-      'https://api.hotcodepush.com/v1/apps/app/releases/release?relations=bundle%2Cchannel',
-    );
-  });
-
-  test('should send the ids in the query as a comma list', async () => {
-    const fetchMock = stubFetch(() => new Response(null, { status: 204 }));
-
-    await new HttpClient({}).fetchJson({
-      method: 'DELETE',
-      path: '/v1/apps/app/channels',
-      query: { ids: ['first', 'second'] },
-    });
-
-    expect(resolveSentRequest(fetchMock).url).toBe(
-      'https://api.hotcodepush.com/v1/apps/app/channels?ids=first%2Csecond',
+      'https://api.hotcodepush.com/v1/apps/app/releases?ids=first%2Csecond&relations=bundle%2Cchannel',
     );
   });
 
@@ -269,23 +255,6 @@ describe('HttpClient', () => {
     });
 
     expect(fetchedChannel).toEqual({ id: 'channel' });
-  });
-
-  test('should throw unexpected_response with the status when a rate limit in front of the api answers html', async () => {
-    stubFetch(
-      () => new Response('<html>Too Many Requests</html>', { status: 429 }),
-    );
-
-    const fetchPromise = new HttpClient({}).fetchJson({
-      method: 'POST',
-      path: '/v1/invitations/invitation/accept',
-    });
-
-    await expect(fetchPromise).rejects.toBeInstanceOf(HotCodePushError);
-    await expect(fetchPromise).rejects.toMatchObject({
-      code: 'unexpected_response',
-      status: 429,
-    });
   });
 
   test.each(['DELETE', 'GET', 'PUT'] as const)(

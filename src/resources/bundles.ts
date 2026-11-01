@@ -109,7 +109,7 @@ export class BundlesResource {
    * A bundle that a release serves or a store build embeds is refused.
    */
   public async delete(options: DeleteBundleOptions): Promise<void> {
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       method: 'DELETE',
       path: resolvePath('/v1/apps/{appId}/bundles/{bundleId}', options),
     });

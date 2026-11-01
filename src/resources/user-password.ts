@@ -18,7 +18,7 @@ export class UserPasswordResource {
    */
   public async create(options: CreateUserPasswordOptions): Promise<void> {
     const { userId, ...body } = options;
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       body,
       method: 'POST',
       path: resolvePath('/v1/users/{userId}/password', { userId }),

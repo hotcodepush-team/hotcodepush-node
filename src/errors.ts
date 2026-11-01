@@ -1,12 +1,13 @@
-import type { ErrorBody, HotCodePushErrorCode } from './types';
+import type { ErrorBody } from './types';
 
 /**
  * Thrown when the API answers with a status outside 2xx.
  * `code`, `message` and `details` come from the API verbatim.
+ * A code newer than this client passes through as a plain string, so `code` is not limited to `HotCodePushErrorCode`.
  * A response without the API error shape becomes `unexpected_response` with the status, and its body is dropped.
  */
 export class HotCodePushError extends Error {
-  public readonly code: HotCodePushErrorCode;
+  public readonly code: ErrorBody['code'];
   public readonly details: unknown;
   public readonly status: number;
 

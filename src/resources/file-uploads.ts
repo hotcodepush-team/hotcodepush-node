@@ -78,7 +78,7 @@ export class FileUploadsResource {
    * Aborts a multipart file upload and discards its parts.
    */
   public async delete(options: DeleteFileUploadOptions): Promise<void> {
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       method: 'DELETE',
       path: resolvePath(
         '/v1/apps/{appId}/files/{sha256}/uploads/{uploadId}',

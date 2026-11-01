@@ -86,7 +86,7 @@ export class MembersResource {
    * An API token answers `forbidden`; sign in with a session.
    */
   public async delete(options: DeleteMemberOptions): Promise<void> {
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       method: 'DELETE',
       path: resolvePath(
         '/v1/organizations/{organizationId}/members/{memberId}',
@@ -102,7 +102,7 @@ export class MembersResource {
    */
   public async deleteMany(options: DeleteManyMembersOptions): Promise<void> {
     const { organizationId, ...query } = options;
-    await this.httpClient.fetchJson({
+    await this.httpClient.fetchStatus({
       method: 'DELETE',
       path: resolvePath('/v1/organizations/{organizationId}/members', {
         organizationId,

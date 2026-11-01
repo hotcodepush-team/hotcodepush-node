@@ -34,22 +34,27 @@ if (differences.length > 0) {
 }
 console.log(`openapi.json has the operations of ${LIVE_DOCUMENT_URL}.`);
 
-// An unreachable API must not block the build, so the check warns and skips.
+// An unreachable API must not block the build, so a thrown fetch or a 5xx warns and skips.
+// A 4xx means the document moved, so it fails.
 async function fetchLiveDocument(): Promise<OpenApiDocument | undefined> {
+  let response: Response;
   try {
-    const response = await fetch(LIVE_DOCUMENT_URL, {
+    response = await fetch(LIVE_DOCUMENT_URL, {
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-    if (!response.ok) {
-      throw new Error(`it answered ${response.status}`);
-    }
-    return (await response.json()) as OpenApiDocument;
   } catch (error) {
-    console.log(
-      `::warning::Skipped the drift check, ${LIVE_DOCUMENT_URL} could not be read: ${String(error)}`,
-    );
+    warnSkippedCheck(String(error));
     return undefined;
   }
+  if (response.status >= 500) {
+    warnSkippedCheck(`it answered ${response.status}`);
+    return undefined;
+  }
+  if (!response.ok) {
+    console.error(`${LIVE_DOCUMENT_URL} answered ${response.status}.`);
+    process.exit(1);
+  }
+  return (await response.json()) as OpenApiDocument;
 }
 
 function resolveOperations(document: OpenApiDocument): Set<string> {
@@ -59,5 +64,11 @@ function resolveOperations(document: OpenApiDocument): Set<string> {
         .filter(method => HTTP_METHODS.includes(method))
         .map(method => `${method.toUpperCase()} ${path}`),
     ),
+  );
+}
+
+function warnSkippedCheck(reason: string): void {
+  console.log(
+    `::warning::Skipped the drift check, ${LIVE_DOCUMENT_URL} could not be read: ${reason}`,
   );
 }

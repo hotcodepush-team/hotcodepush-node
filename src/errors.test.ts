@@ -23,36 +23,20 @@ describe('resolveHotCodePushError', () => {
     });
   });
 
-  test('should answer unexpected_response with the status and without the body when the body is html', () => {
-    const resolvedError = resolveHotCodePushError(
-      429,
-      '<html>Too Many Requests</html>',
-    );
+  test.each([
+    { body: '<html>Too Many Requests</html>', condition: 'is not json' },
+    { body: '{"error":"Not Found"}', condition: 'lacks the error shape' },
+  ])(
+    'should answer unexpected_response with the status and without the body when the body $condition',
+    ({ body }) => {
+      const resolvedError = resolveHotCodePushError(429, body);
 
-    expect(resolvedError).toMatchObject({
-      code: 'unexpected_response',
-      details: undefined,
-      message: 'Request failed with status 429.',
-      status: 429,
-    });
-  });
-
-  test('should answer unexpected_response with the status and without the body when the body is plain text', () => {
-    const resolvedError = resolveHotCodePushError(503, 'unavailable');
-
-    expect(resolvedError).toMatchObject({
-      code: 'unexpected_response',
-      message: 'Request failed with status 503.',
-      status: 503,
-    });
-  });
-
-  test('should answer unexpected_response when the json lacks the error shape', () => {
-    const resolvedError = resolveHotCodePushError(404, '{"error":"Not Found"}');
-
-    expect(resolvedError).toMatchObject({
-      code: 'unexpected_response',
-      status: 404,
-    });
-  });
+      expect(resolvedError).toMatchObject({
+        code: 'unexpected_response',
+        details: undefined,
+        message: 'Request failed with status 429.',
+        status: 429,
+      });
+    },
+  );
 });

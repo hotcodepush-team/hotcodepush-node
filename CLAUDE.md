@@ -42,6 +42,7 @@ Tests live beside the code they test, `*.test.ts` next to the file, and stub the
 | `npm run generate`            | openapi-typescript from `openapi.json` into `src/generated/`                                  |
 | `npm run sync-openapi`        | `<HOTCODEPUSH_API_BASE_URL>/openapi` into `openapi.json`                                      |
 | `npm run check-openapi-drift` | the live API's paths and methods against `openapi.json`'s; an unreachable API warns and skips |
+| `npm run verify`              | lint, typecheck, test and build, the local gate before a push                                 |
 
 Run `npm run fmt` before every commit; lint, typecheck, test and build must pass, and CI runs the four and the drift check on every pull request and push to `main`, then publishes the build to pkg.pr.new.
 `.prettierignore` keeps the files copied from the monorepo and `.github` verbatim, and the snapshot and its generated types as they were written.
@@ -74,7 +75,7 @@ When the API changes:
 
 CI's drift check fetches `https://api.hotcodepush.com/openapi` and fails while its operations differ from the snapshot's, so a stale snapshot shows the day the API moves.
 
-The integration test runs by hand against that API, started with `ENVIRONMENT=dev` and `DEV_DATABASE_URL` in its `.dev.vars` so the mail lands in its log: sign up through `POST /v1/auth/sign-up/email`, send the logged link's token to `GET /v1/auth/verify-email?token=`, sign in through `POST /v1/auth/sign-in/email` and take the `set-auth-token` header, then `HOTCODEPUSH_API_BASE_URL=http://localhost:8787 HOTCODEPUSH_API_TOKEN=<bearer> npx vitest run src/integration.test.ts`.
+The integration test runs by hand against that API, started with `ENVIRONMENT=development` and `DEVELOPMENT_DATABASE_URL` in its `.dev.vars` so the mail lands in its log: sign up through `POST /v1/auth/sign-up/email`, send the logged link's token to `GET /v1/auth/verify-email?token=`, sign in through `POST /v1/auth/sign-in/email` and take the `set-auth-token` header, then `HOTCODEPUSH_API_BASE_URL=http://localhost:8787 HOTCODEPUSH_API_TOKEN=<bearer> npx vitest run src/integration.test.ts`.
 
 ## Naming
 

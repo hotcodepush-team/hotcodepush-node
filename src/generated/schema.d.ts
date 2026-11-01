@@ -1267,7 +1267,7 @@ export interface paths {
         put?: never;
         /**
          * Pause a channel
-         * @description A paused channel serves nothing new: its index carries `isPaused` and devices keep what they have — the kill switch for a whole channel.
+         * @description A paused channel serves nothing new: its index carries `pausedAt` and devices keep what they have — the kill switch for a whole channel.
          */
         post: operations["postV1AppsByAppIdChannelsByChannelIdPause"];
         delete?: never;
@@ -1657,7 +1657,7 @@ export interface paths {
         };
         /**
          * Read the audience of a release
-         * @description The channel's devices seen in the last thirty days that the release's own conditions reach, evaluated over the registry the way the device evaluates the index — the stored attribute hashes and device-id hashes against the devices' values hashed the same way — and the release's rollout percentage as its estimated share; the release detail's audience, where the channel's preview takes the raw values the create dialog has. `warnings` carries `unsupported_condition_share` for the condition types the channel's SDKs do not know, and `fingerprint_unknown` for each fingerprint condition no binary of the app carries once the app has a binary.
+         * @description The channel's devices seen in the last thirty days that the release's own conditions reach, evaluated over the registry the way the device evaluates the index, and the release's rollout percentage as its estimated share; the release detail's audience, where the channel's preview answers the same for conditions before the release exists. `warnings` carries `unsupported_condition_share` for the condition types the channel's SDKs do not know, and `fingerprint_unknown` for each fingerprint condition no binary of the app carries once the app has a binary.
          */
         get: operations["getV1AppsByAppIdReleasesByReleaseIdAudience"];
         put?: never;
@@ -11359,13 +11359,13 @@ export interface operations {
                         key: string;
                         /** @constant */
                         type: "attribute";
-                        valueSha256: string;
+                        value: string;
                     } | {
                         range: string;
                         /** @constant */
                         type: "binary";
                     } | {
-                        hashedIds: string[];
+                        ids: string[];
                         /** @constant */
                         type: "device";
                     } | {
@@ -11417,13 +11417,13 @@ export interface operations {
                             key: string;
                             /** @constant */
                             type: "attribute";
-                            valueSha256: string;
+                            value: string;
                         } | {
                             range: string;
                             /** @constant */
                             type: "binary";
                         } | {
-                            hashedIds: string[];
+                            ids: string[];
                             /** @constant */
                             type: "device";
                         } | {
@@ -11595,13 +11595,13 @@ export interface operations {
                             key: string;
                             /** @constant */
                             type: "attribute";
-                            valueSha256: string;
+                            value: string;
                         } | {
                             range: string;
                             /** @constant */
                             type: "binary";
                         } | {
-                            hashedIds: string[];
+                            ids: string[];
                             /** @constant */
                             type: "device";
                         } | {
@@ -11769,13 +11769,13 @@ export interface operations {
                             key: string;
                             /** @constant */
                             type: "attribute";
-                            valueSha256: string;
+                            value: string;
                         } | {
                             range: string;
                             /** @constant */
                             type: "binary";
                         } | {
-                            hashedIds: string[];
+                            ids: string[];
                             /** @constant */
                             type: "device";
                         } | {
@@ -12081,13 +12081,13 @@ export interface operations {
                                 key: string;
                                 /** @constant */
                                 type: "attribute";
-                                valueSha256: string;
+                                value: string;
                             } | {
                                 range: string;
                                 /** @constant */
                                 type: "binary";
                             } | {
-                                hashedIds: string[];
+                                ids: string[];
                                 /** @constant */
                                 type: "device";
                             } | {
@@ -12471,13 +12471,13 @@ export interface operations {
                                 key: string;
                                 /** @constant */
                                 type: "attribute";
-                                valueSha256: string;
+                                value: string;
                             } | {
                                 range: string;
                                 /** @constant */
                                 type: "binary";
                             } | {
-                                hashedIds: string[];
+                                ids: string[];
                                 /** @constant */
                                 type: "device";
                             } | {
@@ -12734,13 +12734,13 @@ export interface operations {
                                 key: string;
                                 /** @constant */
                                 type: "attribute";
-                                valueSha256: string;
+                                value: string;
                             } | {
                                 range: string;
                                 /** @constant */
                                 type: "binary";
                             } | {
-                                hashedIds: string[];
+                                ids: string[];
                                 /** @constant */
                                 type: "device";
                             } | {
@@ -13591,13 +13591,13 @@ export interface operations {
                             key: string;
                             /** @constant */
                             type: "attribute";
-                            valueSha256: string;
+                            value: string;
                         } | {
                             range: string;
                             /** @constant */
                             type: "binary";
                         } | {
-                            hashedIds: string[];
+                            ids: string[];
                             /** @constant */
                             type: "device";
                         } | {
@@ -13905,13 +13905,13 @@ export interface operations {
                             key: string;
                             /** @constant */
                             type: "attribute";
-                            valueSha256: string;
+                            value: string;
                         } | {
                             range: string;
                             /** @constant */
                             type: "binary";
                         } | {
-                            hashedIds: string[];
+                            ids: string[];
                             /** @constant */
                             type: "device";
                         } | {
@@ -14135,13 +14135,13 @@ export interface operations {
                             key: string;
                             /** @constant */
                             type: "attribute";
-                            valueSha256: string;
+                            value: string;
                         } | {
                             range: string;
                             /** @constant */
                             type: "binary";
                         } | {
-                            hashedIds: string[];
+                            ids: string[];
                             /** @constant */
                             type: "device";
                         } | {
@@ -14404,13 +14404,13 @@ export interface operations {
                             key: string;
                             /** @constant */
                             type: "attribute";
-                            valueSha256: string;
+                            value: string;
                         } | {
                             range: string;
                             /** @constant */
                             type: "binary";
                         } | {
-                            hashedIds: string[];
+                            ids: string[];
                             /** @constant */
                             type: "device";
                         } | {
@@ -14562,13 +14562,13 @@ export interface operations {
                             key: string;
                             /** @constant */
                             type: "attribute";
-                            valueSha256: string;
+                            value: string;
                         } | {
                             range: string;
                             /** @constant */
                             type: "binary";
                         } | {
-                            hashedIds: string[];
+                            ids: string[];
                             /** @constant */
                             type: "device";
                         } | {
@@ -14720,13 +14720,13 @@ export interface operations {
                             key: string;
                             /** @constant */
                             type: "attribute";
-                            valueSha256: string;
+                            value: string;
                         } | {
                             range: string;
                             /** @constant */
                             type: "binary";
                         } | {
-                            hashedIds: string[];
+                            ids: string[];
                             /** @constant */
                             type: "device";
                         } | {

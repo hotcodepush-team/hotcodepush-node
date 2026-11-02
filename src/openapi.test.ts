@@ -835,7 +835,7 @@ describe('the OpenAPI snapshot', () => {
     const resourceMethodNames = Object.entries(new HotCodePush())
       .filter(([name]) => !UNDOCUMENTED_RESOURCES.includes(name))
       .flatMap(([name, resource]) =>
-        resolveResourceMethodNames(resource as object, name),
+        resolveResourceMethodNames(resource as object, { path: name }),
       );
 
     expect(Object.keys(CALLS).sort()).toEqual(resourceMethodNames.sort());
@@ -849,7 +849,10 @@ describe('the OpenAPI snapshot', () => {
     }
 
     const calledOperationNames = fetchMock.mock.calls.map(([input, init]) =>
-      resolveOperationName(init?.method ?? 'GET', new URL(String(input))),
+      resolveOperationName({
+        method: init?.method ?? 'GET',
+        url: new URL(String(input)),
+      }),
     );
     expect([...new Set(calledOperationNames)].sort()).toEqual(
       resolveDocumentedOperationNames().sort(),
@@ -863,10 +866,10 @@ describe('the OpenAPI snapshot', () => {
       const fetchMock = stubFetch();
       await callResourceMethod(new HotCodePush());
       const sentRequest = resolveSentRequest(fetchMock);
-      const operation = resolveOperation(
-        sentRequest.method,
-        new URL(sentRequest.url).pathname,
-      );
+      const operation = resolveOperation({
+        method: sentRequest.method,
+        pathname: new URL(sentRequest.url).pathname,
+      });
       if (
         operation?.security?.some(requirement => 'sessionAuth' in requirement)
       ) {
@@ -902,7 +905,10 @@ describe('the OpenAPI snapshot', () => {
 
       const sentRequest = resolveSentRequest(fetchMock);
       const url = new URL(sentRequest.url);
-      const operation = resolveOperation(sentRequest.method, url.pathname);
+      const operation = resolveOperation({
+        method: sentRequest.method,
+        pathname: url.pathname,
+      });
       const documentedQueryNames = (operation?.parameters ?? [])
         .filter(parameter => parameter.in === 'query')
         .map(parameter => parameter.name);
@@ -944,17 +950,26 @@ function resolveDocumentedOperationNames(): string[] {
   );
 }
 
-function resolveOperation(
-  method: string,
-  pathname: string,
-): OpenApiOperation | undefined {
+function resolveOperation({
+  method,
+  pathname,
+}: {
+  method: string;
+  pathname: string;
+}): OpenApiOperation | undefined {
   const template = resolvePathTemplate(pathname);
   return template === undefined
     ? undefined
     : openApiDocument.paths[template]?.[method.toLowerCase()];
 }
 
-function resolveOperationName(method: string, url: URL): string {
+function resolveOperationName({
+  method,
+  url,
+}: {
+  method: string;
+  url: URL;
+}): string {
   return `${method} ${resolvePathTemplate(url.pathname) ?? url.pathname}`;
 }
 
@@ -964,7 +979,10 @@ function resolvePathTemplate(pathname: string): string | undefined {
   );
 }
 
-function resolveResourceMethodNames(resource: object, path: string): string[] {
+function resolveResourceMethodNames(
+  resource: object,
+  { path }: { path: string },
+): string[] {
   const methodNames = Object.getOwnPropertyNames(
     Object.getPrototypeOf(resource),
   )
@@ -973,7 +991,9 @@ function resolveResourceMethodNames(resource: object, path: string): string[] {
   const nestedMethodNames = Object.entries(resource)
     .filter(([, value]) => !(value instanceof HttpClient))
     .flatMap(([name, value]) =>
-      resolveResourceMethodNames(value as object, `${path}.${name}`),
+      resolveResourceMethodNames(value as object, {
+        path: `${path}.${name}`,
+      }),
     );
   return [...methodNames, ...nestedMethodNames];
 }

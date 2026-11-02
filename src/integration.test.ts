@@ -186,7 +186,10 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
   });
 
   test('should create a bundle, upload its file and pack, complete it and read its manifest hash back', async () => {
-    const indexFile = resolveTestFile('index.html', '<h1>Node client</h1>');
+    const indexFile = resolveTestFile({
+      content: '<h1>Node client</h1>',
+      path: 'index.html',
+    });
     const createdBundle = await hotCodePush.apps.bundles.create({
       appId: app.id,
       files: [indexFile.manifestEntry],
@@ -228,7 +231,10 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
   });
 
   test('should upload a file in parts and complete it', async () => {
-    const mainFile = resolveTestFile('main.js', 'console.log("parts");');
+    const mainFile = resolveTestFile({
+      content: 'console.log("parts");',
+      path: 'main.js',
+    });
     const createdUpload = await hotCodePush.apps.files.uploads.create({
       appId: app.id,
       sha256: mainFile.manifestEntry.sha256,
@@ -252,7 +258,10 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
   });
 
   test('should abort a multipart upload', async () => {
-    const abortedFile = resolveTestFile('aborted.js', 'never completed');
+    const abortedFile = resolveTestFile({
+      content: 'never completed',
+      path: 'aborted.js',
+    });
     const createdUpload = await hotCodePush.apps.files.uploads.create({
       appId: app.id,
       sha256: abortedFile.manifestEntry.sha256,
@@ -268,7 +277,10 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
   });
 
   test('should complete a bundle whose files are stored, list it as ready and delete it', async () => {
-    const mainFile = resolveTestFile('main.js', 'console.log("parts");');
+    const mainFile = resolveTestFile({
+      content: 'console.log("parts");',
+      path: 'main.js',
+    });
     const createdBundle = await hotCodePush.apps.bundles.create({
       appId: app.id,
       files: [mainFile.manifestEntry],
@@ -309,7 +321,10 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
   });
 
   test('should create a binary and read it with its bundle', async () => {
-    const indexFile = resolveTestFile('index.html', '<h1>Node client</h1>');
+    const indexFile = resolveTestFile({
+      content: '<h1>Node client</h1>',
+      path: 'index.html',
+    });
     const createdBinary = await hotCodePush.apps.binaries.create({
       appId: app.id,
       build: '1',
@@ -385,10 +400,13 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
 // The API stores a pack without reading it. A real pack is the tar of the bundle that the CLI builds.
 const PACK_PLACEHOLDER = new TextEncoder().encode('pack placeholder');
 
-function resolveTestFile(
-  path: string,
-  content: string,
-): {
+function resolveTestFile({
+  content,
+  path,
+}: {
+  content: string;
+  path: string;
+}): {
   gzipBytes: Uint8Array<ArrayBuffer>;
   manifestEntry: { path: string; sha256: string; sizeBytes: number };
 } {

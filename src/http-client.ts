@@ -180,7 +180,7 @@ export class HttpClient {
   private resolveUrl(options: FetchJsonOptions): URL {
     const url = this.resolveRouteUrl(options.path);
     for (const [name, value] of Object.entries(options.query ?? {})) {
-      for (const queryValue of resolveQueryValues(name, value)) {
+      for (const queryValue of resolveQueryValues({ name, value })) {
         url.searchParams.append(name, queryValue);
       }
     }
@@ -243,7 +243,13 @@ export function resolvePath(
 
 // The API reads `ids` and `relations` as comma lists. Other lists repeat their parameter,
 // since their values may hold a comma.
-function resolveQueryValues(name: string, value: QueryValue): string[] {
+function resolveQueryValues({
+  name,
+  value,
+}: {
+  name: string;
+  value: QueryValue;
+}): string[] {
   if (value === undefined || value === '') {
     return [];
   }

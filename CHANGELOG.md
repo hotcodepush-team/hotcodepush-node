@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.1.0](https://github.com/hotcodepush-team/hotcodepush-node/compare/v0.0.2...v0.1.0) (2026-11-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* Webhook.isEnabled is gone, replaced by disabledAt, a timestamp or null.
+
+### Features
+
+* the telemetry export resource ([#38](https://github.com/hotcodepush-team/hotcodepush-node/issues/38)) ([bfd529b](https://github.com/hotcodepush-team/hotcodepush-node/commit/bfd529beef82d9b4422e93f3068669df80b31570))
+
 ## [0.0.2](https://github.com/hotcodepush-team/hotcodepush-node/compare/v0.0.1...v0.0.2) (2026-11-01)
 
 

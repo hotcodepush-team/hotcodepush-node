@@ -42,6 +42,8 @@ export type * from './resources/statistics-fleet';
 export type * from './resources/statistics-updates';
 export type * from './resources/statistics-usage';
 export type * from './resources/subscription';
+export type * from './resources/telemetry-export';
+export type * from './resources/telemetry-export-deliveries';
 export type * from './resources/usage';
 export type * from './resources/usage-apps';
 export type * from './resources/user-password';

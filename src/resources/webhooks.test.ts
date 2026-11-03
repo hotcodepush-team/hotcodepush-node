@@ -11,10 +11,10 @@ const WEBHOOKS_URL =
   'https://api.hotcodepush.com/v1/organizations/organization/webhooks';
 const WEBHOOK = {
   appId: null,
+  disabledAt: null,
   events: ['release.created'],
   format: 'raw',
   id: 'webhook',
-  isEnabled: true,
   name: 'Deploys',
 };
 const DELIVERY = {

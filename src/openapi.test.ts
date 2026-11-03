@@ -645,6 +645,51 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.organizations.subscription.uncancel({
       organizationId: ORGANIZATION_ID,
     }),
+  'organizations.telemetryExport.delete': hotCodePush =>
+    hotCodePush.organizations.telemetryExport.delete({
+      organizationId: ORGANIZATION_ID,
+    }),
+  'organizations.telemetryExport.deliveries.count': hotCodePush =>
+    hotCodePush.organizations.telemetryExport.deliveries.count({
+      createdSince: '2026-01-01T00:00:00.000Z',
+      createdUntil: '2026-02-01T00:00:00.000Z',
+      organizationId: ORGANIZATION_ID,
+      status: 'failed',
+    }),
+  'organizations.telemetryExport.deliveries.list': hotCodePush =>
+    hotCodePush.organizations.telemetryExport.deliveries.list({
+      createdSince: '2026-01-01T00:00:00.000Z',
+      createdUntil: '2026-02-01T00:00:00.000Z',
+      limit: 10,
+      offset: 10,
+      organizationId: ORGANIZATION_ID,
+      status: 'failed',
+    }),
+  'organizations.telemetryExport.deliveries.redeliver': hotCodePush =>
+    hotCodePush.organizations.telemetryExport.deliveries.redeliver({
+      deliveryId: DELIVERY_ID,
+      organizationId: ORGANIZATION_ID,
+    }),
+  'organizations.telemetryExport.get': hotCodePush =>
+    hotCodePush.organizations.telemetryExport.get({
+      organizationId: ORGANIZATION_ID,
+    }),
+  'organizations.telemetryExport.set': hotCodePush =>
+    hotCodePush.organizations.telemetryExport.set({
+      headers: { authorization: 'Bearer vendor' },
+      organizationId: ORGANIZATION_ID,
+      signals: ['logs', 'metrics'],
+      url: 'https://otlp.example.com',
+    }),
+  'organizations.telemetryExport.test': hotCodePush =>
+    hotCodePush.organizations.telemetryExport.test({
+      organizationId: ORGANIZATION_ID,
+    }),
+  'organizations.telemetryExport.update': hotCodePush =>
+    hotCodePush.organizations.telemetryExport.update({
+      isEnabled: true,
+      organizationId: ORGANIZATION_ID,
+    }),
   'organizations.usage.apps.count': hotCodePush =>
     hotCodePush.organizations.usage.apps.count({
       month: '2026-09',
@@ -799,6 +844,14 @@ const SESSION_ONLY_METHODS: readonly string[] = [
   'organizations.ssoProvider.verifications.create',
   'organizations.subscription.cancel',
   'organizations.subscription.uncancel',
+  'organizations.telemetryExport.delete',
+  'organizations.telemetryExport.deliveries.count',
+  'organizations.telemetryExport.deliveries.list',
+  'organizations.telemetryExport.deliveries.redeliver',
+  'organizations.telemetryExport.get',
+  'organizations.telemetryExport.set',
+  'organizations.telemetryExport.test',
+  'organizations.telemetryExport.update',
   'organizations.update',
   'organizations.webhooks.count',
   'organizations.webhooks.create',

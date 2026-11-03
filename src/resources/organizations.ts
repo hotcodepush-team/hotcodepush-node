@@ -17,6 +17,7 @@ import { OrganizationAppsResource } from './organization-apps';
 import { OrganizationInvitationsResource } from './organization-invitations';
 import { SsoProviderResource } from './sso-provider';
 import { SubscriptionResource } from './subscription';
+import { TelemetryExportResource } from './telemetry-export';
 import { UsageResource } from './usage';
 import { WebhooksResource } from './webhooks';
 
@@ -63,6 +64,7 @@ export class OrganizationsResource {
   public readonly members: MembersResource;
   public readonly ssoProvider: SsoProviderResource;
   public readonly subscription: SubscriptionResource;
+  public readonly telemetryExport: TelemetryExportResource;
   public readonly usage: UsageResource;
   public readonly webhooks: WebhooksResource;
 
@@ -78,6 +80,7 @@ export class OrganizationsResource {
     this.members = new MembersResource(httpClient);
     this.ssoProvider = new SsoProviderResource(httpClient);
     this.subscription = new SubscriptionResource(httpClient);
+    this.telemetryExport = new TelemetryExportResource(httpClient);
     this.usage = new UsageResource(httpClient);
     this.webhooks = new WebhooksResource(httpClient);
   }

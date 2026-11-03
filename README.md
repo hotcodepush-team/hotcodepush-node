@@ -4,7 +4,11 @@ The typed Node client for the [HotCodePush](https://hotcodepush.com) REST API.
 
 ## Installation
 
-The package is not on npm yet. Every commit on `main` is built to pkg.pr.new, so install one by its commit SHA and bump it deliberately, never `@main`:
+```sh
+npm install @hotcodepush/node
+```
+
+CI also builds every commit to pkg.pr.new, so a commit can be tried before its release; install one by its commit SHA, never `@main`:
 
 ```sh
 npm install https://pkg.pr.new/hotcodepush-team/hotcodepush-node/@hotcodepush/node@<sha>

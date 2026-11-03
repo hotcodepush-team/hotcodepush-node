@@ -64,7 +64,7 @@ export type UpdateWebhookOptions = PathParameters<
 /**
  * An outbound webhook.
  * `format` is `raw` for the JSON payload, or `slack`, `discord` or `teams` for a chat message. `events` lists the subscribed audit events.
- * The app filter is null for the events of every app and of the organization. `isEnabled` turns off after fifty failed deliveries in a row.
+ * The app filter is null for the events of every app and of the organization. `disabledAt` is set while the webhook is off, by hand or after fifty failed deliveries in a row.
  */
 export type Webhook = JsonResponseBody<
   '/v1/organizations/{organizationId}/webhooks/{webhookId}',
@@ -174,7 +174,7 @@ export class WebhooksResource {
 
   /**
    * Changes the name, the URL, the subscribed `events`, the app filter or `isEnabled`. The format and the secret never change.
-   * Enabling a webhook that was disabled after fifty failed deliveries in a row resets that count.
+   * `isEnabled: false` stamps `disabledAt`; `isEnabled: true` clears it and resets the count of failed deliveries in a row.
    * An API token answers `forbidden`; sign in with a session.
    */
   public async update(options: UpdateWebhookOptions): Promise<Webhook> {

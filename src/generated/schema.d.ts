@@ -97,7 +97,7 @@ export interface paths {
         };
         /**
          * List notifications
-         * @description The caller's in-app notifications across every organization, newest first, filtered by `isRead`. Each row carries the ids of the app, channel, release and member user it is about, null where its type is about none or the row is gone; `?relations=app,channel,memberUser,release` embeds each one's id and name, the release's id and number, null in the moment before a hard delete's cascade. A row is listed while what it is about is live: its organization, but for `organization_deleted` itself, its app and its member user; the count follows the same rule.
+         * @description The caller's in-app notifications across every organization, newest first, filtered by `isRead`. Each row carries the ids of the app, channel, release, member user, API token, sign-in client and webhook it is about, null where its type is about none or the row is gone; `?relations=apiToken,app,channel,memberUser,release,userSessionClient,webhook` embeds each one's id and name, the release's id and number, the sign-in client's name and country, null in the moment before a hard delete's cascade. A row is listed while what it is about is live: its organization, but for `organization_deleted` itself, its app and its member user; the count follows the same rule.
          */
         get: operations["getV1Notifications"];
         put?: never;
@@ -524,6 +524,118 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/organizations/{organizationId}/telemetry-export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the telemetry export
+         * @description The organization's telemetry export: the OTLP base URL, the signals it sends, the names of its headers and, while disabled, since when. The header values are write-only.
+         */
+        get: operations["getV1OrganizationsByOrganizationIdTelemetryExport"];
+        /**
+         * Set the telemetry export
+         * @description On a paying plan, sets the telemetry export, replacing the one before; one per organization. The `url` is the OTLP/HTTP base URL, https and never a loopback, private or HotCodePush host, refused under `https_required`, `host_not_allowed` or `credentials_forbidden`, and under `url_signal_path` when it ends in `/v1/logs`, `/v1/metrics` or `/v1/traces`; a trailing slash is dropped. The `headers`, at most 16, carry the vendor's credentials; `content-type`, `content-length` and `host` are refused under `header_reserved`, and two names that differ only in case under `header_duplicate`. The `signals` are `logs`, `metrics` or both. The export starts enabled, its failure count at zero.
+         */
+        put: operations["putV1OrganizationsByOrganizationIdTelemetryExport"];
+        post?: never;
+        /**
+         * Delete the telemetry export
+         * @description Removes the telemetry export with its delivery log, on any plan, so a downgraded organization can still remove it.
+         */
+        delete: operations["deleteV1OrganizationsByOrganizationIdTelemetryExport"];
+        options?: never;
+        head?: never;
+        /**
+         * Update the telemetry export
+         * @description On a paying plan, switches the telemetry export on or off. `isEnabled: false` stamps `disabledAt`; `isEnabled: true` clears it and starts the consecutive failure count again. Setting the state the export already has writes nothing.
+         */
+        patch: operations["patchV1OrganizationsByOrganizationIdTelemetryExport"];
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/telemetry-export/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test the telemetry export
+         * @description On a paying plan, sends one delivery per signal on, once, within the request, with the export's headers: a log record of the type `telemetry_export.test`, outside the audit catalog, to `/v1/logs`, and the current metrics document to `/v1/metrics`. Answers the deliveries settled with the vendor's answers. A disabled export is tested all the same; the outcome never counts toward the fifty consecutive failures.
+         */
+        post: operations["postV1OrganizationsByOrganizationIdTelemetryExportTest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/telemetry-export/deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the deliveries
+         * @description The telemetry export's delivery log, newest first, each delivery one record or document with its attempts, the vendor's last answer, its first 4 KB, and `nextAttemptAt` while the queue retries it; filtered by `status` and by `createdSince` and `createdUntil`, both inclusive. Rows are kept for 30 days.
+         */
+        get: operations["getV1OrganizationsByOrganizationIdTelemetryExportDeliveries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/telemetry-export/deliveries/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Count the deliveries
+         * @description The number of the telemetry export's deliveries under the list's filters, which the list pages through.
+         */
+        get: operations["getV1OrganizationsByOrganizationIdTelemetryExportDeliveriesCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizations/{organizationId}/telemetry-export/deliveries/{deliveryId}/redeliver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Redeliver a delivery
+         * @description On a paying plan, sends the record again, once, within the request — a failed delivery, or any other, a pending one taken from the queue's retries — and answers the delivery settled with the vendor's answer, its attempt count carried on; the outcome never counts toward the fifty consecutive failures; audit `delivery.redelivered`.
+         */
+        post: operations["postV1OrganizationsByOrganizationIdTelemetryExportDeliveriesByDeliveryIdRedeliver"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/organizations/{organizationId}/usage": {
         parameters: {
             query?: never;
@@ -651,7 +763,7 @@ export interface paths {
         head?: never;
         /**
          * Update a webhook
-         * @description Changes the name, the URL, the subscribed `events`, the app filter or `isEnabled`; the format and the secret never change. Setting `isEnabled` on a webhook disabled after fifty consecutive failed deliveries starts its count again. A body equal to the row is a no-op that answers the row and writes nothing.
+         * @description Changes the name, the URL, the subscribed `events`, the app filter or `isEnabled`; the format and the secret never change. `isEnabled: false` stamps `disabledAt`; `isEnabled: true` clears it and, on a webhook disabled after fifty consecutive failed deliveries, starts its count again. A body equal to the row is a no-op that answers the row and writes nothing.
          */
         patch: operations["patchV1OrganizationsByOrganizationIdWebhooksByWebhookId"];
         trace?: never;
@@ -727,7 +839,7 @@ export interface paths {
         put?: never;
         /**
          * Redeliver a delivery
-         * @description Delivers the event again, once, within the request — a failed delivery, or any other, a pending one taken from the queue's retries — and answers the delivery settled with the receiver's answer, its attempt count carried on; the outcome never counts toward the fifty consecutive failures; audit `webhook_delivery.redelivered`.
+         * @description Delivers the event again, once, within the request — a failed delivery, or any other, a pending one taken from the queue's retries — and answers the delivery settled with the receiver's answer, its attempt count carried on; the outcome never counts toward the fifty consecutive failures; audit `delivery.redelivered`.
          */
         post: operations["postV1OrganizationsByOrganizationIdWebhooksByWebhookIdDeliveriesByDeliveryIdRedeliver"];
         delete?: never;
@@ -907,7 +1019,7 @@ export interface paths {
         put?: never;
         /**
          * Create a bundle
-         * @description Creates the bundle from its manifest — platforms, version label, files with path, hash and size, fingerprint, git provenance — and answers the bundle row, `uploading` until completed; its files list with `isStored=false` names the hashes the app lacks, each put at `/v1/apps/{appId}/files/{sha256}`, and the pack goes to `…/bundles/{bundleId}/pack`. The signed content is the manifest the CLI builds from those fields with the signing key’s fingerprint as `keyId` — the files sorted by path and the platforms sorted, each by UTF-16 code units — as canonical JSON; `signature` covers those bytes and is verified here against the app’s keys, `signature_invalid` otherwise, and required once the app has a key, `signature_required`.
+         * @description Creates the bundle from its manifest — platforms, version label, files with path, hash and size, fingerprint, git provenance — and answers the bundle row, `uploading` until completed; its files list with `isStored=false` names the hashes the app lacks, each put at `/v1/apps/{appId}/files/{sha256}`, and the pack goes to `…/bundles/{bundleId}/pack`. The signed content is the manifest the CLI builds from those fields with the signing key’s `keyId` — the files sorted by path and the platforms sorted, each by UTF-16 code units — as canonical JSON; `signature` covers those bytes and is verified here against the app’s keys, `signature_invalid` otherwise, and required once the app has a key, `signature_required`.
          */
         post: operations["postV1AppsByAppIdBundles"];
         delete?: never;
@@ -1307,7 +1419,7 @@ export interface paths {
         put?: never;
         /**
          * Create a release
-         * @description Creates a release in the channel of a ready bundle, `bundleId`, or of what another channel's newest active release serves, `fromChannelId`, recorded as the provenance, with its conditions, rollout, mandatory flag, notes, the nullable auto-pause overrides and the nullable progression schedule, whose last percentage lies above the rollout, numbered next in the channel; refused on a protected channel below Admin, past `release_count_per_app_per_day_limit` and, once the app has a signing key, for an unsigned bundle; an `Idempotency-Key` answers the same release again for 24 hours. The audience preview, `GET …/channels/{channelId}/audience`, answers the warnings for the same conditions before the create.
+         * @description Creates a release in the channel of a ready bundle, `bundleId`, or of what another channel's newest active release serves, `fromChannelId`, recorded as the provenance, with its conditions, rollout, mandatory flag, notes, the nullable auto-pause overrides and the nullable progression schedule, whose last rollout percent lies above the rollout, numbered next in the channel; refused on a protected channel below Admin, past `release_count_per_app_per_day_limit` and, once the app has a signing key, for an unsigned bundle; an `Idempotency-Key` answers the same release again for 24 hours. The audience preview, `GET …/channels/{channelId}/audience`, answers the warnings for the same conditions before the create.
          */
         post: operations["postV1AppsByAppIdChannelsByChannelIdReleases"];
         delete?: never;
@@ -1643,7 +1755,7 @@ export interface paths {
         head?: never;
         /**
          * Update a release
-         * @description Edits the rollout percentage in both directions — a device that has the release keeps it — the progression schedule, null stopping it, the mandatory flag, the notes and the nullable auto-pause overrides, null inheriting the channel; a rollout set without a schedule ends the one the release had, and a schedule named starts its step anew, its last percentage above the rollout; the index re-materializes and devices see the change on their next check; revoked is terminal.
+         * @description Edits the rollout percentage in both directions — a device that has the release keeps it — the progression schedule, null stopping it, the mandatory flag, the notes and the nullable auto-pause overrides, null inheriting the channel; a rollout set without a schedule ends the one the release had, and a schedule named starts its step anew, its last rollout percent above the rollout; the index re-materializes and devices see the change on their next check; revoked is terminal.
          */
         patch: operations["patchV1AppsByAppIdReleasesByReleaseId"];
         trace?: never;
@@ -2562,7 +2674,7 @@ export interface operations {
                 limit?: number;
                 offset?: number;
                 isRead?: "false" | "true";
-                relations?: ("app" | "channel" | "memberUser" | "release")[];
+                relations?: ("apiToken" | "app" | "channel" | "memberUser" | "release" | "userSessionClient" | "webhook")[];
             };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
@@ -2580,6 +2692,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        apiTokenId: string | null;
                         appId: string | null;
                         channelId: string | null;
                         /** Format: date-time */
@@ -2596,6 +2709,13 @@ export interface operations {
                         updatedAt: string;
                         /** Format: uuid */
                         userId: string;
+                        userSessionClientId: string | null;
+                        webhookId: string | null;
+                        apiToken?: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string | null;
+                        } | null;
                         app?: {
                             /** Format: uuid */
                             id: string;
@@ -2615,6 +2735,17 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             number: number;
+                        } | null;
+                        userSessionClient?: {
+                            client: string;
+                            country: string | null;
+                            /** Format: uuid */
+                            id: string;
+                        } | null;
+                        webhook?: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
                         } | null;
                     }[];
                 };
@@ -2899,6 +3030,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        apiTokenId: string | null;
                         appId: string | null;
                         channelId: string | null;
                         /** Format: date-time */
@@ -2915,6 +3047,8 @@ export interface operations {
                         updatedAt: string;
                         /** Format: uuid */
                         userId: string;
+                        userSessionClientId: string | null;
+                        webhookId: string | null;
                     };
                 };
             };
@@ -5717,6 +5851,906 @@ export interface operations {
             };
         };
     };
+    getV1OrganizationsByOrganizationIdTelemetryExport: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The telemetry export. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        consecutiveFailureCount: number;
+                        /** Format: date-time */
+                        createdAt: string;
+                        disabledAt: string | null;
+                        headerNames: string[];
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: uuid */
+                        organizationId: string;
+                        signals: ("logs" | "metrics")[];
+                        /** Format: date-time */
+                        updatedAt: string;
+                        url: string;
+                    };
+                };
+            };
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `unauthenticated` */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `not_found` */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `rate_limited` */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `internal` */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `maintenance` */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    putV1OrganizationsByOrganizationIdTelemetryExport: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    headers: {
+                        [key: string]: string;
+                    };
+                    signals: ("logs" | "metrics")[];
+                    /** Format: uri */
+                    url: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The replaced telemetry export. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        consecutiveFailureCount: number;
+                        /** Format: date-time */
+                        createdAt: string;
+                        disabledAt: string | null;
+                        headerNames: string[];
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: uuid */
+                        organizationId: string;
+                        signals: ("logs" | "metrics")[];
+                        /** Format: date-time */
+                        updatedAt: string;
+                        url: string;
+                    };
+                };
+            };
+            /** @description The new telemetry export. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        consecutiveFailureCount: number;
+                        /** Format: date-time */
+                        createdAt: string;
+                        disabledAt: string | null;
+                        headerNames: string[];
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: uuid */
+                        organizationId: string;
+                        signals: ("logs" | "metrics")[];
+                        /** Format: date-time */
+                        updatedAt: string;
+                        url: string;
+                    };
+                };
+            };
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `unauthenticated` */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `plan_required` */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `not_found` */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `rate_limited` */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `internal` */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `maintenance` */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    deleteV1OrganizationsByOrganizationIdTelemetryExport: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The telemetry export is removed. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `unauthenticated` */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `not_found` */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `rate_limited` */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `internal` */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `maintenance` */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    patchV1OrganizationsByOrganizationIdTelemetryExport: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    isEnabled: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description The telemetry export. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        consecutiveFailureCount: number;
+                        /** Format: date-time */
+                        createdAt: string;
+                        disabledAt: string | null;
+                        headerNames: string[];
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: uuid */
+                        organizationId: string;
+                        signals: ("logs" | "metrics")[];
+                        /** Format: date-time */
+                        updatedAt: string;
+                        url: string;
+                    };
+                };
+            };
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `unauthenticated` */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `plan_required` */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `not_found` */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `rate_limited` */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `internal` */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `maintenance` */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1OrganizationsByOrganizationIdTelemetryExportTest: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The deliveries of the test, settled. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        attemptCount: number;
+                        auditRowId: string | null;
+                        /** Format: date-time */
+                        createdAt: string;
+                        /** Format: uuid */
+                        id: string;
+                        nextAttemptAt: string | null;
+                        responseBody: string | null;
+                        responseCode: number | null;
+                        /** @enum {string} */
+                        status: "failed" | "pending" | "succeeded";
+                        telemetryExportId: string | null;
+                        type: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        webhookId: string | null;
+                    }[];
+                };
+            };
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `unauthenticated` */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `plan_required` */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `not_found` */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `rate_limited` */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `internal` */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `maintenance` */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1OrganizationsByOrganizationIdTelemetryExportDeliveries: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                createdSince?: string;
+                createdUntil?: string;
+                status?: "failed" | "pending" | "succeeded";
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The deliveries. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        attemptCount: number;
+                        auditRowId: string | null;
+                        /** Format: date-time */
+                        createdAt: string;
+                        /** Format: uuid */
+                        id: string;
+                        nextAttemptAt: string | null;
+                        responseBody: string | null;
+                        responseCode: number | null;
+                        /** @enum {string} */
+                        status: "failed" | "pending" | "succeeded";
+                        telemetryExportId: string | null;
+                        type: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        webhookId: string | null;
+                    }[];
+                };
+            };
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `unauthenticated` */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `not_found` */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `rate_limited` */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `internal` */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `maintenance` */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1OrganizationsByOrganizationIdTelemetryExportDeliveriesCount: {
+        parameters: {
+            query?: {
+                createdSince?: string;
+                createdUntil?: string;
+                status?: "failed" | "pending" | "succeeded";
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The number of rows the list's filters match. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        count: number;
+                    };
+                };
+            };
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `unauthenticated` */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `not_found` */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `rate_limited` */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `internal` */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `maintenance` */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1OrganizationsByOrganizationIdTelemetryExportDeliveriesByDeliveryIdRedeliver: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                deliveryId: string;
+                organizationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The delivery, settled again. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        attemptCount: number;
+                        auditRowId: string | null;
+                        /** Format: date-time */
+                        createdAt: string;
+                        /** Format: uuid */
+                        id: string;
+                        nextAttemptAt: string | null;
+                        responseBody: string | null;
+                        responseCode: number | null;
+                        /** @enum {string} */
+                        status: "failed" | "pending" | "succeeded";
+                        telemetryExportId: string | null;
+                        type: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        webhookId: string | null;
+                    };
+                };
+            };
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `unauthenticated` */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `plan_required` */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `not_found` */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `rate_limited` */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `internal` */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `maintenance` */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     getV1OrganizationsByOrganizationIdUsage: {
         parameters: {
             query?: {
@@ -6043,12 +7077,12 @@ export interface operations {
                         consecutiveFailureCount: number;
                         /** Format: date-time */
                         createdAt: string;
+                        disabledAt: string | null;
                         events: string[];
                         /** @enum {string} */
                         format: "discord" | "raw" | "slack" | "teams";
                         /** Format: uuid */
                         id: string;
-                        isEnabled: boolean;
                         name: string;
                         /** Format: uuid */
                         organizationId: string;
@@ -6172,12 +7206,12 @@ export interface operations {
                         consecutiveFailureCount: number;
                         /** Format: date-time */
                         createdAt: string;
+                        disabledAt: string | null;
                         events: string[];
                         /** @enum {string} */
                         format: "discord" | "raw" | "slack" | "teams";
                         /** Format: uuid */
                         id: string;
-                        isEnabled: boolean;
                         name: string;
                         /** Format: uuid */
                         organizationId: string;
@@ -6400,12 +7434,12 @@ export interface operations {
                         consecutiveFailureCount: number;
                         /** Format: date-time */
                         createdAt: string;
+                        disabledAt: string | null;
                         events: string[];
                         /** @enum {string} */
                         format: "discord" | "raw" | "slack" | "teams";
                         /** Format: uuid */
                         id: string;
-                        isEnabled: boolean;
                         name: string;
                         /** Format: uuid */
                         organizationId: string;
@@ -6626,12 +7660,12 @@ export interface operations {
                         consecutiveFailureCount: number;
                         /** Format: date-time */
                         createdAt: string;
+                        disabledAt: string | null;
                         events: string[];
                         /** @enum {string} */
                         format: "discord" | "raw" | "slack" | "teams";
                         /** Format: uuid */
                         id: string;
-                        isEnabled: boolean;
                         name: string;
                         /** Format: uuid */
                         organizationId: string;
@@ -6759,11 +7793,11 @@ export interface operations {
                         responseCode: number | null;
                         /** @enum {string} */
                         status: "failed" | "pending" | "succeeded";
+                        telemetryExportId: string | null;
                         type: string;
                         /** Format: date-time */
                         updatedAt: string;
-                        /** Format: uuid */
-                        webhookId: string;
+                        webhookId: string | null;
                     };
                 };
             };
@@ -6882,11 +7916,11 @@ export interface operations {
                         responseCode: number | null;
                         /** @enum {string} */
                         status: "failed" | "pending" | "succeeded";
+                        telemetryExportId: string | null;
                         type: string;
                         /** Format: date-time */
                         updatedAt: string;
-                        /** Format: uuid */
-                        webhookId: string;
+                        webhookId: string | null;
                     }[];
                 };
             };
@@ -7106,11 +8140,11 @@ export interface operations {
                         responseCode: number | null;
                         /** @enum {string} */
                         status: "failed" | "pending" | "succeeded";
+                        telemetryExportId: string | null;
                         type: string;
                         /** Format: date-time */
                         updatedAt: string;
-                        /** Format: uuid */
-                        webhookId: string;
+                        webhookId: string | null;
                     };
                 };
             };

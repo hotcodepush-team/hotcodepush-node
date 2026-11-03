@@ -1,49 +1,40 @@
 # @hotcodepush/node
 
-The typed Node client for the [HotCodePush](https://hotcodepush.com) REST API.
+[![npm](https://img.shields.io/npm/v/@hotcodepush/node)](https://www.npmjs.com/package/@hotcodepush/node)
+
+The typed Node.js client for the [HotCodePush](https://hotcodepush.com) REST API, the over-the-air (OTA) update platform for React Native, Expo, Capacitor and Cordova.
 
 ## Installation
 
-The package is not on npm yet. Every commit on `main` is built to pkg.pr.new, so install one by its commit SHA and bump it deliberately, never `@main`:
-
 ```sh
-npm install https://pkg.pr.new/hotcodepush-team/hotcodepush-node/@hotcodepush/node@<sha>
+npm install @hotcodepush/node
 ```
 
-It requires Node.js 22 or later.
+It is ES modules only and requires Node.js 22 or later.
 
 ## Usage
 
 ```ts
 import { HotCodePush } from '@hotcodepush/node';
 
-// Reads the token from HOTCODEPUSH_TOKEN; pass `token` to set it yourself.
-const hotCodePush = new HotCodePush();
+const hotCodePush = new HotCodePush({ token: process.env.HOTCODEPUSH_TOKEN });
 
+const [organization] = await hotCodePush.organizations.list();
 const app = await hotCodePush.organizations.apps.create({
   framework: 'capacitor',
   name: 'Demo',
-  organizationId: '<organization id>',
+  organizationId: organization.id,
 });
 const channel = await hotCodePush.apps.channels.create({
   appId: app.id,
   name: 'staging',
 });
-await hotCodePush.apps.channels.pause({ appId: app.id, channelId: channel.id });
-
-const [release] = await hotCodePush.apps.releases.list({
-  appId: app.id,
-  channelId: channel.id,
-  number: 1,
-});
 ```
 
+`token` is an API token from the console's [API tokens](https://console.hotcodepush.com/settings/tokens) page. Left out, the client reads `HOTCODEPUSH_TOKEN`.
 The resources mirror the API's paths, `/v1/apps/{appId}/channels` being `apps.channels`, and every paginated list has a `count` beside it.
-A boolean filter such as `isRead` takes a `boolean`.
-Each attempt of a call may take 60 seconds; pass `timeout` in milliseconds to change it. A binary upload gets ten minutes per attempt.
-A `baseUrl` with a path, such as `https://proxy.example/hcp`, keeps it in front of every route.
 Uploads stream their body, a `Blob` or a `ReadableStream` with its `contentLength`.
-Creating calls send an `Idempotency-Key` and are retried; pass `idempotencyKey` to reuse one across your own retries.
+Creating calls send an `Idempotency-Key` and are retried. Pass `idempotencyKey` to reuse one across your own retries.
 A failed request throws a `HotCodePushError` with the API's `code`, `message`, `details` and the HTTP `status`.
 
 ## Documentation
@@ -62,7 +53,7 @@ npm run fmt          # ESLint's fixes and Prettier, run before every commit
 ```
 
 `npm run sync-openapi` fetches the API's OpenAPI document into `openapi.json`, and `npm run generate` regenerates the types from it.
-`npm run check-openapi-drift` compares the operations of `openapi.json` with the live API's; CI runs it after the tests.
+`npm run check-openapi-drift` compares the operations of `openapi.json` with the live API's. CI runs it after the tests.
 `CLAUDE.md` holds the layout and the rules.
 
 ## License

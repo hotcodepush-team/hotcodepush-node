@@ -92,7 +92,7 @@ The integration test runs by hand against that API, started with `ENVIRONMENT=de
 
 ## Releases
 
-`ci.yml`'s `preview` job publishes every push to `main` and every pull request to pkg.pr.new, with no secret since the pkg.pr.new GitHub App authenticates, and consumers pin one build by its commit hash: `https://pkg.pr.new/hotcodepush-team/hotcodepush-node/@hotcodepush/node@<sha>`, bumped deliberately, never `@main`.
+Consumers install the npm release. `ci.yml`'s `preview` job still publishes every push to `main` and every pull request to pkg.pr.new, with no secret since the pkg.pr.new GitHub App authenticates, so a commit can be tried before its release: `https://pkg.pr.new/hotcodepush-team/hotcodepush-node/@hotcodepush/node@<sha>`, pinned by commit, never `@main`.
 Release-please keeps a release pull request open on `main`, and merging it tags the release.
 `release.yml` then publishes to npm with provenance over OIDC, `prepublishOnly` building a clean `dist/` first.
 

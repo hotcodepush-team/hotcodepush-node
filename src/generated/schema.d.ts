@@ -1013,13 +1013,13 @@ export interface paths {
         };
         /**
          * List the bundle sets
-         * @description The app's bundle sets, newest first, filtered by `bundleId`, a set that carries the bundle, `bundleVersion`, `fingerprint` and `platform`, a set that covers it; `?relations=bundles` embeds each set's bundles.
+         * @description The app's bundle sets, newest first, filtered by `bundleId`, a set that carries the bundle, `bundleVersion`, `fingerprint`, `number`, the set's number in the app, and `platform`, a set that covers it; `?relations=bundles` embeds each set's bundles.
          */
         get: operations["getV1AppsByAppIdBundleSets"];
         put?: never;
         /**
          * Find or create a bundle set
-         * @description Finds the set of exactly the bundles named by `bundleIds`, or creates it with the app's next number: one ready uploaded bundle per platform, sharing one version label, one fingerprint and one framework, refused under `platforms_overlap`, `bundle_version_mismatch`, `fingerprint_mismatch` or `framework_mismatch` otherwise. A set is never changed, and releasing it checks the signing rule.
+         * @description Finds the set of exactly the bundles named by `bundleIds`, or creates it with the app's next number: one ready uploaded bundle per platform, sharing one version label, one fingerprint and one framework, otherwise a `validation` error on `bundleIds` with the rule `platforms_overlap`, `bundle_version_mismatch`, `fingerprint_mismatch` or `framework_mismatch`. A set is never changed, and releasing it checks the signing rule.
          */
         post: operations["postV1AppsByAppIdBundleSets"];
         delete?: never;
@@ -9617,6 +9617,7 @@ export interface operations {
                 bundleId?: string;
                 bundleVersion?: string;
                 fingerprint?: string;
+                number?: number;
                 platform?: "android" | "ios";
                 relations?: "bundles"[];
             };
@@ -9897,6 +9898,7 @@ export interface operations {
                 bundleId?: string;
                 bundleVersion?: string;
                 fingerprint?: string;
+                number?: number;
                 platform?: "android" | "ios";
             };
             header?: {

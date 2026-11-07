@@ -15,18 +15,19 @@ afterEach(() => {
 });
 
 describe('BundleSetsResource', () => {
-  test('should count the bundle sets of the app filtered by platform', async () => {
+  test('should count the bundle sets of the app filtered by number and platform', async () => {
     const fetchMock = stubFetch(() => Response.json({ count: 1 }));
 
     const fetchedCount = await new HotCodePush().apps.bundleSets.count({
       appId: 'app',
+      number: 2,
       platform: 'ios',
     });
 
     expect(fetchedCount).toEqual({ count: 1 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${BUNDLE_SETS_URL}/count?platform=ios`,
+      url: `${BUNDLE_SETS_URL}/count?number=2&platform=ios`,
     });
   });
 
@@ -75,19 +76,20 @@ describe('BundleSetsResource', () => {
     });
   });
 
-  test('should list the bundle sets of the app that carry the bundle', async () => {
+  test('should list the bundle sets of the app filtered by bundle and number', async () => {
     const fetchMock = stubFetch(() => Response.json([BUNDLE_SET]));
 
     const fetchedBundleSets = await new HotCodePush().apps.bundleSets.list({
       appId: 'app',
       bundleId: 'bundle',
       limit: 20,
+      number: 2,
     });
 
     expect(fetchedBundleSets).toEqual([BUNDLE_SET]);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${BUNDLE_SETS_URL}?bundleId=bundle&limit=20`,
+      url: `${BUNDLE_SETS_URL}?bundleId=bundle&limit=20&number=2`,
     });
   });
 });

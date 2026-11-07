@@ -74,6 +74,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       bundleId: BUNDLE_ID,
       bundleVersion: '1.0.0',
       fingerprint: `fp1:${SHA256}`,
+      number: 1,
       platform: 'ios',
     }),
   'apps.bundleSets.create': hotCodePush =>
@@ -94,6 +95,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       bundleVersion: '1.0.0',
       fingerprint: `fp1:${SHA256}`,
       limit: 10,
+      number: 1,
       offset: 10,
       platform: 'ios',
       relations: ['bundles'],

@@ -6,6 +6,7 @@ import type {
   PathParameters,
 } from '../types';
 import { BinariesResource } from './binaries';
+import { BundleSetsResource } from './bundle-sets';
 import { BundlesResource } from './bundles';
 import { ChannelsResource } from './channels';
 import { DevicesResource } from './devices';
@@ -31,6 +32,7 @@ export type UpdateAppOptions = PathParameters<'/v1/apps/{appId}', 'patch'> &
 
 export class AppsResource {
   public readonly binaries: BinariesResource;
+  public readonly bundleSets: BundleSetsResource;
   public readonly bundles: BundlesResource;
   public readonly channels: ChannelsResource;
   public readonly devices: DevicesResource;
@@ -41,6 +43,7 @@ export class AppsResource {
 
   constructor(private readonly httpClient: HttpClient) {
     this.binaries = new BinariesResource(httpClient);
+    this.bundleSets = new BundleSetsResource(httpClient);
     this.bundles = new BundlesResource(httpClient);
     this.channels = new ChannelsResource(httpClient);
     this.devices = new DevicesResource(httpClient);

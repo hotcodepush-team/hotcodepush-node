@@ -52,14 +52,14 @@ describe('ReleasesResource', () => {
 
     const fetchedRelease = await new HotCodePush().apps.releases.get({
       appId: 'app',
-      relations: ['releaseCounters'],
+      relations: ['bundleSet', 'bundleSet.bundles', 'releaseCounters'],
       releaseId: 'release',
     });
 
     expect(fetchedRelease).toEqual(RELEASE);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${RELEASES_URL}/release?relations=releaseCounters`,
+      url: `${RELEASES_URL}/release?relations=bundleSet%2CbundleSet.bundles%2CreleaseCounters`,
     });
   });
 
@@ -86,13 +86,13 @@ describe('ReleasesResource', () => {
       appId: 'app',
       channelId: 'channel',
       number: 1,
-      relations: ['bundle', 'channel', 'releaseCounters'],
+      relations: ['bundleSet', 'channel', 'releaseCounters'],
     });
 
     expect(fetchedReleases).toEqual([RELEASE]);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${RELEASES_URL}?channelId=channel&number=1&relations=bundle%2Cchannel%2CreleaseCounters`,
+      url: `${RELEASES_URL}?channelId=channel&number=1&relations=bundleSet%2Cchannel%2CreleaseCounters`,
     });
   });
 

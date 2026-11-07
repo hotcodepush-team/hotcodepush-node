@@ -165,7 +165,7 @@ describe.runIf(apiBaseUrl)('the client against a running API', () => {
     const fetchedReleases = await hotCodePush.apps.releases.list({
       appId: app.id,
       channelId: channel.id,
-      relations: ['bundle'],
+      relations: ['bundleSet'],
     });
 
     expect(fetchedReleases).toEqual([]);

@@ -27,7 +27,7 @@ export class ChannelReleasesResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * Releases a ready bundle, or what another channel serves, in this channel.
+   * Releases a bundle set, or what another channel serves, in this channel.
    * The release gets the next number of the channel.
    */
   public async create(options: CreateReleaseOptions): Promise<ReleaseRow> {

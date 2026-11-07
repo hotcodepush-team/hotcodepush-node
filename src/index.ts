@@ -9,6 +9,7 @@ export type * from './resources/bundle-files';
 export type * from './resources/bundle-pack';
 export type * from './resources/bundle-pack-upload-parts';
 export type * from './resources/bundle-pack-uploads';
+export type * from './resources/bundle-sets';
 export type * from './resources/bundles';
 export type * from './resources/channel-audience';
 export type * from './resources/channel-qr-code';

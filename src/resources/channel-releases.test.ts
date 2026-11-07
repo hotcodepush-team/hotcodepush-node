@@ -22,7 +22,7 @@ describe('ChannelReleasesResource', () => {
     const createdRelease =
       await new HotCodePush().apps.channels.releases.create({
         appId: 'app',
-        bundleId: 'bundle',
+        bundleSetId: 'bundle-set',
         channelId: 'channel',
         idempotencyKey: 'key',
         rolloutPercent: 10,
@@ -30,7 +30,7 @@ describe('ChannelReleasesResource', () => {
 
     expect(createdRelease).toEqual(RELEASE);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
-      body: { bundleId: 'bundle', rolloutPercent: 10 },
+      body: { bundleSetId: 'bundle-set', rolloutPercent: 10 },
       headers: { 'Idempotency-Key': 'key' },
       method: 'POST',
       url: RELEASES_URL,

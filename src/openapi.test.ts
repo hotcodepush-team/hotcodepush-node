@@ -19,6 +19,7 @@ interface OpenApiDocument {
 const APP_ID = '7c0f3a52-1d8e-4b6a-9f21-5e3c8a0d4b17';
 const BINARY_ID = '3f6a9c2e-7b14-4d58-9e03-b2c8d6f1a475';
 const BUNDLE_ID = '2a9e6c14-8b3f-4d70-a5e2-91c7f0b3d864';
+const BUNDLE_SET_ID = '5d8b3e17-9c2a-4f60-b4e1-7a0c6f2d9e38';
 const CHANNEL_ID = 'e41b7d09-3c6a-4f85-b2d1-6a8f0c9e3b52';
 const DELIVERY_ID = '8f2c6a41-5d9e-4b73-a1c8-0e7b3d5f9a26';
 const DEVICE_ID = '6b1e9d37-2f5c-4a80-9c46-d8e3a1f7b259';
@@ -66,6 +67,38 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       limit: 10,
       offset: 10,
       platform: 'ios',
+    }),
+  'apps.bundleSets.count': hotCodePush =>
+    hotCodePush.apps.bundleSets.count({
+      appId: APP_ID,
+      bundleId: BUNDLE_ID,
+      bundleVersion: '1.0.0',
+      fingerprint: `fp1:${SHA256}`,
+      number: 1,
+      platform: 'ios',
+    }),
+  'apps.bundleSets.create': hotCodePush =>
+    hotCodePush.apps.bundleSets.create({
+      appId: APP_ID,
+      bundleIds: [BUNDLE_ID],
+    }),
+  'apps.bundleSets.get': hotCodePush =>
+    hotCodePush.apps.bundleSets.get({
+      appId: APP_ID,
+      bundleSetId: BUNDLE_SET_ID,
+      relations: ['bundles'],
+    }),
+  'apps.bundleSets.list': hotCodePush =>
+    hotCodePush.apps.bundleSets.list({
+      appId: APP_ID,
+      bundleId: BUNDLE_ID,
+      bundleVersion: '1.0.0',
+      fingerprint: `fp1:${SHA256}`,
+      limit: 10,
+      number: 1,
+      offset: 10,
+      platform: 'ios',
+      relations: ['bundles'],
     }),
   'apps.bundles.complete': hotCodePush =>
     hotCodePush.apps.bundles.complete({ appId: APP_ID, bundleId: BUNDLE_ID }),
@@ -210,7 +243,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
   'apps.channels.releases.create': hotCodePush =>
     hotCodePush.apps.channels.releases.create({
       appId: APP_ID,
-      bundleId: BUNDLE_ID,
+      bundleSetId: BUNDLE_SET_ID,
       channelId: CHANNEL_ID,
       conditions: [{ range: '>=2.0.0', type: 'binary' }],
       failureAction: 'pause',
@@ -343,6 +376,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.apps.releases.count({
       appId: APP_ID,
       bundleId: BUNDLE_ID,
+      bundleSetId: BUNDLE_SET_ID,
       channelId: CHANNEL_ID,
       gitCommit: 'main',
       number: 1,
@@ -358,6 +392,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.apps.releases.list({
       appId: APP_ID,
       bundleId: BUNDLE_ID,
+      bundleSetId: BUNDLE_SET_ID,
       channelId: CHANNEL_ID,
       gitCommit: 'main',
       limit: 10,

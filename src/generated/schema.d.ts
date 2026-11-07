@@ -450,7 +450,7 @@ export interface paths {
         get: operations["getV1OrganizationsByOrganizationIdSsoProvider"];
         /**
          * Set the SSO provider
-         * @description Sets the OIDC or SAML provider and its domain, replacing the one before; one per organization, on a plan that includes single sign-on. A new or changed domain starts unverified, with a new token for its TXT record.
+         * @description Sets the OIDC or SAML provider and its domain, replacing the one before; one per organization, on a plan that includes single sign-on. A new or changed domain starts unverified, with a new token for its TXT record, and once verified the provider signs in addresses on the new domain alone.
          */
         put: operations["putV1OrganizationsByOrganizationIdSsoProvider"];
         post?: never;
@@ -475,7 +475,7 @@ export interface paths {
         put?: never;
         /**
          * Verify the SSO domain
-         * @description Looks up the domain's TXT record `_hotcodepush-sso-{providerId}.{domain}` for the provider's `domainVerificationToken` and sets `domainVerified` when the record carries it; the answer is the provider, verified or still waiting for the record. A verified provider answers unchanged without a lookup.
+         * @description Looks up the domain's TXT record `_hotcodepush-sso-{providerId}.{domain}` for the provider's `domainVerificationToken` and sets `domainVerified` when the record carries it; the answer is the provider, verified or still waiting for the record. A verified provider answers unchanged without a lookup, and a domain another provider verified answers `sso_domain_taken`.
          */
         post: operations["postV1OrganizationsByOrganizationIdSsoProviderVerifications"];
         delete?: never;
@@ -1004,6 +1004,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/apps/{appId}/bundle-sets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the bundle sets
+         * @description The app's bundle sets, newest first, filtered by `bundleId`, a set that carries the bundle, `bundleVersion`, `fingerprint`, `number`, the set's number in the app, and `platform`, a set that covers it; `?relations=bundles` embeds each set's bundles.
+         */
+        get: operations["getV1AppsByAppIdBundleSets"];
+        put?: never;
+        /**
+         * Find or create a bundle set
+         * @description Finds the set of exactly the bundles named by `bundleIds`, or creates it with the app's next number: one ready uploaded bundle per platform, sharing one version label, one fingerprint and one framework, otherwise a `validation` error on `bundleIds` with the rule `platforms_overlap`, `bundle_version_mismatch`, `fingerprint_mismatch` or `framework_mismatch`. A set is never changed, and releasing it checks the signing rule.
+         */
+        post: operations["postV1AppsByAppIdBundleSets"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundle-sets/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Count the bundle sets
+         * @description The number of the app's bundle sets under the list's filters, which the list pages through.
+         */
+        get: operations["getV1AppsByAppIdBundleSetsCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/apps/{appId}/bundle-sets/{bundleSetId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a bundle set
+         * @description One bundle set; `?relations=bundles` embeds its bundles, each with its `platforms`, the way a client finds the bundle of a platform.
+         */
+        get: operations["getV1AppsByAppIdBundleSetsByBundleSetId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/apps/{appId}/bundles": {
         parameters: {
             query?: never;
@@ -1013,7 +1077,7 @@ export interface paths {
         };
         /**
          * List the bundles
-         * @description The app's bundles, newest first, every source unless `source` selects one: `binary`, the bundle a store build ships, which carries no number and no fingerprint; `upload`, one the CLI uploaded. `isInUse` selects the bundles an active or paused release serves, `fingerprint` those built for that native layer, `query` those whose number contains it.
+         * @description The app's bundles, newest first, every source unless `source` selects one: `binary`, the bundle a store build ships, which carries no number and no fingerprint; `upload`, one the CLI uploaded. `isInUse` selects the bundles an active or paused release serves, `fingerprint` those built for that native layer, `number` the bundle of that number, `query` those whose number contains it.
          */
         get: operations["getV1AppsByAppIdBundles"];
         put?: never;
@@ -1064,7 +1128,7 @@ export interface paths {
         post?: never;
         /**
          * Delete a bundle
-         * @description Deletes the bundle now, not by retention: refused while a release serves it or a binary ships it; its manifest, pack and deltas go with it, and the files no other bundle of the app lists.
+         * @description Deletes the bundle now, not by retention: refused while a release refers to a set that carries it or a binary ships it; every set that carries it goes with it, as do its manifest, pack and deltas and the files no other bundle of the app lists.
          */
         delete: operations["deleteV1AppsByAppIdBundlesByBundleId"];
         options?: never;
@@ -1356,7 +1420,7 @@ export interface paths {
         post?: never;
         /**
          * Delete a channel
-         * @description Deletes the channel with its releases: it leaves the frontier and starts its bundles' retention clocks; refused on the app's default channel.
+         * @description Deletes the channel with its releases: it stops serving them and starts the retention clocks of the bundles only it served; refused on the app's default channel.
          */
         delete: operations["deleteV1AppsByAppIdChannelsByChannelId"];
         options?: never;
@@ -1399,7 +1463,7 @@ export interface paths {
         put?: never;
         /**
          * Resume a channel
-         * @description The channel serves its frontier again.
+         * @description The channel serves its active releases again.
          */
         post: operations["postV1AppsByAppIdChannelsByChannelIdResume"];
         delete?: never;
@@ -1419,7 +1483,7 @@ export interface paths {
         put?: never;
         /**
          * Create a release
-         * @description Creates a release in the channel of a ready bundle, `bundleId`, or of what another channel's newest active release serves, `fromChannelId`, recorded as the provenance, with its conditions, rollout, mandatory flag, notes, the nullable auto-pause overrides and the nullable progression schedule, whose last rollout percent lies above the rollout, numbered next in the channel; refused on a protected channel below Admin, past `release_count_per_app_per_day_limit` and, once the app has a signing key, for an unsigned bundle; an `Idempotency-Key` answers the same release again for 24 hours. The audience preview, `GET …/channels/{channelId}/audience`, answers the warnings for the same conditions before the create.
+         * @description Creates a release in the channel of a bundle set, `bundleSetId`, or of the set another channel's newest active release per platform serves, `fromChannelId`, recorded as the provenance and refused under `source_sets_differ` when its platforms serve different sets, with its conditions, rollout, mandatory flag, notes, the nullable auto-pause overrides and the nullable progression schedule, whose last rollout percent lies above the rollout, numbered next in the channel; refused on a protected channel below Admin, past `release_count_per_app_per_day_limit` and, once the app has a signing key, for a set with an unsigned bundle; an `Idempotency-Key` answers the same release again for 24 hours. The audience preview, `GET …/channels/{channelId}/audience`, answers the warnings for the same conditions before the create.
          */
         post: operations["postV1AppsByAppIdChannelsByChannelIdReleases"];
         delete?: never;
@@ -1439,7 +1503,7 @@ export interface paths {
         put?: never;
         /**
          * Roll a channel back
-         * @description Creates a release of the channel's previous bundle, or of the release named by `toReleaseId`, with the rollback recorded as its provenance; a rollback is a release, never a mutation, and mandatory unless `isMandatory` is false, since an incident fix should land now.
+         * @description Creates a release of the channel's previous bundle set, read per platform and refused under `targets_differ` when the platforms disagree, or of the set of the release named by `toReleaseId`, with the rollback recorded as its provenance; a rollback is a release, never a mutation, and mandatory unless `isMandatory` is false, since an incident fix should land now.
          */
         post: operations["postV1AppsByAppIdChannelsByChannelIdRollbacks"];
         delete?: never;
@@ -1705,7 +1769,7 @@ export interface paths {
         };
         /**
          * List the releases
-         * @description Every release of the app, newest first, filtered by `channelId`, `bundleId`, `status`, `number`, a release's number in its channel and valid only beside `channelId`, and `gitCommit`, the text the hash, ref or message of the bundle's Git commit contains, case-insensitively; `?relations=channel,bundle,releaseCounters` embeds the linked rows.
+         * @description Every release of the app, newest first, filtered by `channelId`, `bundleSetId`, `bundleId`, a release whose set carries the bundle, `status`, `number`, a release's number in its channel and valid only beside `channelId`, and `gitCommit`, the text the hash, ref or message of the Git commit of a bundle of the set contains, case-insensitively; `?relations=bundleSet,bundleSet.bundles,channel,releaseCounters` embeds the linked rows, the set's bundles behind the set.
          */
         get: operations["getV1AppsByAppIdReleases"];
         put?: never;
@@ -1725,7 +1789,7 @@ export interface paths {
         };
         /**
          * Count the releases
-         * @description The number of the app's releases under the list's filters, `channelId`, `bundleId`, `status`, `number` and `gitCommit`, which the list pages through.
+         * @description The number of the app's releases under the list's filters, `channelId`, `bundleSetId`, `bundleId`, `status`, `number` and `gitCommit`, which the list pages through.
          */
         get: operations["getV1AppsByAppIdReleasesCount"];
         put?: never;
@@ -1745,7 +1809,7 @@ export interface paths {
         };
         /**
          * Get a release
-         * @description One release with its status — when it went live in the index and when the purge completed; `?relations=channel,bundle,releaseCounters` embeds the linked rows.
+         * @description One release with its status — when it went live in the index and when the purge completed; `?relations=bundleSet,bundleSet.bundles,channel,releaseCounters` embeds the linked rows, the set's bundles behind the set.
          */
         get: operations["getV1AppsByAppIdReleasesByReleaseId"];
         put?: never;
@@ -2103,7 +2167,7 @@ export interface components {
         /** @description The one error shape: a context-free code from the catalog, one sentence of what happened and what to do, and the field, rule and target of a failed validation in `details`. */
         Error: {
             /** @enum {string} */
-            code: "account_banned" | "app_name_taken" | "apps_limit_reached" | "auth_flow_failed" | "binary_conflict" | "bundle_in_use" | "bundle_not_ready" | "bundle_too_large" | "channel_name_taken" | "channel_protected" | "channels_per_app_limit_reached" | "client_update_required" | "country_not_allowed" | "default_channel" | "dns_lookup_failed" | "files_per_bundle_limit_reached" | "forbidden" | "hash_mismatch" | "idempotency_key_reused" | "internal" | "invitation_invalid" | "invitations_per_day_limit_reached" | "ip_not_allowed" | "maintenance" | "members_limit_reached" | "not_found" | "notification_mandatory" | "origin_untrusted" | "password_already_set" | "plan_required" | "rate_limited" | "release_revoked" | "releases_per_day_limit_reached" | "signature_invalid" | "signature_required" | "sole_owner" | "sso_required" | "storage_limit_reached" | "tokens_limit_reached" | "two_factor_required" | "unauthenticated" | "upload_incomplete" | "validation" | "webhook_name_taken";
+            code: "account_banned" | "app_name_taken" | "apps_limit_reached" | "auth_flow_failed" | "binary_conflict" | "bundle_in_use" | "bundle_not_ready" | "bundle_too_large" | "channel_name_taken" | "channel_protected" | "channels_per_app_limit_reached" | "client_update_required" | "country_not_allowed" | "default_channel" | "dns_lookup_failed" | "files_per_bundle_limit_reached" | "forbidden" | "hash_mismatch" | "idempotency_key_reused" | "internal" | "invitation_invalid" | "invitations_per_day_limit_reached" | "ip_not_allowed" | "maintenance" | "members_limit_reached" | "not_found" | "notification_mandatory" | "origin_untrusted" | "password_already_set" | "plan_required" | "rate_limited" | "release_revoked" | "releases_per_day_limit_reached" | "signature_invalid" | "signature_required" | "sole_owner" | "sso_domain_taken" | "sso_required" | "storage_limit_reached" | "tokens_limit_reached" | "two_factor_required" | "unauthenticated" | "upload_incomplete" | "validation" | "webhook_name_taken";
             details: {
                 [key: string]: unknown;
             } | null;
@@ -2112,7 +2176,7 @@ export interface components {
     };
     responses: never;
     parameters: {
-        /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+        /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
         ClientHeader: string;
     };
     requestBodies: never;
@@ -2129,7 +2193,7 @@ export interface operations {
                 relations?: "organization"[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -2241,7 +2305,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -2331,7 +2395,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -2461,7 +2525,7 @@ export interface operations {
                 organizationId?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -2556,7 +2620,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -2677,7 +2741,7 @@ export interface operations {
                 relations?: ("apiToken" | "app" | "channel" | "memberUser" | "release" | "userSessionClient" | "webhook")[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -2821,7 +2885,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -2916,7 +2980,7 @@ export interface operations {
                 isRead?: "false" | "true";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -3006,7 +3070,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -3127,7 +3191,7 @@ export interface operations {
                 query?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -3235,7 +3299,7 @@ export interface operations {
             header?: {
                 /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `idempotency_key_reused`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -3369,7 +3433,7 @@ export interface operations {
                 query?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -3472,7 +3536,7 @@ export interface operations {
                 format?: "csv";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -3621,7 +3685,7 @@ export interface operations {
                 userId?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -3722,7 +3786,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -3815,7 +3879,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -3914,7 +3978,7 @@ export interface operations {
                 status?: "pending";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4025,7 +4089,7 @@ export interface operations {
             header?: {
                 /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `idempotency_key_reused`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4166,7 +4230,7 @@ export interface operations {
                 ids: string[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4258,7 +4322,7 @@ export interface operations {
                 status?: "pending";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4350,7 +4414,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4439,7 +4503,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4542,7 +4606,7 @@ export interface operations {
                 relations?: ("user" | "user.accounts")[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4671,7 +4735,7 @@ export interface operations {
                 ids: string[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4763,7 +4827,7 @@ export interface operations {
                 userId?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4857,7 +4921,7 @@ export interface operations {
                 relations?: ("user" | "user.accounts")[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -4985,7 +5049,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5083,7 +5147,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5195,7 +5259,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5302,7 +5366,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5467,7 +5531,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5555,7 +5619,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5627,6 +5691,15 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description `sso_domain_taken` */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description `rate_limited` */
             429: {
                 headers: {
@@ -5671,7 +5744,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5767,7 +5840,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5855,7 +5928,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -5959,7 +6032,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6106,7 +6179,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6194,7 +6267,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6313,7 +6386,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6435,7 +6508,7 @@ export interface operations {
                 status?: "failed" | "pending" | "succeeded";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6546,7 +6619,7 @@ export interface operations {
                 status?: "failed" | "pending" | "succeeded";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6638,7 +6711,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6757,7 +6830,7 @@ export interface operations {
                 month?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6857,7 +6930,7 @@ export interface operations {
                 format?: "csv";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -6961,7 +7034,7 @@ export interface operations {
                 month?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -7056,7 +7129,7 @@ export interface operations {
                 offset?: number;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -7172,7 +7245,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -7311,7 +7384,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -7412,7 +7485,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -7529,7 +7602,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -7627,7 +7700,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -7764,7 +7837,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -7887,7 +7960,7 @@ export interface operations {
                 status?: "failed" | "pending" | "succeeded";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -8008,7 +8081,7 @@ export interface operations {
                 status?: "failed" | "pending" | "succeeded";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -8110,7 +8183,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -8231,7 +8304,7 @@ export interface operations {
                 offset?: number;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -8274,6 +8347,7 @@ export interface operations {
                         region: string;
                         releaseCountPerAppPerDayLimit: number | null;
                         reportedBillableDeviceCount: number;
+                        /** @description The hour bucket the count was reported for, the start of a UTC hour. Null before the first report. */
                         reportedBillableDeviceCountHour: string | null;
                         reportedBillableDeviceCountMonth: string | null;
                         retentionDays: number | null;
@@ -8361,7 +8435,7 @@ export interface operations {
             header?: {
                 /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `idempotency_key_reused`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -8410,6 +8484,7 @@ export interface operations {
                         region: string;
                         releaseCountPerAppPerDayLimit: number | null;
                         reportedBillableDeviceCount: number;
+                        /** @description The hour bucket the count was reported for, the start of a UTC hour. Null before the first report. */
                         reportedBillableDeviceCountHour: string | null;
                         reportedBillableDeviceCountMonth: string | null;
                         retentionDays: number | null;
@@ -8504,7 +8579,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -8594,7 +8669,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -8639,6 +8714,7 @@ export interface operations {
                         region: string;
                         releaseCountPerAppPerDayLimit: number | null;
                         reportedBillableDeviceCount: number;
+                        /** @description The hour bucket the count was reported for, the start of a UTC hour. Null before the first report. */
                         reportedBillableDeviceCountHour: string | null;
                         reportedBillableDeviceCountMonth: string | null;
                         retentionDays: number | null;
@@ -8724,7 +8800,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -8812,7 +8888,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -8867,6 +8943,7 @@ export interface operations {
                         region: string;
                         releaseCountPerAppPerDayLimit: number | null;
                         reportedBillableDeviceCount: number;
+                        /** @description The hour bucket the count was reported for, the start of a UTC hour. Null before the first report. */
                         reportedBillableDeviceCountHour: string | null;
                         reportedBillableDeviceCountMonth: string | null;
                         retentionDays: number | null;
@@ -8965,7 +9042,7 @@ export interface operations {
                 url: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path?: never;
@@ -9059,7 +9136,7 @@ export interface operations {
                 platform?: "android" | "ios";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -9167,7 +9244,7 @@ export interface operations {
             header?: {
                 /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `idempotency_key_reused`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -9337,7 +9414,7 @@ export interface operations {
                 platform?: "android" | "ios";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -9429,7 +9506,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -9532,6 +9609,524 @@ export interface operations {
             };
         };
     };
+    getV1AppsByAppIdBundleSets: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                bundleId?: string;
+                bundleVersion?: string;
+                fingerprint?: string;
+                number?: number;
+                platform?: "android" | "ios";
+                relations?: "bundles"[];
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The bundle sets. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        bundleIds: string[];
+                        bundleVersion: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        fingerprint: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        number: number;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        bundles?: {
+                            /** Format: uuid */
+                            appId: string;
+                            /** Format: date-time */
+                            createdAt: string;
+                            expiresAt: string | null;
+                            fingerprint: string | null;
+                            /** @enum {string} */
+                            framework: "capacitor" | "cordova" | "expo" | "react_native";
+                            gitMessage: string | null;
+                            gitRef: string | null;
+                            gitRemote: string | null;
+                            gitSha: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            isGitDirty: boolean | null;
+                            manifestSha256: string | null;
+                            number: number | null;
+                            platforms: ("android" | "ios")[];
+                            signature: string | null;
+                            signatureKeyId: string | null;
+                            sizeBytes: number;
+                            /** @enum {string} */
+                            source: "binary" | "upload";
+                            /** @enum {string} */
+                            status: "ready" | "uploading";
+                            unusedSince: string | null;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            version: string;
+                        }[];
+                    }[];
+                };
+            };
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `unauthenticated` */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `not_found` */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `rate_limited` */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `internal` */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `maintenance` */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    postV1AppsByAppIdBundleSets: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    bundleIds: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description The bundle set, created before. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        bundleIds: string[];
+                        bundleVersion: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        fingerprint: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        number: number;
+                        /** Format: date-time */
+                        updatedAt: string;
+                    };
+                };
+            };
+            /** @description The bundle set. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        bundleIds: string[];
+                        bundleVersion: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        fingerprint: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        number: number;
+                        /** Format: date-time */
+                        updatedAt: string;
+                    };
+                };
+            };
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `unauthenticated` */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `not_found` */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `bundle_not_ready` */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `rate_limited` */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `internal` */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `maintenance` */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1AppsByAppIdBundleSetsCount: {
+        parameters: {
+            query?: {
+                bundleId?: string;
+                bundleVersion?: string;
+                fingerprint?: string;
+                number?: number;
+                platform?: "android" | "ios";
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The number of rows the list's filters match. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        count: number;
+                    };
+                };
+            };
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `unauthenticated` */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `not_found` */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `rate_limited` */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `internal` */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `maintenance` */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getV1AppsByAppIdBundleSetsByBundleSetId: {
+        parameters: {
+            query?: {
+                relations?: "bundles"[];
+            };
+            header?: {
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
+                "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
+            };
+            path: {
+                bundleSetId: string;
+                appId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The bundle set. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        appId: string;
+                        bundleIds: string[];
+                        bundleVersion: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        fingerprint: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        number: number;
+                        /** Format: date-time */
+                        updatedAt: string;
+                        bundles?: {
+                            /** Format: uuid */
+                            appId: string;
+                            /** Format: date-time */
+                            createdAt: string;
+                            expiresAt: string | null;
+                            fingerprint: string | null;
+                            /** @enum {string} */
+                            framework: "capacitor" | "cordova" | "expo" | "react_native";
+                            gitMessage: string | null;
+                            gitRef: string | null;
+                            gitRemote: string | null;
+                            gitSha: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            isGitDirty: boolean | null;
+                            manifestSha256: string | null;
+                            number: number | null;
+                            platforms: ("android" | "ios")[];
+                            signature: string | null;
+                            signatureKeyId: string | null;
+                            sizeBytes: number;
+                            /** @enum {string} */
+                            source: "binary" | "upload";
+                            /** @enum {string} */
+                            status: "ready" | "uploading";
+                            unusedSince: string | null;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            version: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description `validation`, with the field, the rule and the target in `details`, or `client_update_required` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `unauthenticated` */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `forbidden`, `account_banned`, `origin_untrusted` on a cookie-authenticated write from an untrusted origin, or `ip_not_allowed`, `country_not_allowed` or `two_factor_required` inside an organization whose security settings refuse the request */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `not_found` */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `rate_limited` */
+            429: {
+                headers: {
+                    /** @description The seconds until the window opens, as `details.retryAfterSeconds` says. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `internal` */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `maintenance` */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     getV1AppsByAppIdBundles: {
         parameters: {
             query?: {
@@ -9539,6 +10134,7 @@ export interface operations {
                 offset?: number;
                 fingerprint?: string;
                 isInUse?: "false" | "true";
+                number?: number;
                 platform?: "android" | "ios";
                 query?: string;
                 source?: "binary" | "upload";
@@ -9546,7 +10142,7 @@ export interface operations {
                 version?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -9668,7 +10264,7 @@ export interface operations {
             header?: {
                 /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `idempotency_key_reused`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -9847,6 +10443,7 @@ export interface operations {
             query?: {
                 fingerprint?: string;
                 isInUse?: "false" | "true";
+                number?: number;
                 platform?: "android" | "ios";
                 query?: string;
                 source?: "binary" | "upload";
@@ -9854,7 +10451,7 @@ export interface operations {
                 version?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -9946,7 +10543,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10067,7 +10664,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10165,7 +10762,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10299,7 +10896,7 @@ export interface operations {
                 relations?: "baseBundle"[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10436,7 +11033,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10533,7 +11130,7 @@ export interface operations {
                 isStored?: "false" | "true";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10637,7 +11234,7 @@ export interface operations {
                 isStored?: "false" | "true";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10730,7 +11327,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10846,7 +11443,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -10939,7 +11536,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -11067,7 +11664,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -11188,7 +11785,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -11280,7 +11877,7 @@ export interface operations {
                 format?: "png" | "svg";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -11376,7 +11973,7 @@ export interface operations {
                 query?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -11486,7 +12083,7 @@ export interface operations {
             header?: {
                 /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `idempotency_key_reused`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -11626,7 +12223,7 @@ export interface operations {
                 ids: string[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -11725,7 +12322,7 @@ export interface operations {
                 query?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -11817,7 +12414,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -11926,7 +12523,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -12024,7 +12621,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -12154,7 +12751,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -12263,7 +12860,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -12374,7 +12971,7 @@ export interface operations {
             header?: {
                 /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `idempotency_key_reused`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -12387,7 +12984,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** Format: uuid */
-                    bundleId?: string;
+                    bundleSetId?: string;
                     /** @default [] */
                     conditions?: ({
                         key: string;
@@ -12444,7 +13041,7 @@ export interface operations {
                     "application/json": {
                         autoPausedAt: string | null;
                         /** Format: uuid */
-                        bundleId: string;
+                        bundleSetId: string;
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -12538,7 +13135,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description `bundle_not_ready` or `idempotency_key_reused` */
+            /** @description `idempotency_key_reused` */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -12593,7 +13190,7 @@ export interface operations {
             header?: {
                 /** @description Makes the request safe to retry: the same key with the same body within 24 hours answers the first response again and creates nothing, the same key with another body is refused with `idempotency_key_reused`. A key is scoped to the caller. */
                 "Idempotency-Key"?: string;
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -12622,7 +13219,7 @@ export interface operations {
                     "application/json": {
                         autoPausedAt: string | null;
                         /** Format: uuid */
-                        bundleId: string;
+                        bundleSetId: string;
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -12769,7 +13366,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -12796,7 +13393,7 @@ export interface operations {
                     "application/json": {
                         autoPausedAt: string | null;
                         /** Format: uuid */
-                        bundleId: string;
+                        bundleSetId: string;
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -12932,7 +13529,7 @@ export interface operations {
                 rolloutPercent?: number;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -13056,7 +13653,7 @@ export interface operations {
                 relations?: ("channel" | "currentRelease")[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -13108,7 +13705,7 @@ export interface operations {
                         currentRelease?: {
                             autoPausedAt: string | null;
                             /** Format: uuid */
-                            bundleId: string;
+                            bundleSetId: string;
                             /** Format: uuid */
                             channelId: string;
                             conditions: ({
@@ -13253,7 +13850,7 @@ export interface operations {
                 ids: string[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -13351,7 +13948,7 @@ export interface operations {
                 sdkVersion?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -13445,7 +14042,7 @@ export interface operations {
                 relations?: ("channel" | "currentRelease")[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -13498,7 +14095,7 @@ export interface operations {
                         currentRelease?: {
                             autoPausedAt: string | null;
                             /** Format: uuid */
-                            bundleId: string;
+                            bundleSetId: string;
                             /** Format: uuid */
                             channelId: string;
                             conditions: ({
@@ -13641,7 +14238,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -13735,7 +14332,7 @@ export interface operations {
                 relations?: "release"[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -13761,7 +14358,7 @@ export interface operations {
                         release?: {
                             autoPausedAt: string | null;
                             /** Format: uuid */
-                            bundleId: string;
+                            bundleSetId: string;
                             /** Format: uuid */
                             channelId: string;
                             conditions: ({
@@ -13899,7 +14496,7 @@ export interface operations {
                 releaseId?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -13992,7 +14589,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -14133,7 +14730,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -14226,7 +14823,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -14354,7 +14951,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -14500,7 +15097,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -14592,14 +15189,15 @@ export interface operations {
                 limit?: number;
                 offset?: number;
                 bundleId?: string;
+                bundleSetId?: string;
                 channelId?: string;
                 gitCommit?: string;
                 number?: number;
                 status?: "active" | "paused" | "revoked";
-                relations?: ("bundle" | "channel" | "releaseCounters")[];
+                relations?: ("bundleSet" | "bundleSet.bundles" | "channel" | "releaseCounters")[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -14618,7 +15216,7 @@ export interface operations {
                     "application/json": {
                         autoPausedAt: string | null;
                         /** Format: uuid */
-                        bundleId: string;
+                        bundleSetId: string;
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -14673,36 +15271,50 @@ export interface operations {
                         updatedAt: string;
                         windowStartAppliedUpdateCount: number;
                         windowStartFailedUpdateCount: number;
-                        bundle?: {
+                        bundleSet?: {
                             /** Format: uuid */
                             appId: string;
+                            bundleIds: string[];
+                            bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
-                            expiresAt: string | null;
                             fingerprint: string | null;
-                            /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react_native";
-                            gitMessage: string | null;
-                            gitRef: string | null;
-                            gitRemote: string | null;
-                            gitSha: string | null;
                             /** Format: uuid */
                             id: string;
-                            isGitDirty: boolean | null;
-                            manifestSha256: string | null;
-                            number: number | null;
-                            platforms: ("android" | "ios")[];
-                            signature: string | null;
-                            signatureKeyId: string | null;
-                            sizeBytes: number;
-                            /** @enum {string} */
-                            source: "binary" | "upload";
-                            /** @enum {string} */
-                            status: "ready" | "uploading";
-                            unusedSince: string | null;
+                            number: number;
                             /** Format: date-time */
                             updatedAt: string;
-                            version: string;
+                            bundles?: {
+                                /** Format: uuid */
+                                appId: string;
+                                /** Format: date-time */
+                                createdAt: string;
+                                expiresAt: string | null;
+                                fingerprint: string | null;
+                                /** @enum {string} */
+                                framework: "capacitor" | "cordova" | "expo" | "react_native";
+                                gitMessage: string | null;
+                                gitRef: string | null;
+                                gitRemote: string | null;
+                                gitSha: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                isGitDirty: boolean | null;
+                                manifestSha256: string | null;
+                                number: number | null;
+                                platforms: ("android" | "ios")[];
+                                signature: string | null;
+                                signatureKeyId: string | null;
+                                sizeBytes: number;
+                                /** @enum {string} */
+                                source: "binary" | "upload";
+                                /** @enum {string} */
+                                status: "ready" | "uploading";
+                                unusedSince: string | null;
+                                /** Format: date-time */
+                                updatedAt: string;
+                                version: string;
+                            }[];
                         };
                         channel?: {
                             /** Format: uuid */
@@ -14812,13 +15424,14 @@ export interface operations {
         parameters: {
             query?: {
                 bundleId?: string;
+                bundleSetId?: string;
                 channelId?: string;
                 gitCommit?: string;
                 number?: number;
                 status?: "active" | "paused" | "revoked";
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -14909,10 +15522,10 @@ export interface operations {
     getV1AppsByAppIdReleasesByReleaseId: {
         parameters: {
             query?: {
-                relations?: ("bundle" | "channel" | "releaseCounters")[];
+                relations?: ("bundleSet" | "bundleSet.bundles" | "channel" | "releaseCounters")[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -14932,7 +15545,7 @@ export interface operations {
                     "application/json": {
                         autoPausedAt: string | null;
                         /** Format: uuid */
-                        bundleId: string;
+                        bundleSetId: string;
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -14987,36 +15600,50 @@ export interface operations {
                         updatedAt: string;
                         windowStartAppliedUpdateCount: number;
                         windowStartFailedUpdateCount: number;
-                        bundle?: {
+                        bundleSet?: {
                             /** Format: uuid */
                             appId: string;
+                            bundleIds: string[];
+                            bundleVersion: string;
                             /** Format: date-time */
                             createdAt: string;
-                            expiresAt: string | null;
                             fingerprint: string | null;
-                            /** @enum {string} */
-                            framework: "capacitor" | "cordova" | "expo" | "react_native";
-                            gitMessage: string | null;
-                            gitRef: string | null;
-                            gitRemote: string | null;
-                            gitSha: string | null;
                             /** Format: uuid */
                             id: string;
-                            isGitDirty: boolean | null;
-                            manifestSha256: string | null;
-                            number: number | null;
-                            platforms: ("android" | "ios")[];
-                            signature: string | null;
-                            signatureKeyId: string | null;
-                            sizeBytes: number;
-                            /** @enum {string} */
-                            source: "binary" | "upload";
-                            /** @enum {string} */
-                            status: "ready" | "uploading";
-                            unusedSince: string | null;
+                            number: number;
                             /** Format: date-time */
                             updatedAt: string;
-                            version: string;
+                            bundles?: {
+                                /** Format: uuid */
+                                appId: string;
+                                /** Format: date-time */
+                                createdAt: string;
+                                expiresAt: string | null;
+                                fingerprint: string | null;
+                                /** @enum {string} */
+                                framework: "capacitor" | "cordova" | "expo" | "react_native";
+                                gitMessage: string | null;
+                                gitRef: string | null;
+                                gitRemote: string | null;
+                                gitSha: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                isGitDirty: boolean | null;
+                                manifestSha256: string | null;
+                                number: number | null;
+                                platforms: ("android" | "ios")[];
+                                signature: string | null;
+                                signatureKeyId: string | null;
+                                sizeBytes: number;
+                                /** @enum {string} */
+                                source: "binary" | "upload";
+                                /** @enum {string} */
+                                status: "ready" | "uploading";
+                                unusedSince: string | null;
+                                /** Format: date-time */
+                                updatedAt: string;
+                                version: string;
+                            }[];
                         };
                         channel?: {
                             /** Format: uuid */
@@ -15126,7 +15753,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -15162,7 +15789,7 @@ export interface operations {
                     "application/json": {
                         autoPausedAt: string | null;
                         /** Format: uuid */
-                        bundleId: string;
+                        bundleSetId: string;
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -15300,7 +15927,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -15411,7 +16038,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -15431,7 +16058,7 @@ export interface operations {
                     "application/json": {
                         autoPausedAt: string | null;
                         /** Format: uuid */
-                        bundleId: string;
+                        bundleSetId: string;
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -15569,7 +16196,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -15589,7 +16216,7 @@ export interface operations {
                     "application/json": {
                         autoPausedAt: string | null;
                         /** Format: uuid */
-                        bundleId: string;
+                        bundleSetId: string;
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -15727,7 +16354,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -15747,7 +16374,7 @@ export interface operations {
                     "application/json": {
                         autoPausedAt: string | null;
                         /** Format: uuid */
-                        bundleId: string;
+                        bundleSetId: string;
                         /** Format: uuid */
                         channelId: string;
                         conditions: ({
@@ -15888,7 +16515,7 @@ export interface operations {
                 offset?: number;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -15989,7 +16616,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -16116,7 +16743,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -16208,7 +16835,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -16299,7 +16926,7 @@ export interface operations {
                 channelId?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -16437,7 +17064,7 @@ export interface operations {
                 releaseId?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -16565,7 +17192,7 @@ export interface operations {
                 periodUntil?: string;
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -16668,7 +17295,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -16774,7 +17401,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -16862,7 +17489,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -16988,7 +17615,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -17121,7 +17748,7 @@ export interface operations {
                 ids: string[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -17211,7 +17838,7 @@ export interface operations {
                 ids: string[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -17301,7 +17928,7 @@ export interface operations {
                 relations?: ("accounts" | "members" | "members.organization")[];
             };
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -17392,6 +18019,7 @@ export interface operations {
                                 region: string;
                                 releaseCountPerAppPerDayLimit: number | null;
                                 reportedBillableDeviceCount: number;
+                                /** @description The hour bucket the count was reported for, the start of a UTC hour. Null before the first report. */
                                 reportedBillableDeviceCountHour: string | null;
                                 reportedBillableDeviceCountMonth: string | null;
                                 retentionDays: number | null;
@@ -17479,7 +18107,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {
@@ -17582,7 +18210,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`; a version listed as faulty answers `client_update_required`. */
+                /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
             };
             path: {

@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.2.0](https://github.com/hotcodepush-team/hotcodepush-node/compare/v0.1.0...v0.2.0) (2026-11-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* follow the API's per-platform release, bundle expiry and list filters ([#44](https://github.com/hotcodepush-team/hotcodepush-node/issues/44))
+
+### Features
+
+* follow the API's per-platform release, bundle expiry and list filters ([#44](https://github.com/hotcodepush-team/hotcodepush-node/issues/44)) ([f11fe5f](https://github.com/hotcodepush-team/hotcodepush-node/commit/f11fe5fa308eddb291314b1b5d37a291070e5f44))
+
 ## [0.1.0](https://github.com/hotcodepush-team/hotcodepush-node/compare/v0.0.2...v0.1.0) (2026-11-03)
 
 

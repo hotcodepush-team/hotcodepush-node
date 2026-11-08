@@ -46,19 +46,19 @@ describe('BundlesResource', () => {
     expect(attemptCount).toBe(3);
   });
 
-  test('should count the bundles of the app filtered by use and platform', async () => {
+  test('should count the unused bundles of the app filtered by platform', async () => {
     const fetchMock = stubFetch(() => Response.json({ count: 3 }));
 
     const fetchedCount = await new HotCodePush().apps.bundles.count({
       appId: 'app',
-      isInUse: true,
+      isUnused: true,
       platform: 'ios',
     });
 
     expect(fetchedCount).toEqual({ count: 3 });
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${BUNDLES_URL}/count?isInUse=true&platform=ios`,
+      url: `${BUNDLES_URL}/count?isUnused=true&platform=ios`,
     });
   });
 
@@ -115,21 +115,20 @@ describe('BundlesResource', () => {
     });
   });
 
-  test('should list the bundles of the app filtered by fingerprint, use, platform and source', async () => {
+  test('should list the bundles of the app in use filtered by fingerprint and platform', async () => {
     const fetchMock = stubFetch(() => Response.json([BUNDLE]));
 
     const fetchedBundles = await new HotCodePush().apps.bundles.list({
       appId: 'app',
       fingerprint: FINGERPRINT,
-      isInUse: false,
+      isUnused: false,
       platform: 'ios',
-      source: 'upload',
     });
 
     expect(fetchedBundles).toEqual([BUNDLE]);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: `${BUNDLES_URL}?fingerprint=${encodeURIComponent(FINGERPRINT)}&isInUse=false&platform=ios&source=upload`,
+      url: `${BUNDLES_URL}?fingerprint=${encodeURIComponent(FINGERPRINT)}&isUnused=false&platform=ios`,
     });
   });
 });

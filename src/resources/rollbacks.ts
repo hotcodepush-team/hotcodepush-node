@@ -18,8 +18,8 @@ export class RollbacksResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * Rolls the channel back to its previous bundle, or to the bundle of `toReleaseId`.
-   * A rollback is a new release.
+   * Rolls the channel back to the release before its newest active one, or before the newest active one serving `platform`.
+   * `toReleaseId` names the target instead. A rollback is a new release.
    */
   public async create(options: CreateRollbackOptions): Promise<ReleaseRow> {
     const { appId, channelId, idempotencyKey, ...body } = options;

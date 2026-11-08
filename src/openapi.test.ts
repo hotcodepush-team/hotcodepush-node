@@ -45,6 +45,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       appId: APP_ID,
       fingerprint: `fp1:${SHA256}`,
       platform: 'ios',
+      version: '1.0.0',
     }),
   'apps.binaries.create': hotCodePush =>
     hotCodePush.apps.binaries.create({
@@ -58,7 +59,11 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       version: '1.0.0',
     }),
   'apps.binaries.get': hotCodePush =>
-    hotCodePush.apps.binaries.get({ appId: APP_ID, binaryId: BINARY_ID }),
+    hotCodePush.apps.binaries.get({
+      appId: APP_ID,
+      binaryId: BINARY_ID,
+      relations: ['bundle'],
+    }),
   'apps.binaries.list': hotCodePush =>
     hotCodePush.apps.binaries.list({
       appId: APP_ID,
@@ -66,6 +71,8 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       limit: 10,
       offset: 10,
       platform: 'ios',
+      relations: ['bundle'],
+      version: '1.0.0',
     }),
   'apps.bundles.complete': hotCodePush =>
     hotCodePush.apps.bundles.complete({ appId: APP_ID, bundleId: BUNDLE_ID }),
@@ -73,11 +80,11 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.apps.bundles.count({
       appId: APP_ID,
       fingerprint: `fp1:${SHA256}`,
-      isInUse: true,
+      isUnused: true,
+      number: 12,
       platform: 'ios',
       query: '12',
-      source: 'upload',
-      status: 'ready',
+      status: 'expired',
       version: '1.0.0',
     }),
   'apps.bundles.create': hotCodePush =>
@@ -87,6 +94,8 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       gitSha: 'b'.repeat(40),
       idempotencyKey: 'key',
       platforms: ['android'],
+      signature: 'signature',
+      signatureKeyId: SIGNING_KEY_ID,
       version: '1.0.0',
     }),
   'apps.bundles.delete': hotCodePush =>
@@ -124,13 +133,13 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
     hotCodePush.apps.bundles.list({
       appId: APP_ID,
       fingerprint: `fp1:${SHA256}`,
-      isInUse: true,
+      isUnused: true,
       limit: 10,
+      number: 12,
       offset: 10,
       platform: 'ios',
       query: '12',
-      source: 'upload',
-      status: 'ready',
+      status: 'expired',
       version: '1.0.0',
     }),
   'apps.bundles.pack.upload': hotCodePush =>
@@ -178,7 +187,12 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       rolloutPercent: 10,
     }),
   'apps.channels.count': hotCodePush =>
-    hotCodePush.apps.channels.count({ appId: APP_ID, query: 'stag' }),
+    hotCodePush.apps.channels.count({
+      appId: APP_ID,
+      isPaused: false,
+      isProtected: true,
+      query: 'stag',
+    }),
   'apps.channels.create': hotCodePush =>
     hotCodePush.apps.channels.create({
       appId: APP_ID,
@@ -195,6 +209,8 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
   'apps.channels.list': hotCodePush =>
     hotCodePush.apps.channels.list({
       appId: APP_ID,
+      isPaused: false,
+      isProtected: true,
       limit: 10,
       offset: 10,
       query: 'stag',
@@ -218,6 +234,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       failureThresholdPercent: 10,
       idempotencyKey: 'key',
       isMandatory: true,
+      platform: 'ios',
       progression: {
         rolloutPercents: [25, 50],
         stepMinimumSeconds: 3600,
@@ -239,6 +256,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       channelId: CHANNEL_ID,
       idempotencyKey: 'key',
       isMandatory: false,
+      platform: 'android',
       toReleaseId: RELEASE_ID,
     }),
   'apps.channels.update': hotCodePush =>
@@ -400,6 +418,7 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
   'apps.statistics.fleet.get': hotCodePush =>
     hotCodePush.apps.statistics.fleet.get({
       appId: APP_ID,
+      binaryId: BINARY_ID,
       channelId: CHANNEL_ID,
     }),
   'apps.statistics.updates.get': hotCodePush =>

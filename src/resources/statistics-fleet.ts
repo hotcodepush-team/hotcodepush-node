@@ -8,7 +8,8 @@ import type {
 
 /**
  * The devices seen in the last thirty days.
- * `deviceCount` counts them all, and `currentDeviceCount` counts those running the newest active release of their channel.
+ * `deviceCount` counts them all. `currentDeviceCount`, `pendingDeviceCount` and `ineligibleDeviceCount` split them by the newest active release serving each device's platform in its channel.
+ * A device is current when it runs that release's bundle, ineligible when its first check skipped the release for a targeting or compatibility reason, and pending otherwise.
  * The counts per dimension come most common first; binaries also carry their platform, version and newest report.
  */
 export type FleetStatistics = JsonResponseBody<
@@ -27,7 +28,7 @@ export class StatisticsFleetResource {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * Gets a snapshot of the fleet from the registry, for one channel when `channelId` is set.
+   * Gets a snapshot of the fleet from the registry, for one channel when `channelId` is set and for one binary when `binaryId` is set.
    */
   public async get(
     options: GetFleetStatisticsOptions,

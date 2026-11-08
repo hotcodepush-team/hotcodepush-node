@@ -28,6 +28,7 @@ export class ChannelReleasesResource {
 
   /**
    * Releases a ready bundle, or what another channel serves, in this channel.
+   * With `fromChannelId`, `platform` picks the newest active release of that channel serving the platform.
    * The release gets the next number of the channel.
    */
   public async create(options: CreateReleaseOptions): Promise<ReleaseRow> {

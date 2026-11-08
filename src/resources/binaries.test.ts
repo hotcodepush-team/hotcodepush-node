@@ -72,6 +72,22 @@ describe('BinariesResource', () => {
     });
   });
 
+  test('should get the binary with its bundle when the bundle relation is set', async () => {
+    const fetchMock = stubFetch(() =>
+      Response.json({ ...BINARY, bundle: { id: 'bundle' } }),
+    );
+
+    await new HotCodePush().apps.binaries.get({
+      appId: 'app',
+      binaryId: 'binary',
+      relations: ['bundle'],
+    });
+
+    expect(resolveSentRequest(fetchMock).url).toBe(
+      `${BINARIES_URL}/binary?relations=bundle`,
+    );
+  });
+
   test('should list the binaries of the app filtered by platform and fingerprint', async () => {
     const fetchMock = stubFetch(() => Response.json([BINARY]));
 

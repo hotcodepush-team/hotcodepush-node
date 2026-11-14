@@ -1,5 +1,5 @@
 export { HotCodePush } from './client';
-export type { HotCodePushOptions } from './client';
+export type { HotCodePushOptions, RequestOptions } from './client';
 export { HotCodePushError } from './errors';
 export type * from './resources/apps';
 export type * from './resources/audit-logs';

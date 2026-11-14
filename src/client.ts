@@ -1,4 +1,4 @@
-import type { HttpClientOptions } from './http-client';
+import type { FetchJsonOptions, HttpClientOptions } from './http-client';
 import { HttpClient } from './http-client';
 import { AppsResource } from './resources/apps';
 import { HealthResource } from './resources/health';
@@ -10,6 +10,8 @@ import { QrCodesResource } from './resources/qr-codes';
 import { UsersResource } from './resources/users';
 
 export type HotCodePushOptions = HttpClientOptions;
+
+export type RequestOptions = Pick<FetchJsonOptions, 'body' | 'method' | 'path'>;
 
 /**
  * The client for the HotCodePush REST API.
@@ -25,17 +27,28 @@ export class HotCodePush {
   public readonly qrCodes: QrCodesResource;
   public readonly users: UsersResource;
 
+  private readonly httpClient: HttpClient;
+
   constructor(options: HotCodePushOptions = {}) {
-    const httpClient = new HttpClient(options);
-    this.apps = new AppsResource(httpClient);
-    this.health = new HealthResource(httpClient);
-    this.invitations = new InvitationsResource(httpClient);
+    this.httpClient = new HttpClient(options);
+    this.apps = new AppsResource(this.httpClient);
+    this.health = new HealthResource(this.httpClient);
+    this.invitations = new InvitationsResource(this.httpClient);
     this.notificationPreferences = new NotificationPreferencesResource(
-      httpClient,
+      this.httpClient,
     );
-    this.notifications = new NotificationsResource(httpClient);
-    this.organizations = new OrganizationsResource(httpClient);
-    this.qrCodes = new QrCodesResource(httpClient);
-    this.users = new UsersResource(httpClient);
+    this.notifications = new NotificationsResource(this.httpClient);
+    this.organizations = new OrganizationsResource(this.httpClient);
+    this.qrCodes = new QrCodesResource(this.httpClient);
+    this.users = new UsersResource(this.httpClient);
+  }
+
+  /**
+   * Sends one request to a path of the API and returns the response as received, for what no resource method covers.
+   * `path` starts with a slash and carries its own query string, and `body` is sent as JSON.
+   * Throws a `HotCodePushError` on a status outside 2xx, and retries a `DELETE`, a `GET` and a `PUT` alone.
+   */
+  public request(options: RequestOptions): Promise<Response> {
+    return this.httpClient.fetchOkResponse(options);
   }
 }

@@ -905,6 +905,7 @@ afterEach(() => {
 describe('the OpenAPI snapshot', () => {
   test('should hold a call for every resource method', () => {
     const resourceMethodNames = Object.entries(new HotCodePush())
+      .filter(([, value]) => !(value instanceof HttpClient))
       .filter(([name]) => !UNDOCUMENTED_RESOURCES.includes(name))
       .flatMap(([name, resource]) =>
         resolveResourceMethodNames(resource as object, { path: name }),

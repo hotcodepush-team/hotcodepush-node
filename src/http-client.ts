@@ -93,8 +93,7 @@ export class HttpClient {
   }
 
   public async fetchBlob(options: FetchJsonOptions): Promise<Blob> {
-    const response = await this.fetchResponse(options);
-    await assertResponseOk(response);
+    const response = await this.fetchOkResponse(options);
     return response.blob();
   }
 
@@ -118,9 +117,14 @@ export class HttpClient {
     return parseResponseBody(response);
   }
 
-  public async fetchStatus(options: FetchJsonOptions): Promise<void> {
+  public async fetchOkResponse(options: FetchJsonOptions): Promise<Response> {
     const response = await this.fetchResponse(options);
     await assertResponseOk(response);
+    return response;
+  }
+
+  public async fetchStatus(options: FetchJsonOptions): Promise<void> {
+    const response = await this.fetchOkResponse(options);
     await response.body?.cancel();
   }
 
@@ -173,7 +177,11 @@ export class HttpClient {
   }
 
   // Concatenated, since `new URL('/v1/…', base)` would drop the path of the base URL.
+  // The base URL ends without a slash, so the path has to bring its own.
   private resolveRouteUrl(path: string): URL {
+    if (!path.startsWith('/')) {
+      throw new Error(`The path ${path} does not start with a slash.`);
+    }
     return new URL(this.baseUrl + path);
   }
 

@@ -11,7 +11,14 @@ import { UsersResource } from './resources/users';
 
 export type HotCodePushOptions = HttpClientOptions;
 
-export type RequestOptions = Pick<FetchJsonOptions, 'body' | 'method' | 'path'>;
+export interface RequestOptions {
+  /** The body, an object or an array, sent as JSON. A `GET` takes none. */
+  body?: unknown;
+  /** A `DELETE`, a `GET` and a `PUT` are retried, a `PATCH` and a `POST` are sent once and carry no `Idempotency-Key`. */
+  method: FetchJsonOptions['method'];
+  /** The path below the base URL with its query string, starting with a slash, such as `/v1/apps?limit=10`. */
+  path: string;
+}
 
 /**
  * The client for the HotCodePush REST API.
@@ -44,11 +51,11 @@ export class HotCodePush {
   }
 
   /**
-   * Sends one request to a path of the API and returns the response as received, for what no resource method covers.
-   * `path` starts with a slash and carries its own query string, and `body` is sent as JSON.
-   * Throws a `HotCodePushError` on a status outside 2xx, and retries a `DELETE`, a `GET` and a `PUT` alone.
+   * Sends one request to a path of the API, for what no resource method covers.
+   * Returns the response with its status, its headers and its body already received.
+   * Throws a `HotCodePushError` on a status outside 2xx.
    */
-  public request(options: RequestOptions): Promise<Response> {
-    return this.httpClient.fetchOkResponse(options);
+  public request({ body, method, path }: RequestOptions): Promise<Response> {
+    return this.httpClient.fetchBufferedResponse({ body, method, path });
   }
 }

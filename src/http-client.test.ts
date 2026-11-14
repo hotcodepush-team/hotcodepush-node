@@ -80,6 +80,33 @@ describe('HttpClient', () => {
     );
   });
 
+  test('should refuse the path when it does not start with a slash', async () => {
+    const fetchMock = stubFetch();
+
+    const fetchPromise = new HttpClient({}).fetchJson({
+      method: 'GET',
+      path: 'v1/apps',
+    });
+
+    await expect(fetchPromise).rejects.toThrow(
+      'The path v1/apps does not start with a slash.',
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  test('should refuse the path when it leaves the path of the base url', async () => {
+    const fetchMock = stubFetch();
+
+    const fetchPromise = new HttpClient({
+      baseUrl: 'https://proxy.example/hcp/',
+    }).fetchJson({ method: 'GET', path: '/../v1/apps' });
+
+    await expect(fetchPromise).rejects.toThrow(
+      'The path /../v1/apps leaves the base URL.',
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   test('should send the token as a bearer when a token is set', async () => {
     const fetchMock = stubFetch(() => new Response(null));
 

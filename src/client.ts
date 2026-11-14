@@ -1,4 +1,4 @@
-import type { HttpClientOptions } from './http-client';
+import type { FetchJsonOptions, HttpClientOptions } from './http-client';
 import { HttpClient } from './http-client';
 import { AppsResource } from './resources/apps';
 import { HealthResource } from './resources/health';
@@ -10,6 +10,15 @@ import { QrCodesResource } from './resources/qr-codes';
 import { UsersResource } from './resources/users';
 
 export type HotCodePushOptions = HttpClientOptions;
+
+export interface RequestOptions {
+  /** The body, an object or an array, sent as JSON. A `GET` takes none. */
+  body?: unknown;
+  /** A `DELETE`, a `GET` and a `PUT` are retried, a `PATCH` and a `POST` are sent once and carry no `Idempotency-Key`. */
+  method: FetchJsonOptions['method'];
+  /** The path below the base URL with its query string, starting with a slash, such as `/v1/apps?limit=10`. */
+  path: string;
+}
 
 /**
  * The client for the HotCodePush REST API.
@@ -25,17 +34,28 @@ export class HotCodePush {
   public readonly qrCodes: QrCodesResource;
   public readonly users: UsersResource;
 
+  private readonly httpClient: HttpClient;
+
   constructor(options: HotCodePushOptions = {}) {
-    const httpClient = new HttpClient(options);
-    this.apps = new AppsResource(httpClient);
-    this.health = new HealthResource(httpClient);
-    this.invitations = new InvitationsResource(httpClient);
+    this.httpClient = new HttpClient(options);
+    this.apps = new AppsResource(this.httpClient);
+    this.health = new HealthResource(this.httpClient);
+    this.invitations = new InvitationsResource(this.httpClient);
     this.notificationPreferences = new NotificationPreferencesResource(
-      httpClient,
+      this.httpClient,
     );
-    this.notifications = new NotificationsResource(httpClient);
-    this.organizations = new OrganizationsResource(httpClient);
-    this.qrCodes = new QrCodesResource(httpClient);
-    this.users = new UsersResource(httpClient);
+    this.notifications = new NotificationsResource(this.httpClient);
+    this.organizations = new OrganizationsResource(this.httpClient);
+    this.qrCodes = new QrCodesResource(this.httpClient);
+    this.users = new UsersResource(this.httpClient);
+  }
+
+  /**
+   * Sends one request to a path of the API, for what no resource method covers.
+   * Returns the response with its status, its headers and its body already received.
+   * Throws a `HotCodePushError` on a status outside 2xx.
+   */
+  public request({ body, method, path }: RequestOptions): Promise<Response> {
+    return this.httpClient.fetchBufferedResponse({ body, method, path });
   }
 }

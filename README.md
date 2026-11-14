@@ -37,6 +37,19 @@ Uploads stream their body, a `Blob` or a `ReadableStream` with its `contentLengt
 Creating calls send an `Idempotency-Key` and are retried. Pass `idempotencyKey` to reuse one across your own retries.
 A failed request throws a `HotCodePushError` with the API's `code`, `message`, `details` and the HTTP `status`.
 
+`request` sends one request to any path of the API, for an endpoint newer than this client or for the status and the headers of an answer. It returns the `Response` with its body already received:
+
+```ts
+const response = await hotCodePush.request({
+  method: 'GET',
+  path: '/v1/organizations?limit=1',
+});
+console.log(response.status, response.headers.get('Content-Type'));
+const organizations = await response.json();
+```
+
+The path starts with a slash and carries its own query string, and a `body` is sent as JSON. A `POST` or a `PATCH` sent this way carries no `Idempotency-Key` and is not retried.
+
 ## Documentation
 
 See [hotcodepush.com/docs/api/node](https://hotcodepush.com/docs/api/node) for this client and [hotcodepush.com/docs](https://hotcodepush.com/docs) for HotCodePush.

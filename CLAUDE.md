@@ -15,7 +15,7 @@ openapi.json                    the snapshot of the API's OpenAPI document, comm
 scripts/sync-openapi.ts         fetches the document into openapi.json
 scripts/check-openapi-drift.ts  fails when the live API's operations differ from openapi.json's
 src/index.ts                    the public exports
-src/client.ts                   HotCodePush: the options and one property per top-level resource
+src/client.ts                   HotCodePush: the options, one property per top-level resource and `request`, the one untyped call
 src/http-client.ts              the one place that calls fetch: the headers, withTimeout, withRetry, JSON in and out
 src/errors.ts                   HotCodePushError and the parsing of the one error shape
 src/types.ts                    the shapes every resource shares and the helpers deriving types from the snapshot
@@ -60,6 +60,7 @@ Run `npm run fmt` before every commit; lint, typecheck, test and build must pass
 - `me` is accepted wherever a `{userId}` appears; the client passes it through.
 - The `/v1/auth/*` slice is Better Auth's and outside the document; its client lives in the CLI and the console, never here.
 - Every binary `PUT` goes through `fetchUpload`: the body is a `Blob` or a `ReadableStream` with its `contentLength`, streamed with `Content-Length` and the documented `Content-Type`, never a buffered string; a `Blob` is retried, a stream is read once and never retried.
+- `request` is the one untyped call, for what no resource method covers. It sends the caller's method, path and JSON body with the same headers, timeout and retry by method, and nothing else the caller passes. It returns the `Response` with its body already received, since the timeout of the attempt would end a body that is read later, and a status outside 2xx is thrown as `HotCodePushError`. The path starts with a slash, carries its own query string and stays below the base URL. The contract test cannot check it, so no resource method is built on it.
 
 ## The OpenAPI snapshot
 

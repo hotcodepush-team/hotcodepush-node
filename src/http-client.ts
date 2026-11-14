@@ -93,9 +93,21 @@ export class HttpClient {
   }
 
   public async fetchBlob(options: FetchJsonOptions): Promise<Blob> {
-    const response = await this.fetchResponse(options);
-    await assertResponseOk(response);
+    const response = await this.fetchOkResponse(options);
     return response.blob();
+  }
+
+  // The timeout of the attempt also ends a body that is read later, so the body is received before the response is returned.
+  public async fetchBufferedResponse(
+    options: FetchJsonOptions,
+  ): Promise<Response> {
+    const response = await this.fetchOkResponse(options);
+    const body = response.body === null ? null : await response.arrayBuffer();
+    return new Response(body, {
+      headers: response.headers,
+      status: response.status,
+      statusText: response.statusText,
+    });
   }
 
   // The key stays the same across retries, so the API answers a repeat with the first result.
@@ -119,8 +131,7 @@ export class HttpClient {
   }
 
   public async fetchStatus(options: FetchJsonOptions): Promise<void> {
-    const response = await this.fetchResponse(options);
-    await assertResponseOk(response);
+    const response = await this.fetchOkResponse(options);
     await response.body?.cancel();
   }
 
@@ -148,6 +159,12 @@ export class HttpClient {
     return parseResponseBody(response);
   }
 
+  private async fetchOkResponse(options: FetchJsonOptions): Promise<Response> {
+    const response = await this.fetchResponse(options);
+    await assertResponseOk(response);
+    return response;
+  }
+
   private async fetchResponse(options: FetchJsonOptions): Promise<Response> {
     const fetchWithTimeout = withTimeout(fetch, { timeoutMs: this.timeoutMs });
     const isRetryable =
@@ -173,8 +190,17 @@ export class HttpClient {
   }
 
   // Concatenated, since `new URL('/v1/…', base)` would drop the path of the base URL.
+  // The base URL ends without a slash, so the path has to bring its own.
+  // A route sits below the base URL, as the `baseUrl` option promises for a proxy.
   private resolveRouteUrl(path: string): URL {
-    return new URL(this.baseUrl + path);
+    if (!path.startsWith('/')) {
+      throw new Error(`The path ${path} does not start with a slash.`);
+    }
+    const url = new URL(this.baseUrl + path);
+    if (!url.href.startsWith(new URL(`${this.baseUrl}/`).href)) {
+      throw new Error(`The path ${path} leaves the base URL.`);
+    }
+    return url;
   }
 
   private resolveUrl(options: FetchJsonOptions): URL {

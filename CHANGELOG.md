@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/hotcodepush-team/hotcodepush-node/compare/v0.2.0...v0.2.1) (2026-11-14)
+
+
+### Features
+
+* request sends one call to a path no resource method covers ([#46](https://github.com/hotcodepush-team/hotcodepush-node/issues/46)) ([809d420](https://github.com/hotcodepush-team/hotcodepush-node/commit/809d42046893cd641506fc9f6a67207b8176e208))
+
 ## [0.2.0](https://github.com/hotcodepush-team/hotcodepush-node/compare/v0.1.0...v0.2.0) (2026-11-08)
 
 

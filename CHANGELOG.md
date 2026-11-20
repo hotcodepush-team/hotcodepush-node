@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/hotcodepush-team/hotcodepush-node/compare/v0.2.1...v0.2.2) (2026-11-20)
+
+
+### Features
+
+* the audience schedule and the app's default channel ([#48](https://github.com/hotcodepush-team/hotcodepush-node/issues/48)) ([0a7f618](https://github.com/hotcodepush-team/hotcodepush-node/commit/0a7f6188d1a19738f165c2accb7f5bd252faf3f7))
+
 ## [0.2.1](https://github.com/hotcodepush-team/hotcodepush-node/compare/v0.2.0...v0.2.1) (2026-11-14)
 
 

@@ -184,6 +184,8 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       device: [DEVICE_ID],
       fingerprint: [`fp1:${SHA256}`],
       os: ['>=17'],
+      progressionRolloutPercent: [10, 50, 100],
+      progressionStepMinimumUpdateCount: 50,
       rolloutPercent: 10,
     }),
   'apps.channels.count': hotCodePush =>
@@ -351,7 +353,8 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       sha256: SHA256,
       uploadId: UPLOAD_ID,
     }),
-  'apps.get': hotCodePush => hotCodePush.apps.get({ appId: APP_ID }),
+  'apps.get': hotCodePush =>
+    hotCodePush.apps.get({ appId: APP_ID, relations: ['defaultChannel'] }),
   'apps.releases.audience.get': hotCodePush =>
     hotCodePush.apps.releases.audience.get({
       appId: APP_ID,

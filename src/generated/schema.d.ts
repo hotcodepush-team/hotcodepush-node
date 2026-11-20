@@ -1013,7 +1013,7 @@ export interface paths {
         };
         /**
          * List the bundles
-         * @description The app's uploaded bundles, newest first; the bundle a store build ships is read through its binary. `isUnused` selects the bundles with an `unusedSince`, counting down to their expiry, `fingerprint` those built for that native layer, `number` the bundle of that number, `query` those whose number contains it.
+         * @description The app's uploaded bundles, newest first; the bundle a store build ships is read through its binary. `isUnused` selects the bundles with an `unusedSince`, counting down to their expiry, `fingerprint` those built for that native layer, `number` the bundle of that number, `query` those whose number or version contains it.
          */
         get: operations["getV1AppsByAppIdBundles"];
         put?: never;
@@ -1419,7 +1419,7 @@ export interface paths {
         put?: never;
         /**
          * Create a release
-         * @description Creates a release in the channel of a ready bundle, `bundleId`, or of what another channel's newest active release serves, `fromChannelId`, the newest serving `platform` when given, recorded as the provenance, with its conditions, rollout, mandatory flag, notes, the nullable auto-pause overrides and the nullable progression schedule, whose last rollout percent lies above the rollout, numbered next in the channel; refused on a protected channel below Admin, past `release_count_per_app_per_day_limit` and, once the app has a signing key, for an unsigned bundle; an `Idempotency-Key` answers the same release again for 24 hours. The audience preview, `GET …/channels/{channelId}/audience`, answers the warnings for the same conditions before the create.
+         * @description Creates a release in the channel of a ready bundle, `bundleId`, or of what another channel's newest active release serves, `fromChannelId`, the newest serving `platform` when given, recorded as the provenance, with its conditions, rollout, mandatory flag, notes, the nullable auto-pause overrides and the nullable progression schedule, whose last rollout percent lies above the rollout, numbered next in the channel; refused on a protected channel below Admin, past `release_count_per_app_per_day_limit` and, once the app has a signing key, for an unsigned bundle; an `Idempotency-Key` answers the same release again for 24 hours. `rolloutPercent` defaults to the schedule's first step, or to 100 without a schedule. The audience preview, `GET …/channels/{channelId}/audience`, answers the warnings for the same conditions and schedule before the create, `progression_step_too_small` among them.
          */
         post: operations["postV1AppsByAppIdChannelsByChannelIdReleases"];
         delete?: never;
@@ -1477,7 +1477,7 @@ export interface paths {
         };
         /**
          * Preview the audience of a release
-         * @description The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `fingerprint` values, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; `rolloutPercent`, 100 by default, estimated as its share of the reached devices, since a bucket is a hash of the release id. `warnings` carries `unsupported_condition_share` with the share of the channel's active devices whose SDK does not know a condition type asked for, and `fingerprint_unknown` for each `fingerprint` no binary of the app carries once the app has a binary.
+         * @description The channel's devices seen in the last thirty days that a release's conditions would reach, each condition evaluated exactly over the registry the way the device evaluates it: `binary` and `os` ranges in the shared subset, refused under `range_syntax` otherwise, `fingerprint` values, `device` ids and `attribute` as `key=value`, each repeatable and all of them required; `rolloutPercent`, by default the schedule's first step or 100 without one, estimated as its share of the reached devices, since a bucket is a hash of the release id. The schedule comes as `progressionRolloutPercent`, repeatable, and `progressionStepMinimumUpdateCount`, both or neither, under the rules of a release's `progression`. `warnings` carries `unsupported_condition_share` with the share of the channel's active devices whose SDK does not know a condition type asked for, `fingerprint_unknown` for each `fingerprint` no binary of the app carries once the app has a binary, and `progression_step_too_small` with the `rolloutPercent` of the schedule's smallest step when that step adds fewer devices than the applied updates it waits for.
          */
         get: operations["getV1AppsByAppIdChannelsByChannelIdAudience"];
         put?: never;
@@ -1973,7 +1973,7 @@ export interface paths {
         };
         /**
          * Get an app
-         * @description One app.
+         * @description One app; `?relations=defaultChannel` embeds the channel new builds follow.
          */
         get: operations["getV1AppsByAppId"];
         put?: never;
@@ -12539,7 +12539,6 @@ export interface operations {
                         stepMinimumSeconds: number;
                         stepMinimumUpdateCount: number;
                     } | null;
-                    /** @default 100 */
                     rolloutPercent?: number;
                 };
             };
@@ -13041,6 +13040,8 @@ export interface operations {
                 device?: string[];
                 fingerprint?: string[];
                 os?: string[];
+                progressionRolloutPercent?: number[];
+                progressionStepMinimumUpdateCount?: number;
                 rolloutPercent?: number;
             };
             header?: {
@@ -13075,7 +13076,7 @@ export interface operations {
                         reachedDeviceCount: number;
                         warnings: {
                             /** @enum {string} */
-                            code: "fingerprint_unknown" | "unsupported_condition_share";
+                            code: "fingerprint_unknown" | "progression_step_too_small" | "unsupported_condition_share";
                             details: {
                                 [key: string]: unknown;
                             } | null;
@@ -15445,7 +15446,7 @@ export interface operations {
                         reachedDeviceCount: number;
                         warnings: {
                             /** @enum {string} */
-                            code: "fingerprint_unknown" | "unsupported_condition_share";
+                            code: "fingerprint_unknown" | "progression_step_too_small" | "unsupported_condition_share";
                             details: {
                                 [key: string]: unknown;
                             } | null;
@@ -16786,7 +16787,9 @@ export interface operations {
     };
     getV1AppsByAppId: {
         parameters: {
-            query?: never;
+            query?: {
+                relations?: "defaultChannel"[];
+            };
             header?: {
                 /** @description The calling client and its version, `<cli|console|mcp|node|python>/<version>`, optionally followed by `ci/<provider>`, which the CLI adds in CI; a version below the minimum of its client answers `client_update_required`. */
                 "X-HotCodePush-Client"?: components["parameters"]["ClientHeader"];
@@ -16820,6 +16823,25 @@ export interface operations {
                         organizationId: string;
                         /** Format: date-time */
                         updatedAt: string;
+                        defaultChannel?: {
+                            /** Format: uuid */
+                            appId: string;
+                            /** Format: date-time */
+                            createdAt: string;
+                            expiresAt: string | null;
+                            failureAction: ("none" | "notify" | "pause" | "revoke") | null;
+                            failureMinimumUpdateCount: number | null;
+                            failureThresholdPercent: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            isDiscoverable: boolean;
+                            isProtected: boolean;
+                            name: string;
+                            nextReleaseNumber: number;
+                            pausedAt: string | null;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
                     };
                 };
             };

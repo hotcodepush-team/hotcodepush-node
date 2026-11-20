@@ -28,15 +28,18 @@ describe('AppsResource', () => {
     });
   });
 
-  test('should get the app', async () => {
+  test('should get the app with its default channel', async () => {
     const fetchMock = stubFetch(() => Response.json(APP));
 
-    const fetchedApp = await new HotCodePush().apps.get({ appId: 'app' });
+    const fetchedApp = await new HotCodePush().apps.get({
+      appId: 'app',
+      relations: ['defaultChannel'],
+    });
 
     expect(fetchedApp).toEqual(APP);
     expect(resolveSentRequest(fetchMock)).toMatchObject({
       method: 'GET',
-      url: APP_URL,
+      url: `${APP_URL}?relations=defaultChannel`,
     });
   });
 

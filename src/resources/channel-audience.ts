@@ -27,6 +27,7 @@ export class ChannelAudienceResource {
   /**
    * Estimates which devices of the channel a release with these conditions would reach, before the release exists.
    * Each condition is repeatable, and repeated conditions combine with AND.
+   * `progressionRolloutPercent` is valid only beside `progressionStepMinimumUpdateCount`. Together they add the warning `progression_step_too_small` when a step adds fewer devices than the applied updates it waits for.
    */
   public async get(options: GetAudienceOptions): Promise<Audience> {
     const { appId, channelId, ...query } = options;

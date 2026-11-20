@@ -4,6 +4,7 @@ import type {
   JsonRequestBody,
   JsonResponseBody,
   PathParameters,
+  QueryParameters,
 } from '../types';
 import { BinariesResource } from './binaries';
 import { BundlesResource } from './bundles';
@@ -16,9 +17,15 @@ import { StatisticsResource } from './statistics';
 
 export type App = JsonResponseBody<'/v1/apps/{appId}', 'get', 200>;
 
+/**
+ * An app without its default channel, as the list and every write answer it.
+ */
+export type AppRow = JsonResponseBody<'/v1/apps/{appId}', 'patch', 200>;
+
 export type DeleteAppOptions = PathParameters<'/v1/apps/{appId}', 'delete'>;
 
-export type GetAppOptions = PathParameters<'/v1/apps/{appId}', 'get'>;
+export type GetAppOptions = PathParameters<'/v1/apps/{appId}', 'get'> &
+  QueryParameters<'/v1/apps/{appId}', 'get'>;
 
 export type TransferAppOptions = PathParameters<
   '/v1/apps/{appId}/transfer',
@@ -62,9 +69,11 @@ export class AppsResource {
   }
 
   public async get(options: GetAppOptions): Promise<App> {
+    const { appId, ...query } = options;
     return this.httpClient.fetchJson({
       method: 'GET',
-      path: resolvePath('/v1/apps/{appId}', options),
+      path: resolvePath('/v1/apps/{appId}', { appId }),
+      query,
     });
   }
 
@@ -73,7 +82,7 @@ export class AppsResource {
    * A repeat answers `validation` because the app is already there, so the client never retries the call.
    * An API token answers `forbidden`; sign in with a session.
    */
-  public async transfer(options: TransferAppOptions): Promise<App> {
+  public async transfer(options: TransferAppOptions): Promise<AppRow> {
     const { appId, ...body } = options;
     return this.httpClient.fetchJson({
       body,
@@ -82,7 +91,7 @@ export class AppsResource {
     });
   }
 
-  public async update(options: UpdateAppOptions): Promise<App> {
+  public async update(options: UpdateAppOptions): Promise<AppRow> {
     const { appId, ...body } = options;
     return this.httpClient.fetchJson({
       body,

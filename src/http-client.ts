@@ -79,7 +79,8 @@ export interface HttpClientOptions {
   userAgent?: string;
 }
 
-type QueryValue = boolean | number | readonly string[] | string | undefined;
+type QueryValue =
+  boolean | number | readonly (number | string)[] | string | undefined;
 
 export class HttpClient {
   private readonly baseUrl: string;
@@ -285,7 +286,7 @@ function resolveQueryValues({
   if (COMMA_LIST_QUERY_NAMES.has(name)) {
     return value.length === 0 ? [] : [value.join(',')];
   }
-  return [...value];
+  return value.map(String);
 }
 
 // `Retry-After` holds either delay seconds or an HTTP date (RFC 9110).

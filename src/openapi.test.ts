@@ -184,6 +184,8 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       device: [DEVICE_ID],
       fingerprint: [`fp1:${SHA256}`],
       os: ['>=17'],
+      progressionRolloutPercent: [10, 50, 100],
+      progressionStepMinimumUpdateCount: 50,
       rolloutPercent: 10,
     }),
   'apps.channels.count': hotCodePush =>

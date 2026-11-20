@@ -7,7 +7,7 @@ import type {
   PathParameters,
   QueryParameters,
 } from '../types';
-import type { App } from './apps';
+import type { AppRow } from './apps';
 
 export type CountAppsOptions = PathParameters<
   '/v1/organizations/{organizationId}/apps/count',
@@ -48,7 +48,7 @@ export class OrganizationAppsResource {
   /**
    * Creates an app with its default channel `production`.
    */
-  public async create(options: CreateAppOptions): Promise<App> {
+  public async create(options: CreateAppOptions): Promise<AppRow> {
     const { idempotencyKey, organizationId, ...body } = options;
     return this.httpClient.fetchCreatingPost({
       body,
@@ -62,7 +62,7 @@ export class OrganizationAppsResource {
   /**
    * Lists the apps of the organization, newest first.
    */
-  public async list(options: ListAppsOptions): Promise<App[]> {
+  public async list(options: ListAppsOptions): Promise<AppRow[]> {
     const { organizationId, ...query } = options;
     return this.httpClient.fetchJson({
       method: 'GET',

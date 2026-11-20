@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 
 import { HotCodePush } from './client';
 import { HotCodePushError } from './errors';
-import type { App } from './resources/apps';
+import type { AppRow } from './resources/apps';
 import type { Channel } from './resources/channels';
 import type { Organization } from './resources/organizations';
 
@@ -16,7 +16,7 @@ const token = process.env.HOTCODEPUSH_API_TOKEN;
 describe.runIf(apiBaseUrl)('the client against a running API', () => {
   const hotCodePush = new HotCodePush({ baseUrl: apiBaseUrl, token });
   const createdOrganizations: Organization[] = [];
-  let app: App;
+  let app: AppRow;
   let channel: Channel;
   let organization: Organization;
 

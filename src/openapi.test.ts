@@ -353,7 +353,8 @@ const CALLS: Record<string, (hotCodePush: HotCodePush) => Promise<unknown>> = {
       sha256: SHA256,
       uploadId: UPLOAD_ID,
     }),
-  'apps.get': hotCodePush => hotCodePush.apps.get({ appId: APP_ID }),
+  'apps.get': hotCodePush =>
+    hotCodePush.apps.get({ appId: APP_ID, relations: ['defaultChannel'] }),
   'apps.releases.audience.get': hotCodePush =>
     hotCodePush.apps.releases.audience.get({
       appId: APP_ID,
